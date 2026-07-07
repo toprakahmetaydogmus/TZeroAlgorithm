@@ -4,6 +4,8 @@ A premium, glassmorphic desktop application built to map software codebases and 
 
 Supports multiple providers including **NVIDIA NIM**, **OpenAI**, **Google Gemini**, and **OpenRouter**.
 
+Btw İf You Only Need The Executable Program There You Go : https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/download/V1.0.0/TZeroAlgorithm.exe
+
 ---
 
 ## ✨ Features
