@@ -1,6 +1,6 @@
 # 🚀 AI Context Tree & README Architect
 
-A premium, glassmorphic desktop application built to map software codebases and architect high-fidelity, hierarchical **T-Master Context Trees** (README.md). Optimized for cutting token ingestion costs by **~90%** on modern AI developer tools (Cursor, VS Code Copilot, Cline, Antigravity IDE).
+A premium, glassmorphic desktop application built to map software codebases and architect high-fidelity, hierarchical **T-Master Context Trees** (README.md). Optimized for cutting token ingestion costs by **~40-95%** on modern AI developer tools (Cursor, VS Code Copilot, Cline, Antigravity IDE).
 
 Supports multiple providers including **NVIDIA NIM**, **OpenAI**, **Google Gemini**, and **OpenRouter**.
 
