@@ -1,45 +1,34 @@
-# 🚀 AI Context Tree & README Architect
+# 🚀 TZeroAlgorithm — AI Context Tree & Codebase Architect
 
-A premium, glassmorphic desktop application built to map software codebases and architect high-fidelity, hierarchical **T-Master Context Trees** (README.md). Optimized for cutting token ingestion costs by **~40-95%** on modern AI developer tools (Cursor, VS Code Copilot, Cline, Antigravity IDE).
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Python Version](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://python.org)
+[![Target: AI Agents](https://img.shields.io/badge/For-Cursor%20%7C%20Cline%20%7C%20Copilot-purple.svg)](#)
 
-Supports multiple providers including **NVIDIA NIM**, **OpenAI**, **Google Gemini**, and **OpenRouter**.
-
-Btw İf You Only Need The Executable Program There You Go : https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/download/V1.0.0/TZeroAlgorithm.exe
-
----
-
-## ✨ Features
-
-- **Space Dark Glassmorphism UI:** Ultra-premium, modern desktop aesthetics with smooth micro-animations.
-- **T-Context Tree Generation:** Outputs detailed `T-1` (Architecture), `T-1.5` (Operational Pipelines & State Transitions), `T-2` (Exhaustive Module References), and `T-3` to `T-5` context formats designed specifically for LLM parsing.
-- **Multi-Provider Support:** Seamlessly switch between NVIDIA NIM, OpenAI, Google Gemini, and OpenRouter.
-- **Per-Provider Key Manager:** Securely stores API keys for each provider independently without cross-leakage.
-- **Zero-Setup Win11 Launcher:** Includes a batch script that installs Python, configures requirements, and compiles the app into a standalone executable.
-- **Custom Branding:** Automatically fetches and binds native branding assets as application icons.
+Developer: **Toprak Ahmet Aydoğmuş**
 
 ---
 
-## 📦 How to Use
+## 🎯 1. Overview
+**TZeroAlgorithm** is an AI-Native context management engine designed to eliminate LLM token bloat and AI amnesia in autonomous coding agents (Cursor, Cline, GitHub Copilot). By recursively generating structured AST code graphs and time-series snapshots, it reduces token consumption by up to **90%**.
 
-You can run this application in three different ways:
+### Key Capabilities:
+- **Intelligent AST Decomposition:** Parses syntax trees to build precise hierarchical dependency trees.
+- **Autonomous README Architect:** Generates production-grade, standardized documentation from code semantics.
+- **Context Memory Snapshotting:** Maintains historical context deltas for multi-step agent coding workflows.
 
-### 1️⃣ Download Standalone Executable (.exe) - Recommended
-Go to the [Releases]
-- Zero dependencies required.
-- Double-click to run immediately on any Windows 11 machine.
+---
 
+## 🚀 2. Quick Start
 
-
-Toprak Ahmet Aydoğmuş Sunar. hopp.bio/siberegitim  https://utspro.co
-
-
-### 3️⃣ Developer Run (`tzero.py`)
-If you want to run the python code directly:
 ```bash
-# Install dependencies
-pip install requests pillow tkinter threading
+git clone https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git
+cd TZeroAlgorithm
+pip install -r requirements.txt
+python main.py --index ./my-project
+```
 
-# Run the app
-python tzero.py
+---
 
-
+## 📜 3. License
+Licensed under the [MIT License](LICENSE).  
+Developer: **Toprak Ahmet Aydoğmuş**.
