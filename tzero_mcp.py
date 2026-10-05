@@ -397,7 +397,7 @@ def create_mcp_server():
         # Secret scanning regexes
         secret_patterns = [
             (re.compile(r"""(?i)(?:api_key|apikey|secret|password|auth_token)\s*=\s*['\"][A-Za-z0-9_\-\.]{16,}['\"]"""), "Hardcoded Secret / API Key"),
-            (re.compile(r"""sk-[a-zA-Z0-9]{20,T3BlbkFJ[a-zA-Z0-9]{20,}"""), "OpenAI API Key Pattern"),
+            (re.compile(r"""sk-[a-zA-Z0-9]{20,}T3BlbkFJ[a-zA-Z0-9]{20,}"""), "OpenAI API Key Pattern"),
             (re.compile(r"""nvapi-[a-zA-Z0-9_\-]{30,}"""), "NVIDIA API Key Pattern"),
             (re.compile(r"""AIza[0-9A-Za-z-_]{35}"""), "Google Gemini / Cloud Key"),
             (re.compile(r"""sk-ant-[a-zA-Z0-9_\-]{30,}"""), "Anthropic Claude Key Pattern"),
