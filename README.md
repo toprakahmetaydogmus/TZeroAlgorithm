@@ -1,301 +1,786 @@
-<div align="center">
+# ⚡ SİBER AKADEMİ — T-ZERO CONTEXT ARCHITECT V3
 
-# ⚡ T-ZERO
+<p align="center">
+  <a href="#-english"><b>🇬🇧 English Documentation</b></a> • 
+  <a href="#-türkçe"><b>🇹🇷 Türkçe Dokümantasyon</b></a>
+</p>
 
-### Stop feeding your AI the whole codebase.
+<p align="center">
+  <img src="https://img.shields.io/badge/Release-v3.0.0-00ffd8?style=for-the-badge&logo=rocket" alt="Release v3.0.0" />
+  <img src="https://img.shields.io/badge/MCP-13%20Tools%20Ready-ff69b4?style=for-the-badge&logo=anthropic" alt="MCP Server 13 Tools Ready" />
+  <img src="https://img.shields.io/badge/Security-100%25%20Zero--Leak%20Keyring-50fa7b?style=for-the-badge&logo=shield" alt="Zero Leak Security" />
+  <img src="https://img.shields.io/badge/Python-3.9%20|%203.10%20|%203.11%20|%203.12%20|%203.13%20|%203.14-bd93f9?style=for-the-badge&logo=python" alt="Python Versions" />
+  <img src="https://img.shields.io/badge/Tests-58%2F58%20Passing-00f0ff?style=for-the-badge&logo=githubactions" alt="Tests 58/58 Passing" />
+  <img src="https://img.shields.io/badge/License-MIT-f1fa8c?style=for-the-badge" alt="MIT License" />
+  <img src="https://img.shields.io/badge/Platform-Windows%20|%20macOS%20|%20Linux-ff79c6?style=for-the-badge" alt="Platform" />
+</p>
 
-**Give Cursor, Claude, Copilot, Cline & friends the *map* — not the whole territory.**
-T-Zero compresses a repository into a hierarchical, AST-accurate context that cuts LLM token usage by **up to 95%** — fully offline, with zero telemetry and zero hardcoded secrets.
+> **Enterprise-Grade Codebase Context Builder, AST Signatures Analyzer, and Token Reducer.**  
+> Built for Cursor, VS Code Copilot, Cline, Antigravity IDE, Claude Code, and ChatGPT. Cuts LLM context ingestion overhead by **up to 95%** while preserving the structural outline of your code (signatures, hierarchy, dependencies).  
+> Includes a native **Model Context Protocol (MCP)** server for autonomous AI coding agents.
 
-<br/>
-
-<img src="https://img.shields.io/badge/release-v3.0.0-00ffd8?style=for-the-badge" alt="Release v3.0.0" />
-<img src="https://img.shields.io/badge/MCP-13%20tools-ff69b4?style=for-the-badge" alt="MCP: 13 tools" />
-<img src="https://img.shields.io/badge/token%20savings-up%20to%2095%25-50fa7b?style=for-the-badge" alt="Up to 95% token savings" />
-<img src="https://img.shields.io/badge/telemetry-zero-f1fa8c?style=for-the-badge" alt="Zero telemetry" />
-<img src="https://img.shields.io/badge/tests-58%20passing-00f0ff?style=for-the-badge" alt="58 tests" />
-<img src="https://img.shields.io/badge/python-3.9%E2%80%933.14-bd93f9?style=for-the-badge" alt="Python 3.9 to 3.14" />
-<img src="https://img.shields.io/badge/license-MIT-ffffff?style=for-the-badge" alt="MIT license" />
-
-<br/><br/>
-
-[**Quick start**](#-quick-start-in-60-seconds) ·
-[**How it works**](#-how-it-works) ·
-[**MCP server**](#-mcp-server-your-agent-gets-superpowers) ·
-[**CLI**](#-cli-cheat-sheet) ·
-[**Security**](#-security-by-design) ·
-[**Install**](#-installation)
-
-</div>
+**Developer:** Toprak Ahmet Aydoğmuş  
+**LinkedIn:** [Toprak Ahmet Aydoğmuş](https://linkedin.com/in/toprak-ahmet-aydo%C4%9Fmu%C5%9F-60462534b/)  
+**Bio & Hub:** [https://hopp.bio/siberegitim](https://hopp.bio/siberegitim)  
+**GitHub Repository:** [https://github.com/toprakahmetaydogmus/TZeroAlgorithm](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)
 
 ---
 
-## 🧠 The problem
+# 🇬🇧 English
 
-Every time you ask an AI assistant about your code, you pay for the same wasteful ritual: paste files, burn tokens, hit the context limit, watch the model lose the plot.
-
-Most of what you paste is *implementation detail the model doesn't need* to understand your architecture. What it needs is the **shape** of the system: what exists, how it connects, and where the boundaries are.
-
-**T-Zero builds exactly that.**
-
-| | Pasting raw source | With T-Zero |
-|:--|:--|:--|
-| **Tokens per question** | Entire files, every time | Signatures, structure and dependencies only |
-| **Architecture awareness** | Whatever fits in the window | Full repo map, always |
-| **Privacy** | Depends on the tool | 100% local, offline by default |
-| **Cost** | Grows with repo size | Up to **95% lower** |
-| **Setup** | — | `pip install` and one command |
+## Table of Contents
+1. [Security Architecture (100% Zero-Leak Guarantee)](#-security-architecture-100-zero-leak-guarantee)
+2. [Model Context Protocol (MCP) Server](#-model-context-protocol-mcp-server)
+3. [System Architecture](#-system-architecture)
+4. [Core Highlights & Capabilities](#-core-highlights--capabilities)
+5. [Installation & Setup](#-installation--setup)
+6. [Usage Guide (GUI & CLI)](#-usage-guide-gui--cli)
+7. [Keyboard Shortcuts](#-keyboard-shortcuts)
+8. [Project Structure](#-project-structure)
+9. [Automated Test Suite & CI/CD](#-automated-test-suite--cicd)
+10. [License & Credits](#-license--credits)
 
 ---
 
-## 🚀 Quick start in 60 seconds
+## 🔒 Security Architecture (100% Zero-Leak Guarantee)
 
+> [!IMPORTANT]
+> **T-Zero Algorithm strictly contains ZERO hardcoded, personal, or public API keys or credentials anywhere in the repository.**  
+> Defense-in-depth and zero-trust principles are enforced by default.
+
+1. **OS-Level Credential Encryption (Keyring Engine):**
+   - API keys are never written to plain-text configuration files or logs.
+   - Stored through the cross-platform [`keyring`](https://pypi.org/project/keyring/) library, which uses the native OS store:
+   - **Windows:** Windows Credential Manager
+   - **macOS:** Apple Keychain
+   - **Linux:** Secret Service API (GNOME Keyring / KWallet via DBus)
+2. **Zero Telemetry & Absolute Privacy:**
+   - Your source code, tokens, file structure, and API credentials are never sent to any third-party telemetry, analytics, or developer servers.
+   - Outbound network traffic is exclusively initiated directly from your client to the AI provider endpoint chosen by you (NVIDIA, OpenAI, Google, Anthropic, OpenRouter, or localhost Ollama).
+   - The optional local web dashboard (`--web`) binds to `127.0.0.1` only; its page loads a web font from Google Fonts in your browser.
+3. **Password-Obfuscated Keyring Backup:**
+   - API keys can be backed up to a password-protected `.dat` binary file. This uses a simple repeating-key XOR (no salt, not strong cryptography), so keep the file private and treat it like a secret. It is git-ignored by default.
+4. **12-Factor Environment Variable Detection:**
+   - Automatically detects and inherits standard system environment variables when present:
+     - `NVIDIA_API_KEY`
+     - `OPENAI_API_KEY`
+     - `GEMINI_API_KEY`
+     - `OPENROUTER_API_KEY`
+     - `ANTHROPIC_API_KEY`
+5. **100% Offline Dry-Run Mode ($0 Cost):**
+   - Generate full-featured context trees, AST signature maps, and markdown blueprints without any internet connection, API keys, or AI provider subscriptions.
+
+---
+
+## 🤖 Model Context Protocol (MCP) Server
+
+T-Zero V3 natively embeds a standard **Model Context Protocol (MCP)** server (`tzero_mcp.py`) operating over `stdio`. This empowers AI agents in **Cursor**, **Claude Desktop**, **Antigravity IDE**, and **Cline** to autonomously inspect, prune, and query your project's codebase before writing a single line of code.
+
+### 🛠 Available MCP Tools (13 Autonomous Tools)
+
+| Tool Name | Parameters | Purpose |
+|:----------|:-----------|:--------|
+| `get_project_context_tree` | `project_root`, `reduction_mode`, `max_tokens`, `include_file_contents` | Scans workspace and builds a multi-tier T-Zero hierarchical context tree (T-1 to T-4). Reduces tokens by up to 95%. |
+| `query_module_dependencies` | `project_root`, `file_path` | Analyzes incoming and outgoing import dependencies, local links, and external packages for a file or entire project. |
+| `query_architecture_boundaries` | `project_root`, `extra_guidance` | Queries active T-4 architectural boundaries, operational constraints, and Zero-Leak rules for coding agents. |
+| `generate_architecture_blueprint` | `project_root` | Generates a complete system architecture specification (`ARCHITECTURE.md`) with live Mermaid topology diagrams. |
+| `generate_repo_map` | `project_root`, `max_tokens` | Produces an ultra-compressed AST symbol map (classes, methods, signatures) optimized for prompt injection. |
+| `audit_codebase_quality` | `project_root`, `file_path` | Runs an AST static code smell check and secret leak scan (detects functions >30 lines, global vars, missing docstrings). |
+| `find_code_duplicity` | `project_root`, `min_lines` | Scans the workspace to identify repeated/duplicate blocks of code across files for refactoring. |
+| `estimate_token_cost` | `text`, `project_root`, `reduction_mode` | Computes exact token count and USD cost comparison across OpenAI, Claude, Groq, NVIDIA NIM, and Ollama ($0). |
+| `analyze_change_impact` | `target_symbol`, `project_root` | Traces AST symbol definitions, caller cascades, inbound dependents, and calculates a 0-100 risk score. |
+| `enforce_architecture_boundaries` | `project_root`, `rules_file` | Validates modular import boundaries against `tzero.rules.json` to prevent architectural erosion. |
+| `search_codebase_semantic` | `query`, `project_root`, `top_k` | 100% private, local in-memory BM25 + TF-IDF hybrid semantic code search and RAG engine ($0 cost, 0 leaks). |
+| `export_agent_rules` | `project_root` | Generates 1-click rules for Cursor (`.cursorrules`, `.cursor/rules/*.mdc`), Cline (`.clinerules`), and Copilot. |
+| `get_token_savings_metrics` | `project_root`, `team_size` | Calculates quantitative token reduction ratio, monthly/annual cost savings, and team developer ROI metrics. |
+
+### 🧭 MCP Prompts
+- **`tzero_grounding`**: Injects strict architectural boundary rules, modular integrity guidelines, and Zero-Leak security mandates into the agent's system session.
+
+### 🔌 Client Configuration
+
+#### 1. Cursor IDE (`.cursor/mcp.json` or Settings → MCP)
+```json
+{
+  "mcpServers": {
+    "tzero": {
+      "command": "python",
+      "args": ["C:/absolute/path/to/TZeroAlgorithm/tzero_mcp.py"]
+    }
+  }
+}
+```
+
+#### 2. Claude Desktop (`claude_desktop_config.json`)
+```json
+{
+  "mcpServers": {
+    "tzero": {
+      "command": "python",
+      "args": ["C:/absolute/path/to/TZeroAlgorithm/tzero_mcp.py"]
+    }
+  }
+}
+```
+
+#### 3. CLI Launch
 ```bash
-git clone https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git
-cd TZeroAlgorithm
-pip install -r requirements.txt
+# Launch directly via MCP entrypoint
+python tzero_mcp.py
 
-# 1. See what your repo costs in tokens
-python main.py --scan .
-
-# 2. Build a compressed context tree. Offline, no API key, $0
-python main.py --dry-run --dir . --output CONTEXT.md
-
-# 3. Plug it into your AI agent through MCP
+# Or launch via main CLI flag
 python main.py --mcp
 ```
 
-That's it. No account, no API key, no network.
-
 ---
 
-## 🔬 How it works
-
-T-Zero parses your code into an AST and keeps what an LLM needs to *reason* about it, dropping what it doesn't.
+## 🏗 System Architecture
 
 ```mermaid
-flowchart LR
-    A["📁 Your repository"] --> B["CodebaseScanner"]
-    B --> C{"AST Token Reducer"}
-    C -->|ultra| D["Signatures only"]
-    C -->|balanced| E["Signatures + control flow"]
-    C -->|none| F["Full source"]
-    B --> G["Dependency graph"]
-    B --> H["Static auditor"]
-    B --> I["Duplicate finder"]
-    D & E & F & G --> J["🧩 T-Zero context tree"]
-    J --> K["📋 AGENTS.md / CLAUDE.md / .cursorrules"]
-    J --> L["🔌 MCP server"]
-    L --> M["Cursor · Claude · Cline · Antigravity"]
+flowchart TD
+    A["Source Code Repository"] --> B["CodebaseScanner"]
+    B --> C{"Token Reducer"}
+    C -->|"Ultra Mode"| D["Function & Class Signatures Only"]
+    C -->|"Balanced Mode"| E["Signatures + Control Flow Lines"]
+    C -->|"None Mode"| F["Full Original Source Code"]
+    
+    B --> G["AST Static Code Auditor"]
+    G --> H["Code Smells & Complexity Report"]
+    
+    B --> I["Dependency Analyzer"]
+    I --> J["Import Graph & Module Tree"]
+    
+    B --> K["Workspace Duplicity Finder"]
+    K --> L["Clone & Duplicate Code Blocks"]
+
+    D --> M{"Context Generator"}
+    J --> M
+    L --> M
+    M -->|"Offline Dry-Run"| N["Local T-Zero Context Tree"]
+    M -->|"AI Provider Mode"| O["LLM Prompt Synthesizer"]
+    O --> P["NVIDIA NIM / OpenAI / Gemini / Anthropic / Ollama"]
+    P --> Q["High-Fidelity README.md, AGENTS.md, & ARCHITECTURE.md"]
+
+    M --> R["Model Context Protocol (MCP)"]
+    R --> S["Cursor / Claude Desktop / Antigravity / Cline"]
 ```
-
-### The T-tier context model
-
-Context is layered so an agent can start broad and zoom in only where it needs to.
-
-| Tier | Name | What the agent gets |
-|:--:|:--|:--|
-| **T-1** | Master Architecture | The big picture: components and how they fit together |
-| **T-2** | Module References | Per-module summaries and relationships |
-| **T-3** | AST Signatures | Classes, functions, arguments, decorators, type hints, docstrings |
-| **T-4** | Agent Boundaries | Rules of the road: layering constraints and conventions the agent must respect |
-
-### Three reduction modes
-
-| Mode | Keeps | Best for |
-|:--|:--|:--|
-| `ultra` | Class hierarchy, function headers, docstrings, decorators, type hints | Maximum savings, architecture questions |
-| `balanced` | Everything in `ultra`, plus control flow and exception handling | Debugging and code review |
-| `none` | 100% of the original source | When the model must see every line |
-
-**Supported languages:** Python, JavaScript, TypeScript, JSX/TSX, C/C++, Go, Rust, HTML, CSS, Bash, Batch, JSON, YAML.
 
 ---
 
-## 🔌 MCP server: your agent gets superpowers
+## 🌟 Core Highlights & Capabilities
 
-T-Zero ships a native [Model Context Protocol](https://modelcontextprotocol.io) server over `stdio`. Connect it once and your AI agent can explore your project on its own, **before it writes a single line of code**.
+### 1. Multi-LLM Provider Engine
+- **NVIDIA NIM:** `llama-3.3-70b-instruct`, `deepseek-r1`, `mistral-large`, `nemotron-51b`, `qwen3.5`
+- **OpenAI:** `gpt-4o`, `gpt-4o-mini`, `o3-mini`, `o1`
+- **Google Gemini:** `gemini-2.5-pro`, `gemini-2.5-flash`, `gemini-2.0-flash`
+- **Anthropic:** `claude-3-7-sonnet-20250219`, `claude-3-5-sonnet`, `claude-3-5-haiku`
+- **OpenRouter:** Universal gateway for `claude-3.7-sonnet`, `gpt-4o`, `deepseek-r1`
+- **Local Ollama:** `llama3:latest`, `mistral:latest`, `phi3:latest`, `qwen2.5:latest` (100% local, offline, private, and free)
 
-| Tool | What it does |
-|:--|:--|
-| `get_project_context_tree` | Builds the full T-1 → T-4 context tree with a token budget |
-| `generate_repo_map` | Ultra-compressed AST symbol map, ready for prompts |
-| `query_module_dependencies` | Inbound and outbound imports for a file or the whole repo |
-| `analyze_change_impact` | Blast radius and risk score *before* you refactor a symbol |
-| `enforce_architecture_boundaries` | Catches forbidden cross-layer imports via `tzero.rules.json` |
-| `query_architecture_boundaries` | Active guardrails and conventions for coding agents |
-| `search_codebase_semantic` | Private, local BM25 + TF-IDF hybrid code search (no embedding API) |
-| `audit_codebase_quality` | AST code-smell audit plus a hardcoded-secret scan |
-| `find_code_duplicity` | Copy-pasted blocks across files |
-| `generate_architecture_blueprint` | `ARCHITECTURE.md` with live Mermaid diagrams |
-| `export_agent_rules` | `.cursorrules`, `.clinerules`, Copilot instructions in one shot |
-| `estimate_token_cost` | Token counts and USD cost across providers (Ollama = $0) |
-| `get_token_savings_metrics` | Compression ratio and team ROI |
+### 2. AST Token Reducer (Up to 95% Token Savings)
+- **Ultra Mode:** Strips implementation internals while preserving class hierarchies, function headers, docstrings, decorators, and type hints.
+- **Balanced Mode:** Retains signatures alongside critical control flow and exception handling statements.
+- **None Mode:** Preserves 100% of raw source code.
+- Supported languages: **Python, JavaScript, TypeScript, JSX/TSX, C/C++, Go, Rust, HTML, CSS, Bash, Batch, JSON, YAML**.
 
-Plus a **`tzero_grounding`** prompt that injects architectural rules and security directives into an agent session.
+### 3. Advanced Codebase Analysis Tools
+- **AST Class & Method Outliner:** Generates a structured hierarchy of every class, method, argument list, and decorator.
+- **Static Code Auditor:** Instantly flags missing docstrings, functions exceeding 30 lines, routines with 6+ parameters, and usage of the `global` keyword (supports both synchronous `def` and asynchronous `async def`).
+- **Dependency Analyzer:** Scans AST import statements to compile an external and internal module dependency map.
+- **Workspace Duplicity Finder:** Identifies identical duplicate blocks of 6+ lines across the entire codebase.
+- **AST Refactoring Engine:** Performs safe global function and identifier renames across workspace files using AST node transformation.
 
-### Connect your client
+### 4. Git VCS Integration & Visual Telemetry
+- **Commit History Classifier:** Classifies recent commits automatically (Added, Fixed, Refactored, Updated).
+- **Color-Coded Git Diff Viewer:** Displays real-time uncommitted changes (`git diff HEAD`) with syntax highlighting.
+- **Integrated Git Manager:** Stage, commit, and switch branches directly from the GUI.
+- **Interactive Dependency Node Graph:** Draggable physics-based node visualization of file relationships.
+- **Live CPU & RAM Telemetry:** Real-time hardware telemetry monitors system resource overhead.
+- **Token Donut Canvas Chart:** Dynamic visual breakdown of file types, code volume, and token consumption.
 
-<details open>
-<summary><b>Claude Code</b>: zero config</summary>
+### 5. Futuristic UI, Dynamic Particle FX & Haptic Audio SFX
+- **8 Curated Themes:**
+  - 🌌 `Glass Dark` (Frosted cyan accents)
+  - ⚡ `Neon Cyberpunk` (Vibrant hot-pink & electric blue)
+  - 🖤 `Midnight OLED` (100% pure black #000000 for zero eye strain)
+  - 🟢 `Matrix Terminal` (Classic phosphor green #00ff41)
+  - 🌆 `Synthwave 80s` (Laser magenta, neon orange, and retro cyan)
+  - ❄️ `Nordic Frost` (Arctic slate and glacier blue)
+  - ☕ `Solarized Amber` (Warm deep espresso and golden amber)
+  - 🕹 `Siber Retro` (Classic hacker aesthetic)
+- **4-Mode Dynamic Particle Engine:**
+  - 🌌 **Stars:** High-speed 3D depth-warping starfield.
+  - 🟢 **Matrix Rain:** Digital cascading green code glyphs.
+  - 🌐 **Cyber Grid:** Retro-perspective horizon wireframe wave.
+  - ⬛ **Solid Minimal:** Distraction-free dark canvas with 0% CPU consumption.
+- **Haptic SFX Engine:** Non-blocking auditory feedback for actions (scans, copies, exports, errors) with an instant header toggle (`🔊 SFX ON` / `🔇 SFX OFF`).
+- **Floating Cyberpunk Toasts:** Non-intrusive status banners that inform you of saves and exports without interrupting workflow.
 
-This repo includes a project-scoped [`.mcp.json`](.mcp.json). Open the folder in Claude Code and the `tzero` server is available.
-</details>
-
-<details>
-<summary><b>Cursor</b></summary>
-
-Pre-configured in `.cursor/mcp.json`, or add this yourself:
-
-```json
-{
-  "mcpServers": {
-    "tzero": {
-      "command": "python",
-      "args": ["/absolute/path/to/TZeroAlgorithm/tzero_mcp.py"]
-    }
-  }
-}
-```
-</details>
-
-<details>
-<summary><b>Claude Desktop</b></summary>
-
-Add the same block to `claude_desktop_config.json` and restart the app.
-
-```json
-{
-  "mcpServers": {
-    "tzero": {
-      "command": "python",
-      "args": ["/absolute/path/to/TZeroAlgorithm/tzero_mcp.py"]
-    }
-  }
-}
-```
-</details>
-
-<details>
-<summary><b>Cline · Roo-Code · Antigravity · any MCP client</b></summary>
-
-Point the client at `python /absolute/path/to/TZeroAlgorithm/tzero_mcp.py` over `stdio`.
-</details>
+### 6. Multi-Format Context Export Hub
+- **`README.md`:** Comprehensive architectural documentation.
+- **`AGENTS.md` / `CLAUDE.md`:** Specially structured context blueprint for AI coding assistants (Cursor, Antigravity IDE, Claude Code, Cline, Copilot) containing architecture rules, AST summaries, and workspace conventions.
+- **`ARCHITECTURE.md`:** System architecture blueprint with auto-generated Mermaid topology diagrams.
+- **`REPO_MAP.txt`:** Highly compressed AST symbol token map tailored for pasting directly into LLM chat prompts.
+- **`README.html`:** Styled cyberpunk dark-mode HTML documentation that launches in your default web browser with one click.
+- **Live Token Budget & USD Cost Estimator:** Real-time token counter and estimated API cost per model (OpenAI, Claude, Groq, NVIDIA NIM, Ollama).
 
 ---
 
-## 🛠 CLI cheat sheet
+## 📦 Installation & Setup
+
+### Method 1: One-Click Installer (Recommended for Windows)
+```cmd
+install_requirements.bat
+```
+> Automatically provisions Python 3.12 (if not detected), configures a virtual environment, and installs all dependencies without requiring manual setup.
+
+### Method 2: Standalone Portable Executable (.exe)
+Download `TZeroAlgorithm.exe` directly from the [Releases](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases) tab. No installation, Python, or administrative rights required.
+
+### Method 3: Python Package / pip Installation
+```bash
+# Clone repository
+git clone https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git
+cd TZeroAlgorithm
+
+# Install dependencies (including MCP SDK)
+pip install -r requirements.txt
+
+# Or install in editable development mode
+pip install -e .
+```
+
+---
+
+## 🎮 Usage Guide (GUI & CLI)
+
+### 1. Graphical User Interface (GUI)
+```bash
+# Launch via Python
+python main.py
+
+# Or launch via Windows batch script
+run.bat
+
+# Or launch via legacy wrapper
+python tzero.py
+```
+
+### 2. Command Line Interface (CLI)
+T-Zero V3 offers a full suite of CLI flags for terminal enthusiasts and automated CI/CD pipelines:
 
 ```bash
-python main.py --scan .                        # Token and size metrics for a directory
-python main.py --audit .                       # AST code-smell audit
-python main.py --dry-run --dir . -o CONTEXT.md # Offline context tree, $0
+# 1. Start Model Context Protocol (MCP) stdio server
+python main.py --mcp
 
-python main.py --impact MyClass                # Blast radius of changing a symbol
-python main.py --search "retry logic"          # Private local semantic search
-python main.py --savings                       # Token reduction and team ROI
+# 2. Scan directory and print metric table
+python main.py --scan .
 
-python main.py --export-agents AGENTS.md       # AGENTS.md / CLAUDE.md blueprint
-python main.py --export-arch ARCHITECTURE.md   # Mermaid architecture spec
-python main.py --export-repomap REPO_MAP.txt   # Compact symbol map for chat prompts
-python main.py --export-agent-rules            # .cursorrules, .clinerules, Copilot
-python main.py --export-html README.html       # Styled HTML preview
+# 3. Audit codebase quality and detect code smells
+python main.py --audit .
 
-python main.py --enforce-boundaries            # CI gate: exits 1 on a violation
-python main.py --web                           # Local dashboard on localhost:7300
-python main.py --mcp                           # MCP stdio server
-python main.py --gui                           # Desktop GUI
+# 4. Generate offline context tree locally ($0 API cost)
+python main.py --dry-run --dir . --output README.md
+
+# 5. Generate AI Agent Rules & Blueprint (AGENTS.md / CLAUDE.md)
+python main.py --export-agents AGENTS.md --dir .
+
+# 6. Generate System Architecture Specification (ARCHITECTURE.md)
+python main.py --export-arch ARCHITECTURE.md --dir .
+
+# 7. Generate Compressed Token Symbol Map (REPO_MAP.txt)
+python main.py --export-repomap REPO_MAP.txt --dir .
+
+# 8. Generate Cyberpunk Styled HTML Preview (README.html)
+python main.py --export-html README.html --dir .
+
+# 9. Launch Interactive Terminal Wizard
+python main.py --cli
+
+# 10. Print current engine version
+python main.py --version
+
+# 11. Analyze blast radius of changing a symbol
+python main.py --impact MyClass
+
+# 12. Private local semantic code search (BM25 + TF-IDF)
+python main.py --search "retry logic"
+
+# 13. Enforce architecture boundaries in CI (exits 1 on violation)
+python main.py --enforce-boundaries
+
+# 14. Token reduction metrics and team ROI
+python main.py --savings
+
+# 15. Export native agent rules (.cursorrules, .clinerules, Copilot)
+python main.py --export-agent-rules
+
+# 16. Launch local web dashboard (default port 7300)
+python main.py --web
+
+# 17. Launch the desktop GUI
+python main.py --gui
 ```
 
-### Use it as a CI gate
+---
 
-Keep architecture from eroding. Declare your layers in `tzero.rules.json`, then fail the build on a violation:
+## ⌨️ Keyboard Shortcuts
 
-```yaml
-- name: Enforce architecture boundaries
-  run: python main.py --enforce-boundaries
+| Shortcut | Action |
+|----------|--------|
+| `Ctrl+S` | Scan Active Workspace Directory |
+| `Ctrl+G` | Generate / Compile Context Tree |
+| `Ctrl+C` | Copy Generated Context to Clipboard |
+| `Ctrl+R` | Refresh Git Log & Branches |
+
+---
+
+## 📂 Project Structure
+
+```
+TZeroAlgorithm/
+├── .mcp.json                    # Claude Code MCP integration
+├── .cursor/
+│   └── mcp.json                 # Pre-configured Cursor MCP integration
+├── .github/
+│   └── workflows/
+│       └── ci.yml               # Automated GitHub Actions test workflow
+├── tests/
+│   ├── __init__.py
+│   ├── test_analyzer.py         # AST analysis and code smell unit tests
+│   ├── test_cli.py              # CLI integration tests
+│   ├── test_config.py           # Configuration & Keyring security tests
+│   ├── test_exports.py          # Multi-format exports & token cost tests
+│   ├── test_features.py         # Feature module tests (impact, rules, search, ROI)
+│   ├── test_generator.py        # Template engine & context generator tests
+│   ├── test_gui.py              # Tkinter GUI headless smoke tests
+│   ├── test_mcp.py              # Model Context Protocol (MCP) server tests
+│   ├── test_providers.py        # Multi-provider LLM adapter tests
+│   └── test_scanner.py          # TokenReducer & CodebaseScanner tests
+├── build_exe.bat                # One-click Windows PyInstaller build script
+├── compile.py                   # PyInstaller asset packaging pipeline
+├── install_requirements.bat     # Windows automated setup script
+├── LICENSE                      # MIT Open Source License
+├── main.py                      # Primary execution entrypoint (CLI & GUI)
+├── pyproject.toml               # Modern PEP 517/621 packaging metadata
+├── README.md                    # Bilingual comprehensive documentation
+├── requirements.txt             # Production Python dependencies
+├── run.bat                      # Windows quick-launch runner
+├── siber_akademi.ico            # High-resolution application icon
+├── tzero.py                     # Backward-compatibility API wrapper
+├── tzero.rules.json             # T-4 architecture boundary rules
+├── tzero_features.py            # Impact analysis, boundary rules, semantic search, ROI, web dashboard
+├── tzero_mcp.py                 # Standard Model Context Protocol (MCP) Server
+├── tzero_v3.py                  # Monolithic portable T-Zero V3 core engine
+└── WALKTHROUGH.md               # Technical architecture walkthrough
 ```
 
 ---
 
-## 🔒 Security by design
+## 🧪 Automated Test Suite & CI/CD
 
-> **No API keys, tokens or credentials are hardcoded anywhere in this repository or its git history.**
-
-- 🗝 **OS-level credential storage.** Keys live in Windows Credential Manager, macOS Keychain, or the Linux Secret Service, never in plain-text config files or logs.
-- 📡 **Zero telemetry.** Your code, structure and tokens are never sent to any developer or analytics server. Network traffic only ever goes from *you* to the AI provider *you* pick.
-- ✈️ **Fully offline mode.** `--dry-run` needs no key, no account and no internet.
-- 🌱 **12-factor friendly.** Honors `NVIDIA_API_KEY`, `OPENAI_API_KEY`, `GEMINI_API_KEY`, `OPENROUTER_API_KEY` and `ANTHROPIC_API_KEY` when present.
-- 🧰 **Built-in secret scanner.** `audit_codebase_quality` flags hardcoded keys before they reach a commit.
-- 💾 **Encrypted backup.** Export your keyring to a password-protected `.dat` archive, git-ignored by default.
-
-Supported AI providers: **NVIDIA NIM · OpenAI · Google Gemini · Anthropic · OpenRouter · local Ollama.**
-
----
-
-## ✨ And there's more
-
-- 🔭 **Static auditor.** Flags missing docstrings, functions over 30 lines, 6+ parameter signatures and `global` usage (sync and async).
-- 🧬 **Duplicate finder.** Spots copy-pasted blocks of 6+ lines across the workspace.
-- ♻️ **AST refactoring engine.** Safe, workspace-wide function and identifier renames.
-- 🌿 **Git integration.** Commit classification, color-coded diffs, branch switching and an interactive dependency graph.
-- 🎨 **Desktop GUI.** Eight themes, four particle backdrops, live CPU/RAM telemetry and a token donut chart.
-- 📊 **Token and cost estimator.** Live budget per provider, with Ollama at $0.
-
----
-
-## 📦 Installation
-
-| Method | How |
-|:--|:--|
-| **pip (from source)** | `pip install -r requirements.txt`, or `pip install -e .` to get the `tzero` and `tzero-mcp` commands |
-| **Windows one-click** | Run `install_requirements.bat`; it sets up Python and a virtual environment for you |
-| **Portable `.exe`** | Download `TZeroAlgorithm.exe` from [Releases](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases). No Python needed |
-
-Requires Python 3.9 or newer. Works on Windows, macOS and Linux.
-
----
-
-## 🧪 Tested
+Run all unit and integration tests locally:
 
 ```bash
 python -m unittest discover -s tests -v
 ```
 
-58 tests cover the analyzer, CLI, config and keyring, exports, generator, GUI, MCP server, providers and scanner. CI runs them on every push and pull request across Ubuntu and Windows with Python 3.10, 3.11 and 3.12.
+Expected output:
+```
+Ran 58 tests in ~6.2s
+OK (100% Pass)
+```
+
+GitHub Actions automatically runs this test suite on every push and pull request across Ubuntu and Windows runners under Python 3.10, 3.11, and 3.12.
 
 ---
 
-## 📂 Project layout
+## 📄 License & Credits
+
+This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for complete terms.
+
+**Toprak Ahmet Aydoğmuş** — Siber Akademi  
+- 💼 **LinkedIn:** [toprak-ahmet-aydoğmuş](https://linkedin.com/in/toprak-ahmet-aydo%C4%9Fmu%C5%9F-60462534b/)  
+- 🔗 **Links & Bio:** [hopp.bio/siberegitim](https://hopp.bio/siberegitim)  
+- 🐙 **GitHub:** [@toprakahmetaydogmus](https://github.com/toprakahmetaydogmus)
+
+---
+---
+
+# 🇹🇷 Türkçe
+
+## İçindekiler
+1. [Şifreli Güvenlik Mimarisi (%100 Zero-Leak Garantisi)](#-şifreli-güvenlik-mimarisi-100-zero-leak-garantisi)
+2. [Model Context Protocol (MCP) Sunucusu](#-model-context-protocol-mcp-sunucusu)
+3. [Sistem Mimarisi](#-sistem-mimarisi-1)
+4. [Öne Çıkan Yetenekler & Özellikler](#-öne-çıkan-yetenekler--özellikler)
+5. [Kurulum ve Başlangıç](#-kurulum-ve-başlangıç)
+6. [Kullanım Kılavuzu (GUI & CLI)](#-kullanım-kılavuzu-gui--cli)
+7. [Klavye Kısayolları](#-klavye-kısayolları)
+8. [Proje Dizin Ağacı](#-proje-dizin-ağacı)
+9. [Otomatik Test Süreci ve CI/CD](#-otomatik-test-süreci-ve-cicd)
+10. [Lisans ve Geliştirici Bilgileri](#-lisans-ve-geliştirici-bilgileri)
+
+---
+
+## 🔒 Şifreli Güvenlik Mimarisi (%100 Zero-Leak Garantisi)
+
+> [!IMPORTANT]
+> **T-Zero Algorithm, kod tabanında kesinlikle sabit kodlanmış (hardcoded), şahsi veya umumi hiçbir API anahtarı veya kimlik bilgisi barındırmaz.**  
+> Uygulama varsayılan olarak sıfır güven (zero-trust) ilkelerini uygular.
+
+1. **İşletim Sistemi Düzeyinde Kimlik Şifreleme (OS Keyring Motoru):**
+   - API anahtarları asla düz metin dosyalarında (`.env`, `.json`, `.txt`) veya loglarda saklanmaz.
+   - Platformlar arası [`keyring`](https://pypi.org/project/keyring/) kütüphanesi üzerinden, işletim sisteminin yerel deposunda saklanır:
+   - **Windows:** Windows Credential Manager
+   - **macOS:** Apple Keychain
+   - **Linux:** Secret Service API (GNOME Keyring / KWallet - DBus üzerinden)
+2. **Sıfır Telemetri ve Tam Veri Gizliliği:**
+   - Kaynak kodlarınız, token verileriniz, dosya hiyerarşiniz veya API anahtarlarınız asla üçüncü taraf telemetri, analitik veya geliştirici sunucularına iletilmez.
+   - Tüm giden ağ trafiği yalnızca sizin belirlediğiniz AI sağlayıcısının (NVIDIA, OpenAI, Google, Anthropic, OpenRouter veya yerel Ollama) resmi uç noktasına doğrudan HTTPS üzerinden gerçekleştirilir.
+   - İsteğe bağlı yerel web paneli (`--web`) yalnızca `127.0.0.1` üzerinde çalışır; sayfası tarayıcınızda Google Fonts'tan bir yazı tipi yükler.
+3. **Parola Korumalı Yerel Yedekleme (Keyring Backup):**
+   - API anahtarlarınızı taşımak veya yedeklemek istediğinizde, kullanıcı tanımlı bir parola ile basit tekrarlı anahtar XOR yöntemi uygulanarak ikili `.dat` dosyası oluşturulur. Bu yöntem tuzsuzdur ve güçlü bir şifreleme değildir; dosyayı gizli tutun ve bir sır gibi muamele edin. Varsayılan olarak git'e eklenmez.
+4. **12-Factor Sistem Ortam Değişkeni Desteği:**
+   - Sisteminizde tanımlı olan çevre değişkenlerini otomatik olarak algılar ve kullanıma sunar:
+     - `NVIDIA_API_KEY`
+     - `OPENAI_API_KEY`
+     - `GEMINI_API_KEY`
+     - `OPENROUTER_API_KEY`
+     - `ANTHROPIC_API_KEY`
+5. **%100 Çevrimdışı (Offline Dry-Run) Modu (0 TL Maliyet):**
+   - Hiçbir API anahtarına, internet bağlantısına veya yapay zeka aboneliğine gerek kalmadan, tamamen yerel makinenizde tam kapsamlı context ağaçları, AST imza haritaları ve doküman taslakları oluşturabilirsiniz.
+
+---
+
+## 🤖 Model Context Protocol (MCP) Sunucusu
+
+T-Zero V3, Anthropic'in standart **Model Context Protocol (MCP)** SDK'sını kullanarak `stdio` üzerinden haberleşen yerel bir sunucu (`tzero_mcp.py`) sunar. Bu sayede **Cursor**, **Claude Desktop**, **Antigravity IDE** ve **Cline** gibi yapay zeka ajanları, projede herhangi bir kod üretmeden veya değiştirmeden önce projenin hiyerarşik mimarisini, bağımlılık grafiğini ve sınırlarını sorgulayabilir.
+
+### 🛠 Sunulan MCP Araçları (13 Otonom Araç)
+
+| Araç Adı | Parametreler | Görevi ve Amacı |
+|:---------|:-------------|:----------------|
+| `get_project_context_tree` | `project_root`, `reduction_mode`, `max_tokens`, `include_file_contents` | Proje dizinini tarar; T-1 Master Architecture, T-2 Modül Referansları ve T-4 sınır kurallarını hiyerarşik bağlam olarak döndürür. Token kullanımını %95'e kadar azaltır. |
+| `query_module_dependencies` | `project_root`, `file_path` | Belirli bir dosyanın veya tüm deponun içe/dışa aktarım (import/export), dahili bağlar ve harici paket imza haritasını çeker. |
+| `query_architecture_boundaries` | `project_root`, `extra_guidance` | Yapay zeka ajanları için aktif mimari sınırları (T-4), kuralları ve Zero-Leak kısıtlamalarını sorgular. |
+| `generate_architecture_blueprint` | `project_root` | Otomatik Mermaid topoloji şeması içeren sistem mimarisi dokümanı (`ARCHITECTURE.md`) üretir. |
+| `generate_repo_map` | `project_root`, `max_tokens` | LLM sohbetleri için aşırı sıkıştırılmış AST simge haritası (sınıflar, metotlar, imzalar) üretir. |
+| `audit_codebase_quality` | `project_root`, `file_path` | AST statik kod kokusu analizi ve gizli anahtar/şifre sızıntısı taraması gerçekleştirir (30+ satır fonksiyonlar, global anahtarlar). |
+| `find_code_duplicity` | `project_root`, `min_lines` | Çalışma alanında 6+ satırlık kopya/tekrar kod bloklarını tespit eder. |
+| `estimate_token_cost` | `text`, `project_root`, `reduction_mode` | Verilen metin veya dizin için OpenAI, Claude, Groq, NVIDIA NIM ve Ollama ($0) modelleri üzerinden tam token ve USD maliyet tablosu çıkarır. |
+| `analyze_change_impact` | `target_symbol`, `project_root` | Refactoring öncesi AST sembol tanımları, çağıran zincirleri ve 0-100 risk skoru ile etki yarıçapını (blast radius) hesaplar. |
+| `enforce_architecture_boundaries` | `project_root`, `rules_file` | `tzero.rules.json` kurallarına göre katmanlar arası yasaklı importları denetler ve mimari bozulmayı engeller. |
+| `search_codebase_semantic` | `query`, `project_root`, `top_k` | %100 yerel ve gizli, bellek içi BM25 + TF-IDF hibrit anlamsal kod arama ve RAG motoru ($0 maliyet, sıfır veri sızıntısı). |
+| `export_agent_rules` | `project_root` | Cursor (`.cursorrules`, `.cursor/rules/*.mdc`), Cline (`.clinerules`) ve Copilot kurallarını tek tıkla üretir. |
+| `get_token_savings_metrics` | `project_root`, `team_size` | Nicel token tasarruf oranını, aylık/yıllık maliyet kârını ve ekip bazlı ROI değerlerini hesaplar. |
+
+### 🧭 MCP Yerleşik Promptları
+- **`tzero_grounding`**: Cursor / Claude / Antigravity oturumlarına mimari kuralları, modüler sınırları ve %100 Zero-Leak güvenlik direktiflerini enjekte eder.
+
+### 🔌 Editör Entegrasyonu
+
+#### 1. Cursor IDE (`.cursor/mcp.json` veya Cursor Ayarları → MCP)
+```json
+{
+  "mcpServers": {
+    "tzero": {
+      "command": "python",
+      "args": ["C:/tam/yol/TZeroAlgorithm/tzero_mcp.py"]
+    }
+  }
+}
+```
+
+#### 2. Claude Desktop (`claude_desktop_config.json`)
+```json
+{
+  "mcpServers": {
+    "tzero": {
+      "command": "python",
+      "args": ["C:/tam/yol/TZeroAlgorithm/tzero_mcp.py"]
+    }
+  }
+}
+```
+
+#### 3. Komut Satırından Başlatma
+```bash
+# Doğrudan MCP sunucusunu başlat
+python tzero_mcp.py
+
+# Veya main.py bayrağı ile başlat
+python main.py --mcp
+```
+
+---
+
+## 🏗 Sistem Mimarisi
+
+```mermaid
+flowchart TD
+    A["Kaynak Kod Deposu"] --> B["CodebaseScanner"]
+    B --> C{"Token Reducer"}
+    C -->|"Ultra Mod"| D["Yalnızca Fonksiyon & Sınıf İmzaları"]
+    C -->|"Balanced Mod"| E["İmzalar + Temel Kontrol Akışı"]
+    C -->|"None Mod"| F["Tam Orijinal Kaynak Kod"]
+    
+    B --> G["AST Statik Kod Denetçisi"]
+    G --> H["Kod Kokuları & Karmaşıklık Raporu"]
+    
+    B --> I["Bağımlılık Analizörü"]
+    I --> J["Import Grafı & Modül Haritası"]
+    
+    B --> K["Workspace Duplicity Finder"]
+    K --> L["Tekrar Eden Kod Blokları"]
+
+    D --> M{"Context Generator"}
+    J --> M
+    L --> M
+    M -->|"Çevrimdışı Dry-Run"| N["Yerel T-Zero Context Ağacı"]
+    M -->|"AI API Modu"| O["LLM Prompt Sentezleyici"]
+    O --> P["NVIDIA NIM / OpenAI / Gemini / Anthropic / Ollama"]
+    P --> Q["Yüksek Sadakatli README.md, AGENTS.md & ARCHITECTURE.md"]
+
+    M --> R["Model Context Protocol (MCP)"]
+    R --> S["Cursor / Claude Desktop / Antigravity / Cline"]
+```
+
+---
+
+## 🌟 Öne Çıkan Yetenekler & Özellikler
+
+### 1. Çoklu LLM Sağlayıcı Entegrasyonu
+- **NVIDIA NIM:** `llama-3.3-70b-instruct`, `deepseek-r1`, `mistral-large`, `nemotron-51b`, `qwen3.5`
+- **OpenAI:** `gpt-4o`, `gpt-4o-mini`, `o3-mini`, `o1`
+- **Google Gemini:** `gemini-2.5-pro`, `gemini-2.5-flash`, `gemini-2.0-flash`
+- **Anthropic:** `claude-3-7-sonnet-20250219`, `claude-3-5-sonnet`, `claude-3-5-haiku`
+- **OpenRouter:** `claude-3.7-sonnet`, `gpt-4o`, `deepseek-r1` için evrensel ağ geçidi
+- **Local Ollama:** `llama3:latest`, `mistral:latest`, `phi3:latest`, `qwen2.5:latest` (%100 yerel, çevrimdışı, gizli ve ücretsiz)
+
+### 2. Akıllı AST Token İndirgeyici (%95'e Varan Tasarruf)
+- **Ultra Mod:** Fonksiyon gövdelerini temizler; sınıf hiyerarşisini, fonksiyon başlıklarını, docstring'leri, dekoratörleri ve tip ipuçlarını korur.
+- **Balanced Mod:** İmzalarla birlikte temel kontrol bloklarını (if/try/for) ve istisna yönetimini muhafaza eder.
+- **None Mod:** Kaynak kodun %100 orijinal halini korur.
+- Desteklenen diller: **Python, JavaScript, TypeScript, JSX/TSX, C/C++, Go, Rust, HTML, CSS, Bash, Batch, JSON, YAML**.
+
+### 3. İleri Düzey Kod Tabanı Analiz Araçları
+- **AST Sınıf ve Metot Ağacı:** Tüm sınıfları, metotları, argüman listelerini ve dekoratörleri hiyerarşik olarak listeler.
+- **Statik Kod Denetçisi (Static Code Auditor):** Eksik docstring'leri, 30 satırı aşan aşırı karmaşık rutinleri, 6 ve üzeri parametre alan fonksiyonları ve `global` anahtar kelimesi kullanımını anında tespit eder (hem senkron `def` hem asenkron `async def` desteklenir).
+- **Bağımlılık Analizi (Dependency Analyzer):** AST import düğümlerini inceleyerek projenin iç ve dış modül haritasını çıkarır.
+- **Tekrar Kod Bulucu (Duplicity Finder):** Çalışma alanı genelinde 6+ satırlık kopya kod bloklarını tespit eder.
+- **AST Refactoring Motoru:** Güvenli AST dönüşümü kullanarak proje genelinde fonksiyon ve değişken isimlerini otomatik olarak refactor eder.
+
+### 4. Git Sürüm Kontrolü ve Canlı Görsel Telemetri
+- **Commit Geçmişi Sınıflandırıcı:** Son commit'leri otomatik etiketler (Added, Fixed, Refactored, Updated).
+- **Canlı Renkli Git Diff:** Kaydedilmemiş değişiklikleri (`git diff HEAD`) sözdizimi renklendirmesiyle gösterir.
+- **Entegre Git Yöneticisi:** GUI üzerinden stage, commit ve dal (branch) değiştirme işlemleri.
+- **İnteraktif Bağımlılık Grafı:** Dosyalar arasındaki ilişkiyi sürükle-bırak destekli fiziksel düğüm grafiği olarak çizer.
+- **Canlı CPU ve RAM Telemetrisi:** Sistem kaynak kullanımını gerçek zamanlı takip eder.
+- **Token Donut Grafiği:** Dosya türü dağılımını, hacmini ve token tüketimini dinamik kanvas üzerinde çizer.
+
+### 5. Fütüristik GUI, Dinamik Parçacık Animasyonları & Haptik Sesler
+- **8 Özel Tema:**
+  - 🌌 `Glass Dark` (Buzlu cam ve camgöbeği vurgular)
+  - ⚡ `Neon Cyberpunk` (Canlı fuşya ve elektrik mavisi)
+  - 🖤 `Midnight OLED` (Sıfır göz yorgunluğu için %100 saf siyah #000000)
+  - 🟢 `Matrix Terminal` (Klasik fosforlu hacker yeşili #00ff41)
+  - 🌆 `Synthwave 80s` (Lazer macenta, neon turuncu ve retro mavi)
+  - ❄️ `Nordic Frost` (Kutup grisi ve buzul mavisi)
+  - ☕ `Solarized Amber` (Derin espresso ve sıcak amber)
+  - 🕹 `Siber Retro` (Klasik Siber Akademi teması)
+- **4-Modlu Dinamik Parçacık FX Motoru:**
+  - 🌌 **Stars:** 3D derinlik algılı ve değişken hızlı yıldız tüneli.
+  - 🟢 **Matrix Rain:** Dijital aşağı kayan yeşil kod ve karakter yağmuru.
+  - 🌐 **Cyber Grid:** Ufuk çizgisine uzanan perspektif tel örgü dalgası.
+  - ⬛ **Solid Minimal:** Sıfır CPU tüketimiyle saf minimal koyu zemin.
+- **Haptik Ses Motoru (SFX):** Tıklamalar, tarama tamamlanması ve bağlam üretiminde sesli geri bildirim sağlar (`winsound.Beep` arka planda çalışır, arayüzü asla dondurmaz; başlık çubuğundan tek tıkla `🔊 SFX ON` / `🔇 SFX OFF` yapılabilir).
+- **Yüzen Cyberpunk Toast Bildirimleri:** Panoya kopyalama ve kaydetme işlemlerinde kullanıcıyı rahatsız etmeden yumuşak bildirimler gösterir.
+
+### 6. Çoklu Format Dışa Aktarma Paketi (Context Architect Hub)
+- **`README.md`:** Ayrıntılı depo ve mimari dokümantasyonu.
+- **`AGENTS.md` / `CLAUDE.md`:** Cursor, Antigravity IDE, Claude Code, Cline ve Copilot gibi yapay zeka kodlama ajanları için özel yapılandırılmış sistem ve kural rehberi.
+- **`ARCHITECTURE.md`:** Otomatik üretilen Mermaid şeması ve modül bağımlılık hiyerarşisi içeren mimari spesifikasyonu.
+- **`REPO_MAP.txt`:** LLM sohbet pencerelerine doğrudan yapıştırılmak üzere aşırı sıkıştırılmış AST simge haritası.
+- **`README.html`:** Cyberpunk koyu temalı, tarayıcıda tek tıkla açılan görsel HTML önizlemesi.
+- **Canlı Token Bütçesi ve USD Maliyet Hesaplayıcı:** Gerçek zamanlı token sayımı ve seçilen modele göre tahmini API harcama maliyeti.
+
+---
+
+## 📦 Kurulum ve Başlangıç
+
+### Yöntem 1: Tek Tıkla Kurulum (.bat) — Windows İçin Önerilen
+```cmd
+install_requirements.bat
+```
+> Sisteminizde Python bulunmasa bile Python 3.12'yi otomatik indirir, sanal ortamı kurar ve tüm paketleri eksiksiz yapılandırır.
+
+### Yöntem 2: Bağımsız Çalıştırılabilir Dosya (.exe)
+Releases bölümünden `TZeroAlgorithm.exe` dosyasını indirin. Kurulum, Python veya yönetici yetkisi gerektirmeden çift tıklayarak çalıştırın.
+
+### Yöntem 3: Python Paketi / pip ile Kurulum
+```bash
+# Depoyu klonlayın
+git clone https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git
+cd TZeroAlgorithm
+
+# Bağımlılıkları yükleyin (MCP SDK dahil)
+pip install -r requirements.txt
+
+# Veya geliştirici modunda kurun
+pip install -e .
+```
+
+---
+
+## 🎮 Kullanım Kılavuzu (GUI & CLI)
+
+### 1. Grafiksel Kullanıcı Arayüzü (GUI)
+```bash
+# Python ile çalıştırma
+python main.py
+
+# Veya Windows başlatıcı betiği ile
+run.bat
+
+# Veya uyumluluk sarmalayıcısı ile
+python tzero.py
+```
+
+### 2. Komut Satırı Arayüzü (CLI)
+Terminal geliştiricileri ve CI/CD otomasyonları için gelişmiş komut satırı bayrakları:
+
+```bash
+# 1. Model Context Protocol (MCP) stdio sunucusunu başlat
+python main.py --mcp
+
+# 2. Projeyi tara ve metrik tablosunu ekrana bas
+python main.py --scan .
+
+# 3. Kod kalitesini denetle ve code smell raporu al
+python main.py --audit .
+
+# 4. Sıfır API maliyetiyle yerel çevrimdışı context ağacı üret
+python main.py --dry-run --dir . --output README.md
+
+# 5. Yapay Zeka Ajan Kılavuzu (AGENTS.md / CLAUDE.md) üret
+python main.py --export-agents AGENTS.md --dir .
+
+# 6. Mermaid Mimari Şeması (ARCHITECTURE.md) üret
+python main.py --export-arch ARCHITECTURE.md --dir .
+
+# 7. Sıkıştırılmış Token Repo Haritası (REPO_MAP.txt) üret
+python main.py --export-repomap REPO_MAP.txt --dir .
+
+# 8. Koyu Modlu Görsel HTML Önizlemesi (README.html) üret
+python main.py --export-html README.html --dir .
+
+# 9. İnteraktif Terminal Sihirbazını başlat
+python main.py --cli
+
+# 10. Sürüm bilgisini görüntüle
+python main.py --version
+
+# 11. Bir sembolü değiştirmenin etki alanını analiz et
+python main.py --impact MyClass
+
+# 12. Yerel ve gizli anlamsal kod arama (BM25 + TF-IDF)
+python main.py --search "retry logic"
+
+# 13. CI'da mimari sınırları denetle (ihlalde 1 ile çıkar)
+python main.py --enforce-boundaries
+
+# 14. Token tasarruf metrikleri ve ekip ROI hesabı
+python main.py --savings
+
+# 15. Yerel ajan kurallarını üret (.cursorrules, .clinerules, Copilot)
+python main.py --export-agent-rules
+
+# 16. Yerel web panelini başlat (varsayılan port 7300)
+python main.py --web
+
+# 17. Masaüstü arayüzünü (GUI) başlat
+python main.py --gui
+```
+
+---
+
+## ⌨️ Klavye Kısayolları
+
+| Kısayol | Eylem |
+|---------|-------|
+| `Ctrl+S` | Seçili Çalışma Alanını Tara |
+| `Ctrl+G` | Context Ağacını Derle / Üret |
+| `Ctrl+C` | Üretilen İçeriği Panoya Kopyala |
+| `Ctrl+R` | Git Geçmişini ve Dalları Yenile |
+
+---
+
+## 📂 Proje Dizin Ağacı
 
 ```
 TZeroAlgorithm/
-├── tzero_v3.py        # Core engine: scanner, AST reducer, analyzers, GUI, CLI
-├── tzero_features.py  # Impact analysis, boundary rules, semantic search, ROI, dashboard
-├── tzero_mcp.py       # MCP server (13 tools + grounding prompt)
-├── main.py            # Entry point for CLI and GUI
-├── tzero.rules.json   # Architecture boundary rules
-├── .mcp.json          # Claude Code MCP config
-├── .cursor/           # Cursor MCP config and rules
-└── tests/             # 58 tests
+├── .mcp.json                    # Claude Code MCP integration
+├── .cursor/
+│   └── mcp.json                 # Hazır Cursor MCP sunucu yapılandırması
+├── .github/
+│   └── workflows/
+│       └── ci.yml               # GitHub Actions CI/CD otomatik test boru hattı
+├── tests/
+│   ├── __init__.py
+│   ├── test_analyzer.py         # AST analiz ve denetim testleri
+│   ├── test_cli.py              # CLI komut satırı entegrasyon testleri
+│   ├── test_config.py           # Config ve Keyring güvenlik testleri
+│   ├── test_exports.py          # Çoklu format dışa aktarım & maliyet testleri
+│   ├── test_features.py         # Özellik modülü testleri (etki, kurallar, arama, ROI)
+│   ├── test_generator.py        # Şablon motoru ve bağlam derleme testleri
+│   ├── test_gui.py              # Tkinter GUI başlatma testleri
+│   ├── test_mcp.py              # Model Context Protocol (MCP) sunucu testleri
+│   ├── test_providers.py        # 6 AI sağlayıcı adaptör testleri
+│   └── test_scanner.py          # TokenReducer ve CodebaseScanner testleri
+├── build_exe.bat                # Windows PyInstaller tek tık derleme betiği
+├── compile.py                   # PyInstaller asset paketleme boru hattı
+├── install_requirements.bat     # Windows otomatik ortam kurulum betiği
+├── LICENSE                      # MIT Açık Kaynak Lisansı
+├── main.py                      # Ana çalıştırma giriş noktası (CLI & GUI)
+├── pyproject.toml               # Modern PEP 517/621 paket yapılandırması
+├── README.md                    # İki dilli kapsamlı dokümantasyon
+├── requirements.txt             # Üretim bağımlılık listesi
+├── run.bat                      # Windows hızlı başlatıcısı
+├── siber_akademi.ico            # Yüksek çözünürlüklü uygulama ikonu
+├── tzero.py                     # Geriye dönük uyumluluk API sarmalayıcısı
+├── tzero.rules.json             # T-4 mimari sınır kuralları
+├── tzero_features.py            # Etki analizi, sınır kuralları, anlamsal arama, ROI, web paneli
+├── tzero_mcp.py                 # Standart Model Context Protocol (MCP) Sunucusu
+├── tzero_v3.py                  # Bağımsız taşınabilir T-Zero V3 motoru
+└── WALKTHROUGH.md               # Detaylı teknik mimari kılavuzu
 ```
 
 ---
 
-## 📄 License
+## 🧪 Otomatik Test Süreci ve CI/CD
 
-Released under the [MIT License](LICENSE). Use it, fork it, ship it.
+Bütün birim ve entegrasyon testlerini yerel olarak çalıştırmak için:
 
-<div align="center">
+```bash
+python -m unittest discover -s tests -v
+```
+
+Beklenen çıktı:
+```
+Ran 58 tests in ~6.2s
+OK (100% Pass)
+```
+
+GitHub Actions, depoya yapılan her push ve pull request işleminde Ubuntu ve Windows ortamlarında Python 3.10, 3.11 ve 3.12 ile bu testleri otomatik olarak yürütür.
 
 ---
 
-### Built by **Toprak Ahmet Aydoğmuş** · [Siber Akademi](https://hopp.bio/siberegitim)
+## 📄 Lisans ve Geliştirici Bilgileri
 
-[LinkedIn](https://linkedin.com/in/toprak-ahmet-aydo%C4%9Fmu%C5%9F-60462534b/) ·
-[Links & Bio](https://hopp.bio/siberegitim) ·
-[GitHub](https://github.com/toprakahmetaydogmus)
+Bu proje **MIT Lisansı** altında lisanslanmıştır. Detaylar için [LICENSE](LICENSE) dosyasına bakabilirsiniz.
 
-**If T-Zero saves you tokens, a ⭐ saves me motivation.**
-
-</div>
+**Toprak Ahmet Aydoğmuş** — Siber Akademi  
+- 💼 **LinkedIn:** [toprak-ahmet-aydoğmuş](https://linkedin.com/in/toprak-ahmet-aydo%C4%9Fmu%C5%9F-60462534b/)  
+- 🔗 **Bağlantılar & Biyografi:** [hopp.bio/siberegitim](https://hopp.bio/siberegitim)  
+- 🐙 **GitHub:** [@toprakahmetaydogmus](https://github.com/toprakahmetaydogmus)
