@@ -192,8 +192,11 @@ DEFAULT_CONFIG_DIR = os.path.expanduser("~/.tzero_v3")
 
 def secure_permissions(filepath: str) -> None:
     try:
-        if os.name == 'posix':
-            os.chmod(filepath, 0o600)
+        if os.name == 'posix' and os.path.exists(filepath):
+            if os.path.isdir(filepath):
+                os.chmod(filepath, 0o700)
+            else:
+                os.chmod(filepath, 0o600)
     except Exception as e:
         logger.warning(f"Unable to enforce file security permissions: {e}")
 
@@ -1236,7 +1239,9 @@ When interpreting this context tree:
 class GitCommitGraphCanvas(tk.Canvas):
     """Draws a beautiful custom commit nodes history tree graph chronologically."""
     def __init__(self, parent, **kwargs):
-        super().__init__(parent, bg=PALETTE["bg_start"], highlightthickness=0, **kwargs)
+        cfg = {"bg": PALETTE["bg_start"], "highlightthickness": 0}
+        cfg.update(kwargs)
+        super().__init__(parent, **cfg)
 
     def draw_graph(self, commits_count: int):
         self.delete("all")
@@ -1269,19 +1274,21 @@ class GitCommitGraphCanvas(tk.Canvas):
 
 class GlassCard(tk.Frame):
     def __init__(self, parent, **kwargs):
-        super().__init__(
-            parent, 
-            bg=PALETTE["card_bg"], 
-            highlightthickness=1, 
-            highlightbackground=PALETTE["card_border"], 
-            bd=0, 
-            **kwargs
-        )
+        cfg = {
+            "bg": PALETTE["card_bg"],
+            "highlightthickness": 1,
+            "highlightbackground": PALETTE["card_border"],
+            "bd": 0,
+        }
+        cfg.update(kwargs)
+        super().__init__(parent, **cfg)
 
 
 class GlowingStatusDot(tk.Canvas):
     def __init__(self, parent, size: int = 16, **kwargs):
-        super().__init__(parent, width=size, height=size, bg=PALETTE["card_bg"], highlightthickness=0, **kwargs)
+        cfg = {"width": size, "height": size, "bg": PALETTE["card_bg"], "highlightthickness": 0}
+        cfg.update(kwargs)
+        super().__init__(parent, **cfg)
         self.size = size
         self.set_status("red")
         
@@ -1304,7 +1311,9 @@ class GlowingStatusDot(tk.Canvas):
 
 class StarfieldCanvas(tk.Canvas):
     def __init__(self, parent, **kwargs):
-        super().__init__(parent, highlightthickness=0, **kwargs)
+        cfg = {"highlightthickness": 0}
+        cfg.update(kwargs)
+        super().__init__(parent, **cfg)
         self.stars: List[Dict[str, Any]] = []
         self.running = True
         self.speed_multiplier = 1.0
@@ -1360,7 +1369,9 @@ class StarfieldCanvas(tk.Canvas):
 
 class NodeGraphCanvas(tk.Canvas):
     def __init__(self, parent, **kwargs):
-        super().__init__(parent, bg=PALETTE["bg_start"], highlightthickness=0, **kwargs)
+        cfg = {"bg": PALETTE["bg_start"], "highlightthickness": 0}
+        cfg.update(kwargs)
+        super().__init__(parent, **cfg)
         self.nodes: Dict[str, Dict[str, Any]] = {}
         self.links: List[Tuple[str, str]] = []
         self.selected_node: Optional[str] = None
@@ -1447,7 +1458,9 @@ class NodeGraphCanvas(tk.Canvas):
 
 class PerformanceChartCanvas(tk.Canvas):
     def __init__(self, parent, **kwargs):
-        super().__init__(parent, bg=PALETTE["bg_start"], highlightthickness=0, **kwargs)
+        cfg = {"bg": PALETTE["bg_start"], "highlightthickness": 0}
+        cfg.update(kwargs)
+        super().__init__(parent, **cfg)
         self.cpu_history: List[float] = [10.0] * 30
         self.mem_history: List[float] = [20.0] * 30
         self.draw()
@@ -1490,7 +1503,9 @@ class PerformanceChartCanvas(tk.Canvas):
 
 class TokenDonutChartCanvas(tk.Canvas):
     def __init__(self, parent, **kwargs):
-        super().__init__(parent, bg=PALETTE["bg_start"], highlightthickness=0, **kwargs)
+        cfg = {"bg": PALETTE["bg_start"], "highlightthickness": 0}
+        cfg.update(kwargs)
+        super().__init__(parent, **cfg)
         self.sections: Dict[str, float] = {"Used": 0.0, "Remaining": 100.0}
         self.draw()
 
@@ -1523,7 +1538,9 @@ class TokenDonutChartCanvas(tk.Canvas):
 class AdvancedTokenDistributionChart(tk.Canvas):
     """Custom language token distribution stats visualizer chart widget."""
     def __init__(self, parent, **kwargs):
-        super().__init__(parent, bg=PALETTE["bg_start"], highlightthickness=0, **kwargs)
+        cfg = {"bg": PALETTE["bg_start"], "highlightthickness": 0}
+        cfg.update(kwargs)
+        super().__init__(parent, **cfg)
         self.stats: Dict[str, float] = {}
 
     def set_stats(self, stats: Dict[str, float]):
@@ -1795,8 +1812,6 @@ class AutoReadmeGUI:
         self.setup_tab_template()
         self.setup_tab_graph()
         
-        self.switch_tab(0)
-
         # 4. Bottom Diagnostic Console Output Logs Panel
         self.console = GlassCard(self.bg_canvas)
         self.console.place(relx=0.02, rely=0.85, relwidth=0.96, relheight=0.13)
@@ -1812,15 +1827,21 @@ class AutoReadmeGUI:
         scroll = tk.Scrollbar(console_frame, command=self.console_text.yview)
         scroll.pack(side=tk.RIGHT, fill=tk.Y)
         self.console_text.config(yscrollcommand=scroll.set)
-        
+
+        self.switch_tab(0)
         self.log("Siber Akademi T-Zero V3 Context builder loaded.")
 
     def log(self, text: str):
-        self.console_text.config(state=tk.NORMAL)
-        t = time.strftime("[%H:%M:%S]")
-        self.console_text.insert(tk.END, f"{t} {text}\n")
-        self.console_text.see(tk.END)
-        self.console_text.config(state=tk.DISABLED)
+        if not hasattr(self, "console_text") or self.console_text is None:
+            return
+        try:
+            self.console_text.config(state=tk.NORMAL)
+            t = time.strftime("[%H:%M:%S]")
+            self.console_text.insert(tk.END, f"{t} {text}\n")
+            self.console_text.see(tk.END)
+            self.console_text.config(state=tk.DISABLED)
+        except Exception:
+            pass
 
     def open_theme_selector(self):
         dialog = tk.Toplevel(self.root)
@@ -2497,7 +2518,7 @@ class AutoReadmeGUI:
         self.selector_stats_lbl = tk.Label(toolbar, text="0 / 0 selected | Estimated Context Size: 0 tokens", font=("Segoe UI", 9, "bold"), fg=PALETTE["accent_green"], bg=PALETTE["card_bg"])
         self.selector_stats_lbl.pack(side=tk.RIGHT, padx=10)
         
-        paned = tk.PanedWindow(f, orient=tk.HORIZONTAL, bg=PALETTE["bg_start"], bd=0, sashwidth=4, sashcolor=PALETTE["card_border"])
+        paned = tk.PanedWindow(f, orient=tk.HORIZONTAL, bg=PALETTE["bg_start"], bd=0, sashwidth=4, sashrelief=tk.FLAT)
         paned.grid(row=1, column=0, sticky="nsew")
         
         tree_container = GlassCard(paned)
@@ -3126,7 +3147,7 @@ class AutoReadmeGUI:
         self.branch_combo.pack(side=tk.LEFT)
         self.branch_combo.bind("<<ComboboxSelected>>", self.on_branch_changed)
         
-        paned = tk.PanedWindow(f, orient=tk.HORIZONTAL, bg=PALETTE["bg_start"], bd=0, sashwidth=4, sashcolor=PALETTE["card_border"])
+        paned = tk.PanedWindow(f, orient=tk.HORIZONTAL, bg=PALETTE["bg_start"], bd=0, sashwidth=4, sashrelief=tk.FLAT)
         paned.grid(row=1, column=0, sticky="nsew")
         
         left_panel = GlassCard(paned)
@@ -3451,7 +3472,7 @@ class AutoReadmeGUI:
         self.gen_status_lbl.pack(side=tk.RIGHT)
         
         # Split pane in generate tab for raw markdown vs styled markdown preview
-        paned = tk.PanedWindow(f, orient=tk.HORIZONTAL, bg=PALETTE["bg_start"], bd=0, sashwidth=4, sashcolor=PALETTE["card_border"])
+        paned = tk.PanedWindow(f, orient=tk.HORIZONTAL, bg=PALETTE["bg_start"], bd=0, sashwidth=4, sashrelief=tk.FLAT)
         paned.grid(row=1, column=0, sticky="nsew")
 
         raw_container = GlassCard(paned)
@@ -3703,7 +3724,7 @@ Custom Requirements:
 
         tk.Label(toolbar, text="Use tokens: {{PROJECT_NAME}}, {{MODULES_REFERENCE}}, {{HALLUCINATION_GUARDRAILS}}", font=("Segoe UI", 9), fg=PALETTE["text_muted"], bg=PALETTE["card_bg"]).pack(side=tk.RIGHT)
         
-        paned = tk.PanedWindow(f, orient=tk.HORIZONTAL, bg=PALETTE["bg_start"], bd=0, sashwidth=4, sashcolor=PALETTE["card_border"])
+        paned = tk.PanedWindow(f, orient=tk.HORIZONTAL, bg=PALETTE["bg_start"], bd=0, sashwidth=4, sashrelief=tk.FLAT)
         paned.grid(row=1, column=0, sticky="nsew", pady=5)
 
         editor_box = GlassCard(paned)
@@ -3787,7 +3808,7 @@ Custom Requirements:
         f.columnconfigure(1, weight=1)
         f.rowconfigure(0, weight=1)
         
-        paned = tk.PanedWindow(f, orient=tk.HORIZONTAL, bg=PALETTE["bg_start"], bd=0, sashwidth=4, sashcolor=PALETTE["card_border"])
+        paned = tk.PanedWindow(f, orient=tk.HORIZONTAL, bg=PALETTE["bg_start"], bd=0, sashwidth=4, sashrelief=tk.FLAT)
         paned.grid(row=0, column=0, columnspan=2, sticky="nsew")
         
         self.node_canvas = NodeGraphCanvas(paned)
