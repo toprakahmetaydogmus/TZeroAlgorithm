@@ -97,15 +97,27 @@ T-Zero V3 natively embeds a standard **Model Context Protocol (MCP)** server (`t
 ### 🧭 MCP Prompts
 - **`tzero_grounding`**: Injects strict architectural boundary rules, modular integrity guidelines, and Zero-Leak security mandates into the agent's system session.
 
+### 📊 Token Benchmark (Single-File Example)
+
+Measured on `tzero_v3.py` at commit `4846dcf` with the project's `count_tokens_precise` estimator (approximately `characters / 4`):
+
+| Input | Full source estimate | Ultra AST signatures | Estimated reduction |
+|:------|---------------------:|---------------------:|---------------------:|
+| `tzero_v3.py` (224,150 characters) | 56,037 tokens | 3,088 tokens | 94.5% |
+
+Reproduce it with: `python -c "from pathlib import Path; from tzero_v3 import TokenReducer,count_tokens_precise; s=Path('tzero_v3.py').read_text(encoding='utf-8'); r=TokenReducer.reduce(s,'tzero_v3.py',mode='ultra'); print(count_tokens_precise(s),count_tokens_precise(r))"`. This is a single-file, signatures-only comparison, not a whole-repository or answer-quality benchmark; provider tokenizers and MCP response overhead vary. Use `balanced` or fetch source when implementation details matter.
+
 ### 🔌 Client Configuration
+
+Install `pipx` first. These configs run the MCP command directly from GitHub without a manual clone; after publishing the package to PyPI, replace the Git URL with `tzero-algorithm`.
 
 #### 1. Cursor IDE (`.cursor/mcp.json` or Settings → MCP)
 ```json
 {
   "mcpServers": {
     "tzero": {
-      "command": "python",
-      "args": ["C:/absolute/path/to/TZeroAlgorithm/tzero_mcp.py"]
+      "command": "pipx",
+      "args": ["run", "--spec", "git+https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git", "tzero-mcp"]
     }
   }
 }
@@ -116,6 +128,18 @@ T-Zero V3 natively embeds a standard **Model Context Protocol (MCP)** server (`t
 {
   "mcpServers": {
     "tzero": {
+      "command": "pipx",
+      "args": ["run", "--spec", "git+https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git", "tzero-mcp"]
+    }
+  }
+}
+```
+
+#### 3. Google Antigravity IDE (`mcp_config.json`)
+```json
+{
+  "mcpServers": {
+    "tzero": {
       "command": "python",
       "args": ["C:/absolute/path/to/TZeroAlgorithm/tzero_mcp.py"]
     }
@@ -123,7 +147,7 @@ T-Zero V3 natively embeds a standard **Model Context Protocol (MCP)** server (`t
 }
 ```
 
-#### 3. CLI Launch
+#### 4. CLI Launch
 ```bash
 # Launch directly via MCP entrypoint
 python tzero_mcp.py
@@ -239,16 +263,16 @@ Download `TZeroAlgorithm.exe` directly from the [Releases](https://github.com/to
 
 ### Method 3: Python Package / pip Installation
 ```bash
-# Clone repository
+# Install from a cloned checkout
 git clone https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git
 cd TZeroAlgorithm
+pip install .
+# The package provides the `tzero` and `tzero-mcp` commands.
 
-# Install dependencies (including MCP SDK)
-pip install -r requirements.txt
-
-# Or install in editable development mode
-pip install -e .
+# After the package is published to PyPI:
+pipx install tzero-algorithm
 ```
+> The PyPI project name is `tzero-algorithm`; `tzero-mcp` is the installed command. Until the first PyPI upload, use the GitHub `pipx run --spec` configuration above.
 
 > **Automatic dependency check:** on startup T-Zero verifies its required packages and installs any that are missing or too old (progress goes to stderr, so MCP stdio stays clean). Opt out with `TZERO_NO_AUTO_INSTALL=1`. Run `python main.py --doctor` for a full health check. The desktop GUI needs `tkinter`; the CLI and the MCP server work without it, so headless servers, Docker and CI are fine.
 
@@ -487,15 +511,27 @@ T-Zero V3, Anthropic'in standart **Model Context Protocol (MCP)** SDK'sını kul
 ### 🧭 MCP Yerleşik Promptları
 - **`tzero_grounding`**: Cursor / Claude / Antigravity oturumlarına mimari kuralları, modüler sınırları ve %100 Zero-Leak güvenlik direktiflerini enjekte eder.
 
+### 📊 Token Benchmark (Tek Dosyalık Örnek)
+
+`4846dcf` commit'indeki `tzero_v3.py`, projenin `count_tokens_precise` tahminleyicisiyle ölçülmüştür (yaklaşık `karakter / 4`):
+
+| Girdi | Tam kaynak tahmini | Ultra AST imzaları | Tahmini azalma |
+|:------|------------------:|-------------------:|---------------:|
+| `tzero_v3.py` (224.150 karakter) | 56.037 token | 3.088 token | %94,5 |
+
+Tekrar üretmek için: `python -c "from pathlib import Path; from tzero_v3 import TokenReducer,count_tokens_precise; s=Path('tzero_v3.py').read_text(encoding='utf-8'); r=TokenReducer.reduce(s,'tzero_v3.py',mode='ultra'); print(count_tokens_precise(s),count_tokens_precise(r))"`. Bu yalnızca tek dosyanın imza-temelli karşılaştırmasıdır; tüm depo veya yanıt kalitesi ölçümü değildir. Sağlayıcı tokenleştiricileri ve MCP yanıt ek yükü farklılık gösterir. Uygulama ayrıntıları gerektiğinde `balanced` modunu veya kaynak kodu kullanın.
+
 ### 🔌 Editör Entegrasyonu
+
+Önce `pipx` kurun. Aşağıdaki ayarlar GitHub'dan MCP komutunu klonlama gerektirmeden çalıştırır. PyPI yayını sonrası Git URL'sini `tzero-algorithm` ile değiştirebilirsiniz.
 
 #### 1. Cursor IDE (`.cursor/mcp.json` veya Cursor Ayarları → MCP)
 ```json
 {
   "mcpServers": {
     "tzero": {
-      "command": "python",
-      "args": ["C:/tam/yol/TZeroAlgorithm/tzero_mcp.py"]
+      "command": "pipx",
+      "args": ["run", "--spec", "git+https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git", "tzero-mcp"]
     }
   }
 }
@@ -506,6 +542,18 @@ T-Zero V3, Anthropic'in standart **Model Context Protocol (MCP)** SDK'sını kul
 {
   "mcpServers": {
     "tzero": {
+      "command": "pipx",
+      "args": ["run", "--spec", "git+https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git", "tzero-mcp"]
+    }
+  }
+}
+```
+
+#### 3. Google Antigravity IDE (`mcp_config.json`)
+```json
+{
+  "mcpServers": {
+    "tzero": {
       "command": "python",
       "args": ["C:/tam/yol/TZeroAlgorithm/tzero_mcp.py"]
     }
@@ -513,7 +561,7 @@ T-Zero V3, Anthropic'in standart **Model Context Protocol (MCP)** SDK'sını kul
 }
 ```
 
-#### 3. Komut Satırından Başlatma
+#### 4. Komut Satırından Başlatma
 ```bash
 # Doğrudan MCP sunucusunu başlat
 python tzero_mcp.py
@@ -629,16 +677,16 @@ Releases bölümünden `TZeroAlgorithm.exe` dosyasını indirin. Kurulum, Python
 
 ### Yöntem 3: Python Paketi / pip ile Kurulum
 ```bash
-# Depoyu klonlayın
+# Klonlanmış depodan kurun
 git clone https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git
 cd TZeroAlgorithm
+pip install .
+# `tzero` ve `tzero-mcp` komutları kurulur.
 
-# Bağımlılıkları yükleyin (MCP SDK dahil)
-pip install -r requirements.txt
-
-# Veya geliştirici modunda kurun
-pip install -e .
+# PyPI yayını yapıldıktan sonra:
+pipx install tzero-algorithm
 ```
+> PyPI proje adı `tzero-algorithm`, kurulan MCP komutu ise `tzero-mcp`'dir. İlk PyPI yayınına kadar yukarıdaki GitHub `pipx run --spec` ayarını kullanın.
 
 > **Otomatik bağımlılık kontrolü:** T-Zero açılışta gerekli paketleri doğrular, eksik veya eski olanları kendisi kurar (çıktı stderr'e gider, MCP stdio bozulmaz). Kapatmak için `TZERO_NO_AUTO_INSTALL=1` kullanın. Tam sağlık kontrolü için `python main.py --doctor` çalıştırın. Masaüstü arayüzü `tkinter` ister; CLI ve MCP sunucusu onsuz da çalışır, yani sunucu, Docker ve CI ortamları sorunsuzdur.
 
