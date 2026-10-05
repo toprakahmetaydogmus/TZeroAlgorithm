@@ -107,69 +107,101 @@ Measured on `tzero_v3.py` at commit `4846dcf` with the project's `count_tokens_p
 
 Reproduce it with: `python -c "from pathlib import Path; from tzero_v3 import TokenReducer,count_tokens_precise; s=Path('tzero_v3.py').read_text(encoding='utf-8'); r=TokenReducer.reduce(s,'tzero_v3.py',mode='ultra'); print(count_tokens_precise(s),count_tokens_precise(r))"`. This is a single-file, signatures-only comparison, not a whole-repository or answer-quality benchmark; provider tokenizers and MCP response overhead vary. Use `balanced` or fetch source when implementation details matter.
 
-### 🔌 Client Configuration
+### 🔌 Add T-Zero to MCP Clients
 
-Install [pipx](https://pipx.pypa.io/stable/installation/) first. The Cursor link imports a local stdio server configuration directly and does not depend on a third-party directory listing. It fetches the server from GitHub on first launch, without a manual clone.
+T-Zero runs as a local stdio server. The first launch downloads the pinned `v3.0.2` package from GitHub; no repository clone is needed. Install Python 3.9+ and pipx first.
 
-#### Add to Cursor in One Click
+#### Install pipx on Windows
 
-[Add T-Zero to Cursor](https://cursor.com/install-mcp?name=tzero&config=eyJjb21tYW5kIjoicGlweCIsImFyZ3MiOlsicnVuIiwiLS1zcGVjIiwiZ2l0K2h0dHBzOi8vZ2l0aHViLmNvbS90b3ByYWthaG1ldGF5ZG9nbXVzL1RaZXJvQWxnb3JpdGhtLmdpdCIsInR6ZXJvLW1jcCJdfQ%3D%3D)
+Open PowerShell and run:
 
-1. Install Cursor and pipx if you have not already.
-2. Open the link above and approve the server configuration in Cursor.
-3. Open **Cursor Settings → MCP** (or **Customize → MCP**) and enable `tzero`.
-4. Confirm the T-Zero tools appear in the available MCP tools list.
+```powershell
+py -m pip install --user pipx
+py -m pipx ensurepath
+```
 
-#### 1. Cursor IDE (`.cursor/mcp.json` or Settings → MCP)
+Restart the client after installation. The Windows configs below call `py -m pipx` directly, so they do not depend on `pipx.exe` being on PATH. For macOS/Linux, install pipx using the [official platform instructions](https://pipx.pypa.io/stable/installation/) and run `pipx ensurepath`.
+
+#### Cursor One-Click Install
+
+Choose the link for your operating system, approve the configuration in Cursor, then enable `tzero` under **Settings → MCP** or **Customize → MCP**.
+
+- [Add T-Zero to Cursor (Windows)](https://cursor.com/install-mcp?name=tzero&config=eyJjb21tYW5kIjoicHkiLCJhcmdzIjpbIi1tIiwicGlweCIsInJ1biIsIi0tc3BlYyIsImdpdCtodHRwczovL2dpdGh1Yi5jb20vdG9wcmFrYWhtZXRheWRvZ211cy9UWmVyb0FsZ29yaXRobS5naXRAdjMuMC4yIiwidHplcm8tbWNwIl19)
+- [Add T-Zero to Cursor (macOS/Linux)](https://cursor.com/install-mcp?name=tzero&config=eyJjb21tYW5kIjoicGlweCIsImFyZ3MiOlsicnVuIiwiLS1zcGVjIiwiZ2l0K2h0dHBzOi8vZ2l0aHViLmNvbS90b3ByYWthaG1ldGF5ZG9nbXVzL1RaZXJvQWxnb3JpdGhtLmdpdEB2My4wLjIiLCJ0emVyby1tY3AiXX0%3D)
+
+If Cursor does not open the installer, use **Settings → MCP → Add Custom MCP** and paste the platform-appropriate JSON below.
+
+**Windows:**
+```json
+{
+  "mcpServers": {
+    "tzero": {
+      "command": "py",
+      "args": ["-m", "pipx", "run", "--spec", "git+https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git@v3.0.2", "tzero-mcp"]
+    }
+  }
+}
+```
+
+**macOS/Linux:**
 ```json
 {
   "mcpServers": {
     "tzero": {
       "command": "pipx",
-      "args": ["run", "--spec", "git+https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git", "tzero-mcp"]
+      "args": ["run", "--spec", "git+https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git@v3.0.2", "tzero-mcp"]
     }
   }
 }
 ```
 
-#### 2. Claude Desktop (`claude_desktop_config.json`)
+#### Claude Desktop
 
-1. Install pipx using the [official instructions](https://pipx.pypa.io/stable/installation/).
-2. In Claude Desktop, open **Settings → Developer → Edit Config**.
-3. Merge the JSON block below into the existing `mcpServers` object; keep any other server entries.
-4. Save the file, fully quit Claude Desktop, then reopen it.
-5. In **Settings → Developer**, confirm `tzero` is running and its tools are available.
+1. Open **Settings → Developer → Edit Config**.
+2. Merge the matching Windows or macOS/Linux JSON block above into the existing `mcpServers` object; keep other server entries.
+3. Save the file and fully quit/reopen Claude Desktop.
+4. Return to **Settings → Developer** and confirm `tzero` is running.
 
+Config locations: Windows `%APPDATA%\Claude\claude_desktop_config.json`; macOS `~/Library/Application Support/Claude/claude_desktop_config.json`.
+
+#### Google Antigravity IDE
+
+1. Open **Settings → Customizations → Installed MCP Servers**.
+2. **Add MCP** opens the Antigravity MCP Store. If T-Zero appears there, select **Add**; otherwise configure it as a custom stdio server below.
+3. Add the Windows or macOS/Linux `tzero` entry from the JSON blocks above to Antigravity's `mcp_config.json`, preserving other `mcpServers` entries. On Windows, the user config is `%USERPROFILE%\.gemini\antigravity\mcp_config.json`.
+4. Save/reload MCP servers and approve the tools when prompted.
+
+See the [official Antigravity MCP guide](https://antigravity.google/docs/mcp) for the current Settings flow and configuration schema.
+
+#### VS Code Copilot
+
+1. Run **MCP: Add Server** from the Command Palette (`Ctrl+Shift+P`).
+2. Choose **Command (stdio)**, then enter the platform command (`py` on Windows; `pipx` on macOS/Linux) and the same arguments shown above.
+3. Save to the workspace `.mcp.json` or `.vscode/mcp.json`, then trust/start `tzero` from the MCP Servers view.
+
+For `.vscode/mcp.json`, VS Code uses a top-level `servers` object and requires `type: "stdio"`:
 ```json
 {
-  "mcpServers": {
+  "servers": {
     "tzero": {
-      "command": "pipx",
-      "args": ["run", "--spec", "git+https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git", "tzero-mcp"]
+      "type": "stdio",
+      "command": "py",
+      "args": ["-m", "pipx", "run", "--spec", "git+https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git@v3.0.2", "tzero-mcp"]
     }
   }
 }
 ```
 
-#### 3. Google Antigravity IDE (`mcp_config.json`)
-```json
-{
-  "mcpServers": {
-    "tzero": {
-      "command": "python",
-      "args": ["C:/absolute/path/to/TZeroAlgorithm/tzero_mcp.py"]
-    }
-  }
-}
-```
+#### Claude Code, Cline, Roo Code, Windsurf, and Other MCP Clients
 
-#### 4. CLI Launch
+Open each client's MCP server settings, choose **Add/Edit Server**, and merge the matching Windows or macOS/Linux `mcpServers` entry above. Claude Code can use the same entry in a project-root `.mcp.json`; Cline, Roo Code, and Windsurf provide their own MCP server settings panels. Restart/reload the client and approve the server.
+
+Only Cursor currently provides a verified public one-click install URL for arbitrary local stdio servers. The other clients use their documented settings/config files; the JSON above is ready to paste.
+
+#### CLI Launch
 ```bash
-# Launch directly via MCP entrypoint
 python tzero_mcp.py
-
-# Or launch via main CLI flag
-python main.py --mcp
+# Or: python main.py --mcp
 ```
 
 ---
@@ -537,69 +569,101 @@ T-Zero V3, Anthropic'in standart **Model Context Protocol (MCP)** SDK'sını kul
 
 Tekrar üretmek için: `python -c "from pathlib import Path; from tzero_v3 import TokenReducer,count_tokens_precise; s=Path('tzero_v3.py').read_text(encoding='utf-8'); r=TokenReducer.reduce(s,'tzero_v3.py',mode='ultra'); print(count_tokens_precise(s),count_tokens_precise(r))"`. Bu yalnızca tek dosyanın imza-temelli karşılaştırmasıdır; tüm depo veya yanıt kalitesi ölçümü değildir. Sağlayıcı tokenleştiricileri ve MCP yanıt ek yükü farklılık gösterir. Uygulama ayrıntıları gerektiğinde `balanced` modunu veya kaynak kodu kullanın.
 
-### 🔌 Editör Entegrasyonu
+### 🔌 T-Zero'yu MCP İstemcilerine Ekle
 
-Önce [pipx'i](https://pipx.pypa.io/stable/installation/) kurun. Cursor bağlantısı yerel stdio sunucusunu doğrudan yapılandırır; üçüncü taraf bir dizinde listelenmesine bağlı değildir. Sunucu ilk açılışta GitHub'dan indirilir, elle klonlama gerekmez.
+T-Zero yerel stdio sunucusu olarak çalışır. İlk başlatmada sabitlenmiş `v3.0.2` paketi GitHub'dan indirilir; depoyu klonlamak gerekmez. Python 3.9+ ve önce pipx kurulu olmalıdır.
 
-#### Cursor'a Tek Tıkla Ekle
+#### Windows'ta pipx Kurulumu
 
-[T-Zero'yu Cursor'a ekle](https://cursor.com/install-mcp?name=tzero&config=eyJjb21tYW5kIjoicGlweCIsImFyZ3MiOlsicnVuIiwiLS1zcGVjIiwiZ2l0K2h0dHBzOi8vZ2l0aHViLmNvbS90b3ByYWthaG1ldGF5ZG9nbXVzL1RaZXJvQWxnb3JpdGhtLmdpdCIsInR6ZXJvLW1jcCJdfQ%3D%3D)
+PowerShell'i açıp çalıştırın:
 
-1. Cursor ve pipx kurulu değilse önce kurun.
-2. Yukarıdaki bağlantıyı açın ve Cursor'daki sunucu yapılandırmasını onaylayın.
-3. **Cursor Settings → MCP** (veya **Customize → MCP**) bölümüne girip `tzero` sunucusunu etkinleştirin.
-4. Kullanılabilir MCP araçları listesinde T-Zero araçlarının göründüğünü doğrulayın.
+```powershell
+py -m pip install --user pipx
+py -m pipx ensurepath
+```
 
-#### 1. Cursor IDE (`.cursor/mcp.json` veya Cursor Ayarları → MCP)
+Kurulumdan sonra istemciyi yeniden başlatın. Aşağıdaki Windows ayarları `py -m pipx` komutunu doğrudan çalıştırır; `pipx.exe` dosyasının PATH'te bulunmasına bağlı değildir. macOS/Linux'ta pipx'i [resmi platform yönergeleriyle](https://pipx.pypa.io/stable/installation/) kurup `pipx ensurepath` çalıştırın.
+
+#### Cursor'a Tek Tıkla Kurulum
+
+İşletim sisteminize uygun bağlantıyı açın, Cursor yapılandırmasını onaylayın ve `tzero` sunucusunu **Settings → MCP** veya **Customize → MCP** bölümünden etkinleştirin.
+
+- [T-Zero'yu Cursor'a ekle (Windows)](https://cursor.com/install-mcp?name=tzero&config=eyJjb21tYW5kIjoicHkiLCJhcmdzIjpbIi1tIiwicGlweCIsInJ1biIsIi0tc3BlYyIsImdpdCtodHRwczovL2dpdGh1Yi5jb20vdG9wcmFrYWhtZXRheWRvZ211cy9UWmVyb0FsZ29yaXRobS5naXRAdjMuMC4yIiwidHplcm8tbWNwIl19)
+- [T-Zero'yu Cursor'a ekle (macOS/Linux)](https://cursor.com/install-mcp?name=tzero&config=eyJjb21tYW5kIjoicGlweCIsImFyZ3MiOlsicnVuIiwiLS1zcGVjIiwiZ2l0K2h0dHBzOi8vZ2l0aHViLmNvbS90b3ByYWthaG1ldGF5ZG9nbXVzL1RaZXJvQWxnb3JpdGhtLmdpdEB2My4wLjIiLCJ0emVyby1tY3AiXX0%3D)
+
+Link açılmazsa **Settings → MCP → Add Custom MCP** bölümüne girip aşağıdaki platforma uygun JSON'u yapıştırın.
+
+**Windows:**
+```json
+{
+  "mcpServers": {
+    "tzero": {
+      "command": "py",
+      "args": ["-m", "pipx", "run", "--spec", "git+https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git@v3.0.2", "tzero-mcp"]
+    }
+  }
+}
+```
+
+**macOS/Linux:**
 ```json
 {
   "mcpServers": {
     "tzero": {
       "command": "pipx",
-      "args": ["run", "--spec", "git+https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git", "tzero-mcp"]
+      "args": ["run", "--spec", "git+https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git@v3.0.2", "tzero-mcp"]
     }
   }
 }
 ```
 
-#### 2. Claude Desktop (`claude_desktop_config.json`)
+#### Claude Desktop
 
-1. [Resmi pipx kurulum yönergelerini](https://pipx.pypa.io/stable/installation/) izleyerek pipx'i kurun.
-2. Claude Desktop'ta **Settings → Developer → Edit Config** bölümünü açın.
-3. Aşağıdaki JSON bloğunu mevcut `mcpServers` nesnesine ekleyin; diğer sunucu kayıtlarını silmeyin.
-4. Dosyayı kaydedin, Claude Desktop'ı tamamen kapatıp yeniden açın.
-5. **Settings → Developer** bölümünde `tzero` sunucusunun çalıştığını ve araçlarının listelendiğini doğrulayın.
+1. **Settings → Developer → Edit Config** bölümünü açın.
+2. Yukarıdaki Windows veya macOS/Linux JSON bloğunu mevcut `mcpServers` nesnesine ekleyin; diğer sunucu kayıtlarını silmeyin.
+3. Dosyayı kaydedin, Claude Desktop'ı tamamen kapatıp yeniden açın.
+4. **Settings → Developer** bölümünde `tzero` sunucusunun çalıştığını doğrulayın.
 
+Yapılandırma yolları: Windows `%APPDATA%\Claude\claude_desktop_config.json`; macOS `~/Library/Application Support/Claude/claude_desktop_config.json`.
+
+#### Google Antigravity IDE
+
+1. **Settings → Customizations → Installed MCP Servers** bölümünü açın.
+2. **Add MCP** düğmesi Antigravity MCP Store'u açar. T-Zero listede görünüyorsa **Add**'e tıklayın; görünmüyorsa aşağıdaki özel stdio ayarını kullanın.
+3. Windows veya macOS/Linux JSON bloğundaki `tzero` kaydını Antigravity `mcp_config.json` dosyasına ekleyin; var olan `mcpServers` kayıtlarını koruyun. Windows'ta kullanıcı config yolu `%USERPROFILE%\.gemini\antigravity\mcp_config.json`.
+4. MCP sunucularını kaydedip/yenileyin ve istendiğinde araçlara izin verin.
+
+Güncel ayarlar ve yapılandırma şeması için [resmi Antigravity MCP kılavuzuna](https://antigravity.google/docs/mcp) bakın.
+
+#### VS Code Copilot
+
+1. Command Palette'i açın (`Ctrl+Shift+P`) ve **MCP: Add Server** çalıştırın.
+2. **Command (stdio)** seçin; Windows'ta `py`, macOS/Linux'ta `pipx` komutunu ve yukarıdaki argümanları girin.
+3. `.mcp.json` veya `.vscode/mcp.json` dosyasına kaydedin; MCP Servers görünümünden `tzero` sunucusunu başlatıp güvenin.
+
+`.vscode/mcp.json` için VS Code üst düzey `servers` nesnesi ve `type: "stdio"` kullanır:
 ```json
 {
-  "mcpServers": {
+  "servers": {
     "tzero": {
-      "command": "pipx",
-      "args": ["run", "--spec", "git+https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git", "tzero-mcp"]
+      "type": "stdio",
+      "command": "py",
+      "args": ["-m", "pipx", "run", "--spec", "git+https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git@v3.0.2", "tzero-mcp"]
     }
   }
 }
 ```
 
-#### 3. Google Antigravity IDE (`mcp_config.json`)
-```json
-{
-  "mcpServers": {
-    "tzero": {
-      "command": "python",
-      "args": ["C:/tam/yol/TZeroAlgorithm/tzero_mcp.py"]
-    }
-  }
-}
-```
+#### Claude Code, Cline, Roo Code, Windsurf ve Diğerleri
 
-#### 4. Komut Satırından Başlatma
+İstemcinin MCP sunucu ayarlarını açıp **Add/Edit Server** seçin ve yukarıdaki Windows veya macOS/Linux `mcpServers` kaydını ekleyin. Claude Code proje kökündeki `.mcp.json` dosyasını kullanabilir; Cline, Roo Code ve Windsurf kendi MCP ayar panellerini sunar. İstemciyi yeniden başlatıp sunucuyu onaylayın.
+
+Şu anda herhangi bir yerel stdio MCP sunucusunu kuran doğrulanmış public tek-tık URL yalnızca Cursor'da mevcut. Diğer istemciler kendi config dosyasını/panelini kullanır; yukarıdaki JSON'lar doğrudan hazırdır.
+
+#### Komut Satırından Başlatma
 ```bash
-# Doğrudan MCP sunucusunu başlat
 python tzero_mcp.py
-
-# Veya main.py bayrağı ile başlat
-python main.py --mcp
+# Veya: python main.py --mcp
 ```
 
 ---
