@@ -40,7 +40,8 @@ dependencies = [
     "keyring>=23.13.1",
     "darkdetect>=0.8.0",
     "pygments>=2.14.0",
-    "Pillow>=9.0.0"
+    "Pillow>=9.0.0",
+    "mcp>=1.0.0"
 ]
 
 [project.optional-dependencies]
@@ -53,6 +54,7 @@ test = [
 
 [project.scripts]
 tzero = "main:main"
+tzero-mcp = "tzero_mcp:main"
 
 [project.urls]
 Homepage = "https://utspro.co"

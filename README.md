@@ -7,15 +7,17 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Release-v3.0.0-00ffd8?style=for-the-badge&logo=rocket" alt="Release v3.0.0" />
+  <img src="https://img.shields.io/badge/MCP-Protocol%20Ready-ff69b4?style=for-the-badge&logo=anthropic" alt="MCP Server Protocol Ready" />
   <img src="https://img.shields.io/badge/Security-100%25%20Zero--Leak%20Keyring-50fa7b?style=for-the-badge&logo=shield" alt="Zero Leak Security" />
   <img src="https://img.shields.io/badge/Python-3.9%20|%203.10%20|%203.11%20|%203.12%20|%203.13%20|%203.14-bd93f9?style=for-the-badge&logo=python" alt="Python Versions" />
-  <img src="https://img.shields.io/badge/Tests-34%2F34%20Passing-00f0ff?style=for-the-badge&logo=githubactions" alt="Tests 34/34 Passing" />
+  <img src="https://img.shields.io/badge/Tests-44%2F44%20Passing-00f0ff?style=for-the-badge&logo=githubactions" alt="Tests 44/44 Passing" />
   <img src="https://img.shields.io/badge/License-MIT-f1fa8c?style=for-the-badge" alt="MIT License" />
   <img src="https://img.shields.io/badge/Platform-Windows%20|%20macOS%20|%20Linux-ff79c6?style=for-the-badge" alt="Platform" />
 </p>
 
 > **Enterprise-Grade Codebase Context Builder, AST Signatures Analyzer, and Token Reducer.**  
-> Built for Cursor, VS Code Copilot, Cline, Antigravity IDE, Claude Code, and ChatGPT. Cuts LLM context ingestion overhead by **40% to 95%** while maintaining 100% semantic fidelity.
+> Built for Cursor, VS Code Copilot, Cline, Antigravity IDE, Claude Code, and ChatGPT. Cuts LLM context ingestion overhead by **40% to 95%** while maintaining 100% semantic fidelity.  
+> Includes a native **Model Context Protocol (MCP)** server for autonomous AI coding agents.
 
 **Developer:** Toprak Ahmet Aydoğmuş  
 **Official Website:** [https://utspro.co](https://utspro.co)  
@@ -28,14 +30,15 @@
 
 ## Table of Contents
 1. [Security Architecture (100% Zero-Leak Guarantee)](#-security-architecture-100-zero-leak-guarantee)
-2. [System Architecture](#-system-architecture)
-3. [Core Highlights & Capabilities](#-core-highlights--capabilities)
-4. [Installation & Setup](#-installation--setup)
-5. [Usage Guide (GUI & CLI)](#-usage-guide-gui--cli)
-6. [Keyboard Shortcuts](#-keyboard-shortcuts)
-7. [Project Structure](#-project-structure)
-8. [Automated Test Suite & CI/CD](#-automated-test-suite--cicd)
-9. [License & Credits](#-license--credits)
+2. [Model Context Protocol (MCP) Server](#-model-context-protocol-mcp-server)
+3. [System Architecture](#-system-architecture)
+4. [Core Highlights & Capabilities](#-core-highlights--capabilities)
+5. [Installation & Setup](#-installation--setup)
+6. [Usage Guide (GUI & CLI)](#-usage-guide-gui--cli)
+7. [Keyboard Shortcuts](#-keyboard-shortcuts)
+8. [Project Structure](#-project-structure)
+9. [Automated Test Suite & CI/CD](#-automated-test-suite--cicd)
+10. [License & Credits](#-license--credits)
 
 ---
 
@@ -67,6 +70,63 @@
 
 ---
 
+## 🤖 Model Context Protocol (MCP) Server
+
+T-Zero V3 natively embeds a standard **Model Context Protocol (MCP)** server (`tzero_mcp.py`) operating over `stdio`. This empowers AI agents in **Cursor**, **Claude Desktop**, **Antigravity IDE**, and **Cline** to autonomously inspect, prune, and query your project's codebase before writing a single line of code.
+
+### 🛠 Available MCP Tools
+
+| Tool Name | Parameters | Purpose |
+|:----------|:-----------|:--------|
+| `get_project_context_tree` | `project_root`, `reduction_mode`, `max_tokens`, `include_file_contents` | Scans workspace and builds a multi-tier T-Zero hierarchical context tree (T-1 to T-4). Reduces tokens by up to 95%. |
+| `query_module_dependencies` | `project_root`, `file_path` | Analyzes incoming and outgoing import dependencies, local links, and external packages for a file or entire project. |
+| `query_architecture_boundaries` | `project_root`, `extra_guidance` | Queries active T-4 architectural boundaries, operational constraints, and Zero-Leak rules for coding agents. |
+| `generate_architecture_blueprint` | `project_root` | Generates a complete system architecture specification (`ARCHITECTURE.md`) with live Mermaid topology diagrams. |
+| `generate_repo_map` | `project_root`, `max_tokens` | Produces an ultra-compressed AST symbol map (classes, methods, signatures) optimized for prompt injection. |
+| `audit_codebase_quality` | `project_root`, `file_path` | Runs an AST static code smell check and secret leak scan (detects functions >30 lines, global vars, missing docstrings). |
+| `find_code_duplicity` | `project_root`, `min_lines` | Scans the workspace to identify repeated/duplicate blocks of code across files for refactoring. |
+| `estimate_token_cost` | `text`, `project_root`, `reduction_mode` | Computes exact token count and USD cost comparison across OpenAI, Claude, Groq, NVIDIA NIM, and Ollama ($0). |
+
+### 🧭 MCP Prompts
+- **`tzero_grounding`**: Injects strict architectural boundary rules, modular integrity guidelines, and Zero-Leak security mandates into the agent's system session.
+
+### 🔌 Client Configuration
+
+#### 1. Cursor IDE (`.cursor/mcp.json` or Settings → MCP)
+```json
+{
+  "mcpServers": {
+    "tzero": {
+      "command": "python",
+      "args": ["C:/absolute/path/to/TZeroAlgorithm/tzero_mcp.py"]
+    }
+  }
+}
+```
+
+#### 2. Claude Desktop (`claude_desktop_config.json`)
+```json
+{
+  "mcpServers": {
+    "tzero": {
+      "command": "python",
+      "args": ["C:/absolute/path/to/TZeroAlgorithm/tzero_mcp.py"]
+    }
+  }
+}
+```
+
+#### 3. CLI Launch
+```bash
+# Launch directly via MCP entrypoint
+python tzero_mcp.py
+
+# Or launch via main CLI flag
+python main.py --mcp
+```
+
+---
+
 ## 🏗 System Architecture
 
 ```mermaid
@@ -91,6 +151,9 @@ flowchart TD
     M -->|AI Provider Mode| O[LLM Prompt Synthesizer]
     O --> P[NVIDIA NIM / OpenAI / Gemini / Anthropic / Ollama]
     P --> Q[High-Fidelity README.md, AGENTS.md, & ARCHITECTURE.md]
+
+    M --> R[Model Context Protocol (MCP)]
+    R --> S[Cursor / Claude Desktop / Antigravity / Cline]
 ```
 
 ---
@@ -171,7 +234,7 @@ Download `TZeroAlgorithm.exe` directly from the [Releases](https://github.com/to
 git clone https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git
 cd TZeroAlgorithm
 
-# Install dependencies
+# Install dependencies (including MCP SDK)
 pip install -r requirements.txt
 
 # Or install in editable development mode
@@ -198,31 +261,34 @@ python tzero.py
 T-Zero V3 offers a full suite of CLI flags for terminal enthusiasts and automated CI/CD pipelines:
 
 ```bash
-# 1. Scan directory and print metric table
+# 1. Start Model Context Protocol (MCP) stdio server
+python main.py --mcp
+
+# 2. Scan directory and print metric table
 python main.py --scan .
 
-# 2. Audit codebase quality and detect code smells
+# 3. Audit codebase quality and detect code smells
 python main.py --audit .
 
-# 3. Generate offline context tree locally ($0 API cost)
+# 4. Generate offline context tree locally ($0 API cost)
 python main.py --dry-run --dir . --output README.md
 
-# 4. Generate AI Agent Rules & Blueprint (AGENTS.md / CLAUDE.md)
+# 5. Generate AI Agent Rules & Blueprint (AGENTS.md / CLAUDE.md)
 python main.py --export-agents AGENTS.md --dir .
 
-# 5. Generate System Architecture Specification (ARCHITECTURE.md)
+# 6. Generate System Architecture Specification (ARCHITECTURE.md)
 python main.py --export-arch ARCHITECTURE.md --dir .
 
-# 6. Generate Compressed Token Symbol Map (REPO_MAP.txt)
+# 7. Generate Compressed Token Symbol Map (REPO_MAP.txt)
 python main.py --export-repomap REPO_MAP.txt --dir .
 
-# 7. Generate Cyberpunk Styled HTML Preview (README.html)
+# 8. Generate Cyberpunk Styled HTML Preview (README.html)
 python main.py --export-html README.html --dir .
 
-# 8. Launch Interactive Terminal Wizard
+# 9. Launch Interactive Terminal Wizard
 python main.py --cli
 
-# 9. Print current engine version
+# 10. Print current engine version
 python main.py --version
 ```
 
@@ -243,6 +309,8 @@ python main.py --version
 
 ```
 TZeroAlgorithm/
+├── .cursor/
+│   └── mcp.json                 # Pre-configured Cursor MCP integration
 ├── .github/
 │   └── workflows/
 │       └── ci.yml               # Automated GitHub Actions test workflow
@@ -254,6 +322,7 @@ TZeroAlgorithm/
 │   ├── test_exports.py          # Multi-format exports & token cost tests
 │   ├── test_generator.py        # Template engine & context generator tests
 │   ├── test_gui.py              # Tkinter GUI headless smoke tests
+│   ├── test_mcp.py              # Model Context Protocol (MCP) server tests
 │   ├── test_providers.py        # Multi-provider LLM adapter tests
 │   └── test_scanner.py          # TokenReducer & CodebaseScanner tests
 ├── build_exe.bat                # One-click Windows PyInstaller build script
@@ -266,7 +335,8 @@ TZeroAlgorithm/
 ├── requirements.txt             # Production Python dependencies
 ├── run.bat                      # Windows quick-launch runner
 ├── siber_akademi.ico            # High-resolution application icon
-├── tzero.py                     # Backward-compatibility execution wrapper
+├── tzero.py                     # Backward-compatibility API wrapper
+├── tzero_mcp.py                 # Standard Model Context Protocol (MCP) Server
 ├── tzero_v3.py                  # Monolithic portable T-Zero V3 core engine
 └── WALKTHROUGH.md               # Technical architecture walkthrough
 ```
@@ -283,7 +353,7 @@ python -m unittest discover -s tests -v
 
 Expected output:
 ```
-Ran 34 tests in ~3.2s
+Ran 44 tests in ~3.8s
 OK (100% Pass)
 ```
 
@@ -307,14 +377,15 @@ This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) f
 
 ## İçindekiler
 1. [Şifreli Güvenlik Mimarisi (%100 Zero-Leak Garantisi)](#-şifreli-güvenlik-mimarisi-100-zero-leak-garantisi)
-2. [Sistem Mimarisi](#-sistem-mimarisi-1)
-3. [Öne Çıkan Yetenekler & Özellikler](#-öne-çıkan-yetenekler--özellikler)
-4. [Kurulum ve Başlangıç](#-kurulum-ve-başlangıç)
-5. [Kullanım Kılavuzu (GUI & CLI)](#-kullanım-kılavuzu-gui--cli)
-6. [Klavye Kısayolları](#-klavye-kısayolları)
-7. [Proje Dizin Ağacı](#-proje-dizin-ağacı)
-8. [Otomatik Test Süreci ve CI/CD](#-otomatik-test-süreci-ve-cicd)
-9. [Lisans ve Geliştirici Bilgileri](#-lisans-ve-geliştirici-bilgileri)
+2. [Model Context Protocol (MCP) Sunucusu](#-model-context-protocol-mcp-sunucusu)
+3. [Sistem Mimarisi](#-sistem-mimarisi-1)
+4. [Öne Çıkan Yetenekler & Özellikler](#-öne-çıkan-yetenekler--özellikler)
+5. [Kurulum ve Başlangıç](#-kurulum-ve-başlangıç)
+6. [Kullanım Kılavuzu (GUI & CLI)](#-kullanım-kılavuzu-gui--cli)
+7. [Klavye Kısayolları](#-klavye-kısayolları)
+8. [Proje Dizin Ağacı](#-proje-dizin-ağacı)
+9. [Otomatik Test Süreci ve CI/CD](#-otomatik-test-süreci-ve-cicd)
+10. [Lisans ve Geliştirici Bilgileri](#-lisans-ve-geliştirici-bilgileri)
 
 ---
 
@@ -346,6 +417,63 @@ This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) f
 
 ---
 
+## 🤖 Model Context Protocol (MCP) Sunucusu
+
+T-Zero V3, Anthropic'in standart **Model Context Protocol (MCP)** SDK'sını kullanarak `stdio` üzerinden haberleşen yerel bir sunucu (`tzero_mcp.py`) sunar. Bu sayede **Cursor**, **Claude Desktop**, **Antigravity IDE** ve **Cline** gibi yapay zeka ajanları, projede herhangi bir kod üretmeden veya değiştirmeden önce projenin hiyerarşik mimarisini, bağımlılık grafiğini ve sınırlarını sorgulayabilir.
+
+### 🛠 Sunulan MCP Araçları (Tools)
+
+| Araç Adı | Parametreler | Görevi ve Amacı |
+|:---------|:-------------|:----------------|
+| `get_project_context_tree` | `project_root`, `reduction_mode`, `max_tokens`, `include_file_contents` | Proje dizinini tarar; T-1 Master Architecture, T-2 Modül Referansları ve T-4 sınır kurallarını hiyerarşik bağlam olarak döndürür. Token kullanımını %95'e kadar azaltır. |
+| `query_module_dependencies` | `project_root`, `file_path` | Belirli bir dosyanın veya tüm deponun içe/dışa aktarım (import/export), dahili bağlar ve harici paket imza haritasını çeker. |
+| `query_architecture_boundaries` | `project_root`, `extra_guidance` | Yapay zeka ajanları için aktif mimari sınırları (T-4), kuralları ve Zero-Leak kısıtlamalarını sorgular. |
+| `generate_architecture_blueprint` | `project_root` | Otomatik Mermaid topoloji şeması içeren sistem mimarisi dokümanı (`ARCHITECTURE.md`) üretir. |
+| `generate_repo_map` | `project_root`, `max_tokens` | LLM sohbetleri için aşırı sıkıştırılmış AST simge haritası (sınıflar, metotlar, imzalar) üretir. |
+| `audit_codebase_quality` | `project_root`, `file_path` | AST statik kod kokusu analizi ve gizli anahtar/şifre sızıntısı taraması gerçekleştirir (30+ satır fonksiyonlar, global anahtarlar). |
+| `find_code_duplicity` | `project_root`, `min_lines` | Çalışma alanında 6+ satırlık kopya/tekrar kod bloklarını tespit eder. |
+| `estimate_token_cost` | `text`, `project_root`, `reduction_mode` | Verilen metin veya dizin için OpenAI, Claude, Groq, NVIDIA NIM ve Ollama ($0) modelleri üzerinden tam token ve USD maliyet tablosu çıkarır. |
+
+### 🧭 MCP Yerleşik Promptları
+- **`tzero_grounding`**: Cursor / Claude / Antigravity oturumlarına mimari kuralları, modüler sınırları ve %100 Zero-Leak güvenlik direktiflerini enjekte eder.
+
+### 🔌 Editör Entegrasyonu
+
+#### 1. Cursor IDE (`.cursor/mcp.json` veya Cursor Ayarları → MCP)
+```json
+{
+  "mcpServers": {
+    "tzero": {
+      "command": "python",
+      "args": ["C:/tam/yol/TZeroAlgorithm/tzero_mcp.py"]
+    }
+  }
+}
+```
+
+#### 2. Claude Desktop (`claude_desktop_config.json`)
+```json
+{
+  "mcpServers": {
+    "tzero": {
+      "command": "python",
+      "args": ["C:/tam/yol/TZeroAlgorithm/tzero_mcp.py"]
+    }
+  }
+}
+```
+
+#### 3. Komut Satırından Başlatma
+```bash
+# Doğrudan MCP sunucusunu başlat
+python tzero_mcp.py
+
+# Veya main.py bayrağı ile başlat
+python main.py --mcp
+```
+
+---
+
 ## 🏗 Sistem Mimarisi
 
 ```mermaid
@@ -370,6 +498,9 @@ flowchart TD
     M -->|AI API Modu| O[LLM Prompt Sentezleyici]
     O --> P[NVIDIA NIM / OpenAI / Gemini / Anthropic / Ollama]
     P --> Q[Yüksek Sadakatli README.md, AGENTS.md & ARCHITECTURE.md]
+
+    M --> R[Model Context Protocol (MCP)]
+    R --> S[Cursor / Claude Desktop / Antigravity / Cline]
 ```
 
 ---
@@ -450,7 +581,7 @@ Releases bölümünden `TZeroAlgorithm.exe` dosyasını indirin. Kurulum, Python
 git clone https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git
 cd TZeroAlgorithm
 
-# Bağımlılıkları yükleyin
+# Bağımlılıkları yükleyin (MCP SDK dahil)
 pip install -r requirements.txt
 
 # Veya geliştirici modunda kurun
@@ -477,31 +608,34 @@ python tzero.py
 Terminal geliştiricileri ve CI/CD otomasyonları için gelişmiş komut satırı bayrakları:
 
 ```bash
-# 1. Projeyi tara ve metrik tablosunu ekrana bas
+# 1. Model Context Protocol (MCP) stdio sunucusunu başlat
+python main.py --mcp
+
+# 2. Projeyi tara ve metrik tablosunu ekrana bas
 python main.py --scan .
 
-# 2. Kod kalitesini denetle ve code smell raporu al
+# 3. Kod kalitesini denetle ve code smell raporu al
 python main.py --audit .
 
-# 3. Sıfır API maliyetiyle yerel çevrimdışı context ağacı üret
+# 4. Sıfır API maliyetiyle yerel çevrimdışı context ağacı üret
 python main.py --dry-run --dir . --output README.md
 
-# 4. Yapay Zeka Ajan Kılavuzu (AGENTS.md / CLAUDE.md) üret
+# 5. Yapay Zeka Ajan Kılavuzu (AGENTS.md / CLAUDE.md) üret
 python main.py --export-agents AGENTS.md --dir .
 
-# 5. Mermaid Mimari Şeması (ARCHITECTURE.md) üret
+# 6. Mermaid Mimari Şeması (ARCHITECTURE.md) üret
 python main.py --export-arch ARCHITECTURE.md --dir .
 
-# 6. Sıkıştırılmış Token Repo Haritası (REPO_MAP.txt) üret
+# 7. Sıkıştırılmış Token Repo Haritası (REPO_MAP.txt) üret
 python main.py --export-repomap REPO_MAP.txt --dir .
 
-# 7. Koyu Modlu Görsel HTML Önizlemesi (README.html) üret
+# 8. Koyu Modlu Görsel HTML Önizlemesi (README.html) üret
 python main.py --export-html README.html --dir .
 
-# 8. İnteraktif Terminal Sihirbazını başlat
+# 9. İnteraktif Terminal Sihirbazını başlat
 python main.py --cli
 
-# 9. Sürüm bilgisini görüntüle
+# 10. Sürüm bilgisini görüntüle
 python main.py --version
 ```
 
@@ -522,6 +656,8 @@ python main.py --version
 
 ```
 TZeroAlgorithm/
+├── .cursor/
+│   └── mcp.json                 # Hazır Cursor MCP sunucu yapılandırması
 ├── .github/
 │   └── workflows/
 │       └── ci.yml               # GitHub Actions CI/CD otomatik test boru hattı
@@ -533,6 +669,7 @@ TZeroAlgorithm/
 │   ├── test_exports.py          # Çoklu format dışa aktarım & maliyet testleri
 │   ├── test_generator.py        # Şablon motoru ve bağlam derleme testleri
 │   ├── test_gui.py              # Tkinter GUI başlatma testleri
+│   ├── test_mcp.py              # Model Context Protocol (MCP) sunucu testleri
 │   ├── test_providers.py        # 6 AI sağlayıcı adaptör testleri
 │   └── test_scanner.py          # TokenReducer ve CodebaseScanner testleri
 ├── build_exe.bat                # Windows PyInstaller tek tık derleme betiği
@@ -545,7 +682,8 @@ TZeroAlgorithm/
 ├── requirements.txt             # Üretim bağımlılık listesi
 ├── run.bat                      # Windows hızlı başlatıcısı
 ├── siber_akademi.ico            # Yüksek çözünürlüklü uygulama ikonu
-├── tzero.py                     # Geriye dönük uyumluluk wrapper'ı
+├── tzero.py                     # Geriye dönük uyumluluk API sarmalayıcısı
+├── tzero_mcp.py                 # Standart Model Context Protocol (MCP) Sunucusu
 ├── tzero_v3.py                  # Bağımsız taşınabilir T-Zero V3 motoru
 └── WALKTHROUGH.md               # Detaylı teknik mimari kılavuzu
 ```
@@ -562,7 +700,7 @@ python -m unittest discover -s tests -v
 
 Beklenen çıktı:
 ```
-Ran 34 tests in ~3.2s
+Ran 44 tests in ~3.8s
 OK (100% Pass)
 ```
 

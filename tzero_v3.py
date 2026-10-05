@@ -1394,7 +1394,7 @@ This repository index outlines code layout architecture using token-reduced sign
         return rendered
 
 
-def count_tokens_precise(text: str, model_name: str) -> int:
+def count_tokens_precise(text: str, model_name: str = "gpt-4o") -> int:
     return len(text) // 4
 
 
@@ -4843,6 +4843,7 @@ def main():
     parser.add_argument("--dir", default=".", help="Target project workspace directory (default: current dir)")
     parser.add_argument("--output", "-o", default="README.md", help="Output filepath for generated markdown (default: README.md)")
     parser.add_argument("--provider", "-p", choices=list(PROVIDERS.keys()), help="AI Provider to use (default: active profile)")
+    parser.add_argument("--mcp", action="store_true", help="Start Model Context Protocol (MCP) stdio server for Cursor/Claude/Antigravity")
     parser.add_argument("--gui", "-g", action="store_true", help="Launch the GUI Dashboard")
     parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect V3.0.0")
 
@@ -4851,7 +4852,10 @@ def main():
         return
 
     args = parser.parse_args()
-    if args.gui:
+    if args.mcp:
+        import tzero_mcp
+        tzero_mcp.main()
+    elif args.gui:
         launch_gui()
     elif args.scan is not None:
         run_scan_cli(args.scan or args.dir)

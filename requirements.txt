@@ -4,3 +4,4 @@ darkdetect>=0.8.0
 pygments>=2.14.0
 Pillow>=9.0.0
 pyinstaller>=6.0.0
+mcp>=1.0.0
