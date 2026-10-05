@@ -52,7 +52,10 @@ class TestMCPOutputQuality(unittest.TestCase):
 
     def call(self, name, args):
         res = asyncio.run(self.server.call_tool(name, args))
-        return res.content[0].text
+        if isinstance(res, tuple):
+            res = res[0]
+        content = getattr(res, "content", res)
+        return content[0].text
 
     def test_audit_detects_openai_style_key(self):
         """The OpenAI key pattern must actually match a key (it was malformed before)."""

@@ -8,6 +8,13 @@ import asyncio
 import tzero_mcp
 
 
+def tool_result_text(result):
+    if isinstance(result, tuple):
+        result = result[0]
+    content = getattr(result, "content", result)
+    return content[0].text
+
+
 class TestMCPServer(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -52,7 +59,7 @@ class TestMCPServer(unittest.TestCase):
                 "get_project_context_tree",
                 {"project_root": temp_dir, "reduction_mode": "ultra", "include_file_contents": True}
             ))
-            output = res.content[0].text
+            output = tool_result_text(res)
             self.assertIn("T-Zero Context Tree", output)
             self.assertIn("app.py", output)
             self.assertIn("Architecture Overview", output)
@@ -71,7 +78,7 @@ class TestMCPServer(unittest.TestCase):
                 "query_module_dependencies",
                 {"project_root": temp_dir}
             ))
-            out_ws = res_ws.content[0].text
+            out_ws = tool_result_text(res_ws)
             self.assertIn("Workspace Dependency Topology", out_ws)
             self.assertIn("json", out_ws)
 
@@ -80,7 +87,7 @@ class TestMCPServer(unittest.TestCase):
                 "query_module_dependencies",
                 {"project_root": temp_dir, "file_path": "a.py"}
             ))
-            out_file = res_file.content[0].text
+            out_file = tool_result_text(res_file)
             self.assertIn("Dependency Analysis for `a.py`", out_file)
             self.assertIn("json", out_file)
             self.assertIn("b.py", out_file)
@@ -95,7 +102,7 @@ class TestMCPServer(unittest.TestCase):
                 "query_architecture_boundaries",
                 {"project_root": temp_dir, "extra_guidance": "Follow strict clean code."}
             ))
-            out = res.content[0].text
+            out = tool_result_text(res)
             self.assertIn("AGENTS & AI ASSISTANT BLUEPRINT", out)
             self.assertIn("Follow strict clean code.", out)
             self.assertIn("Zero-Leak", out)
@@ -110,7 +117,7 @@ class TestMCPServer(unittest.TestCase):
                 "generate_architecture_blueprint",
                 {"project_root": temp_dir}
             ))
-            out = res.content[0].text
+            out = tool_result_text(res)
             self.assertIn("Architecture & System Blueprint", out)
             self.assertIn("```mermaid", out)
 
@@ -124,7 +131,7 @@ class TestMCPServer(unittest.TestCase):
                 "generate_repo_map",
                 {"project_root": temp_dir, "max_tokens": 1000}
             ))
-            out = res.content[0].text
+            out = tool_result_text(res)
             self.assertIn("REPO MAP", out)
             self.assertIn("math_utils.py", out)
 
@@ -138,7 +145,7 @@ class TestMCPServer(unittest.TestCase):
                 "audit_codebase_quality",
                 {"project_root": temp_dir}
             ))
-            out = res.content[0].text
+            out = tool_result_text(res)
             self.assertIn("Code Quality & Security Audit", out)
             self.assertIn("Zero-Leak Verified", out)
 
@@ -156,7 +163,7 @@ class TestMCPServer(unittest.TestCase):
                 "find_code_duplicity",
                 {"project_root": temp_dir, "min_lines": 6}
             ))
-            out = res.content[0].text
+            out = tool_result_text(res)
             self.assertIn("Code Duplicity Report", out)
             self.assertIn("mod1.py", out)
             self.assertIn("mod2.py", out)
@@ -166,7 +173,7 @@ class TestMCPServer(unittest.TestCase):
             "estimate_token_cost",
             {"text": "Sample text for token and pricing estimation."}
         ))
-        out = res.content[0].text
+        out = tool_result_text(res)
         self.assertIn("Token & API Cost Estimation", out)
         self.assertIn("OpenAI (GPT-4o)", out)
         self.assertIn("Anthropic (Claude 3.7 Sonnet)", out)
@@ -196,7 +203,7 @@ class TestMCPServer(unittest.TestCase):
                 "analyze_change_impact",
                 {"target_symbol": "target_func", "project_root": temp_dir}
             ))
-            out = res.content[0].text
+            out = tool_result_text(res)
             self.assertIn("Change Impact & Blast Radius", out)
             self.assertIn("caller.py", out)
 
@@ -213,7 +220,7 @@ class TestMCPServer(unittest.TestCase):
                 "enforce_architecture_boundaries",
                 {"project_root": temp_dir, "rules_file": "tzero.rules.json"}
             ))
-            out = res.content[0].text
+            out = tool_result_text(res)
             self.assertIn("ARCH VIOLATION", out)
 
     def test_tool_search_codebase_semantic(self):
@@ -226,7 +233,7 @@ class TestMCPServer(unittest.TestCase):
                 "search_codebase_semantic",
                 {"query": "jwt token authenticate", "project_root": temp_dir, "top_k": 3}
             ))
-            out = res.content[0].text
+            out = tool_result_text(res)
             self.assertIn("Semantic Code Search", out)
             self.assertIn("auth_service.py", out)
 
@@ -236,7 +243,7 @@ class TestMCPServer(unittest.TestCase):
                 "export_agent_rules",
                 {"project_root": temp_dir, "target": "all"}
             ))
-            out = res.content[0].text
+            out = tool_result_text(res)
             self.assertIn("Generated AI Agent rule files", out)
             self.assertTrue(os.path.exists(os.path.join(temp_dir, ".cursorrules")))
             self.assertTrue(os.path.exists(os.path.join(temp_dir, ".clinerules")))
@@ -251,7 +258,7 @@ class TestMCPServer(unittest.TestCase):
                 "get_token_savings_metrics",
                 {"project_root": temp_dir, "team_size": 3}
             ))
-            out = res.content[0].text
+            out = tool_result_text(res)
             self.assertIn("T-Zero Token Reduction & Economic ROI Report", out)
             self.assertIn("Monthly Team Cost", out)
 

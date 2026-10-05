@@ -1,7 +1,7 @@
 name: Release
 
 # Builds the Windows executable and publishes it as a GitHub Release.
-#   * Push a tag like v3.0.1  -> test, build, and create/update the release.
+#   * Push a version tag like v3.0.2  -> test, build, and create/update the release.
 #   * Run manually (Actions tab) -> test and build only; the .exe is attached to the run as an artifact.
 
 on:

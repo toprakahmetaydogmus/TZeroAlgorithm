@@ -2130,8 +2130,26 @@ class AutoReadmeGUI:
         self.scanner = CodebaseScanner()
         self.template_engine = TemplateEngine()
         
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
+        available_width = max(640, screen_width - 48)
+        available_height = max(480, screen_height - 96)
+        window_width = min(1700, max(min(1100, available_width), int(available_width * 0.88)))
+        window_height = min(1080, max(min(700, available_height), int(available_height * 0.90)))
+        position_x = max(0, (screen_width - window_width) // 2)
+        position_y = max(0, (screen_height - window_height) // 2)
+        self.root.geometry(f"{window_width}x{window_height}+{position_x}+{position_y}")
+        self.root.minsize(min(960, window_width), min(640, window_height))
+
+        resource_dir = getattr(sys, "_MEIPASS", os.path.dirname(os.path.abspath(__file__)))
+        icon_path = os.path.join(resource_dir, "siber_akademi.ico")
+        if os.path.isfile(icon_path):
+            try:
+                self.root.iconbitmap(icon_path)
+            except tk.TclError:
+                pass
+
         self.root.title(get_text("title", self.lang))
-        self.root.geometry("1300x950")
         self.root.configure(bg=PALETTE["bg_start"])
         
         self.create_layout()
@@ -4896,7 +4914,7 @@ def main():
     parser.add_argument("--mcp", action="store_true", help="Start Model Context Protocol (MCP) stdio server for Cursor/Claude/Antigravity")
     parser.add_argument("--gui", "-g", action="store_true", help="Launch the GUI Dashboard")
     parser.add_argument("--doctor", action="store_true", help="Check Python, dependencies, tkinter, git and keyring (installs missing packages)")
-    parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect V3.0.1")
+    parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect V3.0.2")
 
     if len(sys.argv) == 1:
         launch_gui()

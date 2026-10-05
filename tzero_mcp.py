@@ -112,7 +112,7 @@ def create_mcp_server():
     elif "instructions" in supported:
         server_kwargs["instructions"] = summary
     if "version" in supported:
-        server_kwargs["version"] = "3.0.1"
+        server_kwargs["version"] = "3.0.2"
     server = ServerClass(**server_kwargs)
 
     # -------------------------------------------------------------------------

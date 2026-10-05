@@ -108,6 +108,7 @@ def build_binary():
     
     if icon_file:
         build_args.append(f"--icon={icon_file}")
+        build_args.append(f"--add-data={os.path.abspath(icon_file)}{os.pathsep}.")
         
     build_args.append(main_script)
     
