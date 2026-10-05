@@ -23,12 +23,21 @@ import sys
 import json
 import re
 import ast
+import inspect
+import logging
 from typing import Dict, List, Optional, Any
 
 # Ensure project root is in sys.path
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 if SCRIPT_DIR not in sys.path:
     sys.path.insert(0, SCRIPT_DIR)
+
+# Make sure the MCP SDK (and the core packages) are installed before importing them.
+try:
+    import tzero_deps
+    tzero_deps.ensure_dependencies(include_mcp=True)
+except ImportError:
+    pass
 
 # Core T-Zero V3 Engine Imports
 try:
@@ -93,11 +102,18 @@ def create_mcp_server():
             "The 'mcp' Python SDK is not installed. Please run: pip install mcp"
         )
 
-    server = ServerClass(
-        name="tzero-context-engine",
-        description="Enterprise-Grade Codebase Context Architect, AST Signatures Analyzer, & Token Reducer",
-        version="3.0.0"
-    )
+    # mcp 2.x (MCPServer) accepts description/version; mcp 1.x (FastMCP) only knows
+    # `instructions`. Pass whichever the installed SDK supports so both versions start.
+    summary = "Enterprise-Grade Codebase Context Architect, AST Signatures Analyzer, & Token Reducer"
+    supported = inspect.signature(ServerClass.__init__).parameters
+    server_kwargs: Dict[str, Any] = {"name": "tzero-context-engine"}
+    if "description" in supported:
+        server_kwargs["description"] = summary
+    elif "instructions" in supported:
+        server_kwargs["instructions"] = summary
+    if "version" in supported:
+        server_kwargs["version"] = "3.0.1"
+    server = ServerClass(**server_kwargs)
 
     # -------------------------------------------------------------------------
     # TOOL 1: get_project_context_tree
@@ -615,7 +631,8 @@ def create_mcp_server():
         config_p = os.path.join(project_root, rules_file) if not os.path.isabs(rules_file) else rules_file
         engine = ArchitectureRuleEngine(project_root, config_p)
         res = engine.enforce_boundaries()
-        return engine.format_report(res)
+        # The report is colored for terminals; strip ANSI codes so agents get clean text.
+        return re.sub(r"\x1b\[[0-9;]*m", "", engine.format_report(res))
 
     # -------------------------------------------------------------------------
     # TOOL 11: search_codebase_semantic
@@ -718,6 +735,12 @@ def main():
             "    pip install mcp\n\n"
         )
         sys.exit(1)
+
+    # stdout is the MCP protocol channel: any stray log line there corrupts the JSON-RPC
+    # stream. The core engine logs to stdout by default, so move those handlers to stderr.
+    for handler in logging.getLogger().handlers:
+        if isinstance(handler, logging.StreamHandler) and getattr(handler, "stream", None) is sys.stdout:
+            handler.setStream(sys.stderr)
 
     server = create_mcp_server()
     try:

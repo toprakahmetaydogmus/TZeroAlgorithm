@@ -6,11 +6,11 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Release-v3.0.0-00ffd8?style=for-the-badge&logo=rocket" alt="Release v3.0.0" />
+  <img src="https://img.shields.io/badge/Release-v3.0.1-00ffd8?style=for-the-badge&logo=rocket" alt="Release v3.0.1" />
   <img src="https://img.shields.io/badge/MCP-13%20Tools%20Ready-ff69b4?style=for-the-badge&logo=anthropic" alt="MCP Server 13 Tools Ready" />
   <img src="https://img.shields.io/badge/Security-100%25%20Zero--Leak%20Keyring-50fa7b?style=for-the-badge&logo=shield" alt="Zero Leak Security" />
   <img src="https://img.shields.io/badge/Python-3.9%20|%203.10%20|%203.11%20|%203.12%20|%203.13%20|%203.14-bd93f9?style=for-the-badge&logo=python" alt="Python Versions" />
-  <img src="https://img.shields.io/badge/Tests-58%2F58%20Passing-00f0ff?style=for-the-badge&logo=githubactions" alt="Tests 58/58 Passing" />
+  <img src="https://img.shields.io/badge/Tests-72%20Passing-00f0ff?style=for-the-badge&logo=githubactions" alt="Tests 72 Passing" />
   <img src="https://img.shields.io/badge/License-MIT-f1fa8c?style=for-the-badge" alt="MIT License" />
   <img src="https://img.shields.io/badge/Platform-Windows%20|%20macOS%20|%20Linux-ff79c6?style=for-the-badge" alt="Platform" />
 </p>
@@ -250,6 +250,8 @@ pip install -r requirements.txt
 pip install -e .
 ```
 
+> **Automatic dependency check:** on startup T-Zero verifies its required packages and installs any that are missing or too old (progress goes to stderr, so MCP stdio stays clean). Opt out with `TZERO_NO_AUTO_INSTALL=1`. Run `python main.py --doctor` for a full health check. The desktop GUI needs `tkinter`; the CLI and the MCP server work without it, so headless servers, Docker and CI are fine.
+
 ---
 
 ## 🎮 Usage Guide (GUI & CLI)
@@ -320,6 +322,9 @@ python main.py --web
 
 # 17. Launch the desktop GUI
 python main.py --gui
+
+# 18. Check Python, dependencies, tkinter, git and keyring (installs what is missing)
+python main.py --doctor
 ```
 
 ---
@@ -344,14 +349,17 @@ TZeroAlgorithm/
 │   └── mcp.json                 # Pre-configured Cursor MCP integration
 ├── .github/
 │   └── workflows/
-│       └── ci.yml               # Automated GitHub Actions test workflow
+│       ├── ci.yml               # Automated GitHub Actions test workflow
+│       └── release.yml          # Builds TZeroAlgorithm.exe and publishes a GitHub Release on version tags
 ├── tests/
 │   ├── __init__.py
 │   ├── test_analyzer.py         # AST analysis and code smell unit tests
 │   ├── test_cli.py              # CLI integration tests
 │   ├── test_config.py           # Configuration & Keyring security tests
 │   ├── test_exports.py          # Multi-format exports & token cost tests
+│   ├── test_deps.py             # Dependency bootstrap & doctor tests
 │   ├── test_features.py         # Feature module tests (impact, rules, search, ROI)
+│   ├── test_headless.py         # No-tkinter, MCP output & secret-scan regression tests
 │   ├── test_generator.py        # Template engine & context generator tests
 │   ├── test_gui.py              # Tkinter GUI headless smoke tests
 │   ├── test_mcp.py              # Model Context Protocol (MCP) server tests
@@ -369,6 +377,7 @@ TZeroAlgorithm/
 ├── siber_akademi.ico            # High-resolution application icon
 ├── tzero.py                     # Backward-compatibility API wrapper
 ├── tzero.rules.json             # T-4 architecture boundary rules
+├── tzero_deps.py                # Dependency bootstrap and --doctor
 ├── tzero_features.py            # Impact analysis, boundary rules, semantic search, ROI, web dashboard
 ├── tzero_mcp.py                 # Standard Model Context Protocol (MCP) Server
 ├── tzero_v3.py                  # Monolithic portable T-Zero V3 core engine
@@ -387,8 +396,8 @@ python -m unittest discover -s tests -v
 
 Expected output:
 ```
-Ran 58 tests in ~6.2s
-OK (100% Pass)
+Ran 72 tests in ~4s
+OK (the GUI smoke test is skipped when no display is available)
 ```
 
 GitHub Actions automatically runs this test suite on every push and pull request across Ubuntu and Windows runners under Python 3.10, 3.11, and 3.12.
@@ -631,6 +640,8 @@ pip install -r requirements.txt
 pip install -e .
 ```
 
+> **Otomatik bağımlılık kontrolü:** T-Zero açılışta gerekli paketleri doğrular, eksik veya eski olanları kendisi kurar (çıktı stderr'e gider, MCP stdio bozulmaz). Kapatmak için `TZERO_NO_AUTO_INSTALL=1` kullanın. Tam sağlık kontrolü için `python main.py --doctor` çalıştırın. Masaüstü arayüzü `tkinter` ister; CLI ve MCP sunucusu onsuz da çalışır, yani sunucu, Docker ve CI ortamları sorunsuzdur.
+
 ---
 
 ## 🎮 Kullanım Kılavuzu (GUI & CLI)
@@ -701,6 +712,9 @@ python main.py --web
 
 # 17. Masaüstü arayüzünü (GUI) başlat
 python main.py --gui
+
+# 18. Python, bağımlılıklar, tkinter, git ve keyring kontrolü (eksikleri kurar)
+python main.py --doctor
 ```
 
 ---
@@ -725,14 +739,17 @@ TZeroAlgorithm/
 │   └── mcp.json                 # Hazır Cursor MCP sunucu yapılandırması
 ├── .github/
 │   └── workflows/
-│       └── ci.yml               # GitHub Actions CI/CD otomatik test boru hattı
+│       ├── ci.yml               # GitHub Actions CI/CD otomatik test boru hattı
+│       └── release.yml          # Sürüm etiketlerinde TZeroAlgorithm.exe derler ve GitHub Release yayınlar
 ├── tests/
 │   ├── __init__.py
 │   ├── test_analyzer.py         # AST analiz ve denetim testleri
 │   ├── test_cli.py              # CLI komut satırı entegrasyon testleri
 │   ├── test_config.py           # Config ve Keyring güvenlik testleri
 │   ├── test_exports.py          # Çoklu format dışa aktarım & maliyet testleri
+│   ├── test_deps.py             # Bağımlılık kontrolü & doctor testleri
 │   ├── test_features.py         # Özellik modülü testleri (etki, kurallar, arama, ROI)
+│   ├── test_headless.py         # tkinter'sız çalışma, MCP çıktısı & gizli anahtar taraması testleri
 │   ├── test_generator.py        # Şablon motoru ve bağlam derleme testleri
 │   ├── test_gui.py              # Tkinter GUI başlatma testleri
 │   ├── test_mcp.py              # Model Context Protocol (MCP) sunucu testleri
@@ -750,6 +767,7 @@ TZeroAlgorithm/
 ├── siber_akademi.ico            # Yüksek çözünürlüklü uygulama ikonu
 ├── tzero.py                     # Geriye dönük uyumluluk API sarmalayıcısı
 ├── tzero.rules.json             # T-4 mimari sınır kuralları
+├── tzero_deps.py                # Bağımlılık kontrolü ve --doctor
 ├── tzero_features.py            # Etki analizi, sınır kuralları, anlamsal arama, ROI, web paneli
 ├── tzero_mcp.py                 # Standart Model Context Protocol (MCP) Sunucusu
 ├── tzero_v3.py                  # Bağımsız taşınabilir T-Zero V3 motoru
@@ -768,8 +786,8 @@ python -m unittest discover -s tests -v
 
 Beklenen çıktı:
 ```
-Ran 58 tests in ~6.2s
-OK (100% Pass)
+Ran 72 tests in ~4s
+OK (the GUI smoke test is skipped when no display is available)
 ```
 
 GitHub Actions, depoya yapılan her push ve pull request işleminde Ubuntu ve Windows ortamlarında Python 3.10, 3.11 ve 3.12 ile bu testleri otomatik olarak yürütür.

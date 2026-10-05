@@ -32,17 +32,7 @@ def check_and_install_pyinstaller():
 
 def generate_siber_akademi_icon():
     """Generates a custom Siber Akademi icon dynamically using Pillow if missing."""
-    user_ico = r"C:\users\topra_n3vq63d\.nvidia_nim_cache\logo.ico"
     icon_path = "siber_akademi.ico"
-    
-    if os.path.exists(user_ico):
-        logger.info(f"Using custom user icon: {user_ico}")
-        try:
-            shutil.copy2(user_ico, icon_path)
-            return icon_path
-        except Exception as e:
-            logger.warning(f"Unable to copy user icon: {e}")
-            return user_ico
 
     if os.path.exists(icon_path):
         logger.info("Siber Akademi icon already resolved in workspace.")
@@ -106,11 +96,14 @@ def build_binary():
     # --noconsole: run GUI without popping terminal logs console (disable CLI terminal)
     # --clean: clean cache directories before compilation
     build_args = [
-        "pyinstaller",
+        sys.executable, "-m", "PyInstaller",
         "--onefile",
         "--noconsole",
         "--clean",
         "--name=TZeroAlgorithm",
+        # keyring loads its OS backends dynamically; PyInstaller cannot see them on its own
+        "--collect-submodules=keyring.backends",
+        "--hidden-import=win32ctypes.core",
     ]
     
     if icon_file:

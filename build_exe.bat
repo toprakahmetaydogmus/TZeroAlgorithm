@@ -38,12 +38,6 @@ if exist dist rmdir /s /q dist >nul 2>&1
 
 :: Icon check
 set "ICON_PATH=siber_akademi.ico"
-set "USER_ICON=C:\users\topra_n3vq63d\.nvidia_nim_cache\logo.ico"
-
-if exist "%USER_ICON%" (
-    echo [INFO] Copying user icon...
-    copy /y "%USER_ICON%" "%ICON_PATH%" >nul 2>&1
-)
 
 :: Build EXE
 echo.
@@ -53,9 +47,9 @@ echo ============================================================
 echo.
 
 if exist "%ICON_PATH%" (
-    pyinstaller --onefile --noconsole --clean --name=TZeroAlgorithmV3 --icon="%ICON_PATH%" tzero_v3.py
+    pyinstaller --onefile --noconsole --clean --name=TZeroAlgorithm --collect-submodules=keyring.backends --hidden-import=win32ctypes.core --icon="%ICON_PATH%" main.py
 ) else (
-    pyinstaller --onefile --noconsole --clean --name=TZeroAlgorithmV3 tzero_v3.py
+    pyinstaller --onefile --noconsole --clean --name=TZeroAlgorithm --collect-submodules=keyring.backends --hidden-import=win32ctypes.core main.py
 )
 
 if %errorlevel% neq 0 (
@@ -66,13 +60,13 @@ if %errorlevel% neq 0 (
 )
 
 echo.
-if exist "dist\TZeroAlgorithmV3.exe" (
+if exist "dist\TZeroAlgorithm.exe" (
     echo ============================================================
     echo   SUCCESS! EXE file created:
-    echo   dist\TZeroAlgorithmV3.exe
+    echo   dist\TZeroAlgorithm.exe
     echo ============================================================
     echo.
-    echo Location: %cd%\dist\TZeroAlgorithmV3.exe
+    echo Location: %cd%\dist\TZeroAlgorithm.exe
 ) else (
     echo [ERROR] EXE file not found!
 )

@@ -28,14 +28,48 @@ import math
 import random
 import logging
 import shutil
+
+# Install missing third-party packages before they are imported (see tzero_deps.py).
+try:
+    import tzero_deps
+except ImportError:  # tzero_v3.py copied on its own without the helper module
+    tzero_deps = None
+if tzero_deps is not None and not tzero_deps.ensure_dependencies():
+    sys.exit(1)
+
 import keyring
 import requests
 import threading
 import subprocess
 import webbrowser
-import tkinter as tk
-from tkinter import messagebox, filedialog, ttk, colorchooser
 from typing import Dict, List, Any, Tuple, Optional, Set, Callable
+
+# tkinter is only needed for the desktop GUI. Headless environments (servers, Docker,
+# most CI images, MCP hosts) often ship Python without it, so the core engine, CLI and
+# MCP server must keep working when it is missing.
+try:
+    import tkinter as tk
+    from tkinter import messagebox, filedialog, ttk, colorchooser
+    TK_AVAILABLE = True
+except ImportError:  # pragma: no cover - depends on the host Python build
+    TK_AVAILABLE = False
+
+    class _TkUnavailable:
+        """Stand-in base class so GUI classes can still be defined without tkinter."""
+
+        def __init__(self, *args, **kwargs):
+            raise RuntimeError(
+                "tkinter is not installed, so the GUI is unavailable. "
+                "Install it (Debian/Ubuntu: 'sudo apt install python3-tk') or use the CLI: python main.py --help"
+            )
+
+    class _TkModuleStub:
+        """Module-like object: any attribute (Canvas, Frame, Tk, ...) resolves to the stand-in."""
+
+        def __getattr__(self, name):
+            return _TkUnavailable
+
+    tk = ttk = messagebox = filedialog = colorchooser = _TkModuleStub()
 from concurrent.futures import ThreadPoolExecutor
 
 import darkdetect
@@ -4653,6 +4687,12 @@ Custom Requirements:
 # --- 14. STARTUP ORCHESTRATION & CLI WIZARD ---
 
 def launch_gui():
+    if not TK_AVAILABLE:
+        sys.stderr.write(
+            "[ERROR] The GUI needs tkinter, which is not installed in this Python.\n"
+            "        Install it (Debian/Ubuntu: sudo apt install python3-tk) or use the CLI: python main.py --help\n"
+        )
+        sys.exit(1)
     root = tk.Tk()
     style = ttk.Style()
     style.theme_use("clam")
@@ -4855,14 +4895,20 @@ def main():
     parser.add_argument("--web", nargs="?", const=7300, type=int, default=None, metavar="PORT", help="Launch local Cyberpunk web dashboard on localhost:7300")
     parser.add_argument("--mcp", action="store_true", help="Start Model Context Protocol (MCP) stdio server for Cursor/Claude/Antigravity")
     parser.add_argument("--gui", "-g", action="store_true", help="Launch the GUI Dashboard")
-    parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect V3.0.0")
+    parser.add_argument("--doctor", action="store_true", help="Check Python, dependencies, tkinter, git and keyring (installs missing packages)")
+    parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect V3.0.1")
 
     if len(sys.argv) == 1:
         launch_gui()
         return
 
     args = parser.parse_args()
-    if args.mcp:
+    if args.doctor:
+        if tzero_deps is None:
+            print("[ERROR] tzero_deps.py is missing; reinstall T-Zero to use --doctor.")
+            sys.exit(1)
+        sys.exit(tzero_deps.run_doctor())
+    elif args.mcp:
         import tzero_mcp
         tzero_mcp.main()
     elif args.web is not None:
