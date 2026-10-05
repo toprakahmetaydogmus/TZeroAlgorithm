@@ -113,7 +113,7 @@ Install [pipx](https://pipx.pypa.io/stable/installation/) first. The Cursor link
 
 #### Add to Cursor in One Click
 
-[Add T-Zero to Cursor](cursor://anysphere.cursor-deeplink/mcp/install?name=tzero&config=eyJjb21tYW5kIjoicGlweCIsImFyZ3MiOlsicnVuIiwiLS1zcGVjIiwiZ2l0K2h0dHBzOi8vZ2l0aHViLmNvbS90b3ByYWthaG1ldGF5ZG9nbXVzL1RaZXJvQWxnb3JpdGhtLmdpdCIsInR6ZXJvLW1jcCJdfQ%3D%3D)
+[Add T-Zero to Cursor](https://cursor.com/install-mcp?name=tzero&config=eyJjb21tYW5kIjoicGlweCIsImFyZ3MiOlsicnVuIiwiLS1zcGVjIiwiZ2l0K2h0dHBzOi8vZ2l0aHViLmNvbS90b3ByYWthaG1ldGF5ZG9nbXVzL1RaZXJvQWxnb3JpdGhtLmdpdCIsInR6ZXJvLW1jcCJdfQ%3D%3D)
 
 1. Install Cursor and pipx if you have not already.
 2. Open the link above and approve the server configuration in Cursor.
@@ -543,7 +543,7 @@ Tekrar üretmek için: `python -c "from pathlib import Path; from tzero_v3 impor
 
 #### Cursor'a Tek Tıkla Ekle
 
-[T-Zero'yu Cursor'a ekle](cursor://anysphere.cursor-deeplink/mcp/install?name=tzero&config=eyJjb21tYW5kIjoicGlweCIsImFyZ3MiOlsicnVuIiwiLS1zcGVjIiwiZ2l0K2h0dHBzOi8vZ2l0aHViLmNvbS90b3ByYWthaG1ldGF5ZG9nbXVzL1RaZXJvQWxnb3JpdGhtLmdpdCIsInR6ZXJvLW1jcCJdfQ%3D%3D)
+[T-Zero'yu Cursor'a ekle](https://cursor.com/install-mcp?name=tzero&config=eyJjb21tYW5kIjoicGlweCIsImFyZ3MiOlsicnVuIiwiLS1zcGVjIiwiZ2l0K2h0dHBzOi8vZ2l0aHViLmNvbS90b3ByYWthaG1ldGF5ZG9nbXVzL1RaZXJvQWxnb3JpdGhtLmdpdCIsInR6ZXJvLW1jcCJdfQ%3D%3D)
 
 1. Cursor ve pipx kurulu değilse önce kurun.
 2. Yukarıdaki bağlantıyı açın ve Cursor'daki sunucu yapılandırmasını onaylayın.
