@@ -1,0 +1,36 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# PyInstaller / Build artifacts
+build/
+dist/
+*.spec
+
+# Virtual Environments
+venv/
+.venv/
+env/
+.env
+
+# Secrets & Local User Configs
+*.dat
+*.key
+*.pem
+*.backup.json
+.nvidia_nim_config.json
+.tzero_config.json
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+Thumbs.db
+Desktop.ini
+.DS_Store

@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
-"""T-Zero Context Architect V3 - Backward Compatibility Wrapper.
+"""T-Zero Context Architect V3 - Startup Wrapper.
 
 Developer: Toprak Ahmet Aydoğmuş (Siber Akademi)
 Websites: https://utspro.co | https://hopp.bio/siberegitim
 
-Provides seamless backward compatibility for legacy invocations of `tzero.py`,
-delegating directly to the V3 engine.
+Points to unified single-file layout: tzero_v3.py
 """
 
 from tzero_v3 import main
