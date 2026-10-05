@@ -80,19 +80,6 @@ THEME_PALETTES = {
         "success": "#22c55e",
         "error": "#ef4444"
     },
-    "Siber Retro": {
-        "bg_start": "#1a0f0f",
-        "card_bg": "#2c1a1a",
-        "card_border": "#4a2a2a",
-        "card_hover": "#5c3535",
-        "text_main": "#f5e6d3",
-        "text_muted": "#c2a696",
-        "accent_cyan": "#ffaa00",
-        "accent_green": "#00ff66",
-        "accent_purple": "#ff00ff",
-        "success": "#33cc33",
-        "error": "#ff3333"
-    },
     "Neon Cyberpunk": {
         "bg_start": "#050508",
         "card_bg": "#0c0a1c",
@@ -105,6 +92,84 @@ THEME_PALETTES = {
         "accent_purple": "#7209b7",
         "success": "#3f37c9",
         "error": "#f72585"
+    },
+    "Midnight OLED": {
+        "bg_start": "#000000",
+        "card_bg": "#0a0c10",
+        "card_border": "#161b22",
+        "card_hover": "#21262d",
+        "text_main": "#f0f6fc",
+        "text_muted": "#7d8590",
+        "accent_cyan": "#38bdf8",
+        "accent_green": "#10b981",
+        "accent_purple": "#818cf8",
+        "success": "#34d399",
+        "error": "#f87171"
+    },
+    "Matrix Terminal": {
+        "bg_start": "#020803",
+        "card_bg": "#051408",
+        "card_border": "#0d3314",
+        "card_hover": "#144d1e",
+        "text_main": "#00ff66",
+        "text_muted": "#00aa44",
+        "accent_cyan": "#39ff14",
+        "accent_green": "#00ff41",
+        "accent_purple": "#55ff99",
+        "success": "#00ff66",
+        "error": "#ff3333"
+    },
+    "Synthwave 80s": {
+        "bg_start": "#130924",
+        "card_bg": "#1c0d38",
+        "card_border": "#36166b",
+        "card_hover": "#4f1f9e",
+        "text_main": "#ffddfe",
+        "text_muted": "#b59bc9",
+        "accent_cyan": "#00f0ff",
+        "accent_green": "#ffe600",
+        "accent_purple": "#ff2a85",
+        "success": "#00ffcc",
+        "error": "#ff2266"
+    },
+    "Nordic Frost": {
+        "bg_start": "#181b22",
+        "card_bg": "#222733",
+        "card_border": "#2e3440",
+        "card_hover": "#3b4252",
+        "text_main": "#eceff4",
+        "text_muted": "#d8dee9",
+        "accent_cyan": "#88c0d0",
+        "accent_green": "#a3be8c",
+        "accent_purple": "#b48ead",
+        "success": "#a3be8c",
+        "error": "#bf616a"
+    },
+    "Solarized Amber": {
+        "bg_start": "#0e1117",
+        "card_bg": "#181d27",
+        "card_border": "#2d3545",
+        "card_hover": "#3c475d",
+        "text_main": "#fef3c7",
+        "text_muted": "#d97706",
+        "accent_cyan": "#38bdf8",
+        "accent_green": "#f59e0b",
+        "accent_purple": "#fbbf24",
+        "success": "#10b981",
+        "error": "#ef4444"
+    },
+    "Siber Retro": {
+        "bg_start": "#1a0f0f",
+        "card_bg": "#2c1a1a",
+        "card_border": "#4a2a2a",
+        "card_hover": "#5c3535",
+        "text_main": "#f5e6d3",
+        "text_muted": "#c2a696",
+        "accent_cyan": "#ffaa00",
+        "accent_green": "#00ff66",
+        "accent_purple": "#ff00ff",
+        "success": "#33cc33",
+        "error": "#ff3333"
     }
 }
 
@@ -117,6 +182,47 @@ def update_colors(theme_name: str):
     if theme_name in THEME_PALETTES:
         CURRENT_THEME = theme_name
         PALETTE = THEME_PALETTES[theme_name]
+
+# --- Audio Feedback & Telemetry SFX Engine ---
+SFX_ENABLED = True
+
+def play_sfx(kind: str = "click") -> None:
+    """Asynchronous haptic audio chime player using standard Windows winsound."""
+    if not SFX_ENABLED or sys.platform != "win32":
+        return
+    def _worker():
+        try:
+            import winsound
+            if kind == "click":
+                winsound.Beep(1200, 20)
+            elif kind == "success":
+                winsound.Beep(880, 45)
+                winsound.Beep(1400, 65)
+            elif kind == "scan":
+                winsound.Beep(1100, 30)
+                winsound.Beep(1600, 40)
+            elif kind == "error":
+                winsound.Beep(350, 120)
+            elif kind == "notify":
+                winsound.Beep(950, 40)
+        except Exception:
+            pass
+    threading.Thread(target=_worker, daemon=True).start()
+
+# --- Provider Rates & Token Cost Estimator ---
+PROVIDER_COST_PER_MILLION = {
+    "OpenAI": 2.50,
+    "Anthropic": 3.00,
+    "Groq": 0.59,
+    "NVIDIA NIM": 0.70,
+    "Ollama (Local)": 0.00,
+    "OpenRouter": 1.00,
+    "Perplexity": 1.00,
+}
+
+def calculate_token_cost(token_count: int, provider_name: str) -> float:
+    rate = PROVIDER_COST_PER_MILLION.get(provider_name, 1.00)
+    return (token_count / 1_000_000.0) * rate
 
 # i18n Translations
 TRANSLATIONS: Dict[str, Dict[str, str]] = {
@@ -139,13 +245,21 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "generate_btn": "🚀 ARCHITECT CONTEXT README.md",
         "cancel_btn": "🛑 CANCEL GENERATION",
         "copy_btn": "📋 Copy to Clipboard",
-        "save_btn": "💾 Save Workspace README.md",
+        "save_btn": "💾 Save README.md",
+        "agents_btn": "🤖 Export AGENTS.md",
+        "arch_btn": "🏛️ Export ARCHITECTURE.md",
+        "repomap_btn": "🗺️ Export REPO_MAP.txt",
+        "html_btn": "🌐 HTML Preview",
         "success_msg": "README Saved successfully!",
         "error_msg": "Operation failed: ",
         "ping_success": "Ping Success! Connected to API catalog.",
         "smart_select": "🧠 Smart Select",
         "select_all": "Check All",
-        "deselect_all": "Uncheck All"
+        "deselect_all": "Uncheck All",
+        "invert_select": "Invert Selection",
+        "sfx_on": "🔊 SFX ON",
+        "sfx_off": "🔇 SFX OFF",
+        "audit_btn": "🛡️ SECURITY AUDIT"
     },
     "tr": {
         "title": "SİBER AKADEMİ - T-ZERO BAĞLAM MİMARI V3",
@@ -167,12 +281,20 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "cancel_btn": "🛑 İŞLEMİ İPTAL ET",
         "copy_btn": "📋 Panoya Kopyala",
         "save_btn": "💾 README.md Kaydet",
+        "agents_btn": "🤖 AGENTS.md Dışa Aktar",
+        "arch_btn": "🏛️ ARCHITECTURE.md Dışa Aktar",
+        "repomap_btn": "🗺️ REPO_MAP.txt Dışa Aktar",
+        "html_btn": "🌐 HTML Önizleme",
         "success_msg": "README başarıyla kaydedildi!",
         "error_msg": "İşlem başarısız oldu: ",
         "ping_success": "Bağlantı Başarılı! API kataloğuna ulaşıldı.",
         "smart_select": "🧠 Akıllı Seçim",
         "select_all": "Hepsini Seç",
-        "deselect_all": "Seçimleri Kaldır"
+        "deselect_all": "Seçimleri Kaldır",
+        "invert_select": "Seçimi Tersine Çevir",
+        "sfx_on": "🔊 SES AÇIK",
+        "sfx_off": "🔇 SES KAPALI",
+        "audit_btn": "🛡️ GÜVENLİK DENETİMİ"
     }
 }
 
@@ -963,30 +1085,67 @@ class WorkspaceDuplicityFinder:
 
 # --- 8. DYNAMIC MARKDOWN TEXT TAGGER ---
 
+# --- 8. DYNAMIC MARKDOWN TEXT TAGGER & CONTEXT EXPORT SUITE ---
+
 class MarkdownTextTagger:
-    """Parses headings, lists, code fences, and formats Tkinter text blocks dynamically."""
+    """Parses headings, lists, code fences, blockquotes, tables and formats Tkinter text blocks dynamically."""
     def __init__(self, text_widget: tk.Text):
         self.text_widget = text_widget
         self.setup_tags()
 
     def setup_tags(self):
-        self.text_widget.tag_configure("h1", foreground=PALETTE["accent_cyan"], font=("Segoe UI", 14, "bold"), spacing1=10, spacing2=5)
-        self.text_widget.tag_configure("h2", foreground=PALETTE["accent_purple"], font=("Segoe UI", 12, "bold"), spacing1=8, spacing2=4)
-        self.text_widget.tag_configure("bold", font=("Segoe UI", 10, "bold"))
+        self.text_widget.tag_configure("h1", foreground=PALETTE["accent_cyan"], font=("Segoe UI", 14, "bold"), spacing1=12, spacing2=6)
+        self.text_widget.tag_configure("h2", foreground=PALETTE["accent_purple"], font=("Segoe UI", 12, "bold"), spacing1=10, spacing2=4)
+        self.text_widget.tag_configure("h3", foreground=PALETTE["accent_green"], font=("Segoe UI", 11, "bold"), spacing1=8, spacing2=3)
+        self.text_widget.tag_configure("bold", font=("Segoe UI", 10, "bold"), foreground=PALETTE["text_main"])
+        self.text_widget.tag_configure("italic", font=("Segoe UI", 10, "italic"), foreground=PALETTE["text_muted"])
         self.text_widget.tag_configure("code", background=PALETTE["card_bg"], font=("Consolas", 9), foreground=PALETTE["accent_green"])
-        self.text_widget.tag_configure("bullet", lmargin1=15, lmargin2=25)
+        self.text_widget.tag_configure("code_block", background=PALETTE["bg_start"], font=("Consolas", 9), foreground=PALETTE["accent_cyan"], lmargin1=15, lmargin2=15)
+        self.text_widget.tag_configure("bullet", lmargin1=15, lmargin2=25, foreground=PALETTE["text_main"])
+        self.text_widget.tag_configure("quote", lmargin1=20, lmargin2=20, font=("Segoe UI", 9, "italic"), foreground=PALETTE["text_muted"])
+        self.text_widget.tag_configure("table", font=("Consolas", 9), foreground=PALETTE["accent_purple"])
+        self.text_widget.tag_configure("task_done", foreground=PALETTE["success"], font=("Segoe UI", 10, "bold"))
+        self.text_widget.tag_configure("task_todo", foreground=PALETTE["text_muted"], font=("Segoe UI", 10))
+        self.text_widget.tag_configure("hr", foreground=PALETTE["card_border"], font=("Consolas", 8))
 
     def render_markdown(self, markdown_text: str):
         self.text_widget.delete("1.0", tk.END)
         lines = markdown_text.splitlines()
+        in_code_fence = False
+        
         for line in lines:
+            stripped = line.strip()
+            # Code fence toggle
+            if stripped.startswith("```"):
+                in_code_fence = not in_code_fence
+                self.text_widget.insert(tk.END, "  " + line + "\n", "code_block")
+                continue
+            
+            if in_code_fence:
+                self.text_widget.insert(tk.END, "    " + line + "\n", "code_block")
+                continue
+                
             if line.startswith("# "):
                 self.text_widget.insert(tk.END, line[2:] + "\n", "h1")
             elif line.startswith("## "):
                 self.text_widget.insert(tk.END, line[3:] + "\n", "h2")
+            elif line.startswith("### "):
+                self.text_widget.insert(tk.END, line[4:] + "\n", "h3")
+            elif stripped == "---" or stripped == "***":
+                self.text_widget.insert(tk.END, "─" * 60 + "\n", "hr")
+            elif stripped.startswith("> "):
+                self.text_widget.insert(tk.END, "▌ " + stripped[2:] + "\n", "quote")
+            elif stripped.startswith("- [x] ") or stripped.startswith("* [x] "):
+                self.text_widget.insert(tk.END, "  ✔  ", "task_done")
+                self.text_widget.insert(tk.END, stripped[6:] + "\n", "bullet")
+            elif stripped.startswith("- [ ] ") or stripped.startswith("* [ ] "):
+                self.text_widget.insert(tk.END, "  ☐  ", "task_todo")
+                self.text_widget.insert(tk.END, stripped[6:] + "\n", "bullet")
             elif line.startswith("- ") or line.startswith("* "):
-                self.text_widget.insert(tk.END, "•  ", "bold")
+                self.text_widget.insert(tk.END, "  •  ", "bold")
                 self.text_widget.insert(tk.END, line[2:] + "\n", "bullet")
+            elif stripped.startswith("|") and stripped.endswith("|"):
+                self.text_widget.insert(tk.END, line + "\n", "table")
             elif "`" in line:
                 parts = line.split("`")
                 for idx, part in enumerate(parts):
@@ -995,6 +1154,168 @@ class MarkdownTextTagger:
                 self.text_widget.insert(tk.END, "\n")
             else:
                 self.text_widget.insert(tk.END, line + "\n")
+
+
+class ContextExportManager:
+    """Exports synthesized project context into specialized agent, architecture, and web targets."""
+    
+    @staticmethod
+    def generate_agents_blueprint(project_name: str, files_tree: str, snippets: Dict[str, str], extra_rules: str = "") -> str:
+        """Generates comprehensive AGENTS.md / CLAUDE.md instruction blueprint."""
+        return f"""# 🤖 AGENTS & AI ASSISTANT BLUEPRINT: {project_name}
+
+> Automated Agent Grounding Blueprint generated by Siber Akademi T-Zero Context Architect V3.
+
+## 🎯 Project Overview & Scope
+- **Project Name:** {project_name}
+- **Architecture Role:** Context-Aware Automated Software Engineering Blueprint
+- **Primary Runtime:** Python / Modern Polyglot Toolchain
+
+## 🏗️ Directory Hierarchy
+```text
+{files_tree}
+```
+
+## 📐 Core Architecture & Modules Outline
+{json.dumps(snippets, indent=2)}
+
+## 🛡️ Agent Operational Guardrails & Grounding
+1. **Never Assume External Dependencies:** Adhere strictly to the workspace dependencies already listed in `requirements.txt` or `pyproject.toml`.
+2. **Strict Zero-Leak Guarantee:** Never hardcode personal or public API keys, secrets, passwords, or tokens in source code or git commits. Use environment variables or OS keyring.
+3. **Preserve Documentation Integrity:** Maintain existing docstrings and explanatory comments.
+4. **Non-Breaking Changes:** Preserve existing public signatures and backwards compatibility.
+
+## ⚡ Execution Guidelines
+{extra_rules or "Follow standard test-driven development. Run all unit tests before creating release tags."}
+"""
+
+    @staticmethod
+    def generate_architecture_blueprint(project_name: str, files: List[str], deps: Dict[str, List[str]]) -> str:
+        """Generates ARCHITECTURE.md with Mermaid diagrams and module specs."""
+        mermaid_nodes = []
+        mermaid_edges = []
+        for mod, targets in deps.items():
+            clean_mod = re.sub(r'[^a-zA-Z0-9_]', '_', mod)
+            mermaid_nodes.append(f"    {clean_mod}[{mod}]")
+            for t in targets[:4]:
+                clean_t = re.sub(r'[^a-zA-Z0-9_]', '_', t)
+                mermaid_edges.append(f"    {clean_mod} --> {clean_t}")
+
+        mermaid_block = "graph TD\n" + "\n".join(mermaid_nodes[:25]) + "\n" + "\n".join(mermaid_edges[:40]) if mermaid_nodes else "graph TD\n    Workspace[Workspace Root] --> CoreModules[Core Modules]"
+
+        file_list_str = "\n".join(f"- `{f}`" for f in files[:40])
+        return f"""# 🏛️ Architecture & System Blueprint: {project_name}
+
+> Generated by Siber Akademi T-Zero Context Architect V3.
+
+## 📊 System Topology Diagram
+```mermaid
+{mermaid_block}
+```
+
+## 🧩 Component & Layer Breakdown
+- **Presentation Layer (UI/GUI):** High-performance desktop interface with glassmorphism and real-time telemetry.
+- **Service & Provider Layer:** Multi-provider LLM connector interface with retry logic and token budgeting.
+- **Static Analysis & AST Engine:** Python AST signature extractor, docstring pruner, and duplicity analyzer.
+- **Security & Storage Layer:** OS Keyring encryption with POSIX-compliant permission controls.
+
+## 📦 Project Artifacts ({len(files)} indexed files)
+{file_list_str}
+"""
+
+    @staticmethod
+    def generate_repo_map(project_name: str, files: List[str], snippets: Dict[str, str]) -> str:
+        """Generates compact REPO_MAP.txt token map for chat prompts."""
+        lines = [f"=== REPO MAP: {project_name} ({len(files)} files) ==="]
+        for f in files:
+            lines.append(f"\n--- {f} ---")
+            snip = snippets.get(f, "")
+            if snip:
+                lines.append(snip[:1200])
+        return "\n".join(lines)
+
+    @staticmethod
+    def generate_styled_html(project_name: str, markdown_content: str) -> str:
+        """Generates standalone responsive Cyberpunk styled HTML document."""
+        lines = markdown_content.splitlines()
+        html_body = []
+        in_code = False
+        for line in lines:
+            if line.startswith("```"):
+                if in_code:
+                    html_body.append("</code></pre>")
+                    in_code = False
+                else:
+                    lang = line[3:].strip() or "text"
+                    html_body.append(f'<pre><code class="lang-{lang}">')
+                    in_code = True
+            elif in_code:
+                html_body.append(line.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;"))
+            elif line.startswith("# "):
+                html_body.append(f"<h1>{line[2:]}</h1>")
+            elif line.startswith("## "):
+                html_body.append(f"<h2>{line[3:]}</h2>")
+            elif line.startswith("### "):
+                html_body.append(f"<h3>{line[4:]}</h3>")
+            elif line.startswith("- "):
+                html_body.append(f"<li>{line[2:]}</li>")
+            elif line.strip() == "---":
+                html_body.append("<hr/>")
+            elif line.strip():
+                html_body.append(f"<p>{line}</p>")
+                
+        body_content = "\n".join(html_body)
+        return f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{project_name} - T-Zero Context Preview</title>
+<style>
+:root {{
+    --bg: #090a0f;
+    --card-bg: #131520;
+    --card-border: #222536;
+    --text: #f0f6fc;
+    --text-muted: #8e9bb0;
+    --cyan: #06b6d4;
+    --purple: #a855f7;
+    --green: #84cc16;
+}}
+body {{
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.6;
+    padding: 2.5rem;
+    max-width: 1050px;
+    margin: 0 auto;
+}}
+h1, h2, h3 {{ color: var(--cyan); margin-top: 1.5rem; }}
+h2 {{ color: var(--purple); border-bottom: 1px solid var(--card-border); padding-bottom: 0.3rem; }}
+pre {{
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    padding: 1.2rem;
+    overflow-x: auto;
+    font-family: "Consolas", monospace;
+    font-size: 0.9rem;
+    color: var(--green);
+}}
+code {{ font-family: "Consolas", monospace; color: var(--green); }}
+p, li {{ color: var(--text); font-size: 0.95rem; }}
+li {{ margin-left: 1.5rem; }}
+hr {{ border: none; border-top: 1px solid var(--card-border); margin: 2rem 0; }}
+.badge {{ display: inline-block; padding: 0.3rem 0.8rem; border-radius: 6px; background: var(--card-bg); border: 1px solid var(--card-border); font-size: 0.85rem; color: var(--cyan); margin-bottom: 1.5rem; }}
+</style>
+</head>
+<body>
+<div class="badge">🚀 Siber Akademi T-Zero V3 Context Architect Preview</div>
+{body_content}
+</body>
+</html>
+"""
 
 
 # --- 9. WORKSPACE PRESETS AND PROFILE IMPORTER ---
@@ -1310,59 +1631,132 @@ class GlowingStatusDot(tk.Canvas):
 
 
 class StarfieldCanvas(tk.Canvas):
+    """Dynamic animated background canvas supporting Stars Warp, Matrix Digital Rain, Cyber Grid, and Solid modes."""
     def __init__(self, parent, **kwargs):
         cfg = {"highlightthickness": 0}
         cfg.update(kwargs)
         super().__init__(parent, **cfg)
+        self.mode = "stars"  # "stars", "matrix", "grid", "solid"
         self.stars: List[Dict[str, Any]] = []
+        self.matrix_drops: List[Dict[str, Any]] = []
+        self.grid_offset = 0.0
         self.running = True
         self.speed_multiplier = 1.0
-        self.star_count = 60
+        self.star_count = 65
         self.star_colors = [PALETTE["accent_cyan"], PALETTE["accent_purple"], "#ffffff"]
         self.bind("<Configure>", self.on_resize)
         self.animate()
 
+    def cycle_mode(self) -> str:
+        modes = ["stars", "matrix", "grid", "solid"]
+        idx = (modes.index(self.mode) + 1) % len(modes)
+        self.mode = modes[idx]
+        w, h = max(10, self.winfo_width()), max(10, self.winfo_height())
+        if self.mode == "matrix":
+            self.rebuild_matrix(w, h)
+        elif self.mode == "stars":
+            self.rebuild_stars(w, h)
+        self.draw()
+        return self.mode
+
     def on_resize(self, event):
-        self.rebuild_stars(event.width, event.height)
+        if self.mode == "matrix":
+            self.rebuild_matrix(event.width, event.height)
+        else:
+            self.rebuild_stars(event.width, event.height)
 
     def rebuild_stars(self, w: int, h: int):
         self.stars = []
+        w = max(10, w)
+        h = max(10, h)
         for _ in range(self.star_count):
             self.stars.append({
                 "x": random.uniform(0, w),
                 "y": random.uniform(0, h),
-                "speed": random.uniform(0.1, 1.2),
-                "size": random.choice([1, 2]),
+                "speed": random.uniform(0.2, 1.4),
+                "size": random.choice([1, 2, 3]),
                 "color": random.choice(self.star_colors)
             })
-        self.draw()
+
+    def rebuild_matrix(self, w: int, h: int):
+        self.matrix_drops = []
+        col_width = 24
+        cols = max(1, w // col_width)
+        chars = "010101λμΩπΣ∆§0123456789ABCDEF"
+        for c in range(cols):
+            self.matrix_drops.append({
+                "x": c * col_width + 12,
+                "y": random.uniform(-max(10, h), 0),
+                "speed": random.uniform(2.5, 7.0),
+                "char": random.choice(chars),
+                "len": random.randint(6, 16)
+            })
 
     def draw(self):
-        self.delete("gradient", "star")
+        self.delete("all")
         w, h = self.winfo_width(), self.winfo_height()
         if w <= 1 or h <= 1:
             return
 
-        steps = 30
-        for i in range(steps):
-            t = i / steps
-            color = f"#{int(9*(1-t)):02x}{int(10*(1-t)):02x}{int(15*(1-t)):02x}"
-            self.create_rectangle(0, (h/steps)*i, w, (h/steps)*(i+1), fill=color, outline=color, tags="gradient")
+        # Render theme solid background
+        self.create_rectangle(0, 0, w, h, fill=PALETTE["bg_start"], outline=PALETTE["bg_start"])
 
-        for star in self.stars:
-            x, y, size = star["x"], star["y"], star["size"]
-            self.create_oval(x, y, x + size, y + size, fill=star["color"], outline=star["color"], tags="star")
+        if self.mode == "solid":
+            return
+
+        if self.mode == "stars":
+            for star in self.stars:
+                x, y, size = star["x"], star["y"], star["size"]
+                self.create_oval(x, y, x + size, y + size, fill=star["color"], outline=star["color"], tags="star")
+
+        elif self.mode == "matrix":
+            chars = "010101λμΩπΣ∆§0123456789ABCDEF"
+            for drop in self.matrix_drops:
+                x, y = drop["x"], drop["y"]
+                # Glowing leading head character
+                self.create_text(x, y, text=drop["char"], fill="#ffffff", font=("Consolas", 10, "bold"), tags="matrix")
+                # Fading phosphor trail
+                for j in range(1, min(drop["len"], 8)):
+                    trail_y = y - (j * 14)
+                    if 0 <= trail_y <= h:
+                        self.create_text(x, trail_y, text=random.choice(chars), fill=PALETTE["accent_green"], font=("Consolas", 9), tags="matrix")
+
+        elif self.mode == "grid":
+            grid_color = PALETTE["card_border"]
+            horizon_y = h * 0.45
+            # Horizon laser
+            self.create_line(0, horizon_y, w, horizon_y, fill=PALETTE["accent_cyan"], width=1, tags="grid")
+            # Perspective rays
+            center_x = w * 0.5
+            for ox in range(-w, w * 2, 70):
+                self.create_line(center_x, horizon_y, ox, h, fill=grid_color, width=1, tags="grid")
+            # Moving grid horizontals
+            step = 35
+            for gy in range(int(horizon_y), h + step, step):
+                py = gy + (self.grid_offset % step)
+                if py <= h:
+                    self.create_line(0, py, w, py, fill=grid_color, width=1, tags="grid")
 
     def animate(self):
         if not self.running:
             return
-        w = self.winfo_width()
-        if w > 1:
-            for star in self.stars:
-                star["x"] -= star["speed"] * self.speed_multiplier
-                if star["x"] < 0:
-                    star["x"] = w
-                    star["y"] = random.uniform(0, self.winfo_height())
+        w, h = self.winfo_width(), self.winfo_height()
+        if w > 1 and h > 1 and self.mode != "solid":
+            if self.mode == "stars":
+                for star in self.stars:
+                    star["x"] -= star["speed"] * self.speed_multiplier
+                    if star["x"] < 0:
+                        star["x"] = w
+                        star["y"] = random.uniform(0, h)
+            elif self.mode == "matrix":
+                chars = "010101λμΩπΣ∆§0123456789ABCDEF"
+                for drop in self.matrix_drops:
+                    drop["y"] += drop["speed"] * self.speed_multiplier
+                    if drop["y"] - (drop["len"] * 14) > h:
+                        drop["y"] = random.uniform(-100, 0)
+                        drop["char"] = random.choice(chars)
+            elif self.mode == "grid":
+                self.grid_offset += 1.2 * self.speed_multiplier
             self.draw()
         self.after(50, self.animate)
 
@@ -1737,7 +2131,43 @@ class AutoReadmeGUI:
         self.subtitle_lbl.pack(anchor=tk.W, pady=2)
 
         header_controls = tk.Frame(self.header, bg=PALETTE["card_bg"])
-        header_controls.pack(side=tk.RIGHT, fill=tk.Y, padx=15, pady=5)
+        header_controls.pack(side=tk.RIGHT, fill=tk.Y, padx=10, pady=5)
+
+        self.fx_btn = tk.Button(
+            header_controls,
+            text=f"🌌 FX: {self.bg_canvas.mode.upper()}",
+            bg=PALETTE["card_border"],
+            fg=PALETTE["accent_cyan"],
+            relief=tk.FLAT,
+            font=("Segoe UI", 9, "bold"),
+            command=self.cycle_fx_mode,
+            cursor="hand2"
+        )
+        self.fx_btn.pack(side=tk.LEFT, padx=3, pady=8)
+
+        self.sfx_btn = tk.Button(
+            header_controls,
+            text=get_text("sfx_on" if SFX_ENABLED else "sfx_off", self.lang),
+            bg=PALETTE["card_border"],
+            fg=PALETTE["accent_green"],
+            relief=tk.FLAT,
+            font=("Segoe UI", 9, "bold"),
+            command=self.toggle_sfx,
+            cursor="hand2"
+        )
+        self.sfx_btn.pack(side=tk.LEFT, padx=3, pady=8)
+
+        self.audit_btn = tk.Button(
+            header_controls,
+            text=get_text("audit_btn", self.lang),
+            bg=PALETTE["card_border"],
+            fg=PALETTE["accent_purple"],
+            relief=tk.FLAT,
+            font=("Segoe UI", 9, "bold"),
+            command=self.run_quick_security_audit,
+            cursor="hand2"
+        )
+        self.audit_btn.pack(side=tk.LEFT, padx=3, pady=8)
         
         self.theme_btn = tk.Button(
             header_controls,
@@ -1749,7 +2179,7 @@ class AutoReadmeGUI:
             command=self.open_theme_selector,
             cursor="hand2"
         )
-        self.theme_btn.pack(side=tk.LEFT, padx=5, pady=8)
+        self.theme_btn.pack(side=tk.LEFT, padx=3, pady=8)
         
         self.lang_btn = tk.Button(
             header_controls, 
@@ -1761,19 +2191,19 @@ class AutoReadmeGUI:
             command=self.toggle_language,
             cursor="hand2"
         )
-        self.lang_btn.pack(side=tk.LEFT, padx=5, pady=8)
+        self.lang_btn.pack(side=tk.LEFT, padx=3, pady=8)
         
         self.shortcuts_btn = tk.Button(
             header_controls, 
-            text="⌨ SHORTCUTS", 
+            text="⌨", 
             bg=PALETTE["card_border"], 
-            fg=PALETTE["accent_green"], 
+            fg=PALETTE["text_muted"], 
             relief=tk.FLAT, 
             font=("Segoe UI", 9, "bold"),
             command=self.show_shortcuts_modal,
             cursor="hand2"
         )
-        self.shortcuts_btn.pack(side=tk.LEFT, padx=5, pady=8)
+        self.shortcuts_btn.pack(side=tk.LEFT, padx=3, pady=8)
 
         # 2. Tabs Navigation Panels
         self.nav = GlassCard(self.bg_canvas)
@@ -1843,31 +2273,118 @@ class AutoReadmeGUI:
         except Exception:
             pass
 
+    def cycle_fx_mode(self):
+        play_sfx("click")
+        new_mode = self.bg_canvas.cycle_mode()
+        self.fx_btn.config(text=f"🌌 FX: {new_mode.upper()}")
+        self.show_toast(f"Particle background set to {new_mode.upper()}", "info")
+
+    def toggle_sfx(self):
+        global SFX_ENABLED
+        SFX_ENABLED = not SFX_ENABLED
+        play_sfx("click")
+        txt = get_text("sfx_on" if SFX_ENABLED else "sfx_off", self.lang)
+        self.sfx_btn.config(text=txt)
+        self.show_toast(f"Sound effects {'enabled' if SFX_ENABLED else 'disabled'}", "info")
+
+    def show_toast(self, message: str, kind: str = "info", duration_ms: int = 2500):
+        try:
+            border_col = PALETTE["success"] if kind == "success" else (PALETTE["error"] if kind == "error" else PALETTE["accent_cyan"])
+            toast = tk.Frame(self.bg_canvas, bg=PALETTE["card_bg"], highlightthickness=1, highlightbackground=border_col, bd=0)
+            icon = "✔" if kind == "success" else ("⚠" if kind == "error" else "✦")
+            
+            tk.Label(toast, text=icon, font=("Segoe UI", 11, "bold"), fg=border_col, bg=PALETTE["card_bg"]).pack(side=tk.LEFT, padx=(12, 6), pady=6)
+            tk.Label(toast, text=message, font=("Segoe UI", 9, "bold"), fg=PALETTE["text_main"], bg=PALETTE["card_bg"]).pack(side=tk.LEFT, padx=(0, 16), pady=6)
+            toast.place(relx=0.68, rely=0.79, relwidth=0.30, height=38)
+            
+            def fade():
+                try:
+                    toast.destroy()
+                except Exception:
+                    pass
+            self.root.after(duration_ms, fade)
+        except Exception:
+            pass
+
+    def run_quick_security_audit(self):
+        play_sfx("scan")
+        target_dir = self.dir_entry.get().strip() if hasattr(self, "dir_entry") else "."
+        if not target_dir or not os.path.exists(target_dir):
+            self.show_toast("Target workspace does not exist!", "error")
+            return
+        
+        key_patterns = [
+            re.compile(r'sk-[a-zA-Z0-9]{20,}'),
+            re.compile(r'ghp_[a-zA-Z0-9]{36}'),
+            re.compile(r'AIza[0-9A-Za-z-_]{35}'),
+            re.compile(r'nvapi-[a-zA-Z0-9-_]{20,}'),
+        ]
+        leaks = []
+        py_files = 0
+        smells = 0
+        for root, dirs, files in os.walk(target_dir):
+            if any(x in root for x in [".git", "node_modules", "__pycache__", "venv", ".venv", "dist", "build"]):
+                continue
+            for f in files:
+                if f.endswith((".py", ".json", ".yaml", ".yml", ".env", ".txt")):
+                    p = os.path.join(root, f)
+                    try:
+                        with open(p, "r", encoding="utf-8", errors="ignore") as fp:
+                            content = fp.read()
+                        for pat in key_patterns:
+                            if pat.search(content):
+                                leaks.append((f, "API Key Exposure"))
+                        if f.endswith(".py"):
+                            py_files += 1
+                            analyzer = StaticCodeAnalyzer(f)
+                            analyzer.analyze_source(content)
+                            smells += len(analyzer.issues)
+                    except Exception:
+                        pass
+                        
+        if leaks:
+            play_sfx("error")
+            messagebox.showwarning("Security Alert", f"Potential secret exposure detected in {len(leaks)} files!\nReview immediately.")
+        else:
+            play_sfx("success")
+            self.show_toast(f"Security: 100% Zero-Leak | Smells: {smells} across {py_files} files", "success", 4000)
+            self.log(f"Security Audit Clean: 0 hardcoded secrets found. Code smells: {smells}")
+
     def open_theme_selector(self):
+        play_sfx("click")
         dialog = tk.Toplevel(self.root)
         dialog.title("App Theme Manager")
-        dialog.geometry("300x240")
+        dialog.geometry("340x480")
         dialog.configure(bg=PALETTE["bg_start"])
         dialog.transient(self.root)
         dialog.grab_set()
         
-        pad = tk.Frame(dialog, bg=PALETTE["bg_start"], padx=20, pady=20)
+        pad = tk.Frame(dialog, bg=PALETTE["bg_start"], padx=20, pady=15)
         pad.pack(fill=tk.BOTH, expand=True)
         
         tk.Label(pad, text="SELECT INTERFACE THEME:", font=("Segoe UI", 10, "bold"), fg=PALETTE["accent_cyan"], bg=PALETTE["bg_start"]).pack(anchor=tk.W, pady=(0, 10))
         
-        for theme_name in THEME_PALETTES.keys():
+        for theme_name, theme_data in THEME_PALETTES.items():
+            row = tk.Frame(pad, bg=PALETTE["card_bg"], highlightthickness=1, highlightbackground=PALETTE["card_border"])
+            row.pack(fill=tk.X, pady=3, ipady=3)
+            
+            # Theme color badge indicator
+            c_dot = tk.Canvas(row, width=14, height=14, bg=PALETTE["card_bg"], highlightthickness=0)
+            c_dot.pack(side=tk.LEFT, padx=8)
+            c_dot.create_oval(2, 2, 12, 12, fill=theme_data.get("accent_cyan", "#00ffff"), outline=theme_data.get("card_border", "#ffffff"))
+            
             btn = tk.Button(
-                pad,
-                text=theme_name,
-                bg=PALETTE["card_border"],
+                row,
+                text=theme_name + (" (Active)" if theme_name == CURRENT_THEME else ""),
+                bg=PALETTE["card_bg"],
                 fg=PALETTE["text_main"],
                 relief=tk.FLAT,
-                font=("Segoe UI", 9, "bold"),
+                font=("Segoe UI", 9, "bold" if theme_name == CURRENT_THEME else "normal"),
+                anchor="w",
                 command=lambda name=theme_name: self.apply_new_theme(name, dialog),
                 cursor="hand2"
             )
-            btn.pack(fill=tk.X, pady=4, ipady=4)
+            btn.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=4)
 
         # Theme customizer color chooser button
         self.custom_theme_btn = tk.Button(pad, text="⚙ Customize Palette Colors", bg=PALETTE["card_border"], fg=PALETTE["accent_green"], relief=tk.FLAT, font=("Segoe UI", 9, "bold"), command=self.open_custom_color_picker, cursor="hand2")
@@ -2480,43 +2997,56 @@ class AutoReadmeGUI:
         
         toolbar = GlassCard(f)
         toolbar.grid(row=0, column=0, sticky="ew", pady=(0, 10))
-        toolbar.config(padx=15, pady=8)
+        toolbar.config(padx=10, pady=6)
         
         self.sel_all_btn = tk.Button(toolbar, text=get_text("select_all", self.lang), bg=PALETTE["card_border"], fg=PALETTE["text_main"], relief=tk.FLAT, font=("Segoe UI", 8, "bold"), command=self.check_all, cursor="hand2")
-        self.sel_all_btn.pack(side=tk.LEFT, padx=4)
+        self.sel_all_btn.pack(side=tk.LEFT, padx=3)
         
         self.desel_all_btn = tk.Button(toolbar, text=get_text("deselect_all", self.lang), bg=PALETTE["card_border"], fg=PALETTE["text_main"], relief=tk.FLAT, font=("Segoe UI", 8, "bold"), command=self.uncheck_all, cursor="hand2")
-        self.desel_all_btn.pack(side=tk.LEFT, padx=4)
+        self.desel_all_btn.pack(side=tk.LEFT, padx=3)
+
+        self.invert_btn = tk.Button(toolbar, text=get_text("invert_select", self.lang), bg=PALETTE["card_border"], fg=PALETTE["text_muted"], relief=tk.FLAT, font=("Segoe UI", 8, "bold"), command=self.invert_file_selection, cursor="hand2")
+        self.invert_btn.pack(side=tk.LEFT, padx=3)
         
         self.smart_select_btn = tk.Button(toolbar, text=get_text("smart_select", self.lang), bg=PALETTE["card_border"], fg=PALETTE["accent_cyan"], relief=tk.FLAT, font=("Segoe UI", 8, "bold"), command=self.smart_select_action, cursor="hand2")
-        self.smart_select_btn.pack(side=tk.LEFT, padx=4)
+        self.smart_select_btn.pack(side=tk.LEFT, padx=3)
+
+        # Preset Filter Chips
+        self.chip_py = tk.Button(toolbar, text="🐍 Py", bg=PALETTE["card_border"], fg=PALETTE["accent_green"], relief=tk.FLAT, font=("Segoe UI", 8, "bold"), command=lambda: self.set_filter_preset(".py"), cursor="hand2")
+        self.chip_py.pack(side=tk.LEFT, padx=2)
+
+        self.chip_web = tk.Button(toolbar, text="⚡ Web", bg=PALETTE["card_border"], fg=PALETTE["accent_purple"], relief=tk.FLAT, font=("Segoe UI", 8, "bold"), command=lambda: self.set_filter_preset("web"), cursor="hand2")
+        self.chip_web.pack(side=tk.LEFT, padx=2)
+
+        self.chip_cfg = tk.Button(toolbar, text="⚙ Cfg", bg=PALETTE["card_border"], fg=PALETTE["accent_cyan"], relief=tk.FLAT, font=("Segoe UI", 8, "bold"), command=lambda: self.set_filter_preset("configs"), cursor="hand2")
+        self.chip_cfg.pack(side=tk.LEFT, padx=2)
         
-        tk.Label(toolbar, text="🔍 Search:", font=("Segoe UI", 9, "bold"), fg=PALETTE["text_muted"], bg=PALETTE["card_bg"]).pack(side=tk.LEFT, padx=(15, 5))
-        self.search_entry = tk.Entry(toolbar, bg=PALETTE["bg_start"], fg=PALETTE["text_main"], insertbackground="#ffffff", relief=tk.FLAT, width=18, highlightthickness=1, highlightbackground=PALETTE["card_border"])
-        self.search_entry.pack(side=tk.LEFT, ipady=4)
+        tk.Label(toolbar, text="🔍", font=("Segoe UI", 9, "bold"), fg=PALETTE["text_muted"], bg=PALETTE["card_bg"]).pack(side=tk.LEFT, padx=(8, 2))
+        self.search_entry = tk.Entry(toolbar, bg=PALETTE["bg_start"], fg=PALETTE["text_main"], insertbackground="#ffffff", relief=tk.FLAT, width=15, highlightthickness=1, highlightbackground=PALETTE["card_border"])
+        self.search_entry.pack(side=tk.LEFT, ipady=3)
         self.search_entry.bind("<KeyRelease>", self.filter_files_tree)
         
-        self.extensions_btn = tk.Button(toolbar, text="🔍 Extension Filters", bg=PALETTE["card_border"], fg=PALETTE["accent_cyan"], relief=tk.FLAT, font=("Segoe UI", 8, "bold"), command=self.open_extensions_filter_dialog, cursor="hand2")
-        self.extensions_btn.pack(side=tk.LEFT, padx=10)
+        self.extensions_btn = tk.Button(toolbar, text="🔍 Filters", bg=PALETTE["card_border"], fg=PALETTE["accent_cyan"], relief=tk.FLAT, font=("Segoe UI", 8, "bold"), command=self.open_extensions_filter_dialog, cursor="hand2")
+        self.extensions_btn.pack(side=tk.LEFT, padx=4)
         
         # Regex search and replace dialog launcher button
-        self.search_replace_btn = tk.Button(toolbar, text="🔄 Regex Search & Replace", bg=PALETTE["card_border"], fg=PALETTE["accent_purple"], relief=tk.FLAT, font=("Segoe UI", 8, "bold"), command=self.open_search_replace_dialog, cursor="hand2")
-        self.search_replace_btn.pack(side=tk.LEFT, padx=5)
+        self.search_replace_btn = tk.Button(toolbar, text="🔄 Replace", bg=PALETTE["card_border"], fg=PALETTE["accent_purple"], relief=tk.FLAT, font=("Segoe UI", 8, "bold"), command=self.open_search_replace_dialog, cursor="hand2")
+        self.search_replace_btn.pack(side=tk.LEFT, padx=3)
 
         # Static Code Analysis launcher button
-        self.run_audit_btn = tk.Button(toolbar, text="🛡 Static Code Smell Audit", bg=PALETTE["card_border"], fg=PALETTE["accent_green"], relief=tk.FLAT, font=("Segoe UI", 8, "bold"), command=self.run_static_code_audit, cursor="hand2")
-        self.run_audit_btn.pack(side=tk.LEFT, padx=5)
+        self.run_audit_btn = tk.Button(toolbar, text="🛡 Audit", bg=PALETTE["card_border"], fg=PALETTE["accent_green"], relief=tk.FLAT, font=("Segoe UI", 8, "bold"), command=self.run_static_code_audit, cursor="hand2")
+        self.run_audit_btn.pack(side=tk.LEFT, padx=3)
 
         # Duplicity Finder button
-        self.run_duplicity_btn = tk.Button(toolbar, text="👥 Find Duplicates", bg=PALETTE["card_border"], fg=PALETTE["accent_cyan"], relief=tk.FLAT, font=("Segoe UI", 8, "bold"), command=self.run_duplicity_finder, cursor="hand2")
-        self.run_duplicity_btn.pack(side=tk.LEFT, padx=5)
+        self.run_duplicity_btn = tk.Button(toolbar, text="👥 Dups", bg=PALETTE["card_border"], fg=PALETTE["accent_cyan"], relief=tk.FLAT, font=("Segoe UI", 8, "bold"), command=self.run_duplicity_finder, cursor="hand2")
+        self.run_duplicity_btn.pack(side=tk.LEFT, padx=3)
 
         # AST Signature Refactorer Button
-        self.refactor_btn = tk.Button(toolbar, text="⚙ AST Refactorer", bg=PALETTE["card_border"], fg=PALETTE["accent_purple"], relief=tk.FLAT, font=("Segoe UI", 8, "bold"), command=self.open_ast_refactor_dialog, cursor="hand2")
-        self.refactor_btn.pack(side=tk.LEFT, padx=5)
+        self.refactor_btn = tk.Button(toolbar, text="⚙ AST", bg=PALETTE["card_border"], fg=PALETTE["accent_purple"], relief=tk.FLAT, font=("Segoe UI", 8, "bold"), command=self.open_ast_refactor_dialog, cursor="hand2")
+        self.refactor_btn.pack(side=tk.LEFT, padx=3)
 
-        self.selector_stats_lbl = tk.Label(toolbar, text="0 / 0 selected | Estimated Context Size: 0 tokens", font=("Segoe UI", 9, "bold"), fg=PALETTE["accent_green"], bg=PALETTE["card_bg"])
-        self.selector_stats_lbl.pack(side=tk.RIGHT, padx=10)
+        self.selector_stats_lbl = tk.Label(toolbar, text="0 / 0 selected | Tokens: 0 | Cost: Free", font=("Segoe UI", 8, "bold"), fg=PALETTE["accent_green"], bg=PALETTE["card_bg"])
+        self.selector_stats_lbl.pack(side=tk.RIGHT, padx=8)
         
         paned = tk.PanedWindow(f, orient=tk.HORIZONTAL, bg=PALETTE["bg_start"], bd=0, sashwidth=4, sashrelief=tk.FLAT)
         paned.grid(row=1, column=0, sticky="nsew")
@@ -3029,10 +3559,40 @@ class AutoReadmeGUI:
         self.update_parent_states()
 
     def update_selector_stats(self):
-        selected = sum(1 for v in self.file_checked.values() if v)
-        text_payload = "".join(self.file_snippets.values())
-        tokens = len(text_payload) // 4
-        self.selector_stats_lbl.config(text=f"{selected} / {len(self.scanned_files)} selected | Context Size: ~{tokens} tokens")
+        selected_files = [f for f, v in self.file_checked.items() if v]
+        tokens = sum(len(self.file_snippets.get(f, "")) // 4 for f in selected_files)
+        provider = self.provider_var.get() if hasattr(self, "provider_var") else "NVIDIA NIM"
+        cost = calculate_token_cost(tokens, provider)
+        cost_str = "Free" if cost == 0.0 else f"${cost:.4f}"
+        txt = f"{len(selected_files)} / {len(self.scanned_files)} selected | Tokens: ~{tokens:,} | Cost: {cost_str}"
+        if hasattr(self, "selector_stats_lbl"):
+            self.selector_stats_lbl.config(text=txt)
+        if hasattr(self, "cost_lbl"):
+            self.cost_lbl.config(text=f"Est. Tokens: ~{tokens:,} | Cost: {cost_str}")
+
+    def set_filter_preset(self, preset: str):
+        play_sfx("click")
+        for f in self.scanned_files:
+            ext = os.path.splitext(f.lower())[1]
+            if preset == "all":
+                self.file_checked[f] = True
+            elif preset == ".py":
+                self.file_checked[f] = (ext == ".py")
+            elif preset == "web":
+                self.file_checked[f] = (ext in [".js", ".jsx", ".ts", ".tsx", ".html", ".css", ".vue", ".svelte"])
+            elif preset == "configs":
+                self.file_checked[f] = (ext in [".json", ".yaml", ".yml", ".toml", ".ini", ".cfg", ".xml", ".env.example"])
+        self.rebuild_selector_tree()
+        self.update_selector_stats()
+        self.show_toast(f"Preset applied: {preset}", "info")
+
+    def invert_file_selection(self):
+        play_sfx("click")
+        for f in self.scanned_files:
+            self.file_checked[f] = not self.file_checked.get(f, True)
+        self.rebuild_selector_tree()
+        self.update_selector_stats()
+        self.show_toast("Selections inverted", "info")
 
     def toggle_tree_check(self, node_id, force_state=None):
         txt = self.tree.item(node_id, "text")
@@ -3090,21 +3650,21 @@ class AutoReadmeGUI:
             self.update_selector_stats()
 
     def check_all(self):
+        play_sfx("click")
         for root in self.tree.get_children(""):
             self.toggle_tree_check(root, force_state=True)
         self.update_parent_states()
-        self.update_stats()
+        self.update_selector_stats()
 
     def uncheck_all(self):
+        play_sfx("click")
         for root in self.tree.get_children(""):
             self.toggle_tree_check(root, force_state=False)
         self.update_parent_states()
-        self.update_stats()
+        self.update_selector_stats()
 
     def update_stats(self):
-        selected = sum(1 for v in self.file_checked.values() if v)
-        est_tokens = sum(len(v) for v in self.file_snippets.values()) // 4
-        self.selector_stats_lbl.config(text=f"{selected} / {len(self.scanned_files)} selected | Context Size: ~{est_tokens} tokens")
+        self.update_selector_stats()
 
     def smart_select_action(self):
         self.apply_smart_selection_heuristic()
@@ -3505,13 +4065,28 @@ class AutoReadmeGUI:
 
         bottom = GlassCard(f)
         bottom.grid(row=2, column=0, sticky="ew", pady=(10, 0))
-        bottom.config(padx=15, pady=8)
+        bottom.config(padx=10, pady=6)
         
         self.copy_btn = tk.Button(bottom, text=get_text("copy_btn", self.lang), bg=PALETTE["card_border"], fg=PALETTE["accent_cyan"], relief=tk.FLAT, font=("Segoe UI", 9, "bold"), command=self.copy_clipboard, cursor="hand2")
-        self.copy_btn.pack(side=tk.LEFT, ipady=4, ipadx=10)
+        self.copy_btn.pack(side=tk.LEFT, ipady=4, padx=3)
         
         self.save_btn = tk.Button(bottom, text=get_text("save_btn", self.lang), bg=PALETTE["success"], fg="#ffffff", relief=tk.FLAT, font=("Segoe UI", 9, "bold"), command=self.save_readme, cursor="hand2")
-        self.save_btn.pack(side=tk.RIGHT, ipady=4, ipadx=10)
+        self.save_btn.pack(side=tk.LEFT, ipady=4, padx=3)
+
+        self.agents_btn = tk.Button(bottom, text=get_text("agents_btn", self.lang), bg=PALETTE["card_border"], fg=PALETTE["accent_purple"], relief=tk.FLAT, font=("Segoe UI", 9, "bold"), command=self.export_agents_md, cursor="hand2")
+        self.agents_btn.pack(side=tk.LEFT, ipady=4, padx=3)
+
+        self.arch_btn = tk.Button(bottom, text=get_text("arch_btn", self.lang), bg=PALETTE["card_border"], fg=PALETTE["accent_cyan"], relief=tk.FLAT, font=("Segoe UI", 9, "bold"), command=self.export_architecture_md, cursor="hand2")
+        self.arch_btn.pack(side=tk.LEFT, ipady=4, padx=3)
+
+        self.repomap_btn = tk.Button(bottom, text=get_text("repomap_btn", self.lang), bg=PALETTE["card_border"], fg=PALETTE["accent_green"], relief=tk.FLAT, font=("Segoe UI", 9, "bold"), command=self.export_repo_map, cursor="hand2")
+        self.repomap_btn.pack(side=tk.LEFT, ipady=4, padx=3)
+
+        self.html_btn = tk.Button(bottom, text=get_text("html_btn", self.lang), bg=PALETTE["card_border"], fg=PALETTE["text_main"], relief=tk.FLAT, font=("Segoe UI", 9, "bold"), command=self.export_html_preview, cursor="hand2")
+        self.html_btn.pack(side=tk.RIGHT, ipady=4, padx=4)
+
+        self.cost_lbl = tk.Label(bottom, text="Est. Tokens: 0 | Cost: Free", font=("Segoe UI", 8, "bold"), fg=PALETTE["accent_green"], bg=PALETTE["card_bg"])
+        self.cost_lbl.pack(side=tk.RIGHT, padx=8)
 
     def update_rendered_markdown_panel(self, event=None):
         raw_text = self.preview_text.get("1.0", tk.END)
@@ -3685,22 +4260,130 @@ Custom Requirements:
         if txt:
             self.root.clipboard_clear()
             self.root.clipboard_append(txt)
-            messagebox.showinfo("Success", "Copied to clipboard!")
+            play_sfx("success")
+            self.show_toast("Context copied to clipboard!", "success")
+            self.log("Context copied to system clipboard.")
 
     def save_readme(self):
         txt = self.preview_text.get("1.0", tk.END).strip()
         if not txt:
+            self.show_toast("Preview is empty! Generate context first.", "error")
             return
         d = self.dir_entry.get().strip()
         if not os.path.exists(d):
+            self.show_toast("Target project directory does not exist!", "error")
             return
         p = os.path.join(d, "README.md")
         try:
             with open(p, "w", encoding="utf-8") as f:
                 f.write(txt)
-            messagebox.showinfo("Success", f"Context README saved: {p}")
+            play_sfx("success")
+            self.show_toast("README.md saved successfully!", "success")
+            self.log(f"README.md saved to: {p}")
         except Exception as e:
+            play_sfx("error")
             messagebox.showerror("Error", str(e))
+
+    def export_agents_md(self):
+        play_sfx("click")
+        d = self.dir_entry.get().strip()
+        if not os.path.exists(d):
+            self.show_toast("Invalid project directory!", "error")
+            return
+        selected = [f for f, v in self.file_checked.items() if v]
+        p_name = os.path.basename(os.path.abspath(d)) or "Project"
+        tree_ascii = "\n".join(f"├── {f}" for f in sorted(selected))
+        snippets = get_budgeted_snippets(selected, self.file_snippets)
+        extra = self.extra_prompt_text.get("1.0", tk.END).strip() if hasattr(self, "extra_prompt_text") else ""
+        content = ContextExportManager.generate_agents_blueprint(p_name, tree_ascii, snippets, extra)
+        
+        out_path = os.path.join(d, "AGENTS.md")
+        try:
+            with open(out_path, "w", encoding="utf-8") as f:
+                f.write(content)
+            play_sfx("success")
+            self.show_toast("AGENTS.md exported successfully!", "success")
+            self.log(f"AGENTS.md blueprint exported: {out_path}")
+        except Exception as e:
+            play_sfx("error")
+            messagebox.showerror("Error", f"Failed saving AGENTS.md: {e}")
+
+    def export_architecture_md(self):
+        play_sfx("click")
+        d = self.dir_entry.get().strip()
+        if not os.path.exists(d):
+            self.show_toast("Invalid project directory!", "error")
+            return
+        selected = [f for f, v in self.file_checked.items() if v]
+        p_name = os.path.basename(os.path.abspath(d)) or "Project"
+        
+        # Build dependency mapping
+        deps_map = {}
+        for f in selected:
+            if f.endswith(".py"):
+                p = os.path.join(d, f)
+                if os.path.exists(p):
+                    try:
+                        with open(p, "r", encoding="utf-8", errors="ignore") as fp:
+                            tree_ast = ast.parse(fp.read())
+                        visitor = DependencyAnalyzer()
+                        visitor.visit(tree_ast)
+                        if visitor.dependencies:
+                            deps_map[f] = visitor.dependencies
+                    except Exception:
+                        pass
+        content = ContextExportManager.generate_architecture_blueprint(p_name, selected, deps_map)
+        out_path = os.path.join(d, "ARCHITECTURE.md")
+        try:
+            with open(out_path, "w", encoding="utf-8") as f:
+                f.write(content)
+            play_sfx("success")
+            self.show_toast("ARCHITECTURE.md exported successfully!", "success")
+            self.log(f"ARCHITECTURE.md exported: {out_path}")
+        except Exception as e:
+            play_sfx("error")
+            messagebox.showerror("Error", f"Failed saving ARCHITECTURE.md: {e}")
+
+    def export_repo_map(self):
+        play_sfx("click")
+        d = self.dir_entry.get().strip()
+        if not os.path.exists(d):
+            self.show_toast("Invalid project directory!", "error")
+            return
+        selected = [f for f, v in self.file_checked.items() if v]
+        p_name = os.path.basename(os.path.abspath(d)) or "Project"
+        content = ContextExportManager.generate_repo_map(p_name, selected, self.file_snippets)
+        out_path = os.path.join(d, "REPO_MAP.txt")
+        try:
+            with open(out_path, "w", encoding="utf-8") as f:
+                f.write(content)
+            play_sfx("success")
+            self.show_toast("REPO_MAP.txt exported successfully!", "success")
+            self.log(f"REPO_MAP.txt exported: {out_path}")
+        except Exception as e:
+            play_sfx("error")
+            messagebox.showerror("Error", f"Failed saving REPO_MAP.txt: {e}")
+
+    def export_html_preview(self):
+        play_sfx("click")
+        raw_text = self.preview_text.get("1.0", tk.END).strip()
+        if not raw_text:
+            self.show_toast("Context is empty! Run generation first.", "error")
+            return
+        d = self.dir_entry.get().strip()
+        p_name = os.path.basename(os.path.abspath(d)) or "Project"
+        html_content = ContextExportManager.generate_styled_html(p_name, raw_text)
+        out_path = os.path.join(d if os.path.exists(d) else ".", "preview_context.html")
+        try:
+            with open(out_path, "w", encoding="utf-8") as f:
+                f.write(html_content)
+            play_sfx("success")
+            self.show_toast("HTML preview launched in browser!", "success")
+            self.log(f"HTML preview generated: {out_path}")
+            webbrowser.open(os.path.abspath(out_path))
+        except Exception as e:
+            play_sfx("error")
+            messagebox.showerror("Error", f"Failed opening HTML preview: {e}")
 
     # --- TAB 5: PROMPT WORKBENCH PLAYGROUND ---
     def setup_tab_template(self):
@@ -4104,6 +4787,45 @@ def run_tui_wizard():
         print(f"\n\033[31m[FAIL] Failed: {e}\033[0m\n")
 
 
+def run_export_cli(project_dir: str, export_type: str, out_file: str):
+    """Generates specialized context documentation directly from the command line."""
+    scanner = CodebaseScanner()
+    files, sizes, snippets = scanner.scan_directory(project_dir)
+    p_name = os.path.basename(os.path.abspath(project_dir)) or "Project"
+    
+    if export_type == "agents":
+        tree_ascii = "\n".join(f"├── {f}" for f in sorted(files))
+        content = ContextExportManager.generate_agents_blueprint(p_name, tree_ascii, snippets)
+    elif export_type == "arch":
+        deps_map = {}
+        for f in files:
+            if f.endswith(".py"):
+                p = os.path.join(project_dir, f)
+                if os.path.exists(p):
+                    try:
+                        with open(p, "r", encoding="utf-8", errors="ignore") as fp:
+                            tree_ast = ast.parse(fp.read())
+                        visitor = DependencyAnalyzer()
+                        visitor.visit(tree_ast)
+                        if visitor.dependencies:
+                            deps_map[f] = visitor.dependencies
+                    except Exception:
+                        pass
+        content = ContextExportManager.generate_architecture_blueprint(p_name, files, deps_map)
+    elif export_type == "repomap":
+        content = ContextExportManager.generate_repo_map(p_name, files, snippets)
+    elif export_type == "html":
+        raw_md = generate_offline_context(project_dir, files, snippets)
+        content = ContextExportManager.generate_styled_html(p_name, raw_md)
+    else:
+        return
+        
+    out_path = os.path.join(project_dir, out_file) if not os.path.isabs(out_file) else out_file
+    with open(out_path, "w", encoding="utf-8") as f:
+        f.write(content)
+    print(f"\n\033[32m[SUCCESS] Exported {export_type.upper()} blueprint to: {out_path}\033[0m\n")
+
+
 def main():
     import argparse
     parser = argparse.ArgumentParser(
@@ -4114,6 +4836,10 @@ def main():
     parser.add_argument("--scan", "-s", nargs="?", const=".", default=None, metavar="DIR", help="Scan codebase directory and print summary metrics")
     parser.add_argument("--audit", "-a", nargs="?", const=".", default=None, metavar="DIR", help="Run AST static code analysis & audit for code smells")
     parser.add_argument("--dry-run", "-d", action="store_true", help="Generate complete context tree offline without API call (100%% free)")
+    parser.add_argument("--export-agents", nargs="?", const="AGENTS.md", default=None, metavar="FILE", help="Generate AI agent blueprint (AGENTS.md / CLAUDE.md)")
+    parser.add_argument("--export-arch", nargs="?", const="ARCHITECTURE.md", default=None, metavar="FILE", help="Generate Mermaid architecture blueprint (ARCHITECTURE.md)")
+    parser.add_argument("--export-repomap", nargs="?", const="REPO_MAP.txt", default=None, metavar="FILE", help="Generate compact token repository map (REPO_MAP.txt)")
+    parser.add_argument("--export-html", nargs="?", const="README.html", default=None, metavar="FILE", help="Generate styled Cyberpunk dark HTML preview")
     parser.add_argument("--dir", default=".", help="Target project workspace directory (default: current dir)")
     parser.add_argument("--output", "-o", default="README.md", help="Output filepath for generated markdown (default: README.md)")
     parser.add_argument("--provider", "-p", choices=list(PROVIDERS.keys()), help="AI Provider to use (default: active profile)")
@@ -4131,6 +4857,14 @@ def main():
         run_scan_cli(args.scan or args.dir)
     elif args.audit is not None:
         run_audit_cli(args.audit or args.dir)
+    elif args.export_agents is not None:
+        run_export_cli(args.dir, "agents", args.export_agents)
+    elif args.export_arch is not None:
+        run_export_cli(args.dir, "arch", args.export_arch)
+    elif args.export_repomap is not None:
+        run_export_cli(args.dir, "repomap", args.export_repomap)
+    elif args.export_html is not None:
+        run_export_cli(args.dir, "html", args.export_html)
     elif args.dry_run:
         run_dry_run_cli(args.dir, args.output)
     elif args.cli:

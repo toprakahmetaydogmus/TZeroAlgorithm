@@ -102,10 +102,23 @@ flowchart TD
 - **Canlı CPU/RAM Telemetrisi:** Sistem kaynak kullanımını gerçek zamanlı izler.
 - **Token Donut Grafiği & Dil Dağılım Matrisi:** Dosya türü ve boyut dağılımını dinamik Canvas üzerinde çizer.
 
-### 5. Gelişmiş GUI & Pygments Syntax Highlighting
-- **3 Ultra-Lüks Tema:** Glass Dark, Siber Retro, Neon Cyberpunk.
-- **Pygments Sözdizimi Vurgulayıcı:** Dahili bölünmüş editörde kodları renklendirir.
-- **Çift Dilli Destek:** Türkçe ve İngilizce tam arayüz çevirisi.
+### 5. Fütüristik GUI, Parçacık Animasyonları & Haptic SFX
+- **8 Cyberpunk & OLED Teması:** Glass Dark, Neon Cyberpunk, Midnight OLED (%100 saf siyah), Matrix Terminal (Hacker yeşili), Synthwave 80s (Retro neon), Nordic Frost (Kutup mavisi), Solarized Amber (Sıcak espresso), Siber Retro.
+- **Dinamik Parçacık Kanvası (FX Motoru):** 4 farklı arka plan modu arasında anında geçiş:
+  - 🌌 **Stars Warp:** Derinlik algılı ve değişken hızlı yıldız tüneli.
+  - 🟢 **Matrix Rain:** Kayan dijital yeşil karakter ve sembol yağmuru.
+  - 🌐 **Cyber Grid:** Ufuk çizgisine uzanan perspektif neon grid dalgası.
+  - ⬛ **Solid Minimal:** Sıfır CPU kullanımıyla temiz koyu zemin.
+- **Haptic Ses Sistemi (SFX Engine):** Buton tıklamaları, tarama tamamlanması ve bağlam üretiminde sesli geri bildirim (tek tıkla açılıp kapanabilir).
+- **Yüzen Toast Bildirimleri (Non-Blocking Toasts):** Panoya kopyalama ve kaydetme işlemlerinde ekranı kilitlemeyen yumuşak durum bildirimleri.
+
+### 6. Çoklu Format Dışa Aktarma Paketi (Context Architect Hub)
+- **README.md:** Kapsamlı depo ve mimari kılavuzu.
+- **AGENTS.md / CLAUDE.md:** Cursor, Antigravity, Claude Code, Copilot ve Cline gibi yapay zeka kodlama ajanları için özel yapılandırılmış sistem ve kural rehberi.
+- **ARCHITECTURE.md:** Mermaid topoloji diyagramı ve modül bağımlılık haritası içeren sistem mimarisi belgesi.
+- **REPO_MAP.txt:** LLM sohbet pencereleri için optimize edilmiş, aşırı sıkıştırılmış AST simge haritası.
+- **HTML Preview:** Cyberpunk koyu temalı, sözdizimi vurgulu ve tarayıcıda doğrudan açılan görsel önizleme.
+- **Canlı Token & Maliyet Hesaplayıcı:** Seçilen AI sağlayıcısına göre gerçek zamanlı tahmini API maliyetini (USD) ve bağlam penceresi kullanım oranını gösterir.
 
 ---
 
@@ -163,13 +176,22 @@ python main.py --audit .
 # 3. Sıfır API maliyetiyle yerel olarak çevrimdışı context ağacı üret (Offline Dry-Run)
 python main.py --dry-run --dir . --output README.md
 
-# 4. İnteraktif Terminal Sihirbazını başlat
+# 4. Yapay Zeka Ajan Kılavuzu (AGENTS.md / CLAUDE.md) üret
+python main.py --export-agents AGENTS.md --dir .
+
+# 5. Mermaid Mimari Şeması (ARCHITECTURE.md) üret
+python main.py --export-arch ARCHITECTURE.md --dir .
+
+# 6. Sıkıştırılmış Token Repo Haritası (REPO_MAP.txt) üret
+python main.py --export-repomap REPO_MAP.txt --dir .
+
+# 7. Koyu Modlu Görsel HTML Önizlemesi (README.html) üret
+python main.py --export-html README.html --dir .
+
+# 8. İnteraktif Terminal Sihirbazını başlat
 python main.py --cli
 
-# 5. Belirli bir sağlayıcı ve model ile üretim yap
-python main.py --cli --provider "OpenAI"
-
-# 6. Sürüm bilgisini kontrol et
+# 9. Sürüm bilgisini kontrol et
 python main.py --version
 ```
 
