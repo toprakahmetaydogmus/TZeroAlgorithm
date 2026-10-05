@@ -7,7 +7,7 @@ echo.
 echo ============================================================
 echo   SIBER AKADEMI T-ZERO V3 EXE BUILDER
 echo   Developer: Toprak Ahmet Aydogmus
-echo   https://utspro.co  https://hopp.bio/siberegitim
+echo   LinkedIn: Toprak Ahmet Aydogmus  https://hopp.bio/siberegitim
 echo ============================================================
 echo.
 

@@ -7,7 +7,7 @@ echo.
 echo ============================================================
 echo   SIBER AKADEMI - T-ZERO CONTEXT ARCHITECT V3
 echo   Developer: Toprak Ahmet Aydogmus
-echo   https://utspro.co  https://hopp.bio/siberegitim
+echo   LinkedIn: Toprak Ahmet Aydogmus  https://hopp.bio/siberegitim
 echo   AUTOMATIC SETUP PIPELINE
 echo ============================================================
 echo.

@@ -28,7 +28,12 @@ class TestMCPServer(unittest.TestCase):
             "generate_repo_map",
             "audit_codebase_quality",
             "find_code_duplicity",
-            "estimate_token_cost"
+            "estimate_token_cost",
+            "analyze_change_impact",
+            "enforce_architecture_boundaries",
+            "search_codebase_semantic",
+            "export_agent_rules",
+            "get_token_savings_metrics"
         ]
         for exp in expected_tools:
             self.assertIn(exp, tool_names)
@@ -177,6 +182,78 @@ class TestMCPServer(unittest.TestCase):
         self.assertIn("C:/my_project", text)
         self.assertIn("MANDATORY OPERATIONAL DIRECTIVES", text)
         self.assertIn("Zero-Leak", text)
+
+    def test_tool_analyze_change_impact(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            f1 = os.path.join(temp_dir, "lib.py")
+            f2 = os.path.join(temp_dir, "caller.py")
+            with open(f1, "w", encoding="utf-8") as fp:
+                fp.write("def target_func(): pass\n")
+            with open(f2, "w", encoding="utf-8") as fp:
+                fp.write("import lib\nlib.target_func()\n")
+
+            res = self.run_async(self.server.call_tool(
+                "analyze_change_impact",
+                {"target_symbol": "target_func", "project_root": temp_dir}
+            ))
+            out = res.content[0].text
+            self.assertIn("Change Impact & Blast Radius", out)
+            self.assertIn("caller.py", out)
+
+    def test_tool_enforce_architecture_boundaries(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            rules_p = os.path.join(temp_dir, "tzero.rules.json")
+            with open(rules_p, "w", encoding="utf-8") as fp:
+                fp.write('{"layers":{"core":["core/*"]},"forbidden_imports":[{"from_layer":"core","cannot_import":["ui"],"reason":"test"}]}')
+            os.makedirs(os.path.join(temp_dir, "core"), exist_ok=True)
+            with open(os.path.join(temp_dir, "core", "test.py"), "w", encoding="utf-8") as fp:
+                fp.write("import ui\n")
+
+            res = self.run_async(self.server.call_tool(
+                "enforce_architecture_boundaries",
+                {"project_root": temp_dir, "rules_file": "tzero.rules.json"}
+            ))
+            out = res.content[0].text
+            self.assertIn("ARCH VIOLATION", out)
+
+    def test_tool_search_codebase_semantic(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            f = os.path.join(temp_dir, "auth_service.py")
+            with open(f, "w", encoding="utf-8") as fp:
+                fp.write("def authenticate_user(token):\n    '''Validates jwt security token.'''\n    return True\n")
+
+            res = self.run_async(self.server.call_tool(
+                "search_codebase_semantic",
+                {"query": "jwt token authenticate", "project_root": temp_dir, "top_k": 3}
+            ))
+            out = res.content[0].text
+            self.assertIn("Semantic Code Search", out)
+            self.assertIn("auth_service.py", out)
+
+    def test_tool_export_agent_rules(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            res = self.run_async(self.server.call_tool(
+                "export_agent_rules",
+                {"project_root": temp_dir, "target": "all"}
+            ))
+            out = res.content[0].text
+            self.assertIn("Generated AI Agent rule files", out)
+            self.assertTrue(os.path.exists(os.path.join(temp_dir, ".cursorrules")))
+            self.assertTrue(os.path.exists(os.path.join(temp_dir, ".clinerules")))
+
+    def test_tool_get_token_savings_metrics(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            f = os.path.join(temp_dir, "sample.py")
+            with open(f, "w", encoding="utf-8") as fp:
+                fp.write("def foo():\n    pass\n")
+
+            res = self.run_async(self.server.call_tool(
+                "get_token_savings_metrics",
+                {"project_root": temp_dir, "team_size": 3}
+            ))
+            out = res.content[0].text
+            self.assertIn("T-Zero Token Reduction & Economic ROI Report", out)
+            self.assertIn("Monthly Team Cost", out)
 
 
 if __name__ == "__main__":

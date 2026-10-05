@@ -13,7 +13,9 @@ advanced global configuration panel, AST signature matcher/refactoring engine, f
 breakdown matrix table, and keyring credentials backup/restore module into a single robust script.
 
 Developer: Toprak Ahmet Aydoğmuş (Siber Akademi)
-Websites: https://utspro.co | https://hopp.bio/siberegitim
+LinkedIn: https://linkedin.com/in/toprak-ahmet-aydo%C4%9Fmu%C5%9F-60462534b/
+Bio & Socials: https://hopp.bio/siberegitim
+GitHub: https://github.com/toprakahmetaydogmus/TZeroAlgorithm
 """
 
 import os
@@ -62,8 +64,10 @@ logger = logging.getLogger("TZeroV3")
 
 # Branding Constants
 DEV_NAME = "Toprak Ahmet Aydoğmuş"
-DEV_URL_MAIN = "https://utspro.co"
+DEV_URL_LINKEDIN = "https://linkedin.com/in/toprak-ahmet-aydo%C4%9Fmu%C5%9F-60462534b/"
 DEV_URL_BIO = "https://hopp.bio/siberegitim"
+DEV_URL_GITHUB = "https://github.com/toprakahmetaydogmus/TZeroAlgorithm"
+DEV_URL_MAIN = DEV_URL_GITHUB
 
 # Theme Palettes
 THEME_PALETTES = {
@@ -518,8 +522,8 @@ class BaseProvider:
         return {
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",
-            "Referer": "https://utspro.co",
-            "User-Agent": f"TZeroAlgorithmV3/3.0 (Toprak Ahmet Aydogmus; {DEV_URL_MAIN})"
+            "Referer": DEV_URL_GITHUB,
+            "User-Agent": f"TZeroAlgorithmV3/3.0 (Toprak Ahmet Aydogmus; {DEV_URL_GITHUB})"
         }
 
     def get_endpoint_url(self, api_base: str) -> str:
@@ -597,7 +601,7 @@ class OpenRouterProvider(BaseProvider):
 
     def get_headers(self, api_key: str) -> Dict[str, str]:
         headers = super().get_headers(api_key)
-        headers["HTTP-Referer"] = "https://utspro.co"
+        headers["HTTP-Referer"] = DEV_URL_GITHUB
         headers["X-Title"] = "T-ZERO Context Architect"
         return headers
 
@@ -615,8 +619,8 @@ class AnthropicProvider(BaseProvider):
             "x-api-key": api_key,
             "anthropic-version": "2023-06-01",
             "content-type": "application/json",
-            "Referer": "https://utspro.co",
-            "User-Agent": f"TZeroAlgorithmV3/3.0 (Toprak Ahmet Aydogmus; {DEV_URL_MAIN})"
+            "Referer": DEV_URL_GITHUB,
+            "User-Agent": f"TZeroAlgorithmV3/3.0 (Toprak Ahmet Aydogmus; {DEV_URL_GITHUB})"
         }
 
     def get_endpoint_url(self, api_base: str) -> str:
@@ -664,8 +668,8 @@ class LocalOllamaProvider(BaseProvider):
     def get_headers(self, api_key: str) -> Dict[str, str]:
         return {
             "Content-Type": "application/json",
-            "Referer": "https://utspro.co",
-            "User-Agent": f"TZeroAlgorithmV3/3.0 (Toprak Ahmet Aydogmus; {DEV_URL_MAIN})"
+            "Referer": DEV_URL_GITHUB,
+            "User-Agent": f"TZeroAlgorithmV3/3.0 (Toprak Ahmet Aydogmus; {DEV_URL_GITHUB})"
         }
 
 
@@ -2521,11 +2525,11 @@ class AutoReadmeGUI:
         lbl_sa = tk.Label(brand, text=f"Geliştirici: {DEV_NAME}", font=("Segoe UI", 10, "bold"), fg=PALETTE["text_main"], bg=PALETTE["bg_start"])
         lbl_sa.pack(anchor=tk.W, padx=10)
         
-        lbl_web1 = tk.Label(brand, text="🌐 UTSPRO.CO (Main Domain)", font=("Segoe UI", 9, "underline"), fg=PALETTE["accent_purple"], bg=PALETTE["bg_start"], cursor="hand2")
+        lbl_web1 = tk.Label(brand, text="💼 LinkedIn: Toprak Ahmet Aydoğmuş", font=("Segoe UI", 9, "underline"), fg=PALETTE["accent_cyan"], bg=PALETTE["bg_start"], cursor="hand2")
         lbl_web1.pack(anchor=tk.W, padx=10, pady=2)
-        lbl_web1.bind("<Button-1>", lambda e: webbrowser.open(DEV_URL_MAIN))
+        lbl_web1.bind("<Button-1>", lambda e: webbrowser.open(DEV_URL_LINKEDIN))
         
-        lbl_web2 = tk.Label(brand, text="🔗 Siber Eğitim Hub: hopp.bio/siberegitim", font=("Segoe UI", 9, "underline"), fg=PALETTE["accent_purple"], bg=PALETTE["bg_start"], cursor="hand2")
+        lbl_web2 = tk.Label(brand, text="🔗 Biyografi & Hub: hopp.bio/siberegitim", font=("Segoe UI", 9, "underline"), fg=PALETTE["accent_purple"], bg=PALETTE["bg_start"], cursor="hand2")
         lbl_web2.pack(anchor=tk.W, padx=10, pady=2)
         lbl_web2.bind("<Button-1>", lambda e: webbrowser.open(DEV_URL_BIO))
 
@@ -4843,6 +4847,12 @@ def main():
     parser.add_argument("--dir", default=".", help="Target project workspace directory (default: current dir)")
     parser.add_argument("--output", "-o", default="README.md", help="Output filepath for generated markdown (default: README.md)")
     parser.add_argument("--provider", "-p", choices=list(PROVIDERS.keys()), help="AI Provider to use (default: active profile)")
+    parser.add_argument("--impact", metavar="SYMBOL", help="Analyze blast radius and change impact for a symbol")
+    parser.add_argument("--enforce-boundaries", nargs="?", const="tzero.rules.json", default=None, metavar="CONFIG", help="Enforce architectural boundary rules in CI (exits with code 1 if violated)")
+    parser.add_argument("--search", metavar="QUERY", help="Run private local hybrid semantic code search (BM25 RAG)")
+    parser.add_argument("--export-agent-rules", action="store_true", help="Generate all native AI agent rules (.cursorrules, .cursor/rules/*.mdc, .clinerules, Copilot)")
+    parser.add_argument("--savings", action="store_true", help="Calculate token reduction metrics and economic developer team ROI")
+    parser.add_argument("--web", nargs="?", const=7300, type=int, default=None, metavar="PORT", help="Launch local Cyberpunk web dashboard on localhost:7300")
     parser.add_argument("--mcp", action="store_true", help="Start Model Context Protocol (MCP) stdio server for Cursor/Claude/Antigravity")
     parser.add_argument("--gui", "-g", action="store_true", help="Launch the GUI Dashboard")
     parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect V3.0.0")
@@ -4855,6 +4865,46 @@ def main():
     if args.mcp:
         import tzero_mcp
         tzero_mcp.main()
+    elif args.web is not None:
+        from tzero_features import launch_web_dashboard
+        launch_web_dashboard(args.dir, port=args.web)
+    elif args.impact:
+        from tzero_features import ChangeImpactAnalyzer
+        analyzer = ChangeImpactAnalyzer(args.dir)
+        analysis = analyzer.analyze_symbol(args.impact)
+        print(analyzer.format_report(analysis))
+    elif args.enforce_boundaries is not None:
+        from tzero_features import ArchitectureRuleEngine
+        config_p = os.path.join(args.dir, args.enforce_boundaries) if not os.path.isabs(args.enforce_boundaries) else args.enforce_boundaries
+        engine = ArchitectureRuleEngine(args.dir, config_p)
+        res = engine.enforce_boundaries()
+        print(engine.format_report(res))
+        if not res["clean"]:
+            sys.exit(1)
+        else:
+            sys.exit(0)
+    elif args.search:
+        from tzero_features import LocalSemanticCodeSearch
+        searcher = LocalSemanticCodeSearch(args.dir)
+        matches = searcher.search(args.search, top_k=6)
+        print(searcher.format_search_results(args.search, matches))
+    elif args.export_agent_rules:
+        from tzero_features import AgentRulesGenerator
+        created = AgentRulesGenerator.export_all(args.dir)
+        print(f"\n\033[32m[SUCCESS] Exported {len(created)} AI Agent rule files:")
+        for p in created:
+            print(f"  - {os.path.relpath(p, args.dir)}")
+        print("\033[0m")
+    elif args.savings:
+        from tzero_features import TokenROICalculator
+        scanner = CodebaseScanner()
+        files, sizes, snippets = scanner.scan_directory(args.dir)
+        raw_chars = sum(sizes.values())
+        raw_tokens = max(1, raw_chars // 4)
+        reduced_text = "".join(snippets.values())
+        reduced_tokens = max(1, count_tokens_precise(reduced_text))
+        metrics = TokenROICalculator.calculate(raw_tokens, reduced_tokens)
+        print(TokenROICalculator.format_report(metrics))
     elif args.gui:
         launch_gui()
     elif args.scan is not None:

@@ -4,8 +4,9 @@
 > mimari kararlarını ve teknik detaylarını kapsamlı şekilde anlatır.
 
 **Geliştirici:** Toprak Ahmet Aydoğmuş  
-**Ana Site:** [https://utspro.co](https://utspro.co)  
-**Biyografi:** [https://hopp.bio/siberegitim](https://hopp.bio/siberegitim)
+**Biyografi:** [https://hopp.bio/siberegitim](https://hopp.bio/siberegitim)  
+**LinkedIn:** [Toprak Ahmet Aydoğmuş](https://linkedin.com/in/toprak-ahmet-aydo%C4%9Fmu%C5%9F-60462534b/)  
+**GitHub:** [https://github.com/toprakahmetaydogmus/TZeroAlgorithm](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)
 
 ---
 
@@ -168,4 +169,4 @@ Her tema 11 renk değişkeni tanımlar: `bg_start`, `card_bg`, `card_border`, `c
 ---
 
 > **SİBER AKADEMİ** — T-Zero Context Architect V3  
-> © 2024-2026 Toprak Ahmet Aydoğmuş | [utspro.co](https://utspro.co)
+> © 2024-2026 Toprak Ahmet Aydoğmuş | [LinkedIn](https://linkedin.com/in/toprak-ahmet-aydo%C4%9Fmu%C5%9F-60462534b/) • [GitHub](https://github.com/toprakahmetaydogmus)

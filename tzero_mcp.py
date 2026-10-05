@@ -2,7 +2,7 @@
 """Siber Akademi — T-Zero Context Engine MCP (Model Context Protocol) Server.
 
 Developer: Toprak Ahmet Aydoğmuş (Siber Akademi)
-Official Website: https://utspro.co
+LinkedIn: https://linkedin.com/in/toprak-ahmet-aydo%C4%9Fmu%C5%9F-60462534b/
 Bio & Socials: https://hopp.bio/siberegitim
 GitHub: https://github.com/toprakahmetaydogmus/TZeroAlgorithm
 
@@ -575,6 +575,118 @@ def create_mcp_server():
 
         out.append("\n> [TIP] Running with `reduction_mode='ultra'` typically reduces token costs by **80% to 95%**.")
         return "\n".join(out)
+
+    # -------------------------------------------------------------------------
+    # TOOL 9: analyze_change_impact
+    # -------------------------------------------------------------------------
+    @server.tool(
+        name="analyze_change_impact",
+        description=(
+            "Calculates blast radius and change impact for modifying a specific function, "
+            "class, or symbol. Identifies all direct and transitive dependent modules across the codebase."
+        )
+    )
+    def analyze_change_impact(
+        target_symbol: str,
+        project_root: str = "."
+    ) -> str:
+        """Traces symbol references, inbound dependents, and calculates blast radius score."""
+        from tzero_features import ChangeImpactAnalyzer
+        analyzer = ChangeImpactAnalyzer(project_root)
+        analysis = analyzer.analyze_symbol(target_symbol)
+        return analyzer.format_report(analysis)
+
+    # -------------------------------------------------------------------------
+    # TOOL 10: enforce_architecture_boundaries
+    # -------------------------------------------------------------------------
+    @server.tool(
+        name="enforce_architecture_boundaries",
+        description=(
+            "Enforces T-4 architectural boundary rules (tzero.rules.json). Verifies modular "
+            "separation and detects unauthorized cross-layer imports."
+        )
+    )
+    def enforce_architecture_boundaries(
+        project_root: str = ".",
+        rules_file: str = "tzero.rules.json"
+    ) -> str:
+        """Audits imports against architectural layer boundaries."""
+        from tzero_features import ArchitectureRuleEngine
+        config_p = os.path.join(project_root, rules_file) if not os.path.isabs(rules_file) else rules_file
+        engine = ArchitectureRuleEngine(project_root, config_p)
+        res = engine.enforce_boundaries()
+        return engine.format_report(res)
+
+    # -------------------------------------------------------------------------
+    # TOOL 11: search_codebase_semantic
+    # -------------------------------------------------------------------------
+    @server.tool(
+        name="search_codebase_semantic",
+        description=(
+            "100% Private, local hybrid BM25 + TF-IDF semantic code search. Finds relevant "
+            "code functions, classes, and snippets without leaking code to third-party embedding APIs."
+        )
+    )
+    def search_codebase_semantic(
+        query: str,
+        project_root: str = ".",
+        top_k: int = 5
+    ) -> str:
+        """Performs private local hybrid semantic search across the codebase."""
+        from tzero_features import LocalSemanticCodeSearch
+        searcher = LocalSemanticCodeSearch(project_root)
+        results = searcher.search(query, top_k=top_k)
+        return searcher.format_search_results(query, results)
+
+    # -------------------------------------------------------------------------
+    # TOOL 12: export_agent_rules
+    # -------------------------------------------------------------------------
+    @server.tool(
+        name="export_agent_rules",
+        description=(
+            "Generates native configuration rule files for AI coding agents: .cursorrules, "
+            ".cursor/rules/*.mdc, .clinerules, and .github/copilot-instructions.md."
+        )
+    )
+    def export_agent_rules(
+        project_root: str = ".",
+        target: str = "all"
+    ) -> str:
+        """Exports AI coding agent rules into workspace."""
+        from tzero_features import AgentRulesGenerator
+        created = AgentRulesGenerator.export_all(project_root)
+        rel_paths = [os.path.relpath(p, project_root) for p in created]
+        return "✅ Generated AI Agent rule files:\n" + "\n".join(f"- `{p}`" for p in rel_paths)
+
+    # -------------------------------------------------------------------------
+    # TOOL 13: get_token_savings_metrics
+    # -------------------------------------------------------------------------
+    @server.tool(
+        name="get_token_savings_metrics",
+        description=(
+            "Computes quantitative token compression metrics, reduction percentage, "
+            "and developer team financial ROI savings (USD/month)."
+        )
+    )
+    def get_token_savings_metrics(
+        project_root: str = ".",
+        team_size: int = 5
+    ) -> str:
+        """Calculates token reduction and economic ROI."""
+        from tzero_features import TokenROICalculator
+        from tzero_v3 import CodebaseScanner, TokenReducer
+
+        abs_root = os.path.abspath(project_root)
+        scanner = CodebaseScanner()
+        files, sizes, snippets = scanner.scan_directory(abs_root)
+
+        raw_chars = sum(sizes.values())
+        raw_tokens = max(1, raw_chars // 4)
+        reduced_text = "".join(snippets.values())
+        reduced_tokens = max(1, count_tokens_precise(reduced_text))
+
+        metrics = TokenROICalculator.calculate(raw_tokens, reduced_tokens, team_size=team_size)
+        return TokenROICalculator.format_report(metrics)
 
     # -------------------------------------------------------------------------
     # PROMPT: tzero_grounding

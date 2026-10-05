@@ -1,0 +1,9 @@
+---
+description: Architectural Boundary & Modularity Standards
+globs: **/*.py
+---
+# Architecture Standards for TZeroAlgorithm
+
+- Core business logic must remain decoupled from presentation or CLI entrypoints.
+- All public functions and classes must include descriptive docstrings.
+- Follow PEP 8 and maintain type hints where applicable.

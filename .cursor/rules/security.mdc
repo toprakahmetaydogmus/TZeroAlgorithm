@@ -1,0 +1,9 @@
+---
+description: Zero-Leak Security & Secret Protection
+globs: **/*
+---
+# Zero-Leak Security Mandate
+
+- NEVER write raw API keys (OpenAI, Anthropic, NVIDIA, Gemini) into code.
+- Always retrieve credentials via OS keyring or environment variables.
+- Keep test data strictly synthetic.

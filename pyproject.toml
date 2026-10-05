@@ -57,7 +57,7 @@ tzero = "main:main"
 tzero-mcp = "tzero_mcp:main"
 
 [project.urls]
-Homepage = "https://utspro.co"
+LinkedIn = "https://linkedin.com/in/toprak-ahmet-aydo%C4%9Fmu%C5%9F-60462534b/"
 Biography = "https://hopp.bio/siberegitim"
 Repository = "https://github.com/toprakahmetaydogmus/TZeroAlgorithm"
 Documentation = "https://github.com/toprakahmetaydogmus/TZeroAlgorithm#readme"

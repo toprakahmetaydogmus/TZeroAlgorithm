@@ -7,10 +7,10 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Release-v3.0.0-00ffd8?style=for-the-badge&logo=rocket" alt="Release v3.0.0" />
-  <img src="https://img.shields.io/badge/MCP-Protocol%20Ready-ff69b4?style=for-the-badge&logo=anthropic" alt="MCP Server Protocol Ready" />
+  <img src="https://img.shields.io/badge/MCP-13%20Tools%20Ready-ff69b4?style=for-the-badge&logo=anthropic" alt="MCP Server 13 Tools Ready" />
   <img src="https://img.shields.io/badge/Security-100%25%20Zero--Leak%20Keyring-50fa7b?style=for-the-badge&logo=shield" alt="Zero Leak Security" />
   <img src="https://img.shields.io/badge/Python-3.9%20|%203.10%20|%203.11%20|%203.12%20|%203.13%20|%203.14-bd93f9?style=for-the-badge&logo=python" alt="Python Versions" />
-  <img src="https://img.shields.io/badge/Tests-44%2F44%20Passing-00f0ff?style=for-the-badge&logo=githubactions" alt="Tests 44/44 Passing" />
+  <img src="https://img.shields.io/badge/Tests-58%2F58%20Passing-00f0ff?style=for-the-badge&logo=githubactions" alt="Tests 58/58 Passing" />
   <img src="https://img.shields.io/badge/License-MIT-f1fa8c?style=for-the-badge" alt="MIT License" />
   <img src="https://img.shields.io/badge/Platform-Windows%20|%20macOS%20|%20Linux-ff79c6?style=for-the-badge" alt="Platform" />
 </p>
@@ -20,8 +20,8 @@
 > Includes a native **Model Context Protocol (MCP)** server for autonomous AI coding agents.
 
 **Developer:** Toprak Ahmet Aydoğmuş  
-**Official Website:** [https://utspro.co](https://utspro.co)  
-**Bio & Socials:** [https://hopp.bio/siberegitim](https://hopp.bio/siberegitim)  
+**LinkedIn:** [Toprak Ahmet Aydoğmuş](https://linkedin.com/in/toprak-ahmet-aydo%C4%9Fmu%C5%9F-60462534b/)  
+**Bio & Hub:** [https://hopp.bio/siberegitim](https://hopp.bio/siberegitim)  
 **GitHub Repository:** [https://github.com/toprakahmetaydogmus/TZeroAlgorithm](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)
 
 ---
@@ -74,7 +74,7 @@
 
 T-Zero V3 natively embeds a standard **Model Context Protocol (MCP)** server (`tzero_mcp.py`) operating over `stdio`. This empowers AI agents in **Cursor**, **Claude Desktop**, **Antigravity IDE**, and **Cline** to autonomously inspect, prune, and query your project's codebase before writing a single line of code.
 
-### 🛠 Available MCP Tools
+### 🛠 Available MCP Tools (13 Autonomous Tools)
 
 | Tool Name | Parameters | Purpose |
 |:----------|:-----------|:--------|
@@ -86,6 +86,11 @@ T-Zero V3 natively embeds a standard **Model Context Protocol (MCP)** server (`t
 | `audit_codebase_quality` | `project_root`, `file_path` | Runs an AST static code smell check and secret leak scan (detects functions >30 lines, global vars, missing docstrings). |
 | `find_code_duplicity` | `project_root`, `min_lines` | Scans the workspace to identify repeated/duplicate blocks of code across files for refactoring. |
 | `estimate_token_cost` | `text`, `project_root`, `reduction_mode` | Computes exact token count and USD cost comparison across OpenAI, Claude, Groq, NVIDIA NIM, and Ollama ($0). |
+| `analyze_change_impact` | `symbol_name`, `project_root` | Traces AST symbol definitions, caller cascades, inbound dependents, and calculates a 0-100 risk score. |
+| `enforce_architecture_boundaries` | `project_root`, `rules_path` | Validates modular import boundaries against `tzero.rules.json` to prevent architectural erosion. |
+| `search_codebase_semantic` | `query`, `project_root`, `top_k` | 100% private, local in-memory BM25 + TF-IDF hybrid semantic code search and RAG engine ($0 cost, 0 leaks). |
+| `export_agent_rules` | `project_root` | Generates 1-click rules for Cursor (`.cursorrules`, `.cursor/rules/*.mdc`), Cline (`.clinerules`), and Copilot. |
+| `get_token_savings_metrics` | `project_root`, `team_size`, `queries_per_day` | Calculates quantitative token reduction ratio, monthly/annual cost savings, and team developer ROI metrics. |
 
 ### 🧭 MCP Prompts
 - **`tzero_grounding`**: Injects strict architectural boundary rules, modular integrity guidelines, and Zero-Leak security mandates into the agent's system session.
@@ -131,29 +136,31 @@ python main.py --mcp
 
 ```mermaid
 flowchart TD
-    A[Source Code Repository] --> B[CodebaseScanner]
-    B --> C{Token Reducer}
-    C -->|Ultra Mode| D[Function & Class Signatures Only]
-    C -->|Balanced Mode| E[Signatures + Control Flow Lines]
-    C -->|None Mode| F[Full Original Source Code]
+    A["Source Code Repository"] --> B["CodebaseScanner"]
+    B --> C{"Token Reducer"}
+    C -->|"Ultra Mode"| D["Function & Class Signatures Only"]
+    C -->|"Balanced Mode"| E["Signatures + Control Flow Lines"]
+    C -->|"None Mode"| F["Full Original Source Code"]
     
-    B --> G[AST Static Code Auditor]
-    G --> H[Code Smells & Complexity Report]
+    B --> G["AST Static Code Auditor"]
+    G --> H["Code Smells & Complexity Report"]
     
-    B --> I[Dependency Analyzer]
-    I --> J[Import Graph & Module Tree]
+    B --> I["Dependency Analyzer"]
+    I --> J["Import Graph & Module Tree"]
     
-    B --> K[Workspace Duplicity Finder]
-    K --> L[Clone & Duplicate Code Blocks]
+    B --> K["Workspace Duplicity Finder"]
+    K --> L["Clone & Duplicate Code Blocks"]
 
-    D & J & L --> M{Context Generator}
-    M -->|Offline Dry-Run| N[Local T-Zero Context Tree]
-    M -->|AI Provider Mode| O[LLM Prompt Synthesizer]
-    O --> P[NVIDIA NIM / OpenAI / Gemini / Anthropic / Ollama]
-    P --> Q[High-Fidelity README.md, AGENTS.md, & ARCHITECTURE.md]
+    D --> M{"Context Generator"}
+    J --> M
+    L --> M
+    M -->|"Offline Dry-Run"| N["Local T-Zero Context Tree"]
+    M -->|"AI Provider Mode"| O["LLM Prompt Synthesizer"]
+    O --> P["NVIDIA NIM / OpenAI / Gemini / Anthropic / Ollama"]
+    P --> Q["High-Fidelity README.md, AGENTS.md, & ARCHITECTURE.md"]
 
-    M --> R[Model Context Protocol (MCP)]
-    R --> S[Cursor / Claude Desktop / Antigravity / Cline]
+    M --> R["Model Context Protocol (MCP)"]
+    R --> S["Cursor / Claude Desktop / Antigravity / Cline"]
 ```
 
 ---
@@ -353,7 +360,7 @@ python -m unittest discover -s tests -v
 
 Expected output:
 ```
-Ran 44 tests in ~3.8s
+Ran 58 tests in ~6.2s
 OK (100% Pass)
 ```
 
@@ -366,8 +373,8 @@ GitHub Actions automatically runs this test suite on every push and pull request
 This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for complete terms.
 
 **Toprak Ahmet Aydoğmuş** — Siber Akademi  
-- 🌐 **Website:** [utspro.co](https://utspro.co)  
-- 🔗 **Links & Socials:** [hopp.bio/siberegitim](https://hopp.bio/siberegitim)  
+- 💼 **LinkedIn:** [toprak-ahmet-aydoğmuş](https://linkedin.com/in/toprak-ahmet-aydo%C4%9Fmu%C5%9F-60462534b/)  
+- 🔗 **Links & Bio:** [hopp.bio/siberegitim](https://hopp.bio/siberegitim)  
 - 🐙 **GitHub:** [@toprakahmetaydogmus](https://github.com/toprakahmetaydogmus)
 
 ---
@@ -421,7 +428,7 @@ This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) f
 
 T-Zero V3, Anthropic'in standart **Model Context Protocol (MCP)** SDK'sını kullanarak `stdio` üzerinden haberleşen yerel bir sunucu (`tzero_mcp.py`) sunar. Bu sayede **Cursor**, **Claude Desktop**, **Antigravity IDE** ve **Cline** gibi yapay zeka ajanları, projede herhangi bir kod üretmeden veya değiştirmeden önce projenin hiyerarşik mimarisini, bağımlılık grafiğini ve sınırlarını sorgulayabilir.
 
-### 🛠 Sunulan MCP Araçları (Tools)
+### 🛠 Sunulan MCP Araçları (13 Otonom Araç)
 
 | Araç Adı | Parametreler | Görevi ve Amacı |
 |:---------|:-------------|:----------------|
@@ -433,6 +440,11 @@ T-Zero V3, Anthropic'in standart **Model Context Protocol (MCP)** SDK'sını kul
 | `audit_codebase_quality` | `project_root`, `file_path` | AST statik kod kokusu analizi ve gizli anahtar/şifre sızıntısı taraması gerçekleştirir (30+ satır fonksiyonlar, global anahtarlar). |
 | `find_code_duplicity` | `project_root`, `min_lines` | Çalışma alanında 6+ satırlık kopya/tekrar kod bloklarını tespit eder. |
 | `estimate_token_cost` | `text`, `project_root`, `reduction_mode` | Verilen metin veya dizin için OpenAI, Claude, Groq, NVIDIA NIM ve Ollama ($0) modelleri üzerinden tam token ve USD maliyet tablosu çıkarır. |
+| `analyze_change_impact` | `symbol_name`, `project_root` | Refactoring öncesi AST sembol tanımları, çağıran zincirleri ve 0-100 risk skoru ile etki yarıçapını (blast radius) hesaplar. |
+| `enforce_architecture_boundaries` | `project_root`, `rules_path` | `tzero.rules.json` kurallarına göre katmanlar arası yasaklı importları denetler ve mimari bozulmayı engeller. |
+| `search_codebase_semantic` | `query`, `project_root`, `top_k` | %100 yerel ve gizli, bellek içi BM25 + TF-IDF hibrit anlamsal kod arama ve RAG motoru ($0 maliyet, sıfır veri sızıntısı). |
+| `export_agent_rules` | `project_root` | Cursor (`.cursorrules`, `.cursor/rules/*.mdc`), Cline (`.clinerules`) ve Copilot kurallarını tek tıkla üretir. |
+| `get_token_savings_metrics` | `project_root`, `team_size`, `queries_per_day` | Nicel token tasarruf oranını, aylık/yıllık maliyet kârını ve ekip bazlı ROI değerlerini hesaplar. |
 
 ### 🧭 MCP Yerleşik Promptları
 - **`tzero_grounding`**: Cursor / Claude / Antigravity oturumlarına mimari kuralları, modüler sınırları ve %100 Zero-Leak güvenlik direktiflerini enjekte eder.
@@ -478,29 +490,31 @@ python main.py --mcp
 
 ```mermaid
 flowchart TD
-    A[Kaynak Kod Deposu] --> B[CodebaseScanner]
-    B --> C{Token Reducer}
-    C -->|Ultra Mod| D[Yalnızca Fonksiyon & Sınıf İmzaları]
-    C -->|Balanced Mod| E[İmzalar + Temel Kontrol Akışı]
-    C -->|None Mod| F[Tam Orijinal Kaynak Kod]
+    A["Kaynak Kod Deposu"] --> B["CodebaseScanner"]
+    B --> C{"Token Reducer"}
+    C -->|"Ultra Mod"| D["Yalnızca Fonksiyon & Sınıf İmzaları"]
+    C -->|"Balanced Mod"| E["İmzalar + Temel Kontrol Akışı"]
+    C -->|"None Mod"| F["Tam Orijinal Kaynak Kod"]
     
-    B --> G[AST Statik Kod Denetçisi]
-    G --> H[Kod Kokuları & Karmaşıklık Raporu]
+    B --> G["AST Statik Kod Denetçisi"]
+    G --> H["Kod Kokuları & Karmaşıklık Raporu"]
     
-    B --> I[Bağımlılık Analizörü]
-    I --> J[Import Grafı & Modül Haritası]
+    B --> I["Bağımlılık Analizörü"]
+    I --> J["Import Grafı & Modül Haritası"]
     
-    B --> K[Workspace Duplicity Finder]
-    K --> L[Tekrar Eden Kod Blokları]
+    B --> K["Workspace Duplicity Finder"]
+    K --> L["Tekrar Eden Kod Blokları"]
 
-    D & J & L --> M{Context Generator}
-    M -->|Çevrimdışı Dry-Run| N[Yerel T-Zero Context Ağacı]
-    M -->|AI API Modu| O[LLM Prompt Sentezleyici]
-    O --> P[NVIDIA NIM / OpenAI / Gemini / Anthropic / Ollama]
-    P --> Q[Yüksek Sadakatli README.md, AGENTS.md & ARCHITECTURE.md]
+    D --> M{"Context Generator"}
+    J --> M
+    L --> M
+    M -->|"Çevrimdışı Dry-Run"| N["Yerel T-Zero Context Ağacı"]
+    M -->|"AI API Modu"| O["LLM Prompt Sentezleyici"]
+    O --> P["NVIDIA NIM / OpenAI / Gemini / Anthropic / Ollama"]
+    P --> Q["Yüksek Sadakatli README.md, AGENTS.md & ARCHITECTURE.md"]
 
-    M --> R[Model Context Protocol (MCP)]
-    R --> S[Cursor / Claude Desktop / Antigravity / Cline]
+    M --> R["Model Context Protocol (MCP)"]
+    R --> S["Cursor / Claude Desktop / Antigravity / Cline"]
 ```
 
 ---
@@ -700,7 +714,7 @@ python -m unittest discover -s tests -v
 
 Beklenen çıktı:
 ```
-Ran 44 tests in ~3.8s
+Ran 58 tests in ~6.2s
 OK (100% Pass)
 ```
 
@@ -713,6 +727,6 @@ GitHub Actions, depoya yapılan her push ve pull request işleminde Ubuntu ve Wi
 Bu proje **MIT Lisansı** altında lisanslanmıştır. Detaylar için [LICENSE](LICENSE) dosyasına bakabilirsiniz.
 
 **Toprak Ahmet Aydoğmuş** — Siber Akademi  
-- 🌐 **Web Sitesi:** [utspro.co](https://utspro.co)  
-- 🔗 **Bağlantılar & Sosyal:** [hopp.bio/siberegitim](https://hopp.bio/siberegitim)  
+- 💼 **LinkedIn:** [toprak-ahmet-aydoğmuş](https://linkedin.com/in/toprak-ahmet-aydo%C4%9Fmu%C5%9F-60462534b/)  
+- 🔗 **Bağlantılar & Biyografi:** [hopp.bio/siberegitim](https://hopp.bio/siberegitim)  
 - 🐙 **GitHub:** [@toprakahmetaydogmus](https://github.com/toprakahmetaydogmus)

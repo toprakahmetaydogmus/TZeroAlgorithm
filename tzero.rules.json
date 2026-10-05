@@ -1,0 +1,22 @@
+{
+  "version": "1.0",
+  "description": "T-Zero Architectural Boundary Rules for Modular Integrity",
+  "layers": {
+    "core": ["core/*", "engine/*"],
+    "api": ["api/*", "tzero_mcp.py", "server/*"],
+    "cli": ["main.py", "compile.py", "cli/*"],
+    "ui": ["gui/*", "views/*"]
+  },
+  "forbidden_imports": [
+    {
+      "from_layer": "core",
+      "cannot_import": ["ui", "views"],
+      "reason": "Core domain logic must never have visual UI dependencies."
+    },
+    {
+      "from_layer": "models",
+      "cannot_import": ["views", "controllers"],
+      "reason": "Data models must remain decoupled from presentation layers."
+    }
+  ]
+}
