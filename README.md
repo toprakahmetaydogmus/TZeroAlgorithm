@@ -109,7 +109,16 @@ Reproduce it with: `python -c "from pathlib import Path; from tzero_v3 import To
 
 ### 🔌 Client Configuration
 
-Install `pipx` first. These configs run the MCP command directly from GitHub without a manual clone; after publishing the package to PyPI, replace the Git URL with `tzero-algorithm`.
+Install [pipx](https://pipx.pypa.io/stable/installation/) first. The Cursor link imports a local stdio server configuration directly and does not depend on a third-party directory listing. It fetches the server from GitHub on first launch, without a manual clone.
+
+#### Add to Cursor in One Click
+
+[Add T-Zero to Cursor](cursor://anysphere.cursor-deeplink/mcp/install?name=tzero&config=eyJjb21tYW5kIjoicGlweCIsImFyZ3MiOlsicnVuIiwiLS1zcGVjIiwiZ2l0K2h0dHBzOi8vZ2l0aHViLmNvbS90b3ByYWthaG1ldGF5ZG9nbXVzL1RaZXJvQWxnb3JpdGhtLmdpdCIsInR6ZXJvLW1jcCJdfQ%3D%3D)
+
+1. Install Cursor and pipx if you have not already.
+2. Open the link above and approve the server configuration in Cursor.
+3. Open **Cursor Settings → MCP** (or **Customize → MCP**) and enable `tzero`.
+4. Confirm the T-Zero tools appear in the available MCP tools list.
 
 #### 1. Cursor IDE (`.cursor/mcp.json` or Settings → MCP)
 ```json
@@ -124,6 +133,13 @@ Install `pipx` first. These configs run the MCP command directly from GitHub wit
 ```
 
 #### 2. Claude Desktop (`claude_desktop_config.json`)
+
+1. Install pipx using the [official instructions](https://pipx.pypa.io/stable/installation/).
+2. In Claude Desktop, open **Settings → Developer → Edit Config**.
+3. Merge the JSON block below into the existing `mcpServers` object; keep any other server entries.
+4. Save the file, fully quit Claude Desktop, then reopen it.
+5. In **Settings → Developer**, confirm `tzero` is running and its tools are available.
+
 ```json
 {
   "mcpServers": {
@@ -523,7 +539,16 @@ Tekrar üretmek için: `python -c "from pathlib import Path; from tzero_v3 impor
 
 ### 🔌 Editör Entegrasyonu
 
-Önce `pipx` kurun. Aşağıdaki ayarlar GitHub'dan MCP komutunu klonlama gerektirmeden çalıştırır. PyPI yayını sonrası Git URL'sini `tzero-algorithm` ile değiştirebilirsiniz.
+Önce [pipx'i](https://pipx.pypa.io/stable/installation/) kurun. Cursor bağlantısı yerel stdio sunucusunu doğrudan yapılandırır; üçüncü taraf bir dizinde listelenmesine bağlı değildir. Sunucu ilk açılışta GitHub'dan indirilir, elle klonlama gerekmez.
+
+#### Cursor'a Tek Tıkla Ekle
+
+[T-Zero'yu Cursor'a ekle](cursor://anysphere.cursor-deeplink/mcp/install?name=tzero&config=eyJjb21tYW5kIjoicGlweCIsImFyZ3MiOlsicnVuIiwiLS1zcGVjIiwiZ2l0K2h0dHBzOi8vZ2l0aHViLmNvbS90b3ByYWthaG1ldGF5ZG9nbXVzL1RaZXJvQWxnb3JpdGhtLmdpdCIsInR6ZXJvLW1jcCJdfQ%3D%3D)
+
+1. Cursor ve pipx kurulu değilse önce kurun.
+2. Yukarıdaki bağlantıyı açın ve Cursor'daki sunucu yapılandırmasını onaylayın.
+3. **Cursor Settings → MCP** (veya **Customize → MCP**) bölümüne girip `tzero` sunucusunu etkinleştirin.
+4. Kullanılabilir MCP araçları listesinde T-Zero araçlarının göründüğünü doğrulayın.
 
 #### 1. Cursor IDE (`.cursor/mcp.json` veya Cursor Ayarları → MCP)
 ```json
@@ -538,6 +563,13 @@ Tekrar üretmek için: `python -c "from pathlib import Path; from tzero_v3 impor
 ```
 
 #### 2. Claude Desktop (`claude_desktop_config.json`)
+
+1. [Resmi pipx kurulum yönergelerini](https://pipx.pypa.io/stable/installation/) izleyerek pipx'i kurun.
+2. Claude Desktop'ta **Settings → Developer → Edit Config** bölümünü açın.
+3. Aşağıdaki JSON bloğunu mevcut `mcpServers` nesnesine ekleyin; diğer sunucu kayıtlarını silmeyin.
+4. Dosyayı kaydedin, Claude Desktop'ı tamamen kapatıp yeniden açın.
+5. **Settings → Developer** bölümünde `tzero` sunucusunun çalıştığını ve araçlarının listelendiğini doğrulayın.
+
 ```json
 {
   "mcpServers": {
