@@ -137,7 +137,7 @@ If Cursor does not open the installer, use **Settings → MCP → Add Custom MCP
   "mcpServers": {
     "tzero": {
       "command": "py",
-      "args": ["-m", "pipx", "run", "--spec", "git+https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git@v3.0.3", "tzero-mcp"]
+      "args": ["-m", "pipx", "run", "--spec", "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/archive/refs/tags/v3.0.3.zip", "tzero-mcp"]
     }
   }
 }
@@ -149,7 +149,7 @@ If Cursor does not open the installer, use **Settings → MCP → Add Custom MCP
   "mcpServers": {
     "tzero": {
       "command": "pipx",
-      "args": ["run", "--spec", "git+https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git@v3.0.3", "tzero-mcp"]
+      "args": ["run", "--spec", "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/archive/refs/tags/v3.0.3.zip", "tzero-mcp"]
     }
   }
 }
@@ -186,7 +186,7 @@ For `.vscode/mcp.json`, VS Code uses a top-level `servers` object and requires `
     "tzero": {
       "type": "stdio",
       "command": "py",
-      "args": ["-m", "pipx", "run", "--spec", "git+https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git@v3.0.3", "tzero-mcp"]
+      "args": ["-m", "pipx", "run", "--spec", "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/archive/refs/tags/v3.0.3.zip", "tzero-mcp"]
     }
   }
 }
@@ -601,7 +601,7 @@ Link açılmazsa **Settings → MCP → Add Custom MCP** bölümüne girip aşa�
   "mcpServers": {
     "tzero": {
       "command": "py",
-      "args": ["-m", "pipx", "run", "--spec", "git+https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git@v3.0.3", "tzero-mcp"]
+      "args": ["-m", "pipx", "run", "--spec", "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/archive/refs/tags/v3.0.3.zip", "tzero-mcp"]
     }
   }
 }
@@ -613,7 +613,7 @@ Link açılmazsa **Settings → MCP → Add Custom MCP** bölümüne girip aşa�
   "mcpServers": {
     "tzero": {
       "command": "pipx",
-      "args": ["run", "--spec", "git+https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git@v3.0.3", "tzero-mcp"]
+      "args": ["run", "--spec", "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/archive/refs/tags/v3.0.3.zip", "tzero-mcp"]
     }
   }
 }
