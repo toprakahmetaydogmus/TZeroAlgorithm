@@ -15,7 +15,25 @@ class TestCLI(unittest.TestCase):
             text=True
         )
         self.assertEqual(res.returncode, 0)
-        self.assertIn("3.0.2", res.stdout)
+        self.assertIn("3.0.3", res.stdout)
+
+    def test_mcp_version_flag(self):
+        res = subprocess.run(
+            [sys.executable, "tzero_mcp.py", "--version"],
+            capture_output=True,
+            text=True
+        )
+        self.assertEqual(res.returncode, 0)
+        self.assertIn("3.0.3", res.stdout)
+
+    def test_addmcp_version_flag(self):
+        res = subprocess.run(
+            [sys.executable, "addmcp.py", "--version"],
+            capture_output=True,
+            text=True
+        )
+        self.assertEqual(res.returncode, 0)
+        self.assertIn("3.0.3", res.stdout)
 
     def test_scan_flag(self):
         res = subprocess.run(
@@ -43,7 +61,7 @@ class TestCLI(unittest.TestCase):
             text=True
         )
         self.assertEqual(res.returncode, 0)
-        self.assertIn("3.0.2", res.stdout)
+        self.assertIn("3.0.3", res.stdout)
 
 
 if __name__ == "__main__":

@@ -4912,9 +4912,10 @@ def main():
     parser.add_argument("--savings", action="store_true", help="Calculate token reduction metrics and economic developer team ROI")
     parser.add_argument("--web", nargs="?", const=7300, type=int, default=None, metavar="PORT", help="Launch local Cyberpunk web dashboard on localhost:7300")
     parser.add_argument("--mcp", action="store_true", help="Start Model Context Protocol (MCP) stdio server for Cursor/Claude/Antigravity")
+    parser.add_argument("--add-mcp", action="store_true", help="Install T-Zero MCP server into Cursor, Claude Desktop, Antigravity, VS Code, etc.")
     parser.add_argument("--gui", "-g", action="store_true", help="Launch the GUI Dashboard")
     parser.add_argument("--doctor", action="store_true", help="Check Python, dependencies, tkinter, git and keyring (installs missing packages)")
-    parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect V3.0.2")
+    parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect V3.0.3")
 
     if len(sys.argv) == 1:
         launch_gui()
@@ -4926,6 +4927,9 @@ def main():
             print("[ERROR] tzero_deps.py is missing; reinstall T-Zero to use --doctor.")
             sys.exit(1)
         sys.exit(tzero_deps.run_doctor())
+    elif args.add_mcp:
+        import addmcp
+        sys.exit(addmcp.run_cli())
     elif args.mcp:
         import tzero_mcp
         tzero_mcp.main()

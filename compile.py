@@ -101,29 +101,80 @@ def build_binary():
         "--noconsole",
         "--clean",
         "--name=TZeroAlgorithm",
+        "--distpath=dist",
+        "--workpath=build/TZeroAlgorithm",
+        "--specpath=build/specs",
         # keyring loads its OS backends dynamically; PyInstaller cannot see them on its own
         "--collect-submodules=keyring.backends",
         "--hidden-import=win32ctypes.core",
     ]
     
     if icon_file:
-        build_args.append(f"--icon={icon_file}")
-        build_args.append(f"--add-data={os.path.abspath(icon_file)}{os.pathsep}.")
+        abs_icon = os.path.abspath(icon_file)
+        build_args.append(f"--icon={abs_icon}")
+        build_args.append(f"--add-data={abs_icon}{os.pathsep}.")
         
     build_args.append(main_script)
     
     try:
         subprocess.run(build_args, check=True)
-        logger.info("Binary compilation completed successfully.")
-        
-        # Verify output target
-        target_exe = os.path.join("dist", "TZeroAlgorithm.exe" if os.name == 'nt' else "TZeroAlgorithm")
-        if os.path.exists(target_exe):
-            logger.info(f"Target executable successfully built at: {os.path.abspath(target_exe)}")
-            return True
-        else:
-            logger.error("Compilation succeeded but output file could not be verified.")
+
+        server_args = [
+            sys.executable, "-m", "PyInstaller",
+            "--onefile",
+            "--clean",
+            "--noconfirm",
+            "--name=TZeroMCP",
+            "--distpath=dist",
+            "--workpath=build/TZeroMCP",
+            "--specpath=build/specs",
+            "--collect-submodules=keyring.backends",
+            "--hidden-import=win32ctypes.core",
+        ]
+        if icon_file:
+            server_args.append(f"--icon={os.path.abspath(icon_file)}")
+        server_args.append("tzero_mcp.py")
+        subprocess.run(server_args, check=True)
+
+        server_binary = os.path.join(
+            "dist", "TZeroMCP.exe" if os.name == "nt" else "TZeroMCP"
+        )
+        if not os.path.exists(server_binary):
+            logger.error("MCP server executable was not created.")
             return False
+
+        installer_args = [
+            sys.executable, "-m", "PyInstaller",
+            "--onefile",
+            "--noconsole",
+            "--clean",
+            "--noconfirm",
+            "--name=AddMCP",
+            "--distpath=dist",
+            "--workpath=build/AddMCP",
+            "--specpath=build/specs",
+            f"--add-binary={os.path.abspath(server_binary)}{os.pathsep}.",
+        ]
+        if icon_file:
+            installer_args.append(f"--icon={os.path.abspath(icon_file)}")
+            installer_args.append(f"--add-data={os.path.abspath(icon_file)}{os.pathsep}.")
+        installer_args.append("addmcp.py")
+        subprocess.run(installer_args, check=True)
+
+        suffix = ".exe" if os.name == "nt" else ""
+        expected_outputs = [
+            os.path.join("dist", f"TZeroAlgorithm{suffix}"),
+            os.path.join("dist", f"TZeroMCP{suffix}"),
+            os.path.join("dist", f"AddMCP{suffix}"),
+        ]
+        missing = [path for path in expected_outputs if not os.path.exists(path)]
+        if missing:
+            logger.error("Build outputs could not be verified: %s", ", ".join(missing))
+            return False
+
+        for path in expected_outputs:
+            logger.info("Binary successfully built at: %s", os.path.abspath(path))
+        return True
             
     except subprocess.CalledProcessError as cpe:
         logger.critical(f"Compilation pipeline failed with command exception: {cpe}")

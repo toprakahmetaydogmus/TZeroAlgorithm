@@ -27,6 +27,8 @@ import inspect
 import logging
 from typing import Dict, List, Optional, Any
 
+SERVER_VERSION = "3.0.3"
+
 # Ensure project root is in sys.path
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 if SCRIPT_DIR not in sys.path:
@@ -112,7 +114,7 @@ def create_mcp_server():
     elif "instructions" in supported:
         server_kwargs["instructions"] = summary
     if "version" in supported:
-        server_kwargs["version"] = "3.0.2"
+        server_kwargs["version"] = SERVER_VERSION
     server = ServerClass(**server_kwargs)
 
     # -------------------------------------------------------------------------
@@ -728,6 +730,37 @@ def create_mcp_server():
 
 def main():
     """Main execution entrypoint for the T-Zero MCP stdio server."""
+    if "--version" in sys.argv[1:]:
+        print(f"T-Zero MCP Server {SERVER_VERSION}")
+        return
+
+    if "--help" in sys.argv[1:] or "-h" in sys.argv[1:]:
+        print(f"T-Zero MCP Server v{SERVER_VERSION}")
+        print("\nUsage:")
+        print("  tzero-mcp             Run MCP stdio server for AI agents (Cursor, Claude, Antigravity)")
+        print("  tzero-mcp --install   Configure and install T-Zero MCP into detected IDEs")
+        print("  tzero-mcp --doctor    Inspect system environment and auto-install requirements")
+        print("  tzero-mcp --version   Show server version")
+        return
+
+    if "--doctor" in sys.argv[1:]:
+        try:
+            import tzero_deps
+            sys.exit(tzero_deps.run_doctor())
+        except ImportError:
+            sys.stderr.write("[ERROR] tzero_deps module not found.\n")
+            sys.exit(1)
+
+    if "--install" in sys.argv[1:] or "--add-mcp" in sys.argv[1:]:
+        try:
+            import addmcp
+            sys.argv = [sys.argv[0]] + [a for a in sys.argv[1:] if a not in ("--install", "--add-mcp")]
+            addmcp.main()
+            return
+        except ImportError as e:
+            sys.stderr.write(f"[ERROR] addmcp installer failed: {e}\n")
+            sys.exit(1)
+
     if ServerClass is None:
         sys.stderr.write(
             "\n[ERROR] The 'mcp' Python SDK is not installed.\n"

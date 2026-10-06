@@ -109,12 +109,23 @@ Reproduce it with: `python -c "from pathlib import Path; from tzero_v3 import To
 
 ### 🔌 Add T-Zero to MCP Clients
 
-T-Zero runs as a local stdio server. The first launch downloads the pinned `v3.0.3` package from GitHub; no repository clone is needed. Install Python 3.9+ and pipx first, or use the standalone `AddMCP.exe` installer on Windows.
+T-Zero runs as a local stdio server with full support for Cursor, Claude Desktop, Antigravity IDE, VS Code, Windsurf, Cline, and Roo Code.
 
-#### Install pipx on Windows
+#### ⚡ Option 1: 1-Click Zero-Dependency Windows Installer (Recommended)
 
+Download **`AddMCP.exe`** directly from [Latest Release (v3.0.3)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases):
+- **GUI Mode:** Double-click `AddMCP.exe`. It automatically detects all installed IDEs on your computer and configures them with a single click.
+- **CLI / Headless Mode:** Run `AddMCP.exe --all` (automatically installs to all detected IDEs without a GUI).
+- **Zero Requirements:** Does **not** require Python, pip, pipx, or Git. Bundles the standalone `TZeroMCP.exe` runtime internally.
+
+---
+
+#### 📦 Option 2: Remote Launch via pipx (Cross-Platform: Windows, macOS, Linux)
+
+The first launch downloads the pinned `v3.0.3` package from GitHub without cloning the repo. Install Python 3.9+ and pipx:
+
+##### Install pipx on Windows
 Open PowerShell and run:
-
 ```powershell
 py -m pip install --user pipx
 py -m pipx ensurepath
@@ -573,12 +584,23 @@ Tekrar üretmek için: `python -c "from pathlib import Path; from tzero_v3 impor
 
 ### 🔌 T-Zero'yu MCP İstemcilerine Ekle
 
-T-Zero yerel stdio sunucusu olarak çalışır. İlk başlatmada sabitlenmiş `v3.0.3` paketi GitHub'dan indirilir; depoyu klonlamak gerekmez. Python 3.9+ ve önce pipx kurulu olmalıdır; Windows'ta IDE'lere otomatik kurulum için `AddMCP.exe` de kullanılabilir.
+T-Zero, Cursor, Claude Desktop, Antigravity IDE, VS Code, Windsurf, Cline ve Roo Code için tam destekli yerel bir stdio MCP sunucusu sunar.
 
-#### Windows'ta pipx Kurulumu
+#### ⚡ 1. Seçenek: Tek Tıkla Sıfır Gereksinimli Windows Kurulumu (Önerilen)
 
+[Son Sürüm (v3.0.3)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases) sayfasından doğrudan **`AddMCP.exe`** dosyasını indirin:
+- **Grafik Arayüz (GUI):** `AddMCP.exe` dosyasına çift tıklayın. Bilgisayarınızda yüklü tüm IDE'leri otomatik tespit eder ve tek tıkla entegrasyonu tamamlar.
+- **Terminal / Komut Satırı:** `AddMCP.exe --all` (hiçbir arayüz açmadan algılanan tüm IDE'lere sessizce kurar).
+- **Sıfır Gereksinim:** Python, pip, pipx veya Git gerektirmez. Bağımsız `TZeroMCP.exe` çalışma motorunu içinde gömülü olarak taşır.
+
+---
+
+#### 📦 2. Seçenek: pipx ile Uzaktan Çalıştırma (Çapraz Platform: Windows, macOS, Linux)
+
+İlk başlatmada sabitlenmiş `v3.0.3` paketi GitHub'dan otomatik indirilir; depoyu klonlamak gerekmez. Python 3.9+ ve pipx gereklidir:
+
+##### Windows'ta pipx Kurulumu
 PowerShell'i açıp çalıştırın:
-
 ```powershell
 py -m pip install --user pipx
 py -m pipx ensurepath

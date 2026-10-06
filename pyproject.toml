@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tzero-algorithm"
-version = "3.0.2"
+version = "3.0.3"
 description = "Enterprise Codebase Context Builder, AST Signatures Analyzer, & Token Reducer for LLMs"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -55,9 +55,10 @@ test = [
 [project.scripts]
 tzero = "main:main"
 tzero-mcp = "tzero_mcp:main"
+tzero-add-mcp = "addmcp:main"
 
 [tool.setuptools]
-py-modules = ["main", "tzero", "tzero_features", "tzero_mcp", "tzero_v3"]
+py-modules = ["main", "tzero", "tzero_features", "tzero_mcp", "tzero_v3", "tzero_deps", "addmcp"]
 
 [project.urls]
 LinkedIn = "https://linkedin.com/in/toprak-ahmet-aydo%C4%9Fmu%C5%9F-60462534b/"
