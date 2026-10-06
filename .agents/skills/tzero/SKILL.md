@@ -9,7 +9,7 @@ description: >-
 # /tzero — Siber Akademi T-Zero Context Engine
 
 Enterprise-Grade Codebase Context Architect, AST Signatures Analyzer, and Token Reducer.
-Cuts LLM context ingestion overhead by up to **95%** while preserving structural fidelity for AI agents.
+Cuts LLM context ingestion overhead by up to 95% while preserving structural fidelity for AI agents.
 
 Developer: Toprak Ahmet Aydoğmuş (Siber Akademi)
 Repository: https://github.com/toprakahmetaydogmus/TZeroAlgorithm

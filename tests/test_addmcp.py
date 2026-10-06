@@ -151,9 +151,36 @@ class TestClientDetection(unittest.TestCase):
             home = Path(temp_dir)
             with mock.patch("pathlib.Path.home", return_value=home):
                 _install_antigravity_skill()
+                # Test global skills
                 skill_path = home / ".gemini" / "config" / "skills" / "tzero" / "SKILL.md"
                 self.assertTrue(skill_path.is_file())
                 self.assertIn("name: tzero", skill_path.read_text(encoding="utf-8"))
+
+                tree_skill = home / ".gemini" / "config" / "skills" / "tzero-tree" / "SKILL.md"
+                self.assertTrue(tree_skill.is_file())
+                self.assertIn("name: tzero-tree", tree_skill.read_text(encoding="utf-8"))
+
+                audit_skill = home / ".gemini" / "config" / "skills" / "tzero-audit" / "SKILL.md"
+                self.assertTrue(audit_skill.is_file())
+                self.assertIn("name: tzero-audit", audit_skill.read_text(encoding="utf-8"))
+
+                arch_skill = home / ".gemini" / "config" / "skills" / "tzero-arch" / "SKILL.md"
+                self.assertTrue(arch_skill.is_file())
+                self.assertIn("name: tzero-arch", arch_skill.read_text(encoding="utf-8"))
+
+                # Test ~/.gemini/skills mirror
+                self.assertTrue((home / ".gemini" / "skills" / "tzero" / "SKILL.md").is_file())
+
+                # Test Antigravity plugin
+                plugin_json = home / ".gemini" / "config" / "plugins" / "tzero" / "plugin.json"
+                self.assertTrue(plugin_json.is_file())
+                self.assertIn('"name": "tzero"', plugin_json.read_text(encoding="utf-8"))
+
+                plugin_skill = home / ".gemini" / "config" / "plugins" / "tzero" / "skills" / "tzero" / "SKILL.md"
+                self.assertTrue(plugin_skill.is_file())
+
+                plugin_rules = home / ".gemini" / "config" / "plugins" / "tzero" / "rules" / "tzero-token-optimization.md"
+                self.assertTrue(plugin_rules.is_file())
 
 
 if __name__ == "__main__":

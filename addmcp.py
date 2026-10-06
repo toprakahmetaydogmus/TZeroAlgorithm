@@ -239,6 +239,10 @@ def merge_server_config(
 
     entry = server_entry(target, server_path)
     if servers.get(server_name) == entry:
+        if target.key == "antigravity":
+            _sync_alternate_antigravity_config(target, server_path, server_name)
+        elif target.key == "claude-desktop":
+            _sync_alternate_claude_desktop_config(target, server_path, server_name)
         return {"status": "unchanged", "backup": None}
 
     backup = None
@@ -309,20 +313,87 @@ def _sync_alternate_antigravity_config(
                     with alt_path.open("w", encoding="utf-8") as fp:
                         json.dump(cfg, fp, indent=2, ensure_ascii=False)
                         fp.write("\n")
-        # Also install the /tzero slash skill into Antigravity
-        _install_antigravity_skill()
+        # Also install the /tzero slash skills, plugin, and instructions into Antigravity
+        _install_antigravity_skill(server_path)
     except Exception:
         pass
 
 
-def _install_antigravity_skill() -> None:
-    """Installs the /tzero slash skill into Antigravity global configuration."""
+def _install_antigravity_skill(server_path: Optional[Path] = None) -> None:
+    """Installs the /tzero slash skills, Antigravity plugin, and MCP instructions."""
     try:
         home = Path.home()
-        skill_dir = home / ".gemini" / "config" / "skills" / "tzero"
-        skill_file = skill_dir / "SKILL.md"
-        skill_dir.mkdir(parents=True, exist_ok=True)
-        skill_file.write_text(_ANTIGRAVITY_SKILL_CONTENT, encoding="utf-8")
+        # 1. Global skills directories
+        skills_targets = [
+            home / ".gemini" / "config" / "skills",
+            home / ".gemini" / "skills",
+        ]
+
+        # If running within a git or project workspace, also install workspace skill
+        cwd = Path.cwd()
+        if (cwd / ".git").is_dir() or (cwd / ".agents").is_dir():
+            skills_targets.append(cwd / ".agents" / "skills")
+
+        all_skills = {
+            "tzero": _ANTIGRAVITY_SKILL_CONTENT,
+            "tzero-tree": _ANTIGRAVITY_TREE_SKILL_CONTENT,
+            "tzero-audit": _ANTIGRAVITY_AUDIT_SKILL_CONTENT,
+            "tzero-arch": _ANTIGRAVITY_ARCH_SKILL_CONTENT,
+        }
+
+        for target_base in skills_targets:
+            for skill_name, content in all_skills.items():
+                s_dir = target_base / skill_name
+                s_dir.mkdir(parents=True, exist_ok=True)
+                (s_dir / "SKILL.md").write_text(content, encoding="utf-8")
+
+        # 2. Antigravity Plugin (~/.gemini/config/plugins/tzero)
+        plugin_dir = home / ".gemini" / "config" / "plugins" / "tzero"
+        plugin_dir.mkdir(parents=True, exist_ok=True)
+        (plugin_dir / "plugin.json").write_text(_ANTIGRAVITY_PLUGIN_JSON, encoding="utf-8")
+        (plugin_dir / "installed_version.json").write_text('{"version": "3.0.3"}\n', encoding="utf-8")
+
+        # Plugin skills
+        for skill_name, content in all_skills.items():
+            p_skill_dir = plugin_dir / "skills" / skill_name
+            p_skill_dir.mkdir(parents=True, exist_ok=True)
+            (p_skill_dir / "SKILL.md").write_text(content, encoding="utf-8")
+
+        # Plugin rules
+        p_rules_dir = plugin_dir / "rules"
+        p_rules_dir.mkdir(parents=True, exist_ok=True)
+        (p_rules_dir / "tzero-token-optimization.md").write_text(_ANTIGRAVITY_RULE_CONTENT, encoding="utf-8")
+
+        # Plugin mcp_config.json
+        cmd = str(server_path.resolve()) if server_path else str(home / "AppData" / "Local" / "TZeroAlgorithm" / SERVER_FILENAME)
+        plugin_mcp = {
+            "mcpServers": {
+                SERVER_NAME: {
+                    "command": cmd,
+                    "args": []
+                }
+            }
+        }
+        (plugin_dir / "mcp_config.json").write_text(json.dumps(plugin_mcp, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+
+        # 3. Enable plugin in ~/.gemini/config/config.json
+        cfg_file = home / ".gemini" / "config" / "config.json"
+        if cfg_file.exists():
+            try:
+                cfg_data = json.loads(cfg_file.read_text(encoding="utf-8-sig"))
+                if isinstance(cfg_data, dict):
+                    plugins_dict = cfg_data.setdefault("plugins", {})
+                    if isinstance(plugins_dict, dict) and "tzero" not in plugins_dict:
+                        plugins_dict["tzero"] = {"enabled": True}
+                        cfg_file.write_text(json.dumps(cfg_data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+            except Exception:
+                pass
+
+        # 4. MCP instructions in ~/.gemini/antigravity-ide/mcp/tzero/instructions.md
+        ide_mcp_dir = home / ".gemini" / "antigravity-ide" / "mcp" / SERVER_NAME
+        if ide_mcp_dir.is_dir():
+            (ide_mcp_dir / "instructions.md").write_text(_ANTIGRAVITY_MCP_INSTRUCTIONS, encoding="utf-8")
+
     except Exception:
         pass
 
@@ -368,6 +439,121 @@ When the user enters `/tzero [subcommand]` or asks for T-Zero assistance, dispat
 2. **Fallback to CLI/Engine:** If MCP is temporarily unavailable, use the local CLI `tzero_v3.py` or `TZeroAlgorithm.exe` with matching flags (`--scan`, `--audit`, `--export-arch`, etc.).
 3. **100% Zero-Leak Guarantee:** Never output, log, or commit sensitive API keys or user credentials.
 4. **Summary & Presentation:** Format the output with clear GitHub-style Markdown, tables, and alerts (`> [!TIP]`, `> [!IMPORTANT]`).
+"""
+
+_ANTIGRAVITY_TREE_SKILL_CONTENT = """---
+name: tzero-tree
+description: >-
+  Generate multi-tier hierarchical AST context tree with up to 95% token reduction for AI context ingestion.
+  Activate when the user types "/tzero-tree" or asks to build a code tree.
+---
+
+# /tzero-tree — AST Hierarchical Context Tree Generator
+
+Generate a multi-tier pruned AST context tree to provide AI agents with full architectural understanding at up to 95% lower token cost.
+
+## Modes & Tiers
+- **Tier 1 (T-1):** High-level architectural map & entry points.
+- **Tier 2 (T-2):** Public API & class/function signatures with types.
+- **Tier 3 (T-3):** Full signatures, method contracts, and docstrings.
+- **Tier 4 (T-4):** Full AST graph with import dependencies.
+
+## Execution
+Call the `get_project_context_tree` MCP tool with the target path (default: current workspace) and desired tier (default: `T-2`).
+"""
+
+_ANTIGRAVITY_AUDIT_SKILL_CONTENT = """---
+name: tzero-audit
+description: >-
+  Run AST static code analysis, code smells check, cyclomatic complexity report, and 100% Zero-Leak security audit for hardcoded secrets.
+  Activate when the user types "/tzero-audit" or asks to audit code quality.
+---
+
+# /tzero-audit — AST Code Quality & Zero-Leak Security Audit
+
+Perform a comprehensive AST quality audit and verify 100% Zero-Leak security:
+1. **Code Smells:** Functions >50 lines, classes >300 lines, high complexity.
+2. **Dead Code:** Unused imports and unreferenced private functions.
+3. **Security (Zero-Leak):** High-entropy strings, hardcoded API keys, tokens, and credentials.
+
+## Execution
+Call the `audit_codebase_quality` MCP tool on the target path (default: `.`).
+"""
+
+_ANTIGRAVITY_ARCH_SKILL_CONTENT = """---
+name: tzero-arch
+description: >-
+  Generate complete system architecture specification (ARCHITECTURE.md) with live Mermaid component diagrams.
+  Activate when the user types "/tzero-arch" or asks for system architecture blueprint.
+---
+
+# /tzero-arch — System Architecture Blueprint Generator
+
+Generate an enterprise-grade architectural specification:
+1. Module decomposition and layer boundaries.
+2. Inter-module import topology.
+3. Interactive Mermaid diagram showing system component relationships.
+4. Auto-exports or updates `ARCHITECTURE.md`.
+
+## Execution
+Call the `generate_architecture_blueprint` MCP tool on the target path (default: `.`).
+"""
+
+_ANTIGRAVITY_PLUGIN_JSON = """{
+  "name": "tzero",
+  "displayName": "Siber Akademi T-Zero Context Engine",
+  "version": "3.0.3",
+  "description": "Enterprise-Grade Codebase Context Architect, AST Signatures Analyzer, and Token Reducer. Cuts LLM prompt context by up to 95%, audits code smells & security, enforces architecture boundaries, and traces module dependencies.",
+  "suggestedPrompts": [
+    "/tzero tree - Build multi-tier AST hierarchical context tree with 95% token savings",
+    "/tzero audit - Run AST code quality and 100% Zero-Leak security leak audit",
+    "/tzero arch - Generate system architecture specification (ARCHITECTURE.md) with Mermaid diagrams",
+    "/tzero impact <symbol> - Analyze blast radius and change impact before editing code",
+    "/tzero savings - Compute token reduction metrics and financial ROI"
+  ],
+  "author": {
+    "name": "Toprak Ahmet Aydoğmuş (Siber Akademi)",
+    "url": "https://github.com/toprakahmetaydogmus/TZeroAlgorithm"
+  },
+  "keywords": [
+    "tzero",
+    "token-reduction",
+    "ast",
+    "codebase-context",
+    "mcp",
+    "architecture",
+    "security-audit"
+  ],
+  "homepage": "https://github.com/toprakahmetaydogmus/TZeroAlgorithm",
+  "repository": "https://github.com/toprakahmetaydogmus/TZeroAlgorithm",
+  "license": "MIT"
+}
+"""
+
+_ANTIGRAVITY_RULE_CONTENT = """---
+description: Suggest using T-Zero MCP tools for token pruning and AST architecture mapping on codebases.
+trigger: model_decision
+---
+
+# T-Zero Token Efficiency & Architecture Rule
+
+When exploring large repositories or analyzing multi-file impact:
+1. Prefer `tzero` MCP tools (`get_project_context_tree`, `analyze_change_impact`, `audit_codebase_quality`) to drastically reduce token usage and preserve context window limit.
+2. Ensure Zero-Leak safety before committing or suggesting code with credentials or secrets.
+"""
+
+_ANTIGRAVITY_MCP_INSTRUCTIONS = """# T-Zero MCP Server Instructions & Best Practices
+
+T-Zero is an Enterprise-Grade Codebase Context Architect and Token Reduction Engine.
+Developer: Toprak Ahmet Aydoğmuş (Siber Akademi)
+Repository: https://github.com/toprakahmetaydogmus/TZeroAlgorithm
+
+## When to Use T-Zero MCP Tools:
+1. **Large Codebases or Deep Trees:** Before reading massive directories or hundreds of files into prompt context, invoke `get_project_context_tree` with `tier="T-2"` or `tier="T-3"`. This reduces token consumption by up to 95% while keeping all class/function AST signatures and types.
+2. **Refactoring & Symbol Edits:** Before modifying, deleting, or renaming functions/classes, call `analyze_change_impact` to assess the blast radius and downstream dependents across the workspace.
+3. **Architecture Mapping:** Use `generate_architecture_blueprint` to produce comprehensive `ARCHITECTURE.md` and live Mermaid dependency diagrams.
+4. **Code Quality & Security:** Use `audit_codebase_quality` to scan for code smells, cyclomatic complexity, dead code, and hardcoded secrets (100% Zero-Leak check).
+5. **Architectural Guardrails:** Enforce boundary rules in `tzero.rules.json` using `enforce_architecture_boundaries` to prevent architectural erosion.
 """
 
 
