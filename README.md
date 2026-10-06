@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Release-v3.0.3-00ffd8?style=for-the-badge&logo=rocket" alt="Release v3.0.3" />
+  <img src="https://img.shields.io/badge/Release-v3.0.4-00ffd8?style=for-the-badge&logo=rocket" alt="Release v3.0.4" />
   <img src="https://img.shields.io/badge/MCP-13%20Tools%20Ready-ff69b4?style=for-the-badge&logo=anthropic" alt="MCP Server 13 Tools Ready" />
   <img src="https://img.shields.io/badge/Security-100%25%20Zero--Leak%20Keyring-50fa7b?style=for-the-badge&logo=shield" alt="Zero Leak Security" />
   <img src="https://img.shields.io/badge/Python-3.9%20|%203.10%20|%203.11%20|%203.12%20|%203.13%20|%203.14-bd93f9?style=for-the-badge&logo=python" alt="Python Versions" />
@@ -113,7 +113,7 @@ T-Zero runs as a local stdio server with full support for Cursor, Claude Desktop
 
 #### ⚡ Option 1: 1-Click Zero-Dependency Windows Installer (Recommended)
 
-Download **`AddMCP.exe`** directly from [Latest Release (v3.0.3)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases):
+Download **`AddMCP.exe`** directly from [Latest Release (v3.0.4)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases):
 - **GUI Mode:** Double-click `AddMCP.exe`. It automatically detects all installed IDEs on your computer and configures them with a single click.
 - **CLI / Headless Mode:** Run `AddMCP.exe --all` (automatically installs to all detected IDEs without a GUI).
 - **Zero Requirements:** Does **not** require Python, pip, pipx, or Git. Bundles the standalone `TZeroMCP.exe` runtime internally.
@@ -122,7 +122,7 @@ Download **`AddMCP.exe`** directly from [Latest Release (v3.0.3)](https://github
 
 #### 📦 Option 2: Remote Launch via pipx (Cross-Platform: Windows, macOS, Linux)
 
-The first launch downloads the pinned `v3.0.3` package from GitHub without cloning the repo. Install Python 3.9+ and pipx:
+The first launch downloads the pinned `v3.0.4` package from GitHub without cloning the repo. Install Python 3.9+ and pipx:
 
 ##### Install pipx on Windows
 Open PowerShell and run:
@@ -148,7 +148,7 @@ If Cursor does not open the installer, use **Settings → MCP → Add Custom MCP
   "mcpServers": {
     "tzero": {
       "command": "py",
-      "args": ["-m", "pipx", "run", "--spec", "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/archive/refs/tags/v3.0.3.zip", "tzero-mcp"]
+      "args": ["-m", "pipx", "run", "--spec", "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/archive/refs/tags/v3.0.4.zip", "tzero-mcp"]
     }
   }
 }
@@ -160,7 +160,7 @@ If Cursor does not open the installer, use **Settings → MCP → Add Custom MCP
   "mcpServers": {
     "tzero": {
       "command": "pipx",
-      "args": ["run", "--spec", "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/archive/refs/tags/v3.0.3.zip", "tzero-mcp"]
+      "args": ["run", "--spec", "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/archive/refs/tags/v3.0.4.zip", "tzero-mcp"]
     }
   }
 }
@@ -209,7 +209,7 @@ For `.vscode/mcp.json`, VS Code uses a top-level `servers` object and requires `
     "tzero": {
       "type": "stdio",
       "command": "py",
-      "args": ["-m", "pipx", "run", "--spec", "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/archive/refs/tags/v3.0.3.zip", "tzero-mcp"]
+      "args": ["-m", "pipx", "run", "--spec", "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/archive/refs/tags/v3.0.4.zip", "tzero-mcp"]
     }
   }
 }
@@ -600,7 +600,7 @@ T-Zero, Cursor, Claude Desktop, Antigravity IDE, VS Code, Windsurf, Cline ve Roo
 
 #### ⚡ 1. Seçenek: Tek Tıkla Sıfır Gereksinimli Windows Kurulumu (Önerilen)
 
-[Son Sürüm (v3.0.3)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases) sayfasından doğrudan **`AddMCP.exe`** dosyasını indirin:
+[Son Sürüm (v3.0.4)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases) sayfasından doğrudan **`AddMCP.exe`** dosyasını indirin:
 - **Grafik Arayüz (GUI):** `AddMCP.exe` dosyasına çift tıklayın. Bilgisayarınızda yüklü tüm IDE'leri otomatik tespit eder ve tek tıkla entegrasyonu tamamlar.
 - **Terminal / Komut Satırı:** `AddMCP.exe --all` (hiçbir arayüz açmadan algılanan tüm IDE'lere sessizce kurar).
 - **Sıfır Gereksinim:** Python, pip, pipx veya Git gerektirmez. Bağımsız `TZeroMCP.exe` çalışma motorunu içinde gömülü olarak taşır.
@@ -609,7 +609,7 @@ T-Zero, Cursor, Claude Desktop, Antigravity IDE, VS Code, Windsurf, Cline ve Roo
 
 #### 📦 2. Seçenek: pipx ile Uzaktan Çalıştırma (Çapraz Platform: Windows, macOS, Linux)
 
-İlk başlatmada sabitlenmiş `v3.0.3` paketi GitHub'dan otomatik indirilir; depoyu klonlamak gerekmez. Python 3.9+ ve pipx gereklidir:
+İlk başlatmada sabitlenmiş `v3.0.4` paketi GitHub'dan otomatik indirilir; depoyu klonlamak gerekmez. Python 3.9+ ve pipx gereklidir:
 
 ##### Windows'ta pipx Kurulumu
 PowerShell'i açıp çalıştırın:
@@ -635,7 +635,7 @@ Link açılmazsa **Settings → MCP → Add Custom MCP** bölümüne girip aşa�
   "mcpServers": {
     "tzero": {
       "command": "py",
-      "args": ["-m", "pipx", "run", "--spec", "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/archive/refs/tags/v3.0.3.zip", "tzero-mcp"]
+      "args": ["-m", "pipx", "run", "--spec", "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/archive/refs/tags/v3.0.4.zip", "tzero-mcp"]
     }
   }
 }
@@ -647,7 +647,7 @@ Link açılmazsa **Settings → MCP → Add Custom MCP** bölümüne girip aşa�
   "mcpServers": {
     "tzero": {
       "command": "pipx",
-      "args": ["run", "--spec", "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/archive/refs/tags/v3.0.3.zip", "tzero-mcp"]
+      "args": ["run", "--spec", "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/archive/refs/tags/v3.0.4.zip", "tzero-mcp"]
     }
   }
 }
@@ -696,7 +696,7 @@ Güncel ayarlar ve yapılandırma şeması için [resmi Antigravity MCP kılavuz
     "tzero": {
       "type": "stdio",
       "command": "py",
-      "args": ["-m", "pipx", "run", "--spec", "git+https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git@v3.0.3", "tzero-mcp"]
+      "args": ["-m", "pipx", "run", "--spec", "git+https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git@v3.0.4", "tzero-mcp"]
     }
   }
 }

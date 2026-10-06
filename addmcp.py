@@ -21,7 +21,7 @@ from pathlib import Path
 from typing import Callable, Dict, List, Optional, Tuple
 
 
-APP_VERSION = "3.0.3"
+APP_VERSION = "3.0.4"
 SERVER_NAME = "tzero"
 SERVER_FILENAME = "TZeroMCP.exe"
 
@@ -341,6 +341,22 @@ def _install_antigravity_skill(server_path: Optional[Path] = None) -> None:
             "tzero-arch": _ANTIGRAVITY_ARCH_SKILL_CONTENT,
         }
 
+        for tool_name, (desc, action) in _MCP_TOOLS_SPEC.items():
+            all_skills[tool_name] = f"""---
+name: {tool_name}
+description: >-
+  {desc}
+  Activate when the user types "/{tool_name}" or asks to run {tool_name}.
+---
+
+# /{tool_name} — T-Zero MCP Tool
+
+{desc}
+
+## Execution
+{action}
+"""
+
         for target_base in skills_targets:
             for skill_name, content in all_skills.items():
                 s_dir = target_base / skill_name
@@ -351,7 +367,7 @@ def _install_antigravity_skill(server_path: Optional[Path] = None) -> None:
         plugin_dir = home / ".gemini" / "config" / "plugins" / "tzero"
         plugin_dir.mkdir(parents=True, exist_ok=True)
         (plugin_dir / "plugin.json").write_text(_ANTIGRAVITY_PLUGIN_JSON, encoding="utf-8")
-        (plugin_dir / "installed_version.json").write_text('{"version": "3.0.3"}\n', encoding="utf-8")
+        (plugin_dir / "installed_version.json").write_text('{"version": "3.0.4"}\n', encoding="utf-8")
 
         # Plugin skills
         for skill_name, content in all_skills.items():
@@ -499,10 +515,65 @@ Generate an enterprise-grade architectural specification:
 Call the `generate_architecture_blueprint` MCP tool on the target path (default: `.`).
 """
 
+_MCP_TOOLS_SPEC = {
+    "get_project_context_tree": (
+        "Scans target project directory and builds an enterprise-grade multi-tier T-Zero hierarchical context tree (T-1 to T-4) with up to 95% token reduction.",
+        "Invoke the `get_project_context_tree` MCP tool with arguments `{\"project_root\": \".\", \"reduction_mode\": \"ultra\"}`."
+    ),
+    "query_module_dependencies": (
+        "Analyzes import/export dependencies, module relationships, and internal vs external package dependencies across codebase or for a specific file.",
+        "Invoke the `query_module_dependencies` MCP tool."
+    ),
+    "query_architecture_boundaries": (
+        "Retrieves active T-4 architectural boundaries, operational constraints, and 100% Zero-Leak security rules.",
+        "Invoke the `query_architecture_boundaries` MCP tool."
+    ),
+    "generate_architecture_blueprint": (
+        "Generates a complete system architecture specification (ARCHITECTURE.md) including auto-generated Mermaid topology diagrams.",
+        "Invoke the `generate_architecture_blueprint` MCP tool."
+    ),
+    "generate_repo_map": (
+        "Generates an ultra-compact AST symbol token map for chat context windows.",
+        "Invoke the `generate_repo_map` MCP tool."
+    ),
+    "audit_codebase_quality": (
+        "Performs an AST static code smell audit and 100% Zero-Leak security check for hardcoded secret leaks across workspace files.",
+        "Invoke the `audit_codebase_quality` MCP tool."
+    ),
+    "find_code_duplicity": (
+        "Scans workspace for duplicate or copy-pasted code blocks (6+ lines) across modules.",
+        "Invoke the `find_code_duplicity` MCP tool."
+    ),
+    "estimate_token_cost": (
+        "Calculates exact token cost comparison across OpenAI, Anthropic, Gemini, DeepSeek models.",
+        "Invoke the `estimate_token_cost` MCP tool."
+    ),
+    "analyze_change_impact": (
+        "Analyzes change blast radius (0-100 score) and downstream dependents before modifying a class/function.",
+        "Invoke the `analyze_change_impact` MCP tool."
+    ),
+    "enforce_architecture_boundaries": (
+        "Enforces architectural boundary rules defined in tzero.rules.json to prevent architectural erosion.",
+        "Invoke the `enforce_architecture_boundaries` MCP tool."
+    ),
+    "search_codebase_semantic": (
+        "Performs 100% private local BM25 hybrid semantic code search across codebase without cloud embedding APIs.",
+        "Invoke the `search_codebase_semantic` MCP tool."
+    ),
+    "export_agent_rules": (
+        "Exports AI agent rule specifications (.cursorrules, .clinerules, .cursor/rules/*.mdc).",
+        "Invoke the `export_agent_rules` MCP tool."
+    ),
+    "get_token_savings_metrics": (
+        "Computes quantitative token reduction metrics and monthly team financial ROI savings.",
+        "Invoke the `get_token_savings_metrics` MCP tool."
+    ),
+}
+
 _ANTIGRAVITY_PLUGIN_JSON = """{
   "name": "tzero",
   "displayName": "Siber Akademi T-Zero Context Engine",
-  "version": "3.0.3",
+  "version": "3.0.4",
   "description": "Enterprise-Grade Codebase Context Architect, AST Signatures Analyzer, and Token Reducer. Cuts LLM prompt context by up to 95%, audits code smells & security, enforces architecture boundaries, and traces module dependencies.",
   "suggestedPrompts": [
     "/tzero tree - Build multi-tier AST hierarchical context tree with 95% token savings",

@@ -4915,7 +4915,7 @@ def main():
     parser.add_argument("--add-mcp", action="store_true", help="Install T-Zero MCP server into Cursor, Claude Desktop, Antigravity, VS Code, etc.")
     parser.add_argument("--gui", "-g", action="store_true", help="Launch the GUI Dashboard")
     parser.add_argument("--doctor", action="store_true", help="Check Python, dependencies, tkinter, git and keyring (installs missing packages)")
-    parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect V3.0.3")
+    parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect V3.0.4")
 
     if len(sys.argv) == 1:
         launch_gui()
