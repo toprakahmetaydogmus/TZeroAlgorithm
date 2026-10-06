@@ -144,5 +144,17 @@ class TestClientDetection(unittest.TestCase):
             self.assertNotIn("windsurf", detected)
 
 
+    def test_installs_antigravity_skill(self):
+        from addmcp import _install_antigravity_skill
+        from unittest import mock
+        with tempfile.TemporaryDirectory() as temp_dir:
+            home = Path(temp_dir)
+            with mock.patch("pathlib.Path.home", return_value=home):
+                _install_antigravity_skill()
+                skill_path = home / ".gemini" / "config" / "skills" / "tzero" / "SKILL.md"
+                self.assertTrue(skill_path.is_file())
+                self.assertIn("name: tzero", skill_path.read_text(encoding="utf-8"))
+
+
 if __name__ == "__main__":
     unittest.main()

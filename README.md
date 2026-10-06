@@ -179,8 +179,20 @@ Config locations: Windows `%APPDATA%\Claude\claude_desktop_config.json`; macOS `
 
 1. Open **Settings → Customizations → Installed MCP Servers**.
 2. **Add MCP** opens the Antigravity MCP Store. If T-Zero appears there, select **Add**; otherwise configure it as a custom stdio server below.
-3. Add the Windows or macOS/Linux `tzero` entry from the JSON blocks above to Antigravity's `mcp_config.json`, preserving other `mcpServers` entries. On Windows, the user config is `%USERPROFILE%\.gemini\antigravity\mcp_config.json`.
+3. Add the Windows or macOS/Linux `tzero` entry from the JSON blocks above to Antigravity's `mcp_config.json`, preserving other `mcpServers` entries. On Windows, the user config is `%USERPROFILE%\.gemini\config\mcp_config.json` (or `~/.gemini/antigravity/mcp_config.json`).
 4. Save/reload MCP servers and approve the tools when prompted.
+
+##### ⚡ Antigravity Slash Command & Skill (`/tzero`)
+T-Zero includes a native Antigravity skill (`.agents/skills/tzero/SKILL.md` and `~/.gemini/config/skills/tzero/SKILL.md`).
+Simply type `/tzero` in the Antigravity chat prompt to view available actions or run:
+- `/tzero` or `/tzero tree` — Builds multi-tier context tree with 95% token reduction
+- `/tzero audit` — Runs AST code smell check and 100% Zero-Leak security audit
+- `/tzero arch` — Generates ARCHITECTURE.md with live Mermaid diagrams
+- `/tzero deps [file]` — Traces module dependency topology
+- `/tzero impact <symbol>` — Computes blast radius score before refactoring
+- `/tzero rules` — Generates .cursorrules, .clinerules, Copilot instructions
+- `/tzero search <query>` — Runs 100% private local BM25 semantic code search
+- `/tzero savings` — Computes developer team token ROI metrics
 
 See the [official Antigravity MCP guide](https://antigravity.google/docs/mcp) for the current Settings flow and configuration schema.
 
@@ -654,8 +666,20 @@ Yapılandırma yolları: Windows `%APPDATA%\Claude\claude_desktop_config.json`; 
 
 1. **Settings → Customizations → Installed MCP Servers** bölümünü açın.
 2. **Add MCP** düğmesi Antigravity MCP Store'u açar. T-Zero listede görünüyorsa **Add**'e tıklayın; görünmüyorsa aşağıdaki özel stdio ayarını kullanın.
-3. Windows veya macOS/Linux JSON bloğundaki `tzero` kaydını Antigravity `mcp_config.json` dosyasına ekleyin; var olan `mcpServers` kayıtlarını koruyun. Windows'ta kullanıcı config yolu `%USERPROFILE%\.gemini\antigravity\mcp_config.json`.
+3. Windows veya macOS/Linux JSON bloğundaki `tzero` kaydını Antigravity `mcp_config.json` dosyasına ekleyin; var olan `mcpServers` kayıtlarını koruyun. Windows'ta kullanıcı config yolu `%USERPROFILE%\.gemini\config\mcp_config.json` (veya `~/.gemini/antigravity/mcp_config.json`).
 4. MCP sunucularını kaydedip/yenileyin ve istendiğinde araçlara izin verin.
+
+##### ⚡ Antigravity Slash Komutu & Yeteneği (`/tzero`)
+T-Zero yerleşik Antigravity Skill desteği sunar (`.agents/skills/tzero/SKILL.md` ve `~/.gemini/config/skills/tzero/SKILL.md`).
+Antigravity sohbet alanında doğrudan `/tzero` yazarak komutları listeleyebilir veya çalıştırabilirsiniz:
+- `/tzero` veya `/tzero tree` — %95 token tasarruflu çok katmanlı bağlam ağacını üretir
+- `/tzero audit` — AST kod kokusu ve %100 Zero-Leak güvenlik denetimini çalıştırır
+- `/tzero arch` — Canlı Mermaid şemalarıyla ARCHITECTURE.md üretir
+- `/tzero deps [dosya]` — Modül bağımlılık topolojisini analiz eder
+- `/tzero impact <sembol>` — Refactoring öncesi sembol etki yarıçapı skorunu hesaplar
+- `/tzero rules` — .cursorrules, .clinerules ve Copilot kurallarını üretir
+- `/tzero search <sorgu>` — %100 yerel ve gizli BM25 semantik kod aramasını çalıştırır
+- `/tzero savings` — Ekip bazlı token ROI tasarruf analizini hesaplar
 
 Güncel ayarlar ve yapılandırma şeması için [resmi Antigravity MCP kılavuzuna](https://antigravity.google/docs/mcp) bakın.
 
