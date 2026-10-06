@@ -6,11 +6,11 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Release-v3.0.2-00ffd8?style=for-the-badge&logo=rocket" alt="Release v3.0.2" />
+  <img src="https://img.shields.io/badge/Release-v3.0.3-00ffd8?style=for-the-badge&logo=rocket" alt="Release v3.0.3" />
   <img src="https://img.shields.io/badge/MCP-13%20Tools%20Ready-ff69b4?style=for-the-badge&logo=anthropic" alt="MCP Server 13 Tools Ready" />
   <img src="https://img.shields.io/badge/Security-100%25%20Zero--Leak%20Keyring-50fa7b?style=for-the-badge&logo=shield" alt="Zero Leak Security" />
   <img src="https://img.shields.io/badge/Python-3.9%20|%203.10%20|%203.11%20|%203.12%20|%203.13%20|%203.14-bd93f9?style=for-the-badge&logo=python" alt="Python Versions" />
-  <img src="https://img.shields.io/badge/Tests-72%20Passing-00f0ff?style=for-the-badge&logo=githubactions" alt="Tests 72 Passing" />
+  <img src="https://img.shields.io/badge/Tests-79%20Passing-00f0ff?style=for-the-badge&logo=githubactions" alt="Tests 79 Passing" />
   <img src="https://img.shields.io/badge/License-MIT-f1fa8c?style=for-the-badge" alt="MIT License" />
   <img src="https://img.shields.io/badge/Platform-Windows%20|%20macOS%20|%20Linux-ff79c6?style=for-the-badge" alt="Platform" />
 </p>
@@ -109,7 +109,7 @@ Reproduce it with: `python -c "from pathlib import Path; from tzero_v3 import To
 
 ### 🔌 Add T-Zero to MCP Clients
 
-T-Zero runs as a local stdio server. The first launch downloads the pinned `v3.0.2` package from GitHub; no repository clone is needed. Install Python 3.9+ and pipx first.
+T-Zero runs as a local stdio server. The first launch downloads the pinned `v3.0.3` package from GitHub; no repository clone is needed. Install Python 3.9+ and pipx first, or use the standalone `AddMCP.exe` installer on Windows.
 
 #### Install pipx on Windows
 
@@ -126,8 +126,8 @@ Restart the client after installation. The Windows configs below call `py -m pip
 
 Choose the link for your operating system, approve the configuration in Cursor, then enable `tzero` under **Settings → MCP** or **Customize → MCP**.
 
-- [Add T-Zero to Cursor (Windows)](https://cursor.com/install-mcp?name=tzero&config=eyJjb21tYW5kIjoicHkiLCJhcmdzIjpbIi1tIiwicGlweCIsInJ1biIsIi0tc3BlYyIsImdpdCtodHRwczovL2dpdGh1Yi5jb20vdG9wcmFrYWhtZXRheWRvZ211cy9UWmVyb0FsZ29yaXRobS5naXRAdjMuMC4yIiwidHplcm8tbWNwIl19)
-- [Add T-Zero to Cursor (macOS/Linux)](https://cursor.com/install-mcp?name=tzero&config=eyJjb21tYW5kIjoicGlweCIsImFyZ3MiOlsicnVuIiwiLS1zcGVjIiwiZ2l0K2h0dHBzOi8vZ2l0aHViLmNvbS90b3ByYWthaG1ldGF5ZG9nbXVzL1RaZXJvQWxnb3JpdGhtLmdpdEB2My4wLjIiLCJ0emVyby1tY3AiXX0%3D)
+- [Add T-Zero to Cursor (Windows)](https://cursor.com/install-mcp?name=tzero&config=eyJjb21tYW5kIjoicHkiLCJhcmdzIjpbIi1tIiwicGlweCIsInJ1biIsIi0tc3BlYyIsImdpdCtodHRwczovL2dpdGh1Yi5jb20vdG9wcmFrYWhtZXRheWRvZ211cy9UWmVyb0FsZ29yaXRobS5naXRAdjMuMC4zIiwidHplcm8tbWNwIl19)
+- [Add T-Zero to Cursor (macOS/Linux)](https://cursor.com/install-mcp?name=tzero&config=eyJjb21tYW5kIjoicGlweCIsImFyZ3MiOlsicnVuIiwiLS1zcGVjIiwiZ2l0K2h0dHBzOi8vZ2l0aHViLmNvbS90b3ByYWthaG1ldGF5ZG9nbXVzL1RaZXJvQWxnb3JpdGhtLmdpdEB2My4wLjMiLCJ0emVyby1tY3AiXX0%3D)
 
 If Cursor does not open the installer, use **Settings → MCP → Add Custom MCP** and paste the platform-appropriate JSON below.
 
@@ -137,7 +137,7 @@ If Cursor does not open the installer, use **Settings → MCP → Add Custom MCP
   "mcpServers": {
     "tzero": {
       "command": "py",
-      "args": ["-m", "pipx", "run", "--spec", "git+https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git@v3.0.2", "tzero-mcp"]
+      "args": ["-m", "pipx", "run", "--spec", "git+https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git@v3.0.3", "tzero-mcp"]
     }
   }
 }
@@ -149,7 +149,7 @@ If Cursor does not open the installer, use **Settings → MCP → Add Custom MCP
   "mcpServers": {
     "tzero": {
       "command": "pipx",
-      "args": ["run", "--spec", "git+https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git@v3.0.2", "tzero-mcp"]
+      "args": ["run", "--spec", "git+https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git@v3.0.3", "tzero-mcp"]
     }
   }
 }
@@ -186,7 +186,7 @@ For `.vscode/mcp.json`, VS Code uses a top-level `servers` object and requires `
     "tzero": {
       "type": "stdio",
       "command": "py",
-      "args": ["-m", "pipx", "run", "--spec", "git+https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git@v3.0.2", "tzero-mcp"]
+      "args": ["-m", "pipx", "run", "--spec", "git+https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git@v3.0.3", "tzero-mcp"]
     }
   }
 }
@@ -307,7 +307,7 @@ install_requirements.bat
 > Automatically provisions Python 3.12 (if not detected), configures a virtual environment, and installs all dependencies without requiring manual setup.
 
 ### Method 2: Standalone Portable Executable (.exe)
-Download `TZeroAlgorithm.exe` directly from the [Releases](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases) tab. No installation, Python, or administrative rights required.
+Download `TZeroAlgorithm.exe` for the desktop app. To add MCP to detected IDEs, run `AddMCP.exe`; it bundles `TZeroMCP.exe`, needs no Python or pipx, preserves existing server entries, and backs up config files before changing them. `TZeroMCP.exe` is also available separately for manual setup.
 
 ### Method 3: Python Package / pip Installation
 ```bash
@@ -422,9 +422,10 @@ TZeroAlgorithm/
 ├── .github/
 │   └── workflows/
 │       ├── ci.yml               # Automated GitHub Actions test workflow
-│       └── release.yml          # Builds TZeroAlgorithm.exe and publishes a GitHub Release on version tags
+│       └── release.yml          # Builds TZeroAlgorithm.exe, TZeroMCP.exe, AddMCP.exe, and publishes releases
 ├── tests/
 │   ├── __init__.py
+│   ├── test_addmcp.py            # Installer config merge/backup and detection tests
 │   ├── test_analyzer.py         # AST analysis and code smell unit tests
 │   ├── test_cli.py              # CLI integration tests
 │   ├── test_config.py           # Configuration & Keyring security tests
@@ -439,6 +440,7 @@ TZeroAlgorithm/
 │   └── test_scanner.py          # TokenReducer & CodebaseScanner tests
 ├── build_exe.bat                # One-click Windows PyInstaller build script
 ├── compile.py                   # PyInstaller asset packaging pipeline
+├── addmcp.py                    # Windows installer for supported IDE MCP configs
 ├── install_requirements.bat     # Windows automated setup script
 ├── LICENSE                      # MIT Open Source License
 ├── main.py                      # Primary execution entrypoint (CLI & GUI)
@@ -468,7 +470,7 @@ python -m unittest discover -s tests -v
 
 Expected output:
 ```
-Ran 72 tests in ~4s
+Ran 79 tests in ~4s
 OK (the GUI smoke test is skipped when no display is available)
 ```
 
@@ -571,7 +573,7 @@ Tekrar üretmek için: `python -c "from pathlib import Path; from tzero_v3 impor
 
 ### 🔌 T-Zero'yu MCP İstemcilerine Ekle
 
-T-Zero yerel stdio sunucusu olarak çalışır. İlk başlatmada sabitlenmiş `v3.0.2` paketi GitHub'dan indirilir; depoyu klonlamak gerekmez. Python 3.9+ ve önce pipx kurulu olmalıdır.
+T-Zero yerel stdio sunucusu olarak çalışır. İlk başlatmada sabitlenmiş `v3.0.3` paketi GitHub'dan indirilir; depoyu klonlamak gerekmez. Python 3.9+ ve önce pipx kurulu olmalıdır; Windows'ta IDE'lere otomatik kurulum için `AddMCP.exe` de kullanılabilir.
 
 #### Windows'ta pipx Kurulumu
 
@@ -588,8 +590,8 @@ Kurulumdan sonra istemciyi yeniden başlatın. Aşağıdaki Windows ayarları `p
 
 İşletim sisteminize uygun bağlantıyı açın, Cursor yapılandırmasını onaylayın ve `tzero` sunucusunu **Settings → MCP** veya **Customize → MCP** bölümünden etkinleştirin.
 
-- [T-Zero'yu Cursor'a ekle (Windows)](https://cursor.com/install-mcp?name=tzero&config=eyJjb21tYW5kIjoicHkiLCJhcmdzIjpbIi1tIiwicGlweCIsInJ1biIsIi0tc3BlYyIsImdpdCtodHRwczovL2dpdGh1Yi5jb20vdG9wcmFrYWhtZXRheWRvZ211cy9UWmVyb0FsZ29yaXRobS5naXRAdjMuMC4yIiwidHplcm8tbWNwIl19)
-- [T-Zero'yu Cursor'a ekle (macOS/Linux)](https://cursor.com/install-mcp?name=tzero&config=eyJjb21tYW5kIjoicGlweCIsImFyZ3MiOlsicnVuIiwiLS1zcGVjIiwiZ2l0K2h0dHBzOi8vZ2l0aHViLmNvbS90b3ByYWthaG1ldGF5ZG9nbXVzL1RaZXJvQWxnb3JpdGhtLmdpdEB2My4wLjIiLCJ0emVyby1tY3AiXX0%3D)
+- [T-Zero'yu Cursor'a ekle (Windows)](https://cursor.com/install-mcp?name=tzero&config=eyJjb21tYW5kIjoicHkiLCJhcmdzIjpbIi1tIiwicGlweCIsInJ1biIsIi0tc3BlYyIsImdpdCtodHRwczovL2dpdGh1Yi5jb20vdG9wcmFrYWhtZXRheWRvZ211cy9UWmVyb0FsZ29yaXRobS5naXRAdjMuMC4zIiwidHplcm8tbWNwIl19)
+- [T-Zero'yu Cursor'a ekle (macOS/Linux)](https://cursor.com/install-mcp?name=tzero&config=eyJjb21tYW5kIjoicGlweCIsImFyZ3MiOlsicnVuIiwiLS1zcGVjIiwiZ2l0K2h0dHBzOi8vZ2l0aHViLmNvbS90b3ByYWthaG1ldGF5ZG9nbXVzL1RaZXJvQWxnb3JpdGhtLmdpdEB2My4wLjMiLCJ0emVyby1tY3AiXX0%3D)
 
 Link açılmazsa **Settings → MCP → Add Custom MCP** bölümüne girip aşağıdaki platforma uygun JSON'u yapıştırın.
 
@@ -599,7 +601,7 @@ Link açılmazsa **Settings → MCP → Add Custom MCP** bölümüne girip aşa�
   "mcpServers": {
     "tzero": {
       "command": "py",
-      "args": ["-m", "pipx", "run", "--spec", "git+https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git@v3.0.2", "tzero-mcp"]
+      "args": ["-m", "pipx", "run", "--spec", "git+https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git@v3.0.3", "tzero-mcp"]
     }
   }
 }
@@ -611,7 +613,7 @@ Link açılmazsa **Settings → MCP → Add Custom MCP** bölümüne girip aşa�
   "mcpServers": {
     "tzero": {
       "command": "pipx",
-      "args": ["run", "--spec", "git+https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git@v3.0.2", "tzero-mcp"]
+      "args": ["run", "--spec", "git+https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git@v3.0.3", "tzero-mcp"]
     }
   }
 }
@@ -648,7 +650,7 @@ Güncel ayarlar ve yapılandırma şeması için [resmi Antigravity MCP kılavuz
     "tzero": {
       "type": "stdio",
       "command": "py",
-      "args": ["-m", "pipx", "run", "--spec", "git+https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git@v3.0.2", "tzero-mcp"]
+      "args": ["-m", "pipx", "run", "--spec", "git+https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git@v3.0.3", "tzero-mcp"]
     }
   }
 }
@@ -769,7 +771,7 @@ install_requirements.bat
 > Sisteminizde Python bulunmasa bile Python 3.12'yi otomatik indirir, sanal ortamı kurar ve tüm paketleri eksiksiz yapılandırır.
 
 ### Yöntem 2: Bağımsız Çalıştırılabilir Dosya (.exe)
-Releases bölümünden `TZeroAlgorithm.exe` dosyasını indirin. Kurulum, Python veya yönetici yetkisi gerektirmeden çift tıklayarak çalıştırın.
+Masaüstü uygulaması için `TZeroAlgorithm.exe` dosyasını indirin. MCP'yi algılanan IDE'lere eklemek için `AddMCP.exe` dosyasını çalıştırın; `TZeroMCP.exe` içinde gelir, Python/pipx istemez, mevcut sunucu kayıtlarını korur ve config dosyalarını değiştirmeden önce yedekler. `TZeroMCP.exe` manuel kurulum için ayrıca sunulur.
 
 ### Yöntem 3: Python Paketi / pip ile Kurulum
 ```bash
@@ -884,9 +886,10 @@ TZeroAlgorithm/
 ├── .github/
 │   └── workflows/
 │       ├── ci.yml               # GitHub Actions CI/CD otomatik test boru hattı
-│       └── release.yml          # Sürüm etiketlerinde TZeroAlgorithm.exe derler ve GitHub Release yayınlar
+│       └── release.yml          # TZeroAlgorithm.exe, TZeroMCP.exe ve AddMCP.exe derler; sürümlerde yayınlar
 ├── tests/
 │   ├── __init__.py
+│   ├── test_addmcp.py            # Config merge, backups and client detection tests
 │   ├── test_analyzer.py         # AST analiz ve denetim testleri
 │   ├── test_cli.py              # CLI komut satırı entegrasyon testleri
 │   ├── test_config.py           # Config ve Keyring güvenlik testleri
@@ -901,6 +904,7 @@ TZeroAlgorithm/
 │   └── test_scanner.py          # TokenReducer ve CodebaseScanner testleri
 ├── build_exe.bat                # Windows PyInstaller tek tık derleme betiği
 ├── compile.py                   # PyInstaller asset paketleme boru hattı
+├── addmcp.py                    # IDE MCP ayarlarını kuran Windows installer
 ├── install_requirements.bat     # Windows otomatik ortam kurulum betiği
 ├── LICENSE                      # MIT Açık Kaynak Lisansı
 ├── main.py                      # Ana çalıştırma giriş noktası (CLI & GUI)
@@ -930,7 +934,7 @@ python -m unittest discover -s tests -v
 
 Beklenen çıktı:
 ```
-Ran 72 tests in ~4s
+Ran 79 tests in ~4s
 OK (the GUI smoke test is skipped when no display is available)
 ```
 
