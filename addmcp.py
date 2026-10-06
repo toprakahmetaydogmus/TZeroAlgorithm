@@ -57,6 +57,29 @@ def _get_antigravity_config_path(home: Path) -> Path:
     return home / ".gemini" / "antigravity" / "mcp_config.json"
 
 
+def _get_claude_desktop_config_path(app_data: Path, local_app_data: Path) -> Tuple[Path, bool]:
+    """Resolves Claude Desktop configuration path, handling both MSIX packages and standard AppData."""
+    # 1. Standard AppData Roaming
+    standard_cfg = app_data / "Claude" / "claude_desktop_config.json"
+    if standard_cfg.exists():
+        return standard_cfg, True
+
+    # 2. Windows Store / MSIX Package sandboxed Roaming
+    packages_dir = local_app_data / "Packages"
+    if packages_dir.is_dir():
+        for claude_pkg in packages_dir.glob("Claude_*"):
+            candidate = claude_pkg / "LocalCache" / "Roaming" / "Claude" / "claude_desktop_config.json"
+            if candidate.exists() or (claude_pkg / "LocalCache" / "Roaming" / "Claude").is_dir():
+                return candidate, True
+
+    detected = any([
+        (app_data / "Claude").exists(),
+        (local_app_data / "Programs" / "Claude" / "Claude.exe").exists(),
+        bool(list(packages_dir.glob("Claude_*"))) if packages_dir.is_dir() else False,
+    ])
+    return standard_cfg, detected
+
+
 def build_client_targets(
     home: Optional[Path] = None,
     app_data: Optional[Path] = None,
@@ -79,6 +102,7 @@ def build_client_targets(
         return bool(list(vscode_extensions.glob(f"{prefix}-*")))
 
     antigravity_config = _get_antigravity_config_path(home)
+    claude_config, claude_detected = _get_claude_desktop_config_path(app_data, local_app_data)
 
     return [
         ClientTarget(
@@ -106,12 +130,9 @@ def build_client_targets(
         ClientTarget(
             "claude-desktop",
             "Claude Desktop",
-            app_data / "Claude" / "claude_desktop_config.json",
+            claude_config,
             "mcpServers",
-            any_path_exists(
-                app_data / "Claude",
-                local_app_data / "Programs" / "Claude" / "Claude.exe",
-            ),
+            claude_detected,
         ),
         ClientTarget(
             "antigravity",
@@ -248,9 +269,11 @@ def merge_server_config(
         if temporary_path is not None and temporary_path.exists():
             temporary_path.unlink()
 
-    # If this is Google Antigravity, also sync secondary config path if present
+    # If this is Google Antigravity or Claude Desktop, sync alternate config paths if present
     if target.key == "antigravity":
         _sync_alternate_antigravity_config(target, server_path, server_name)
+    elif target.key == "claude-desktop":
+        _sync_alternate_claude_desktop_config(target, server_path, server_name)
 
     return {"status": "installed", "backup": backup}
 
@@ -270,6 +293,46 @@ def _sync_alternate_antigravity_config(
             if alt_path.resolve() == target.config_path.resolve():
                 continue
             if alt_path.parent.exists():
+                cfg: Dict[str, object] = {}
+                if alt_path.exists():
+                    try:
+                        with alt_path.open("r", encoding="utf-8-sig") as fp:
+                            cfg = json.load(fp)
+                    except Exception:
+                        continue
+                if not isinstance(cfg, dict):
+                    cfg = {}
+                servers = cfg.setdefault("mcpServers", {})
+                if isinstance(servers, dict) and servers.get(server_name) != entry:
+                    servers[server_name] = entry
+                    alt_path.parent.mkdir(parents=True, exist_ok=True)
+                    with alt_path.open("w", encoding="utf-8") as fp:
+                        json.dump(cfg, fp, indent=2, ensure_ascii=False)
+                        fp.write("\n")
+    except Exception:
+        pass
+
+
+def _sync_alternate_claude_desktop_config(
+    target: ClientTarget, server_path: Path, server_name: str
+) -> None:
+    """Keep standard AppData and Windows Store / MSIX Claude configs in sync."""
+    try:
+        home = Path.home()
+        app_data = Path(os.environ.get("APPDATA", home / "AppData/Roaming"))
+        local_app_data = Path(os.environ.get("LOCALAPPDATA", home / "AppData/Local"))
+        entry = server_entry(target, server_path)
+        candidates = [app_data / "Claude" / "claude_desktop_config.json"]
+        packages_dir = local_app_data / "Packages"
+        if packages_dir.is_dir():
+            for claude_pkg in packages_dir.glob("Claude_*"):
+                candidates.append(
+                    claude_pkg / "LocalCache" / "Roaming" / "Claude" / "claude_desktop_config.json"
+                )
+        for alt_path in candidates:
+            if alt_path.resolve() == target.config_path.resolve():
+                continue
+            if alt_path.exists() or alt_path.parent.is_dir():
                 cfg: Dict[str, object] = {}
                 if alt_path.exists():
                     try:
