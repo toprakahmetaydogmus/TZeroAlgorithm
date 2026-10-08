@@ -6,7 +6,12 @@ import ast
 import tempfile
 import unittest
 
-from tzero_v3 import TokenReducer, CodebaseScanner, DependencyAnalyzer
+from tzero_v3 import (
+    CodebaseScanner,
+    DependencyAnalyzer,
+    TokenReducer,
+    resolve_default_workspace,
+)
 
 
 class TestTokenReducer(unittest.TestCase):
@@ -144,7 +149,9 @@ class TestCodebaseScanner(unittest.TestCase):
             file1 = os.path.join(temp_dir, "a.py")
             file2 = os.path.join(temp_dir, "b.js")
             ignored = os.path.join(temp_dir, ".git", "hidden.py")
+            ignored_venv = os.path.join(temp_dir, ".venv-1", "hidden.py")
             os.makedirs(os.path.dirname(ignored), exist_ok=True)
+            os.makedirs(os.path.dirname(ignored_venv), exist_ok=True)
 
             with open(file1, "w") as f:
                 f.write("def sample_a(): pass")
@@ -152,6 +159,8 @@ class TestCodebaseScanner(unittest.TestCase):
                 f.write("function sampleB() {}")
             with open(ignored, "w") as f:
                 f.write("def ignored(): pass")
+            with open(ignored_venv, "w") as f:
+                f.write("def ignored_venv(): pass")
 
             scanner = CodebaseScanner()
             files, sizes, snippets = scanner.scan_directory(temp_dir)
@@ -160,6 +169,30 @@ class TestCodebaseScanner(unittest.TestCase):
             self.assertIn("b.js", files)
             # Ignored folder should not appear
             self.assertFalse(any(".git" in f for f in files))
+            self.assertFalse(any(".venv-1" in f for f in files))
+
+
+class TestDefaultWorkspace(unittest.TestCase):
+    def test_resolves_project_root_when_launched_from_dist(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            project_root = os.path.join(temp_dir, "project")
+            dist_dir = os.path.join(project_root, "dist")
+            os.makedirs(dist_dir)
+            for filename in ("tzero_v3.py", "pyproject.toml"):
+                with open(os.path.join(project_root, filename), "w") as file:
+                    file.write("")
+
+            self.assertEqual(
+                resolve_default_workspace(dist_dir),
+                project_root,
+            )
+
+    def test_keeps_explicit_non_build_workspace(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            workspace = os.path.join(temp_dir, "workspace")
+            os.makedirs(workspace)
+
+            self.assertEqual(resolve_default_workspace(workspace), workspace)
 
 
 if __name__ == "__main__":

@@ -1002,6 +1002,29 @@ class DependencyAnalyzer(ast.NodeVisitor):
         self.generic_visit(node)
 
 
+def resolve_default_workspace(current_dir: Optional[str] = None, executable_dir: Optional[str] = None) -> str:
+    """Use the project root when the app is launched from its dist/build folder."""
+    current_dir = os.path.abspath(current_dir or os.getcwd())
+    candidates = [current_dir]
+    if executable_dir:
+        candidates.append(os.path.abspath(executable_dir))
+
+    for candidate in candidates:
+        if os.path.basename(candidate).lower() not in {"dist", "build"}:
+            continue
+
+        root = os.path.dirname(candidate)
+        while root != os.path.dirname(root):
+            if (
+                os.path.isfile(os.path.join(root, "tzero_v3.py"))
+                and os.path.isfile(os.path.join(root, "pyproject.toml"))
+            ):
+                return root
+            root = os.path.dirname(root)
+
+    return current_dir
+
+
 class CodebaseScanner:
     """Asynchronously scans workspaces using file settings criteria."""
 
@@ -1016,7 +1039,11 @@ class CodebaseScanner:
         snippets = {}
         
         for dirpath, dirnames, filenames in os.walk(root_dir):
-            dirnames[:] = [d for d in dirnames if d not in ignored_folders]
+            dirnames[:] = [
+                d for d in dirnames
+                if d not in ignored_folders
+                and not d.lower().startswith((".venv-", "venv-"))
+            ]
             
             for f in filenames:
                 ext = os.path.splitext(f.lower())[1]
@@ -2746,6 +2773,7 @@ class AutoReadmeGUI:
         self.manual_changes: List[Dict[str, str]] = []
         self.git_checkboxes: Dict[str, Tuple[tk.BooleanVar, Dict[str, str]]] = {}
         self.active_preview_file: Optional[str] = None
+        self.has_scanned = False
         
         self.cancel_event = threading.Event()
         self.scanner = CodebaseScanner()
@@ -3175,12 +3203,36 @@ class AutoReadmeGUI:
                 
         # Store current tab index
         old_idx = self.active_tab_index if hasattr(self, 'active_tab_index') else 0
-        
+        old_target = self.dir_entry.get().strip() if hasattr(self, "dir_entry") else ""
+        old_search = self.search_entry.get() if hasattr(self, "search_entry") else ""
+        old_header_search = (
+            self.header_search_entry.get()
+            if hasattr(self, "header_search_entry")
+            else ""
+        )
+        old_preview = self.active_preview_file
+
         # Redraw structure layout safely by destroying the old canvas
         if hasattr(self, "bg_canvas") and self.bg_canvas:
             self.bg_canvas.destroy()
             
         self.create_layout()
+        if old_target:
+            self.dir_entry.delete(0, tk.END)
+            self.dir_entry.insert(0, old_target)
+        if old_header_search and old_header_search != "Search files...":
+            self.header_search_entry.delete(0, tk.END)
+            self.header_search_entry.insert(0, old_header_search)
+            self.header_search_entry.config(fg=PALETTE["text_main"])
+        if old_search:
+            self.search_entry.insert(0, old_search)
+        if self.has_scanned:
+            self.rebuild_selector_tree()
+            if old_search:
+                self.filter_files_tree()
+            if old_preview and self.tree.exists(old_preview):
+                self.tree.selection_set(old_preview)
+                self.on_file_select_changed(None)
         
         # Restore logs
         if hasattr(self, "console_text") and self.console_text and old_logs.strip():
@@ -3512,7 +3564,7 @@ class AutoReadmeGUI:
         b_top = tk.Frame(brand, bg=PALETTE["bg_start"])
         b_top.pack(fill=tk.X, padx=10, pady=(4, 2))
         tk.Label(b_top, text="🛡️ SİBER AKADEMİ CREATOR HUB", font=("Segoe UI", 8, "bold"), fg=PALETTE["accent_cyan"], bg=PALETTE["bg_start"]).pack(side=tk.LEFT)
-        tk.Label(b_top, text="v3.0.9", font=("Segoe UI", 8, "bold"), fg=PALETTE["accent_green"], bg=PALETTE["bg_start"]).pack(side=tk.RIGHT)
+        tk.Label(b_top, text="v3.0.10", font=("Segoe UI", 8, "bold"), fg=PALETTE["accent_green"], bg=PALETTE["bg_start"]).pack(side=tk.RIGHT)
 
         b_links = tk.Frame(brand, bg=PALETTE["bg_start"])
         b_links.pack(fill=tk.X, padx=10, pady=(2, 6))
@@ -3939,6 +3991,7 @@ class AutoReadmeGUI:
         threading.Thread(target=run_thread, daemon=True).start()
 
     def on_scan_finish(self, files, sizes, snippets):
+        self.has_scanned = True
         self.scanned_files = files
         self.file_sizes = sizes
         self.file_snippets = snippets
@@ -3967,7 +4020,9 @@ class AutoReadmeGUI:
     def load_saved_credentials(self):
         pname = self.provider_var.get()
         self.on_provider_select()
-        self.dir_entry.insert(0, os.getcwd())
+        executable_dir = os.path.dirname(sys.executable) if getattr(sys, "frozen", False) else None
+        if not self.dir_entry.get().strip():
+            self.dir_entry.insert(0, resolve_default_workspace(executable_dir=executable_dir))
 
     def show_shortcuts_modal(self):
         dialog = tk.Toplevel(self.root)
@@ -4070,6 +4125,16 @@ class AutoReadmeGUI:
         self.tree.column("Size", width=80, stretch=False)
         self.tree.column("Status", width=80, stretch=False)
         self.tree.grid(row=0, column=0, sticky="nsew")
+        self.tree_empty_lbl = tk.Label(
+            tree_container,
+            text="",
+            justify=tk.CENTER,
+            wraplength=320,
+            font=("Segoe UI", 10),
+            fg=PALETTE["text_muted"],
+            bg=PALETTE["card_bg"],
+        )
+        self.tree_empty_lbl.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
         
         scroll = tk.Scrollbar(tree_container, command=self.tree.yview)
         scroll.grid(row=0, column=1, sticky="ns")
@@ -4077,6 +4142,7 @@ class AutoReadmeGUI:
         self.tree.bind("<<TreeviewSelect>>", self.on_file_select_changed)
         self.tree.bind("<Double-Button-1>", self.on_tree_double_click)
         self.tree.bind("<Button-1>", self.on_tree_click)
+        self._update_tree_empty_state()
         
         editor_container = GlassCard(paned)
         editor_container.rowconfigure(1, weight=1)
@@ -4473,6 +4539,7 @@ class AutoReadmeGUI:
             status_txt = "Included" if checked else "Excluded"
             
             self.tree.insert(parent, "end", iid=filepath, text=f"{glyph} 📄 {fname}", values=(f"{sz_kb:.1f} KB", status_txt))
+        self._update_tree_empty_state()
         self.update_parent_states()
 
     def on_file_select_changed(self, event):
@@ -4562,8 +4629,29 @@ class AutoReadmeGUI:
             
             self.tree.insert(parent, "end", iid=filepath, text=f"{glyph} 📄 {fname}", values=(f"{sz_kb:.1f} KB", status_txt))
             
+        self._update_tree_empty_state()
         self.update_selector_stats()
         self.update_parent_states()
+
+    def _update_tree_empty_state(self):
+        if not hasattr(self, "tree_empty_lbl"):
+            return
+        if self.tree.get_children(""):
+            self.tree_empty_lbl.place_forget()
+        elif not self.has_scanned:
+            self.tree_empty_lbl.config(
+                text="Choose a workspace folder, then scan to list its source files."
+            )
+            self.tree_empty_lbl.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
+        elif not self.scanned_files:
+            self.tree_empty_lbl.config(
+                text="No supported source files found.\n"
+                "Choose the project source folder; compiled .exe files are not scanned."
+            )
+            self.tree_empty_lbl.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
+        else:
+            self.tree_empty_lbl.config(text="No files match this search. Clear the search field.")
+            self.tree_empty_lbl.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
     def update_selector_stats(self):
         selected_files = [f for f, v in self.file_checked.items() if v]
@@ -5950,12 +6038,12 @@ def main():
     parser.add_argument("--info", "--quickstart", action="store_true", help="Show quickstart guide and simplest installation/usage steps")
     parser.add_argument("--gui", "-g", action="store_true", help="Launch the GUI Dashboard")
     parser.add_argument("--doctor", action="store_true", help="Check Python, dependencies, tkinter, git and keyring (installs missing packages)")
-    parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect V3.0.9")
+    parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect V3.0.10")
 
     def print_quickstart_guide():
         print("""
 ================================================================================
-⚡ SİBER AKADEMİ — T-ZERO CONTEXT ARCHITECT & MCP v3.0.9
+⚡ SİBER AKADEMİ — T-ZERO CONTEXT ARCHITECT & MCP v3.0.10
 ================================================================================
 🎯 %95'e Varan Token Tasarrufu & Otonom Yapay Zeka Mimari Bağlam Motoru
 
