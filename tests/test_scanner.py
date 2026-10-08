@@ -37,6 +37,75 @@ class DataProcessor:
         self.assertNotIn('x = 10 + 20', reduced)
         self.assertNotIn('print("Initializing")', reduced)
 
+    def test_python_reduction_ultra_preserves_multiline_headers(self):
+        sample_code = '''from collections import (
+    defaultdict,
+    deque,
+)
+
+class DataProcessor(
+    BaseProcessor,
+    LoggerMixin,
+):
+    @classmethod
+    async def process_data(
+        cls,
+        data: list[str],
+        threshold: float,
+        normalize: bool = True,
+    ) -> dict:
+        return {"data": data}
+'''
+        reduced = TokenReducer.reduce(sample_code, "test.py", mode="ultra")
+
+        self.assertEqual(
+            reduced,
+            '''from collections import (
+    defaultdict,
+    deque,
+)
+class DataProcessor(
+    BaseProcessor,
+    LoggerMixin,
+):
+    @classmethod
+    async def process_data(
+        cls,
+        data: list[str],
+        threshold: float,
+        normalize: bool = True,
+    ) -> dict:''',
+        )
+
+    def test_python_reduction_ultra_preserves_multiline_function_signature(self):
+        code = '''def process_data(
+    data: list[str],
+    threshold: float,
+    normalize: bool = True,
+) -> dict:
+    ...
+'''
+
+        reduced = TokenReducer.reduce(code, "example.py", mode="ultra")
+
+        self.assertEqual(
+            reduced,
+            '''def process_data(
+    data: list[str],
+    threshold: float,
+    normalize: bool = True,
+) -> dict:''',
+        )
+
+    def test_python_reduction_ultra_falls_back_for_invalid_syntax(self):
+        code = "from package import (\ndef available():\n    pass\n"
+
+        reduced = TokenReducer.reduce(code, "test.py", mode="ultra")
+
+        self.assertIn("from package import (", reduced)
+        self.assertIn("def available():", reduced)
+        self.assertNotIn("    pass", reduced)
+
     def test_javascript_reduction(self):
         sample_js = '''import React from 'react';
 // Comment

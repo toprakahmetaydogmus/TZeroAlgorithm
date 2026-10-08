@@ -330,7 +330,7 @@ flowchart TD
 - **Local Ollama:** `llama3:latest`, `mistral:latest`, `phi3:latest`, `qwen2.5:latest` (100% local, offline, private, and free)
 
 ### 2. AST Token Reducer (Up to 95% Token Savings)
-- **Ultra Mode:** Strips implementation internals while preserving class hierarchies, function headers, docstrings, decorators, and type hints.
+- **Ultra Mode:** Strips implementation internals while preserving class hierarchies, decorators, docstrings, type hints, and complete multi-line Python function/class/import headers.
 - **Balanced Mode:** Retains signatures alongside critical control flow and exception handling statements.
 - **None Mode:** Preserves 100% of raw source code.
 - Supported languages: **Python, JavaScript, TypeScript, JSX/TSX, C/C++, Go, Rust, HTML, CSS, Bash, Batch, JSON, YAML**.
@@ -899,7 +899,7 @@ flowchart TD
 - **Local Ollama:** `llama3:latest`, `mistral:latest`, `phi3:latest`, `qwen2.5:latest` (%100 yerel, çevrimdışı, gizli ve ücretsiz)
 
 ### 2. Akıllı AST Token İndirgeyici (%95'e Varan Tasarruf)
-- **Ultra Mod:** Fonksiyon gövdelerini temizler; sınıf hiyerarşisini, fonksiyon başlıklarını, docstring'leri, dekoratörleri ve tip ipuçlarını korur.
+- **Ultra Mod:** Fonksiyon gövdelerini temizler; sınıf hiyerarşisini, dekoratörleri, docstring'leri, tip ipuçlarını ve çok satırlı Python fonksiyon/sınıf/import başlıklarının tamamını korur.
 - **Balanced Mod:** İmzalarla birlikte temel kontrol bloklarını (if/try/for) ve istisna yönetimini muhafaza eder.
 - **None Mod:** Kaynak kodun %100 orijinal halini korur.
 - Desteklenen diller: **Python, JavaScript, TypeScript, JSX/TSX, C/C++, Go, Rust, HTML, CSS, Bash, Batch, JSON, YAML**.

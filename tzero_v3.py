@@ -890,6 +890,41 @@ class TokenReducer:
 
     @staticmethod
     def _reduce_python(code: str, mode: str) -> str:
+        if mode.lower() == "ultra":
+            try:
+                tree = ast.parse(code)
+            except (SyntaxError, ValueError):
+                pass
+            else:
+                lines = code.splitlines()
+                preserved_lines = set()
+
+                for node in ast.walk(tree):
+                    if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                        start_line = min(
+                            [node.lineno] + [decorator.lineno for decorator in node.decorator_list]
+                        )
+                        first_body = node.body[0] if node.body else None
+                        body_start = first_body.lineno if first_body else node.lineno
+                        if isinstance(first_body, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                            body_start = min(
+                                [body_start]
+                                + [decorator.lineno for decorator in first_body.decorator_list]
+                            )
+                        end_line = max(node.lineno, body_start - 1)
+                    elif isinstance(node, (ast.Import, ast.ImportFrom)):
+                        start_line = node.lineno
+                        end_line = getattr(node, "end_lineno", node.lineno) or node.lineno
+                    else:
+                        continue
+
+                    preserved_lines.update(range(start_line, end_line + 1))
+
+                return "\n".join(
+                    line for line_number, line in enumerate(lines, start=1)
+                    if line_number in preserved_lines
+                )
+
         lines = code.splitlines()
         reduced = []
         in_docstring = False
@@ -913,8 +948,6 @@ class TokenReducer:
                 continue
                 
             if stripped.startswith(("def ", "class ", "@", "import ", "from ")):
-                reduced.append(line)
-            elif stripped.startswith("def ") or stripped.startswith("async def "):
                 reduced.append(line)
             elif mode.lower() == "balanced" and not stripped.startswith("#"):
                 reduced.append(line)
