@@ -558,6 +558,31 @@ GitHub Actions automatically runs this test suite on every push and pull request
 
 ---
 
+## 🛡️ GitHub Action (GitHub Marketplace)
+
+T-Zero is available as an official GitHub Action (`action.yml`) to audit codebases, enforce architecture boundaries, and prevent secret leaks directly in your CI/CD pipelines:
+
+```yaml
+name: T-Zero Quality Guard
+
+on: [push, pull_request]
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: T-Zero Architecture & Quality Guard
+        uses: toprakahmetaydogmus/TZeroAlgorithm@v3.0.8
+        with:
+          workspace: '.'
+          audit: 'true'
+          enforce-boundaries: 'false'
+```
+
+---
+
 ## 📄 License & Credits
 
 This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for complete terms.
@@ -1099,6 +1124,31 @@ OK (the GUI smoke test is skipped when no display is available)
 ```
 
 GitHub Actions, depoya yapılan her push ve pull request işleminde Ubuntu ve Windows ortamlarında Python 3.10, 3.11 ve 3.12 ile bu testleri otomatik olarak yürütür.
+
+---
+
+## 🛡️ GitHub Action (GitHub Marketplace Entegrasyonu)
+
+T-Zero, CI/CD süreçlerinizde kod kalitesini denetlemek, mimari sınırları korumak ve gizli anahtar sızıntılarını önlemek için GitHub Actions üzerinde de çalışır:
+
+```yaml
+name: T-Zero Quality Guard
+
+on: [push, pull_request]
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: T-Zero Architecture & Quality Guard
+        uses: toprakahmetaydogmus/TZeroAlgorithm@v3.0.8
+        with:
+          workspace: '.'
+          audit: 'true'
+          enforce-boundaries: 'false'
+```
 
 ---
 
