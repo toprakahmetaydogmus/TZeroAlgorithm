@@ -12,34 +12,42 @@ class TestCLI(unittest.TestCase):
         res = subprocess.run(
             [sys.executable, "tzero_v3.py", "--version"],
             capture_output=True,
-            text=True
+            text=True,
+            encoding="utf-8",
+            errors="replace"
         )
         self.assertEqual(res.returncode, 0)
-        self.assertIn("3.0.5", res.stdout)
+        self.assertIn("3.0.6", res.stdout)
 
     def test_mcp_version_flag(self):
         res = subprocess.run(
             [sys.executable, "tzero_mcp.py", "--version"],
             capture_output=True,
-            text=True
+            text=True,
+            encoding="utf-8",
+            errors="replace"
         )
         self.assertEqual(res.returncode, 0)
-        self.assertIn("3.0.5", res.stdout)
+        self.assertIn("3.0.6", res.stdout)
 
     def test_addmcp_version_flag(self):
         res = subprocess.run(
             [sys.executable, "addmcp.py", "--version"],
             capture_output=True,
-            text=True
+            text=True,
+            encoding="utf-8",
+            errors="replace"
         )
         self.assertEqual(res.returncode, 0)
-        self.assertIn("3.0.5", res.stdout)
+        self.assertIn("3.0.6", res.stdout)
 
     def test_scan_flag(self):
         res = subprocess.run(
             [sys.executable, "tzero_v3.py", "--scan", "."],
             capture_output=True,
-            text=True
+            text=True,
+            encoding="utf-8",
+            errors="replace"
         )
         self.assertEqual(res.returncode, 0)
         self.assertIn("T-ZERO CODEBASE SCANNER", res.stdout)
@@ -49,7 +57,9 @@ class TestCLI(unittest.TestCase):
         res = subprocess.run(
             [sys.executable, "tzero_v3.py", "--audit", "."],
             capture_output=True,
-            text=True
+            text=True,
+            encoding="utf-8",
+            errors="replace"
         )
         self.assertEqual(res.returncode, 0)
         self.assertIn("T-ZERO AST STATIC CODE AUDITOR", res.stdout)
@@ -58,10 +68,12 @@ class TestCLI(unittest.TestCase):
         res = subprocess.run(
             [sys.executable, "tzero.py", "--version"],
             capture_output=True,
-            text=True
+            text=True,
+            encoding="utf-8",
+            errors="replace"
         )
         self.assertEqual(res.returncode, 0)
-        self.assertIn("3.0.5", res.stdout)
+        self.assertIn("3.0.6", res.stdout)
 
     def test_quickstart_info(self):
         res = subprocess.run(

@@ -1,0 +1,15 @@
+- id: tzero-audit
+  name: T-Zero Code Quality & Security Audit
+  description: AST static analysis, code smell detection, and zero hardcoded secrets verification
+  entry: tzero --audit .
+  language: python
+  types: [python]
+  pass_filenames: false
+
+- id: tzero-boundaries
+  name: T-Zero Architectural Boundary Enforcer
+  description: Validates modular boundaries defined in tzero.rules.json
+  entry: tzero --enforce-boundaries
+  language: python
+  types: [python]
+  pass_filenames: false

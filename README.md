@@ -149,9 +149,28 @@ Once installed, use any of the available interfaces:
 
 ---
 
+#### 🌐 Option 1B: 1-Click Instant Web Installer (Zero Setup)
+
+**Windows (PowerShell):**
+```powershell
+irm https://raw.githubusercontent.com/toprakahmetaydogmus/TZeroAlgorithm/main/install.ps1 | iex
+```
+
+**Linux / macOS (Bash / Zsh):**
+```bash
+curl -fsSL https://raw.githubusercontent.com/toprakahmetaydogmus/TZeroAlgorithm/main/install.sh | bash
+```
+
+**Smithery MCP Registry:**
+```bash
+npx -y @smithery/cli install tzero --client cursor
+```
+
+---
+
 #### ⚡ Option 2: 1-Click Zero-Dependency Windows Installer (Standalone Binary)
 
-Download **`AddMCP.exe`** directly from [Latest Release (v3.0.5)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases):
+Download **`AddMCP.exe`** directly from [Latest Release (v3.0.6)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases):
 - **GUI Mode:** Double-click `AddMCP.exe`. It automatically detects all installed IDEs on your computer and configures them with a single click.
 - **CLI / Headless Mode:** Run `AddMCP.exe --all` (automatically installs to all detected IDEs without a GUI).
 - **Zero Requirements:** Does **not** require Python, pip, pipx, or Git. Bundles the standalone `TZeroMCP.exe` runtime internally.
@@ -160,7 +179,7 @@ Download **`AddMCP.exe`** directly from [Latest Release (v3.0.5)](https://github
 
 #### 📦 Option 3: Remote Launch via pipx (Cross-Platform: Windows, macOS, Linux)
 
-The first launch downloads the pinned `v3.0.5` package from GitHub without cloning the repo. Install Python 3.9+ and pipx:
+The first launch downloads the pinned `v3.0.6` package from GitHub without cloning the repo. Install Python 3.9+ and pipx:
 
 ##### Install pipx on Windows
 Open PowerShell and run:
@@ -175,8 +194,8 @@ Restart the client after installation. The Windows configs below call `py -m pip
 
 Choose the link for your operating system, approve the configuration in Cursor, then enable `tzero` under **Settings → MCP** or **Customize → MCP**.
 
-- [Add T-Zero to Cursor (Windows)](https://cursor.com/install-mcp?name=tzero&config=eyJjb21tYW5kIjoicHkiLCJhcmdzIjpbIi1tIiwicGlweCIsInJ1biIsIi0tc3BlYyIsImdpdCtodHRwczovL2dpdGh1Yi5jb20vdG9wcmFrYWhtZXRheWRvZ211cy9UWmVyb0FsZ29yaXRobS5naXRAdjMuMC41IiwidHplcm8tbWNwIl19)
-- [Add T-Zero to Cursor (macOS/Linux)](https://cursor.com/install-mcp?name=tzero&config=eyJjb21tYW5kIjoicGlweCIsImFyZ3MiOlsicnVuIiwiLS1zcGVjIiwiZ2l0K2h0dHBzOi8vZ2l0aHViLmNvbS90b3ByYWthaG1ldGF5ZG9nbXVzL1RaZXJvQWxnb3JpdGhtLmdpdEB2My4wLjUiLCJ0emVyby1tY3AiXX0%3D)
+- [Add T-Zero to Cursor (Windows)](https://cursor.com/install-mcp?name=tzero&config=eyJjb21tYW5kIjoicHkiLCJhcmdzIjpbIi1tIiwicGlweCIsInJ1biIsIi0tc3BlYyIsImdpdCtodHRwczovL2dpdGh1Yi5jb20vdG9wcmFrYWhtZXRheWRvZ211cy9UWmVyb0FsZ29yaXRobS5naXRAdjMuMC42IiwidHplcm8tbWNwIl19)
+- [Add T-Zero to Cursor (macOS/Linux)](https://cursor.com/install-mcp?name=tzero&config=eyJjb21tYW5kIjoicGlweCIsImFyZ3MiOlsicnVuIiwiLS1zcGVjIiwiZ2l0K2h0dHBzOi8vZ2l0aHViLmNvbS90b3ByYWthaG1ldGF5ZG9nbXVzL1RaZXJvQWxnb3JpdGhtLmdpdEB2My4wLjYiLCJ0emVyby1tY3AiXX0%3D)
 
 If Cursor does not open the installer, use **Settings → MCP → Add Custom MCP** and paste the platform-appropriate JSON below.
 
@@ -186,7 +205,7 @@ If Cursor does not open the installer, use **Settings → MCP → Add Custom MCP
   "mcpServers": {
     "tzero": {
       "command": "py",
-      "args": ["-m", "pipx", "run", "--spec", "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/archive/refs/tags/v3.0.5.zip", "tzero-mcp"]
+      "args": ["-m", "pipx", "run", "--spec", "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/archive/refs/tags/v3.0.6.zip", "tzero-mcp"]
     }
   }
 }
@@ -198,7 +217,7 @@ If Cursor does not open the installer, use **Settings → MCP → Add Custom MCP
   "mcpServers": {
     "tzero": {
       "command": "pipx",
-      "args": ["run", "--spec", "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/archive/refs/tags/v3.0.5.zip", "tzero-mcp"]
+      "args": ["run", "--spec", "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/archive/refs/tags/v3.0.6.zip", "tzero-mcp"]
     }
   }
 }
@@ -247,7 +266,7 @@ For `.vscode/mcp.json`, VS Code uses a top-level `servers` object and requires `
     "tzero": {
       "type": "stdio",
       "command": "py",
-      "args": ["-m", "pipx", "run", "--spec", "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/archive/refs/tags/v3.0.5.zip", "tzero-mcp"]
+      "args": ["-m", "pipx", "run", "--spec", "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/archive/refs/tags/v3.0.6.zip", "tzero-mcp"]
     }
   }
 }
@@ -674,9 +693,28 @@ Kurulum tamamlandıktan sonra dilediğiniz gibi kullanabilirsiniz:
 
 ---
 
+#### 🌐 1B. Seçenek: Tek Satırda Anında Web Kurulumu (Sıfır Kurulum)
+
+**Windows (PowerShell):**
+```powershell
+irm https://raw.githubusercontent.com/toprakahmetaydogmus/TZeroAlgorithm/main/install.ps1 | iex
+```
+
+**Linux / macOS (Bash / Zsh):**
+```bash
+curl -fsSL https://raw.githubusercontent.com/toprakahmetaydogmus/TZeroAlgorithm/main/install.sh | bash
+```
+
+**Smithery MCP Kaydı:**
+```bash
+npx -y @smithery/cli install tzero --client cursor
+```
+
+---
+
 #### ⚡ 2. Seçenek: Tek Tıkla Sıfır Gereksinimli Windows Kurulumu (Bağımsız Binary)
 
-[Son Sürüm (v3.0.5)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases) sayfasından doğrudan **`AddMCP.exe`** dosyasını indirin:
+[Son Sürüm (v3.0.6)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases) sayfasından doğrudan **`AddMCP.exe`** dosyasını indirin:
 - **Grafik Arayüz (GUI):** `AddMCP.exe` dosyasına çift tıklayın. Bilgisayarınızda yüklü tüm IDE'leri otomatik tespit eder ve tek tıkla entegrasyonu tamamlar.
 - **Terminal / Komut Satırı:** `AddMCP.exe --all` (hiçbir arayüz açmadan algılanan tüm IDE'lere sessizce kurar).
 - **Sıfır Gereksinim:** Python, pip, pipx veya Git gerektirmez. Bağımsız `TZeroMCP.exe` çalışma motorunu içinde gömülü olarak taşır.
@@ -685,7 +723,7 @@ Kurulum tamamlandıktan sonra dilediğiniz gibi kullanabilirsiniz:
 
 #### 📦 3. Seçenek: pipx ile Uzaktan Çalıştırma (Çapraz Platform: Windows, macOS, Linux)
 
-İlk başlatmada sabitlenmiş `v3.0.5` paketi GitHub'dan otomatik indirilir; depoyu klonlamak gerekmez. Python 3.9+ ve pipx gereklidir:
+İlk başlatmada sabitlenmiş `v3.0.6` paketi GitHub'dan otomatik indirilir; depoyu klonlamak gerekmez. Python 3.9+ ve pipx gereklidir:
 
 ##### Windows'ta pipx Kurulumu
 PowerShell'i açıp çalıştırın:
@@ -700,8 +738,8 @@ Kurulumdan sonra istemciyi yeniden başlatın. Aşağıdaki Windows ayarları `p
 
 İşletim sisteminize uygun bağlantıyı açın, Cursor yapılandırmasını onaylayın ve `tzero` sunucusunu **Settings → MCP** veya **Customize → MCP** bölümünden etkinleştirin.
 
-- [T-Zero'yu Cursor'a ekle (Windows)](https://cursor.com/install-mcp?name=tzero&config=eyJjb21tYW5kIjoicHkiLCJhcmdzIjpbIi1tIiwicGlweCIsInJ1biIsIi0tc3BlYyIsImdpdCtodHRwczovL2dpdGh1Yi5jb20vdG9wcmFrYWhtZXRheWRvZ211cy9UWmVyb0FsZ29yaXRobS5naXRAdjMuMC41IiwidHplcm8tbWNwIl19)
-- [T-Zero'yu Cursor'a ekle (macOS/Linux)](https://cursor.com/install-mcp?name=tzero&config=eyJjb21tYW5kIjoicGlweCIsImFyZ3MiOlsicnVuIiwiLS1zcGVjIiwiZ2l0K2h0dHBzOi8vZ2l0aHViLmNvbS90b3ByYWthaG1ldGF5ZG9nbXVzL1RaZXJvQWxnb3JpdGhtLmdpdEB2My4wLjUiLCJ0emVyby1tY3AiXX0%3D)
+- [T-Zero'yu Cursor'a ekle (Windows)](https://cursor.com/install-mcp?name=tzero&config=eyJjb21tYW5kIjoicHkiLCJhcmdzIjpbIi1tIiwicGlweCIsInJ1biIsIi0tc3BlYyIsImdpdCtodHRwczovL2dpdGh1Yi5jb20vdG9wcmFrYWhtZXRheWRvZ211cy9UWmVyb0FsZ29yaXRobS5naXRAdjMuMC42IiwidHplcm8tbWNwIl19)
+- [T-Zero'yu Cursor'a ekle (macOS/Linux)](https://cursor.com/install-mcp?name=tzero&config=eyJjb21tYW5kIjoicGlweCIsImFyZ3MiOlsicnVuIiwiLS1zcGVjIiwiZ2l0K2h0dHBzOi8vZ2l0aHViLmNvbS90b3ByYWthaG1ldGF5ZG9nbXVzL1RaZXJvQWxnb3JpdGhtLmdpdEB2My4wLjYiLCJ0emVyby1tY3AiXX0%3D)
 
 Link açılmazsa **Settings → MCP → Add Custom MCP** bölümüne girip aşağıdaki platforma uygun JSON'u yapıştırın.
 
@@ -711,7 +749,7 @@ Link açılmazsa **Settings → MCP → Add Custom MCP** bölümüne girip aşa�
   "mcpServers": {
     "tzero": {
       "command": "py",
-      "args": ["-m", "pipx", "run", "--spec", "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/archive/refs/tags/v3.0.5.zip", "tzero-mcp"]
+      "args": ["-m", "pipx", "run", "--spec", "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/archive/refs/tags/v3.0.6.zip", "tzero-mcp"]
     }
   }
 }
@@ -723,7 +761,7 @@ Link açılmazsa **Settings → MCP → Add Custom MCP** bölümüne girip aşa�
   "mcpServers": {
     "tzero": {
       "command": "pipx",
-      "args": ["run", "--spec", "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/archive/refs/tags/v3.0.5.zip", "tzero-mcp"]
+      "args": ["run", "--spec", "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/archive/refs/tags/v3.0.6.zip", "tzero-mcp"]
     }
   }
 }
@@ -772,7 +810,7 @@ Güncel ayarlar ve yapılandırma şeması için [resmi Antigravity MCP kılavuz
     "tzero": {
       "type": "stdio",
       "command": "py",
-      "args": ["-m", "pipx", "run", "--spec", "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/archive/refs/tags/v3.0.5.zip", "tzero-mcp"]
+      "args": ["-m", "pipx", "run", "--spec", "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/archive/refs/tags/v3.0.6.zip", "tzero-mcp"]
     }
   }
 }

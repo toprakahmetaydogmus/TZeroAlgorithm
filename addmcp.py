@@ -21,7 +21,7 @@ from pathlib import Path
 from typing import Callable, Dict, List, Optional, Tuple
 
 
-APP_VERSION = "3.0.5"
+APP_VERSION = "3.0.6"
 SERVER_NAME = "tzero"
 SERVER_FILENAME = "TZeroMCP.exe"
 
@@ -367,7 +367,7 @@ description: >-
         plugin_dir = home / ".gemini" / "config" / "plugins" / "tzero"
         plugin_dir.mkdir(parents=True, exist_ok=True)
         (plugin_dir / "plugin.json").write_text(_ANTIGRAVITY_PLUGIN_JSON, encoding="utf-8")
-        (plugin_dir / "installed_version.json").write_text('{"version": "3.0.5"}\n', encoding="utf-8")
+        (plugin_dir / "installed_version.json").write_text('{"version": "3.0.6"}\n', encoding="utf-8")
 
         # Plugin skills
         for skill_name, content in all_skills.items():
@@ -573,7 +573,7 @@ _MCP_TOOLS_SPEC = {
 _ANTIGRAVITY_PLUGIN_JSON = """{
   "name": "tzero",
   "displayName": "Siber Akademi T-Zero Context Engine",
-  "version": "3.0.5",
+  "version": "3.0.6",
   "description": "Enterprise-Grade Codebase Context Architect, AST Signatures Analyzer, and Token Reducer. Cuts LLM prompt context by up to 95%, audits code smells & security, enforces architecture boundaries, and traces module dependencies.",
   "suggestedPrompts": [
     "/tzero tree - Build multi-tier AST hierarchical context tree with 95% token savings",
