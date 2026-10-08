@@ -2268,6 +2268,11 @@ class StarfieldCanvas(tk.Canvas):
         self.bind("<Configure>", self.on_resize)
         self.animate()
 
+    def destroy(self):
+        self.running = False
+        super().destroy()
+
+
     def cycle_mode(self) -> str:
         modes = ["stars", "matrix", "grid", "solid"]
         idx = (modes.index(self.mode) + 1) % len(modes)
@@ -3118,12 +3123,41 @@ class AutoReadmeGUI:
         self.root.configure(bg=PALETTE["bg_start"])
         dialog.destroy()
         
-        # Redraw structure layout
-        for w in self.bg_canvas.winfo_children():
-            w.destroy()
+        # Defer the layout rebuild so the dialog destruction and event loop can settle
+        self.root.after(10, lambda: self._rebuild_layout_for_theme(name))
+
+    def _rebuild_layout_for_theme(self, theme_name: str):
+        # Backup console logs
+        old_logs = ""
+        if hasattr(self, "console_text") and self.console_text:
+            try:
+                old_logs = self.console_text.get("1.0", tk.END)
+            except Exception:
+                pass
+                
+        # Store current tab index
+        old_idx = self.active_tab_index if hasattr(self, 'active_tab_index') else 0
+        
+        # Redraw structure layout safely by destroying the old canvas
+        if hasattr(self, "bg_canvas") and self.bg_canvas:
+            self.bg_canvas.destroy()
+            
         self.create_layout()
+        
+        # Restore logs
+        if hasattr(self, "console_text") and self.console_text and old_logs.strip():
+            try:
+                self.console_text.config(state=tk.NORMAL)
+                self.console_text.delete("1.0", tk.END)
+                self.console_text.insert("1.0", old_logs)
+                self.console_text.see(tk.END)
+                self.console_text.config(state=tk.DISABLED)
+            except Exception:
+                pass
+                
+        self.switch_tab(old_idx)
         self.load_saved_credentials()
-        self.log(f"Interface color theme updated: {name}")
+        self.log(f"Interface color theme updated: {theme_name}")
 
     def switch_tab(self, idx: int):
         self.active_tab_index = idx
@@ -3168,11 +3202,7 @@ class AutoReadmeGUI:
         _config_mgr.get_profile()["theme"] = target
         _config_mgr.save()
         self.root.configure(bg=PALETTE["bg_start"])
-        for w in self.bg_canvas.winfo_children():
-            w.destroy()
-        self.create_layout()
-        self.load_saved_credentials()
-        self.log(f"Theme switched instantly to: {target}")
+        self.root.after(10, lambda: self._rebuild_layout_for_theme(target))
 
     def quick_optimize_action(self):
         play_sfx("click")
