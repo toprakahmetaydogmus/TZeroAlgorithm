@@ -20,12 +20,12 @@ class TestGUIInstantiation(unittest.TestCase):
             self.assertIsNotNone(app)
             self.assertIsNotNone(app.console_text)
             
-            # Verify cycling through all 6 tabs
-            for i in range(6):
+            # Verify cycling through all tabs
+            for i in range(len(app.tab_frames)):
                 app.switch_tab(i)
                 root.update()
                 
-            self.assertEqual(len(app.tab_frames), 6)
+            self.assertEqual(len(app.tab_frames), 7)
         finally:
             try:
                 root.destroy()

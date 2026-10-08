@@ -27,7 +27,7 @@ import inspect
 import logging
 from typing import Dict, List, Optional, Any
 
-SERVER_VERSION = "3.0.7"
+SERVER_VERSION = "3.0.8"
 
 # Safe UTF-8 reconfiguration for Windows console & piped subprocesses
 if sys.stdout and hasattr(sys.stdout, "reconfigure"):
