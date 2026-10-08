@@ -84,6 +84,24 @@ except ImportError:  # pragma: no cover - depends on the host Python build
     tk = ttk = messagebox = filedialog = colorchooser = _TkModuleStub()
 from concurrent.futures import ThreadPoolExecutor
 
+try:
+    import siber_akademi_icon
+except ImportError:
+    siber_akademi_icon = None
+
+if TK_AVAILABLE and siber_akademi_icon:
+    try:
+        _orig_toplevel_init = tk.Toplevel.__init__
+        def _toplevel_init_with_icon(self, *args, **kwargs):
+            _orig_toplevel_init(self, *args, **kwargs)
+            try:
+                siber_akademi_icon.apply_window_icon(self)
+            except Exception:
+                pass
+        tk.Toplevel.__init__ = _toplevel_init_with_icon
+    except Exception:
+        pass
+
 import darkdetect
 from pygments import lex
 from pygments.lexers import get_lexer_by_name
@@ -117,6 +135,45 @@ DEV_URL_MAIN = DEV_URL_GITHUB
 
 # Theme Palettes
 THEME_PALETTES = {
+    "Luxury Dashboard": {
+        "bg_start": "#eef2ff",
+        "card_bg": "#ffffff",
+        "card_border": "#dbeafe",
+        "card_hover": "#f1f5f9",
+        "text_main": "#0f172a",
+        "text_muted": "#64748b",
+        "accent_cyan": "#4f46e5",
+        "accent_green": "#10b981",
+        "accent_purple": "#7c3aed",
+        "success": "#10b981",
+        "error": "#ef4444"
+    },
+    "Royal Indigo": {
+        "bg_start": "#0b0e1d",
+        "card_bg": "#13172e",
+        "card_border": "#22274c",
+        "card_hover": "#31386c",
+        "text_main": "#ffffff",
+        "text_muted": "#8d95cf",
+        "accent_cyan": "#6366f1",
+        "accent_green": "#10b981",
+        "accent_purple": "#a855f7",
+        "success": "#22c55e",
+        "error": "#f43f5e"
+    },
+    "Emerald Obsidian": {
+        "bg_start": "#050f0a",
+        "card_bg": "#0c1d15",
+        "card_border": "#163829",
+        "card_hover": "#1d4c38",
+        "text_main": "#ecfdf5",
+        "text_muted": "#6ee7b7",
+        "accent_cyan": "#10b981",
+        "accent_green": "#34d399",
+        "accent_purple": "#fbbf24",
+        "success": "#34d399",
+        "error": "#f87171"
+    },
     "Glass Dark": {
         "bg_start": "#07090e",
         "card_bg": "#0f131f",
@@ -277,21 +334,21 @@ def calculate_token_cost(token_count: int, provider_name: str) -> float:
 # i18n Translations
 TRANSLATIONS: Dict[str, Dict[str, str]] = {
     "en": {
-        "title": "SİBER AKADEMİ - T-ZERO CONTEXT ARCHITECT V3",
+        "title": "SİBER AKADEMİ — T-ZERO CONTEXT ARCHITECT V3",
         "subtitle": f"Developer: {DEV_NAME} | {DEV_URL_MAIN} | {DEV_URL_BIO}",
-        "setup_tab": "⚙️ SETUP & PROVIDERS",
-        "selector_tab": "📁 FILE SELECTOR & EDITOR",
-        "changelog_tab": "🕒 GIT LOGS & DIFF VIEWER",
-        "generate_tab": "🚀 GENERATE CONTEXT",
-        "template_tab": "📝 PROMPT WORKBENCH",
-        "graph_tab": "📊 LIVE GRAPH & METRICS",
+        "setup_tab": "⚡ Setup & AI Models",
+        "selector_tab": "📂 Code Explorer",
+        "changelog_tab": "🔀 Git & Diff Analysis",
+        "generate_tab": "🚀 Context Generator",
+        "template_tab": "🧪 Prompt Studio",
+        "graph_tab": "📊 Live Metrics",
         "provider": "SELECT AI PROVIDER:",
         "api_url": "API BASE URL:",
         "api_key": "API KEY:",
         "model": "LLM MODEL:",
         "target_dir": "TARGET PROJECT DIRECTORY:",
         "reduction": "TOKEN REDUCTION LEVEL:",
-        "scan_btn": "🔍 SCAN CODEBASE WORKSPACE",
+        "scan_btn": "⚡ SCAN CODEBASE (Ctrl+S)",
         "generate_btn": "🚀 ARCHITECT CONTEXT README.md",
         "cancel_btn": "🛑 CANCEL GENERATION",
         "copy_btn": "📋 Copy to Clipboard",
@@ -312,21 +369,21 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "audit_btn": "🛡️ SECURITY AUDIT"
     },
     "tr": {
-        "title": "SİBER AKADEMİ - T-ZERO BAĞLAM MİMARI V3",
+        "title": "SİBER AKADEMİ — T-ZERO BAĞLAM MİMARI V3",
         "subtitle": f"Geliştirici: {DEV_NAME} | {DEV_URL_MAIN} | {DEV_URL_BIO}",
-        "setup_tab": "⚙️ KURULUM VE SAĞLAYICILAR",
-        "selector_tab": "📁 DOSYA SEÇİCİ VE EDİTÖR",
-        "changelog_tab": "🕒 GİT GÜNLÜKLERİ VE DİFF GÖSTERİCİ",
-        "generate_tab": "🚀 BAĞLAM README OLUŞTUR",
-        "template_tab": "📝 PROMPT EDİTÖRÜ",
-        "graph_tab": "📊 CANLI GRAFİK VE METRİKLER",
+        "setup_tab": "⚡ Kurulum & Model",
+        "selector_tab": "📂 Kod Gezgini",
+        "changelog_tab": "🔀 Git & Diff Analizi",
+        "generate_tab": "🚀 Bağlam Üretici",
+        "template_tab": "🧪 Prompt Atölyesi",
+        "graph_tab": "📊 Canlı Metrikler",
         "provider": "YAPAY ZEKA SAĞLAYICISI SEÇİN:",
         "api_url": "API URL ADRESİ:",
         "api_key": "API ANAHTARI:",
         "model": "LLM MODELİ:",
         "target_dir": "HEDEF PROJE DİZİNİ:",
         "reduction": "TOKEN AZALTMA DÜZEYİ:",
-        "scan_btn": "🔍 DİZİNİ TARA",
+        "scan_btn": "⚡ KOD TABANINI TARA (Ctrl+S)",
         "generate_btn": "🚀 BAĞLAM README.md OLUŞTUR",
         "cancel_btn": "🛑 İŞLEMİ İPTAL ET",
         "copy_btn": "📋 Panoya Kopyala",
@@ -2199,13 +2256,24 @@ class AutoReadmeGUI:
         self.root.geometry(f"{window_width}x{window_height}+{position_x}+{position_y}")
         self.root.minsize(min(960, window_width), min(640, window_height))
 
-        resource_dir = getattr(sys, "_MEIPASS", os.path.dirname(os.path.abspath(__file__)))
-        icon_path = os.path.join(resource_dir, "siber_akademi.ico")
-        if os.path.isfile(icon_path):
+        # Apply official Siber Akademi Brand Icon (Embedded Base64 + Fallback)
+        self.logo_img = None
+        self.logo_sm = None
+        if siber_akademi_icon:
             try:
-                self.root.iconbitmap(icon_path)
-            except tk.TclError:
+                siber_akademi_icon.apply_window_icon(self.root)
+                self.logo_img = siber_akademi_icon.get_logo_photo_image((36, 36))
+                self.logo_sm = siber_akademi_icon.get_logo_photo_image((22, 22))
+            except Exception:
                 pass
+        if not self.logo_img:
+            resource_dir = getattr(sys, "_MEIPASS", os.path.dirname(os.path.abspath(__file__)))
+            icon_path = os.path.join(resource_dir, "siber_akademi.ico")
+            if os.path.isfile(icon_path):
+                try:
+                    self.root.iconbitmap(icon_path)
+                except Exception:
+                    pass
 
         self.root.title(get_text("title", self.lang))
         self.root.configure(bg=PALETTE["bg_start"])
@@ -2225,27 +2293,128 @@ class AutoReadmeGUI:
         self.bg_canvas = StarfieldCanvas(self.root)
         self.bg_canvas.pack(fill=tk.BOTH, expand=True)
 
-        # 1. Custom Header Box
+        # 1. Left Vertical Executive Sidebar Rail
+        self.sidebar = GlassCard(self.bg_canvas)
+        self.sidebar.place(relx=0.012, rely=0.015, relwidth=0.155, relheight=0.97)
+
+        # Brand header in sidebar
+        brand_box = tk.Frame(self.sidebar, bg=PALETTE["card_bg"])
+        brand_box.pack(fill=tk.X, padx=10, pady=(12, 10))
+
+        if self.logo_img:
+            self.brand_icon_lbl = tk.Label(brand_box, image=self.logo_img, bg=PALETTE["card_bg"])
+            self.brand_icon_lbl.pack(pady=(0, 4))
+        
+        tk.Label(brand_box, text="SİBER AKADEMİ", font=("Segoe UI", 10, "bold"), fg=PALETTE["accent_cyan"], bg=PALETTE["card_bg"]).pack()
+        tk.Label(brand_box, text="T-ZERO CONTEXT ARCHITECT", font=("Segoe UI", 7, "bold"), fg=PALETTE["text_muted"], bg=PALETTE["card_bg"]).pack()
+
+        # Nav menu header
+        nav_header = tk.Frame(self.sidebar, bg=PALETTE["card_bg"])
+        nav_header.pack(fill=tk.X, padx=12, pady=(8, 4))
+        tk.Label(nav_header, text="WORKSPACE VIEWS", font=("Segoe UI", 7, "bold"), fg=PALETTE["text_muted"], bg=PALETTE["card_bg"]).pack(anchor=tk.W)
+
+        # Tabs navigation buttons (vertical stack)
+        self.tabs = ["setup_tab", "selector_tab", "changelog_tab", "generate_tab", "template_tab", "graph_tab"]
+        self.tab_buttons: List[tk.Button] = []
+        for idx, key in enumerate(self.tabs):
+            btn = apply_modern_hover(tk.Button(
+                self.sidebar,
+                text=get_text(key, self.lang),
+                font=("Segoe UI", 9, "bold"),
+                fg=PALETTE["text_muted"],
+                bg=PALETTE["card_bg"],
+                activebackground=PALETTE["card_hover"],
+                activeforeground=PALETTE["accent_cyan"],
+                bd=0,
+                relief=tk.FLAT,
+                anchor="w",
+                padx=10,
+                pady=6,
+                cursor="hand2",
+                command=lambda i=idx: self.switch_tab(i)
+            ))
+            btn.pack(fill=tk.X, padx=8, pady=2)
+            self.tab_buttons.append(btn)
+
+        self.nav_indicator = tk.Frame(self.sidebar, bg=PALETTE["accent_cyan"], width=3)
+        self.nav_indicator.place(x=4, y=100, width=3, height=28)
+
+        # Spacer
+        spacer = tk.Frame(self.sidebar, bg=PALETTE["card_bg"])
+        spacer.pack(fill=tk.BOTH, expand=True)
+
+        # Bottom Utilities of Sidebar
+        sidebar_bottom = tk.Frame(self.sidebar, bg=PALETTE["card_bg"])
+        sidebar_bottom.pack(fill=tk.X, padx=8, pady=(0, 10))
+
+        self.theme_btn = apply_modern_hover(tk.Button(
+            sidebar_bottom,
+            text="🎨 Tema Seçici",
+            bg=PALETTE["card_border"],
+            fg=PALETTE["accent_purple"],
+            relief=tk.FLAT,
+            font=("Segoe UI", 8, "bold"),
+            command=self.open_theme_selector,
+            cursor="hand2",
+            anchor="w",
+            padx=8,
+            pady=4
+        ))
+        self.theme_btn.pack(fill=tk.X, pady=2)
+
+        self.lang_btn = apply_modern_hover(tk.Button(
+            sidebar_bottom,
+            text="🌐 Dil: TR / EN",
+            bg=PALETTE["card_border"],
+            fg=PALETTE["text_main"],
+            relief=tk.FLAT,
+            font=("Segoe UI", 8, "bold"),
+            command=self.toggle_language,
+            cursor="hand2",
+            anchor="w",
+            padx=8,
+            pady=4
+        ))
+        self.lang_btn.pack(fill=tk.X, pady=2)
+
+        self.shortcuts_btn = apply_modern_hover(tk.Button(
+            sidebar_bottom,
+            text="⌨ Kısayollar",
+            bg=PALETTE["card_border"],
+            fg=PALETTE["text_muted"],
+            relief=tk.FLAT,
+            font=("Segoe UI", 8, "bold"),
+            command=self.show_shortcuts_modal,
+            cursor="hand2",
+            anchor="w",
+            padx=8,
+            pady=4
+        ))
+        self.shortcuts_btn.pack(fill=tk.X, pady=2)
+
+        tk.Label(sidebar_bottom, text="● v3.0.7 ONLINE", font=("Segoe UI", 7, "bold"), fg=PALETTE["success"], bg=PALETTE["card_bg"]).pack(pady=(4, 0))
+
+        # 2. Top Header Box
         self.header = GlassCard(self.bg_canvas)
-        self.header.place(relx=0.02, rely=0.01, relwidth=0.96, relheight=0.10)
-        
+        self.header.place(relx=0.175, rely=0.015, relwidth=0.813, relheight=0.08)
+
         title_frame = tk.Frame(self.header, bg=PALETTE["card_bg"])
-        title_frame.pack(side=tk.LEFT, fill=tk.Y, padx=15, pady=5)
-        
+        title_frame.pack(side=tk.LEFT, fill=tk.Y, padx=15, pady=4)
+
         title_row = tk.Frame(title_frame, bg=PALETTE["card_bg"])
         title_row.pack(anchor=tk.W)
-        
-        self.title_lbl = tk.Label(title_row, text=get_text("title", self.lang), font=("Segoe UI", 13, "bold"), fg=PALETTE["accent_cyan"], bg=PALETTE["card_bg"])
+
+        self.title_lbl = tk.Label(title_row, text=get_text("title", self.lang), font=("Segoe UI", 12, "bold"), fg=PALETTE["accent_cyan"], bg=PALETTE["card_bg"])
         self.title_lbl.pack(side=tk.LEFT)
-        
+
         self.status_dot = GlowingStatusDot(title_row)
         self.status_dot.pack(side=tk.LEFT, padx=10)
-        
+
         self.subtitle_lbl = tk.Label(title_frame, text=get_text("subtitle", self.lang), font=("Segoe UI", 8), fg=PALETTE["text_muted"], bg=PALETTE["card_bg"])
-        self.subtitle_lbl.pack(anchor=tk.W, pady=2)
+        self.subtitle_lbl.pack(anchor=tk.W, pady=1)
 
         header_controls = tk.Frame(self.header, bg=PALETTE["card_bg"])
-        header_controls.pack(side=tk.RIGHT, fill=tk.Y, padx=10, pady=5)
+        header_controls.pack(side=tk.RIGHT, fill=tk.Y, padx=10, pady=4)
 
         self.fx_btn = apply_modern_hover(tk.Button(
             header_controls,
@@ -2253,11 +2422,11 @@ class AutoReadmeGUI:
             bg=PALETTE["card_border"],
             fg=PALETTE["accent_cyan"],
             relief=tk.FLAT,
-            font=("Segoe UI", 9, "bold"),
+            font=("Segoe UI", 8, "bold"),
             command=self.cycle_fx_mode,
             cursor="hand2"
         ))
-        self.fx_btn.pack(side=tk.LEFT, padx=3, pady=8)
+        self.fx_btn.pack(side=tk.LEFT, padx=3, pady=6)
 
         self.sfx_btn = apply_modern_hover(tk.Button(
             header_controls,
@@ -2265,11 +2434,11 @@ class AutoReadmeGUI:
             bg=PALETTE["card_border"],
             fg=PALETTE["accent_green"],
             relief=tk.FLAT,
-            font=("Segoe UI", 9, "bold"),
+            font=("Segoe UI", 8, "bold"),
             command=self.toggle_sfx,
             cursor="hand2"
         ))
-        self.sfx_btn.pack(side=tk.LEFT, padx=3, pady=8)
+        self.sfx_btn.pack(side=tk.LEFT, padx=3, pady=6)
 
         self.audit_btn = apply_modern_hover(tk.Button(
             header_controls,
@@ -2277,77 +2446,16 @@ class AutoReadmeGUI:
             bg=PALETTE["card_border"],
             fg=PALETTE["accent_purple"],
             relief=tk.FLAT,
-            font=("Segoe UI", 9, "bold"),
+            font=("Segoe UI", 8, "bold"),
             command=self.run_quick_security_audit,
             cursor="hand2"
         ))
-        self.audit_btn.pack(side=tk.LEFT, padx=3, pady=8)
-        
-        self.theme_btn = apply_modern_hover(tk.Button(
-            header_controls,
-            text="🎨 THEME",
-            bg=PALETTE["card_border"],
-            fg=PALETTE["accent_purple"],
-            relief=tk.FLAT,
-            font=("Segoe UI", 9, "bold"),
-            command=self.open_theme_selector,
-            cursor="hand2"
-        ))
-        self.theme_btn.pack(side=tk.LEFT, padx=3, pady=8)
-        
-        self.lang_btn = apply_modern_hover(tk.Button(
-            header_controls, 
-            text="TR / EN", 
-            bg=PALETTE["card_border"], 
-            fg=PALETTE["text_main"], 
-            relief=tk.FLAT, 
-            font=("Segoe UI", 9, "bold"),
-            command=self.toggle_language,
-            cursor="hand2"
-        ))
-        self.lang_btn.pack(side=tk.LEFT, padx=3, pady=8)
-        
-        self.shortcuts_btn = apply_modern_hover(tk.Button(
-            header_controls, 
-            text="⌨", 
-            bg=PALETTE["card_border"], 
-            fg=PALETTE["text_muted"], 
-            relief=tk.FLAT, 
-            font=("Segoe UI", 9, "bold"),
-            command=self.show_shortcuts_modal,
-            cursor="hand2"
-        ))
-        self.shortcuts_btn.pack(side=tk.LEFT, padx=3, pady=8)
-
-        # 2. Tabs Navigation Panels
-        self.nav = GlassCard(self.bg_canvas)
-        self.nav.place(relx=0.02, rely=0.12, relwidth=0.96, relheight=0.05)
-        
-        self.tabs = ["setup_tab", "selector_tab", "changelog_tab", "generate_tab", "template_tab", "graph_tab"]
-        self.tab_buttons: List[tk.Button] = []
-        for idx, key in enumerate(self.tabs):
-            btn = apply_modern_hover(tk.Button(
-                self.nav, 
-                text=get_text(key, self.lang), 
-                font=("Segoe UI", 9, "bold"), 
-                fg=PALETTE["text_muted"], 
-                bg=PALETTE["card_bg"],
-                activebackground=PALETTE["card_hover"], 
-                activeforeground=PALETTE["accent_cyan"], 
-                bd=0, 
-                cursor="hand2",
-                command=lambda i=idx: self.switch_tab(i)
-            ))
-            btn.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-            self.tab_buttons.append(btn)
-            
-        self.nav_indicator = tk.Frame(self.nav, bg=PALETTE["accent_cyan"], height=2)
-        self.nav_indicator.place(relx=0, rely=0.92, relwidth=0.166)
+        self.audit_btn.pack(side=tk.LEFT, padx=3, pady=6)
 
         # 3. Main content frame
         self.content = tk.Frame(self.bg_canvas, bg=PALETTE["bg_start"], bd=0)
-        self.content.place(relx=0.02, rely=0.18, relwidth=0.96, relheight=0.66)
-        
+        self.content.place(relx=0.175, rely=0.105, relwidth=0.813, relheight=0.74)
+
         self.tab_frames = [tk.Frame(self.content, bg=PALETTE["bg_start"]) for _ in range(6)]
         self.setup_tab_setup()
         self.setup_tab_selector()
@@ -2355,19 +2463,19 @@ class AutoReadmeGUI:
         self.setup_tab_generate()
         self.setup_tab_template()
         self.setup_tab_graph()
-        
+
         # 4. Bottom Diagnostic Console Output Logs Panel
         self.console = GlassCard(self.bg_canvas)
-        self.console.place(relx=0.02, rely=0.85, relwidth=0.96, relheight=0.13)
-        
+        self.console.place(relx=0.175, rely=0.855, relwidth=0.813, relheight=0.13)
+
         tk.Label(self.console, text="DIAGNOSTICS & SYSTEM AUDITS LOG:", font=("Segoe UI", 8, "bold"), fg=PALETTE["text_muted"], bg=PALETTE["card_bg"]).pack(anchor=tk.W, padx=10, pady=2)
-        
+
         console_frame = tk.Frame(self.console, bg=PALETTE["card_bg"])
-        console_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=(0, 5))
-        
+        console_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=(0, 4))
+
         self.console_text = tk.Text(console_frame, bg=PALETTE["bg_start"], fg=PALETTE["accent_cyan"], relief=tk.FLAT, font=("Consolas", 8), state=tk.DISABLED, bd=0)
         self.console_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-        
+
         scroll = tk.Scrollbar(console_frame, command=self.console_text.yview)
         scroll.pack(side=tk.RIGHT, fill=tk.Y)
         self.console_text.config(yscrollcommand=scroll.set)
@@ -2534,10 +2642,17 @@ class AutoReadmeGUI:
             f.pack_forget()
         self.tab_frames[idx].pack(fill=tk.BOTH, expand=True)
         
-        for btn in self.tab_buttons:
-            btn.config(bg=PALETTE["card_bg"], fg=PALETTE["text_muted"])
-        self.tab_buttons[idx].config(bg=PALETTE["card_hover"], fg=PALETTE["text_main"])
-        self.nav_indicator.place(relx=idx*0.166, rely=0.92, relwidth=0.166)
+        for i, btn in enumerate(self.tab_buttons):
+            if i == idx:
+                btn.config(bg=PALETTE["card_hover"], fg=PALETTE["accent_cyan"])
+            else:
+                btn.config(bg=PALETTE["card_bg"], fg=PALETTE["text_muted"])
+        try:
+            btn_info = self.tab_buttons[idx]
+            y_pos = btn_info.winfo_y() if btn_info.winfo_y() > 0 else (90 + idx * 36)
+            self.nav_indicator.place(x=4, y=y_pos + 4, width=3, height=24)
+        except Exception:
+            pass
         
         if idx == 5:
             self.node_canvas.set_data(self.scanned_files)
@@ -2564,6 +2679,8 @@ class AutoReadmeGUI:
         self.smart_select_btn.config(text=get_text("smart_select", self.lang))
         self.sel_all_btn.config(text=get_text("select_all", self.lang))
         self.desel_all_btn.config(text=get_text("deselect_all", self.lang))
+        self.sfx_btn.config(text=get_text("sfx_on" if SFX_ENABLED else "sfx_off", self.lang))
+        self.audit_btn.config(text=get_text("audit_btn", self.lang))
         
         self.log(f"App interface translation updated: {self.lang.upper()}")
 
@@ -2575,143 +2692,181 @@ class AutoReadmeGUI:
         f.rowconfigure(0, weight=1)
         
         left = GlassCard(f)
-        left.grid(row=0, column=0, sticky="nsew", padx=(0, 10), pady=5)
+        left = GlassCard(f)
+        left.grid(row=0, column=0, sticky="nsew", padx=(0, 6), pady=4)
         left.pack_propagate(False)
         
         right = GlassCard(f)
-        right.grid(row=0, column=1, sticky="nsew", padx=(10, 0), pady=5)
+        right.grid(row=0, column=1, sticky="nsew", padx=(6, 0), pady=4)
         right.pack_propagate(False)
         
         # Left Panel (API settings)
-        pad_l = tk.Frame(left, bg=PALETTE["card_bg"], padx=20, pady=20)
+        pad_l = tk.Frame(left, bg=PALETTE["card_bg"], padx=16, pady=16)
         pad_l.pack(fill=tk.BOTH, expand=True)
         
-        tk.Label(pad_l, text="AI PROVIDER INTEGRATION", font=("Segoe UI", 10, "bold"), fg=PALETTE["accent_green"], bg=PALETTE["card_bg"]).pack(anchor=tk.W, pady=(0, 10))
+        tk.Label(pad_l, text="AI PROVIDER INTEGRATION", font=("Segoe UI", 10, "bold"), fg=PALETTE["accent_green"], bg=PALETTE["card_bg"]).pack(anchor=tk.W, pady=(0, 8))
         
         self.provider_var = tk.StringVar(value="NVIDIA NIM")
         self.provider_combo = ttk.Combobox(pad_l, textvariable=self.provider_var, values=list(PROVIDERS.keys()), state="readonly")
-        self.provider_combo.pack(fill=tk.X, ipady=4, pady=(0, 12))
+        self.provider_combo.pack(fill=tk.X, ipady=4, pady=(0, 10))
         self.provider_combo.bind("<<ComboboxSelected>>", self.on_provider_select)
         
-        tk.Label(pad_l, text="API BASE URL:", font=("Segoe UI", 9, "bold"), fg=PALETTE["text_muted"], bg=PALETTE["card_bg"]).pack(anchor=tk.W, pady=(0, 4))
+        tk.Label(pad_l, text="API BASE URL:", font=("Segoe UI", 8, "bold"), fg=PALETTE["text_muted"], bg=PALETTE["card_bg"]).pack(anchor=tk.W, pady=(0, 3))
         self.api_url_entry = apply_entry_focus_glow(tk.Entry(pad_l, bg=PALETTE["bg_start"], fg=PALETTE["text_main"], insertbackground="#ffffff", relief=tk.FLAT, highlightthickness=1, highlightbackground=PALETTE["card_border"]))
-        self.api_url_entry.pack(fill=tk.X, ipady=6, pady=(0, 12))
+        self.api_url_entry.pack(fill=tk.X, ipady=5, pady=(0, 10))
         
-        tk.Label(pad_l, text="API KEY:", font=("Segoe UI", 9, "bold"), fg=PALETTE["text_muted"], bg=PALETTE["card_bg"]).pack(anchor=tk.W, pady=(0, 4))
+        tk.Label(pad_l, text="API KEY:", font=("Segoe UI", 8, "bold"), fg=PALETTE["text_muted"], bg=PALETTE["card_bg"]).pack(anchor=tk.W, pady=(0, 3))
         key_frame = tk.Frame(pad_l, bg=PALETTE["card_bg"])
-        key_frame.pack(fill=tk.X, pady=(0, 12))
+        key_frame.pack(fill=tk.X, pady=(0, 10))
         self.api_key_entry = apply_entry_focus_glow(tk.Entry(key_frame, bg=PALETTE["bg_start"], fg=PALETTE["text_main"], show="*", insertbackground="#ffffff", relief=tk.FLAT, highlightthickness=1, highlightbackground=PALETTE["card_border"]))
-        self.api_key_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, ipady=6)
+        self.api_key_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, ipady=5)
         
-        self.ping_btn = apply_modern_hover(tk.Button(key_frame, text="PING", bg=PALETTE["card_border"], fg=PALETTE["accent_cyan"], relief=tk.FLAT, font=("Segoe UI", 9, "bold"), command=self.ping_endpoint, cursor="hand2"))
-        self.ping_btn.pack(side=tk.RIGHT, padx=(10, 0), ipady=4, ipadx=10)
+        self.ping_btn = apply_modern_hover(tk.Button(key_frame, text="⚡ PING", bg=PALETTE["card_border"], fg=PALETTE["accent_cyan"], relief=tk.FLAT, font=("Segoe UI", 8, "bold"), command=self.ping_endpoint, cursor="hand2"))
+        self.ping_btn.pack(side=tk.RIGHT, padx=(8, 0), ipady=3, ipadx=8)
         
-        tk.Label(pad_l, text="TARGET MODEL:", font=("Segoe UI", 9, "bold"), fg=PALETTE["text_muted"], bg=PALETTE["card_bg"]).pack(anchor=tk.W, pady=(0, 4))
+        tk.Label(pad_l, text="TARGET MODEL:", font=("Segoe UI", 8, "bold"), fg=PALETTE["text_muted"], bg=PALETTE["card_bg"]).pack(anchor=tk.W, pady=(0, 3))
         self.model_var = tk.StringVar()
         self.model_combo = ttk.Combobox(pad_l, textvariable=self.model_var, state="readonly")
-        self.model_combo.pack(fill=tk.X, ipady=4, pady=(0, 12))
+        self.model_combo.pack(fill=tk.X, ipady=4, pady=(0, 10))
         
-        tk.Label(pad_l, text="TARGET SCAN DİZİNİ:", font=("Segoe UI", 9, "bold"), fg=PALETTE["text_muted"], bg=PALETTE["card_bg"]).pack(anchor=tk.W, pady=(0, 4))
+        tk.Label(pad_l, text="TARGET SCAN DİZİNİ:", font=("Segoe UI", 8, "bold"), fg=PALETTE["text_muted"], bg=PALETTE["card_bg"]).pack(anchor=tk.W, pady=(0, 3))
         dir_frame = tk.Frame(pad_l, bg=PALETTE["card_bg"])
-        dir_frame.pack(fill=tk.X, pady=(0, 15))
+        dir_frame.pack(fill=tk.X, pady=(0, 12))
         self.dir_entry = apply_entry_focus_glow(tk.Entry(dir_frame, bg=PALETTE["bg_start"], fg=PALETTE["text_main"], insertbackground="#ffffff", relief=tk.FLAT, highlightthickness=1, highlightbackground=PALETTE["card_border"]))
-        self.dir_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, ipady=6, padx=(0, 10))
+        self.dir_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, ipady=5, padx=(0, 8))
         
         self.browse_btn = apply_modern_hover(tk.Button(dir_frame, text="BROWSE...", bg=PALETTE["card_border"], fg=PALETTE["text_main"], relief=tk.FLAT, font=("Segoe UI", 8, "bold"), command=self.browse_dir, cursor="hand2"))
-        self.browse_btn.pack(side=tk.RIGHT, ipady=4, ipadx=8)
+        self.browse_btn.pack(side=tk.RIGHT, ipady=3, ipadx=8)
         
-        self.scan_btn = apply_modern_hover(tk.Button(pad_l, text=get_text("scan_btn", self.lang), bg=PALETTE["card_border"], fg=PALETTE["accent_green"], relief=tk.FLAT, font=("Segoe UI", 10, "bold"), command=self.run_scanner, cursor="hand2"), hover_bg=PALETTE["accent_green"], hover_fg="#000000")
-        self.scan_btn.pack(fill=tk.X, ipady=10, pady=(10, 0))
+        self.scan_btn = apply_modern_hover(
+            tk.Button(
+                pad_l,
+                text=get_text("scan_btn", self.lang),
+                bg=PALETTE["card_hover"],
+                fg=PALETTE["accent_green"],
+                relief=tk.FLAT,
+                font=("Segoe UI", 11, "bold"),
+                command=self.run_scanner,
+                cursor="hand2"
+            ),
+            hover_bg=PALETTE["accent_green"],
+            hover_fg="#000000"
+        )
+        self.scan_btn.pack(fill=tk.X, ipady=12, pady=(12, 0))
         
         # Right Panel (Support & Profile Configuration manager details)
-        pad_r = tk.Frame(right, bg=PALETTE["card_bg"], padx=20, pady=20)
+        pad_r = tk.Frame(right, bg=PALETTE["card_bg"], padx=16, pady=16)
         pad_r.pack(fill=tk.BOTH, expand=True)
         
-        # Sponsor & Brand Banner
+        # 1. Sponsor & Brand Banner Card
         brand = GlassCard(pad_r, bg=PALETTE["bg_start"])
-        brand.pack(fill=tk.X, pady=(0, 15), ipady=5)
+        brand.pack(fill=tk.X, pady=(0, 10), ipady=3)
         
-        tk.Label(brand, text="SİBER AKADEMİ SUPPORT PORTAL", font=("Segoe UI", 9, "bold"), fg=PALETTE["accent_cyan"], bg=PALETTE["bg_start"]).pack(anchor=tk.W, padx=10, pady=4)
-        lbl_sa = tk.Label(brand, text=f"Geliştirici: {DEV_NAME}", font=("Segoe UI", 10, "bold"), fg=PALETTE["text_main"], bg=PALETTE["bg_start"])
-        lbl_sa.pack(anchor=tk.W, padx=10)
+        b_top = tk.Frame(brand, bg=PALETTE["bg_start"])
+        b_top.pack(fill=tk.X, padx=10, pady=(4, 2))
+        tk.Label(b_top, text="🛡️ SİBER AKADEMİ SUPPORT & CREATOR HUB", font=("Segoe UI", 8, "bold"), fg=PALETTE["accent_cyan"], bg=PALETTE["bg_start"]).pack(side=tk.LEFT)
+        tk.Label(b_top, text="v3.0.7", font=("Segoe UI", 8, "bold"), fg=PALETTE["accent_green"], bg=PALETTE["bg_start"]).pack(side=tk.RIGHT)
         
-        lbl_web1 = tk.Label(brand, text="💼 LinkedIn: Toprak Ahmet Aydoğmuş", font=("Segoe UI", 9, "underline"), fg=PALETTE["accent_cyan"], bg=PALETTE["bg_start"], cursor="hand2")
-        lbl_web1.pack(anchor=tk.W, padx=10, pady=2)
+        b_links = tk.Frame(brand, bg=PALETTE["bg_start"])
+        b_links.pack(fill=tk.X, padx=10, pady=(2, 6))
+        
+        lbl_sa = tk.Label(b_links, text=f"Geliştirici: {DEV_NAME}", font=("Segoe UI", 9, "bold"), fg=PALETTE["text_main"], bg=PALETTE["bg_start"])
+        lbl_sa.pack(side=tk.LEFT, padx=(0, 10))
+        
+        lbl_web1 = tk.Label(b_links, text="💼 LinkedIn", font=("Segoe UI", 8, "bold"), fg=PALETTE["accent_cyan"], bg=PALETTE["card_bg"], padx=6, pady=2, cursor="hand2")
+        lbl_web1.pack(side=tk.LEFT, padx=3)
         lbl_web1.bind("<Button-1>", lambda e: webbrowser.open(DEV_URL_LINKEDIN))
         
-        lbl_web2 = tk.Label(brand, text="🔗 Biyografi & Hub: hopp.bio/siberegitim", font=("Segoe UI", 9, "underline"), fg=PALETTE["accent_purple"], bg=PALETTE["bg_start"], cursor="hand2")
-        lbl_web2.pack(anchor=tk.W, padx=10, pady=2)
+        lbl_web2 = tk.Label(b_links, text="🌐 Biyografi & Hub", font=("Segoe UI", 8, "bold"), fg=PALETTE["accent_purple"], bg=PALETTE["card_bg"], padx=6, pady=2, cursor="hand2")
+        lbl_web2.pack(side=tk.LEFT, padx=3)
         lbl_web2.bind("<Button-1>", lambda e: webbrowser.open(DEV_URL_BIO))
+        
+        lbl_web3 = tk.Label(b_links, text="⭐ GitHub Repo", font=("Segoe UI", 8, "bold"), fg=PALETTE["accent_green"], bg=PALETTE["card_bg"], padx=6, pady=2, cursor="hand2")
+        lbl_web3.pack(side=tk.LEFT, padx=3)
+        lbl_web3.bind("<Button-1>", lambda e: webbrowser.open(DEV_URL_MAIN))
 
-        # Dynamic profiles manager controls
+        # 2. Dynamic profiles manager & Security hub
         profile_editor_frame = GlassCard(pad_r)
-        profile_editor_frame.pack(fill=tk.BOTH, expand=True, pady=(5, 10))
-        profile_editor_frame.config(padx=10, pady=10)
+        profile_editor_frame.pack(fill=tk.X, pady=(0, 10))
+        profile_editor_frame.config(padx=10, pady=8)
         
-        tk.Label(profile_editor_frame, text="PROFILE LIST MANAGER:", font=("Segoe UI", 9, "bold"), fg=PALETTE["accent_green"], bg=PALETTE["card_bg"]).pack(anchor=tk.W, pady=(0, 5))
+        p_head_row = tk.Frame(profile_editor_frame, bg=PALETTE["card_bg"])
+        p_head_row.pack(fill=tk.X, pady=(0, 4))
+        tk.Label(p_head_row, text="⚙️ PROFİL & GÜVENLİK YÖNETİMİ", font=("Segoe UI", 8, "bold"), fg=PALETTE["accent_green"], bg=PALETTE["card_bg"]).pack(side=tk.LEFT)
         
-        self.profile_listbox = tk.Listbox(profile_editor_frame, bg=PALETTE["bg_start"], fg=PALETTE["text_main"], selectbackground=PALETTE["card_hover"], relief=tk.FLAT, bd=0, height=3)
-        self.profile_listbox.pack(fill=tk.X, pady=(0, 5))
+        # Profile selector and actions
+        p_select_row = tk.Frame(profile_editor_frame, bg=PALETTE["card_bg"])
+        p_select_row.pack(fill=tk.X, pady=(0, 6))
+        
+        self.profile_listbox = tk.Listbox(p_select_row, bg=PALETTE["bg_start"], fg=PALETTE["text_main"], selectbackground=PALETTE["card_hover"], relief=tk.FLAT, bd=0, height=2)
+        self.profile_listbox.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 6))
         self.refresh_profile_listbox()
         
-        p_btn_row = tk.Frame(profile_editor_frame, bg=PALETTE["card_bg"])
-        p_btn_row.pack(fill=tk.X)
+        p_actions = tk.Frame(p_select_row, bg=PALETTE["card_bg"])
+        p_actions.pack(side=tk.RIGHT)
         
-        self.new_profile_btn = apply_modern_hover(tk.Button(p_btn_row, text="New Profile", bg=PALETTE["card_border"], fg=PALETTE["text_main"], relief=tk.FLAT, font=("Segoe UI", 8), command=self.create_new_profile_modal, cursor="hand2"))
-        self.new_profile_btn.pack(side=tk.LEFT, padx=2)
+        self.use_profile_btn = apply_modern_hover(tk.Button(p_actions, text="⚡ Etkinleştir", bg=PALETTE["card_border"], fg=PALETTE["accent_cyan"], relief=tk.FLAT, font=("Segoe UI", 8, "bold"), command=self.activate_selected_profile, cursor="hand2"), hover_bg=PALETTE["accent_cyan"], hover_fg="#000000")
+        self.use_profile_btn.pack(side=tk.TOP, fill=tk.X, pady=1)
         
-        self.del_profile_btn = apply_modern_hover(tk.Button(p_btn_row, text="Delete Profile", bg=PALETTE["card_border"], fg=PALETTE["error"], relief=tk.FLAT, font=("Segoe UI", 8), command=self.delete_selected_profile, cursor="hand2"), hover_bg=PALETTE["error"], hover_fg="#ffffff")
-        self.del_profile_btn.pack(side=tk.LEFT, padx=2)
+        p_mini = tk.Frame(p_actions, bg=PALETTE["card_bg"])
+        p_mini.pack(side=tk.BOTTOM, fill=tk.X)
+        self.new_profile_btn = apply_modern_hover(tk.Button(p_mini, text="+ Yeni", bg=PALETTE["card_border"], fg=PALETTE["text_main"], relief=tk.FLAT, font=("Segoe UI", 7, "bold"), command=self.create_new_profile_modal, cursor="hand2"))
+        self.new_profile_btn.pack(side=tk.LEFT, padx=1)
+        self.del_profile_btn = apply_modern_hover(tk.Button(p_mini, text="🗑 Sil", bg=PALETTE["card_border"], fg=PALETTE["error"], relief=tk.FLAT, font=("Segoe UI", 7, "bold"), command=self.delete_selected_profile, cursor="hand2"), hover_bg=PALETTE["error"], hover_fg="#ffffff")
+        self.del_profile_btn.pack(side=tk.LEFT, padx=1)
         
-        self.use_profile_btn = apply_modern_hover(tk.Button(p_btn_row, text="Activate", bg=PALETTE["card_border"], fg=PALETTE["accent_cyan"], relief=tk.FLAT, font=("Segoe UI", 8, "bold"), command=self.activate_selected_profile, cursor="hand2"), hover_bg=PALETTE["accent_cyan"], hover_fg="#000000")
-        self.use_profile_btn.pack(side=tk.RIGHT, padx=2)
-
-        # Profile Backup importer/exporter row
-        backup_row = tk.Frame(profile_editor_frame, bg=PALETTE["card_bg"])
-        backup_row.pack(fill=tk.X, pady=(5, 0))
+        # 2x2 Management tools grid
+        tools_grid = tk.Frame(profile_editor_frame, bg=PALETTE["card_bg"])
+        tools_grid.pack(fill=tk.X, pady=(2, 6))
+        tools_grid.columnconfigure(0, weight=1)
+        tools_grid.columnconfigure(1, weight=1)
         
-        self.import_profile_btn = apply_modern_hover(tk.Button(backup_row, text="📥 Import Profile", bg=PALETTE["card_border"], fg=PALETTE["accent_cyan"], relief=tk.FLAT, font=("Segoe UI", 8), command=self.import_profile_json, cursor="hand2"))
-        self.import_profile_btn.pack(side=tk.LEFT, padx=2, expand=True, fill=tk.X)
+        self.keyring_btn = apply_modern_hover(tk.Button(tools_grid, text="🔑 API Anahtarları (Keyring)", bg=PALETTE["card_border"], fg=PALETTE["accent_cyan"], relief=tk.FLAT, font=("Segoe UI", 8, "bold"), command=self.open_keyring_editor_dialog, cursor="hand2"))
+        self.keyring_btn.grid(row=0, column=0, sticky="ew", padx=2, pady=2, ipady=3)
         
-        self.export_profile_btn = apply_modern_hover(tk.Button(backup_row, text="📤 Export Profile", bg=PALETTE["card_border"], fg=PALETTE["accent_green"], relief=tk.FLAT, font=("Segoe UI", 8), command=self.export_profile_json, cursor="hand2"))
-        self.export_profile_btn.pack(side=tk.RIGHT, padx=2, expand=True, fill=tk.X)
-
-        # Keyring secrets manager button launcher
-        self.keyring_btn = apply_modern_hover(tk.Button(profile_editor_frame, text="🔑 Edit Saved Secrets Keys", bg=PALETTE["card_border"], fg=PALETTE["accent_cyan"], relief=tk.FLAT, font=("Segoe UI", 8, "bold"), command=self.open_keyring_editor_dialog, cursor="hand2"))
-        self.keyring_btn.pack(fill=tk.X, pady=(5, 0))
-
-        # Keyring secrets backup modal launcher
-        self.keyring_backup_btn = apply_modern_hover(tk.Button(profile_editor_frame, text="🛡 Keyring Credentials Backup/Restore", bg=PALETTE["card_border"], fg=PALETTE["accent_green"], relief=tk.FLAT, font=("Segoe UI", 8, "bold"), command=self.open_keyring_backup_dialog, cursor="hand2"))
-        self.keyring_backup_btn.pack(fill=tk.X, pady=(5, 0))
-
-        # Scan filter presets row
-        preset_row = tk.Frame(profile_editor_frame, bg=PALETTE["card_bg"])
-        preset_row.pack(fill=tk.X, pady=(5, 0))
-        tk.Label(preset_row, text="Presets:", font=("Segoe UI", 8, "bold"), fg=PALETTE["text_muted"], bg=PALETTE["card_bg"]).pack(side=tk.LEFT)
-        self.preset_combo = ttk.Combobox(preset_row, values=list(WorkspacePresetManager.PRESETS.keys()), state="readonly", width=25)
-        self.preset_combo.pack(side=tk.RIGHT, padx=5)
+        self.keyring_backup_btn = apply_modern_hover(tk.Button(tools_grid, text="🛡 Kimlik Yedeği", bg=PALETTE["card_border"], fg=PALETTE["accent_green"], relief=tk.FLAT, font=("Segoe UI", 8, "bold"), command=self.open_keyring_backup_dialog, cursor="hand2"))
+        self.keyring_backup_btn.grid(row=0, column=1, sticky="ew", padx=2, pady=2, ipady=3)
+        
+        self.global_config_btn = apply_modern_hover(tk.Button(tools_grid, text="⚙ Performans & Limitler", bg=PALETTE["card_border"], fg=PALETTE["accent_purple"], relief=tk.FLAT, font=("Segoe UI", 8, "bold"), command=self.open_global_config_editor, cursor="hand2"))
+        self.global_config_btn.grid(row=1, column=0, sticky="ew", padx=2, pady=2, ipady=3)
+        
+        self.ignore_folders_btn = apply_modern_hover(tk.Button(tools_grid, text="📁 Yoksayılan Klasörler", bg=PALETTE["card_border"], fg=PALETTE["text_muted"], relief=tk.FLAT, font=("Segoe UI", 8, "bold"), command=self.open_ignored_folders_dialog, cursor="hand2"))
+        self.ignore_folders_btn.grid(row=1, column=1, sticky="ew", padx=2, pady=2, ipady=3)
+        
+        # Import/Export + Presets row
+        io_row = tk.Frame(profile_editor_frame, bg=PALETTE["card_bg"])
+        io_row.pack(fill=tk.X, pady=(2, 0))
+        
+        self.import_profile_btn = apply_modern_hover(tk.Button(io_row, text="📥 İçe Aktar", bg=PALETTE["card_border"], fg=PALETTE["text_muted"], relief=tk.FLAT, font=("Segoe UI", 8), command=self.import_profile_json, cursor="hand2"))
+        self.import_profile_btn.pack(side=tk.LEFT, padx=2)
+        
+        self.export_profile_btn = apply_modern_hover(tk.Button(io_row, text="📤 Dışa Aktar", bg=PALETTE["card_border"], fg=PALETTE["text_muted"], relief=tk.FLAT, font=("Segoe UI", 8), command=self.export_profile_json, cursor="hand2"))
+        self.export_profile_btn.pack(side=tk.LEFT, padx=2)
+        
+        tk.Label(io_row, text="Önayar:", font=("Segoe UI", 8, "bold"), fg=PALETTE["text_muted"], bg=PALETTE["card_bg"]).pack(side=tk.LEFT, padx=(8, 2))
+        self.preset_combo = ttk.Combobox(io_row, values=list(WorkspacePresetManager.PRESETS.keys()), state="readonly", width=16)
+        self.preset_combo.pack(side=tk.RIGHT, fill=tk.X, expand=True, padx=2)
         self.preset_combo.bind("<<ComboboxSelected>>", self.apply_scan_preset)
 
-        # Global configs settings panel modal launcher button
-        self.global_config_btn = apply_modern_hover(tk.Button(profile_editor_frame, text="⚙ Configure Thread Pool & Token Limits", bg=PALETTE["card_border"], fg=PALETTE["accent_purple"], relief=tk.FLAT, font=("Segoe UI", 8, "bold"), command=self.open_global_config_editor, cursor="hand2"))
-        self.global_config_btn.pack(fill=tk.X, pady=(5, 0))
-
-        # Ignored Folders Configuration manager modal launcher
-        self.ignore_folders_btn = apply_modern_hover(tk.Button(profile_editor_frame, text="📁 Configure Ignored Folders", bg=PALETTE["card_border"], fg=PALETTE["accent_purple"], relief=tk.FLAT, font=("Segoe UI", 8, "bold"), command=self.open_ignored_folders_dialog, cursor="hand2"))
-        self.ignore_folders_btn.pack(fill=tk.X, pady=(5, 0))
-
-        # Star speed controls
-        stars_frame = tk.Frame(pad_r, bg=PALETTE["card_bg"])
-        stars_frame.pack(fill=tk.X, pady=(10, 0))
-        tk.Label(stars_frame, text="STARFIELD VELOCITY:", font=("Segoe UI", 9, "bold"), fg=PALETTE["text_muted"], bg=PALETTE["card_bg"]).pack(anchor=tk.W, pady=2)
+        # 3. Custom prompt directives & particle speed card
+        prompt_card = GlassCard(pad_r)
+        prompt_card.pack(fill=tk.BOTH, expand=True, pady=(0, 2))
+        prompt_card.config(padx=10, pady=6)
         
-        self.star_scale = tk.Scale(stars_frame, from_=0.1, to=4.0, resolution=0.1, orient=tk.HORIZONTAL, bg=PALETTE["card_bg"], fg=PALETTE["text_main"], troughcolor=PALETTE["bg_start"], highlightthickness=0, command=self.update_star_velocity)
+        pr_head = tk.Frame(prompt_card, bg=PALETTE["card_bg"])
+        pr_head.pack(fill=tk.X, pady=(0, 3))
+        tk.Label(pr_head, text="📝 ÖZEL SİSTEM VE PROMPT YÖNERGELERİ:", font=("Segoe UI", 8, "bold"), fg=PALETTE["accent_cyan"], bg=PALETTE["card_bg"]).pack(side=tk.LEFT)
+        
+        self.extra_prompt_text = tk.Text(prompt_card, bg=PALETTE["bg_start"], fg=PALETTE["text_main"], insertbackground="#ffffff", relief=tk.FLAT, font=("Segoe UI", 9), height=4, bd=0)
+        self.extra_prompt_text.pack(fill=tk.BOTH, expand=True, pady=(0, 4))
+        
+        # Bottom FX bar in prompt card
+        bottom_fx = tk.Frame(prompt_card, bg=PALETTE["card_bg"])
+        bottom_fx.pack(fill=tk.X)
+        tk.Label(bottom_fx, text="🌌 Efekt Hızı:", font=("Segoe UI", 8, "bold"), fg=PALETTE["text_muted"], bg=PALETTE["card_bg"]).pack(side=tk.LEFT, padx=(0, 6))
+        self.star_scale = tk.Scale(bottom_fx, from_=0.1, to=4.0, resolution=0.1, orient=tk.HORIZONTAL, bg=PALETTE["card_bg"], fg=PALETTE["text_main"], troughcolor=PALETTE["bg_start"], highlightthickness=0, command=self.update_star_velocity, showvalue=False)
         self.star_scale.set(1.0)
-        self.star_scale.pack(fill=tk.X)
-        
-        tk.Label(pad_r, text="CUSTOM INSTRUCTIONS / EXTRA PROMPT BUILD DETAILS:", font=("Segoe UI", 9, "bold"), fg=PALETTE["text_muted"], bg=PALETTE["card_bg"]).pack(anchor=tk.W, pady=(10, 3))
-        self.extra_prompt_text = tk.Text(pad_r, bg=PALETTE["bg_start"], fg=PALETTE["text_main"], insertbackground="#ffffff", relief=tk.FLAT, font=("Segoe UI", 9), height=5, bd=0)
-        self.extra_prompt_text.pack(fill=tk.BOTH, expand=True)
+        self.star_scale.pack(side=tk.LEFT, fill=tk.X, expand=True)
 
     def open_keyring_backup_dialog(self):
         dialog = tk.Toplevel(self.root)
@@ -5050,12 +5205,12 @@ def main():
     parser.add_argument("--info", "--quickstart", action="store_true", help="Show quickstart guide and simplest installation/usage steps")
     parser.add_argument("--gui", "-g", action="store_true", help="Launch the GUI Dashboard")
     parser.add_argument("--doctor", action="store_true", help="Check Python, dependencies, tkinter, git and keyring (installs missing packages)")
-    parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect V3.0.6")
+    parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect V3.0.7")
 
     def print_quickstart_guide():
         print("""
 ================================================================================
-⚡ SİBER AKADEMİ — T-ZERO CONTEXT ARCHITECT & MCP v3.0.6
+⚡ SİBER AKADEMİ — T-ZERO CONTEXT ARCHITECT & MCP v3.0.7
 ================================================================================
 🎯 %95'e Varan Token Tasarrufu & Otonom Yapay Zeka Mimari Bağlam Motoru
 

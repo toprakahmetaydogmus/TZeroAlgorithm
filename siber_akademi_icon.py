@@ -1,0 +1,77 @@
+# -*- coding: utf-8 -*-
+"""Embedded Siber Akademi Brand Icon and Logo Assets for 100% Reliable Rendering."""
+
+import os
+import sys
+import io
+import tempfile
+import base64
+from typing import Optional, Tuple
+
+SIBER_AKADEMI_ICO_BASE64 = "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"
+
+_CACHED_ICO_PATH: Optional[str] = None
+_CACHED_PHOTO_IMAGES = {}
+
+def get_icon_file_path() -> str:
+    """Returns a guaranteed valid file path to siber_akademi.ico."""
+    global _CACHED_ICO_PATH
+    if _CACHED_ICO_PATH and os.path.exists(_CACHED_ICO_PATH):
+        return _CACHED_ICO_PATH
+
+    candidates = [
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), 'siber_akademi.ico'),
+        os.path.join(getattr(sys, '_MEIPASS', ''), 'siber_akademi.ico'),
+        os.path.abspath('siber_akademi.ico'),
+    ]
+    for c in candidates:
+        if c and os.path.isfile(c) and os.path.getsize(c) > 0:
+            _CACHED_ICO_PATH = c
+            return c
+
+    try:
+        tmp_dir = tempfile.gettempdir()
+        target = os.path.join(tmp_dir, 'siber_akademi_tzero.ico')
+        data = base64.b64decode(SIBER_AKADEMI_ICO_BASE64)
+        with open(target, 'wb') as fp:
+            fp.write(data)
+        _CACHED_ICO_PATH = target
+        return target
+    except Exception:
+        return candidates[0]
+
+def get_logo_photo_image(size: Tuple[int, int] = (36, 36)):
+    """Returns an ImageTk.PhotoImage of the official Siber Akademi logo at the requested size."""
+    if size in _CACHED_PHOTO_IMAGES:
+        return _CACHED_PHOTO_IMAGES[size]
+    try:
+        from PIL import Image, ImageTk
+        ico_path = get_icon_file_path()
+        if os.path.exists(ico_path):
+            with Image.open(ico_path) as im:
+                img = im.copy()
+        else:
+            raw = base64.b64decode(SIBER_AKADEMI_ICO_BASE64)
+            with Image.open(io.BytesIO(raw)) as im:
+                img = im.copy()
+        img = img.resize(size, Image.Resampling.LANCZOS)
+        photo = ImageTk.PhotoImage(img)
+        _CACHED_PHOTO_IMAGES[size] = photo
+        return photo
+    except Exception:
+        return None
+
+def apply_window_icon(root) -> None:
+    """Applies Siber Akademi icon to Tk or Toplevel window for taskbar and titlebar."""
+    ico_path = get_icon_file_path()
+    try:
+        if os.path.isfile(ico_path):
+            root.iconbitmap(ico_path)
+    except Exception:
+        pass
+    try:
+        photo = get_logo_photo_image((32, 32))
+        if photo:
+            root.iconphoto(True, photo)
+    except Exception:
+        pass
