@@ -20,6 +20,7 @@ from tzero_v3 import (
     ContextExportManager,
     calculate_token_cost,
     count_tokens_precise,
+    launch_gui,
     main,
 )
 

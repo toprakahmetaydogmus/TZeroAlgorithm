@@ -97,6 +97,7 @@ def ensure_dependencies(include_mcp: bool = False) -> bool:
     if getattr(sys, "frozen", False):  # PyInstaller build: dependencies are bundled
         return True
 
+    ensure_scripts_in_path(quiet=True)
     deps = list(REQUIRED) + ([MCP_DEPENDENCY] if include_mcp else [])
     problems = [d for d in deps if check_dependency(d)[0] != "ok"]
     if not problems:
@@ -130,12 +131,82 @@ def ensure_dependencies(include_mcp: bool = False) -> bool:
             _err(f"  Install manually:\n  {manual}")
         return False
 
+    ensure_scripts_in_path(quiet=True)
     still_bad = [d.spec for d in problems if check_dependency(d)[0] != "ok"]
     if still_bad:
         _err("[T-Zero] Still unavailable after install: " + ", ".join(still_bad))
         return False
     _err("[T-Zero] Dependencies ready.")
     return True
+
+
+def ensure_scripts_in_path(quiet: bool = True) -> bool:
+    """Ensures Python's Scripts/bin directory is in the user's PATH environment variable.
+    
+    Automatically fixes Windows and Unix PATH when installing via pip so commands
+    like `tzero`, `tzero-gui`, `tzero-mcp`, `tzero-add-mcp` work everywhere immediately.
+    """
+    import site
+    candidates = []
+
+    if os.name == "nt":
+        sys_scripts = os.path.join(sys.prefix, "Scripts")
+        user_scripts = os.path.join(site.USER_BASE, "Scripts")
+    else:
+        sys_scripts = os.path.join(sys.prefix, "bin")
+        user_scripts = os.path.join(site.USER_BASE, "bin")
+
+    for p in [sys_scripts, user_scripts]:
+        if p and os.path.isdir(p) and p not in candidates:
+            candidates.append(p)
+
+    current_path_dirs = [os.path.normcase(os.path.abspath(x)) for x in os.environ.get("PATH", "").split(os.pathsep) if x]
+
+    added_any = False
+    for candidate in candidates:
+        norm_cand = os.path.normcase(os.path.abspath(candidate))
+        if norm_cand not in current_path_dirs:
+            # Update current process
+            os.environ["PATH"] = candidate + os.pathsep + os.environ.get("PATH", "")
+            current_path_dirs.insert(0, norm_cand)
+            added_any = True
+
+            # Permanently update user PATH
+            if os.name == "nt":
+                try:
+                    import winreg
+                    with winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Environment", 0, winreg.KEY_READ | winreg.KEY_WRITE) as key:
+                        try:
+                            user_path, _ = winreg.QueryValueEx(key, "Path")
+                        except FileNotFoundError:
+                            user_path = ""
+                        parts = [x.strip() for x in user_path.split(";") if x.strip()]
+                        if candidate not in parts:
+                            parts.append(candidate)
+                            new_path = ";".join(parts)
+                            winreg.SetValueEx(key, "Path", 0, winreg.REG_EXPAND_SZ, new_path)
+                            if not quiet:
+                                sys.stderr.write(f"[T-Zero] Added {candidate} to User PATH in Windows Registry.\n")
+                except Exception:
+                    pass
+            else:
+                try:
+                    home = os.path.expanduser("~")
+                    for rc_name in [".bashrc", ".zshrc"]:
+                        rc_path = os.path.join(home, rc_name)
+                        if os.path.exists(rc_path):
+                            with open(rc_path, "r", encoding="utf-8", errors="ignore") as f:
+                                rc_content = f.read()
+                            export_line = f'export PATH="{candidate}:$PATH"'
+                            if candidate not in rc_content:
+                                with open(rc_path, "a", encoding="utf-8") as f:
+                                    f.write(f"\n# Added by T-Zero Context Architect\n{export_line}\n")
+                                if not quiet:
+                                    sys.stderr.write(f"[T-Zero] Added {candidate} to {rc_name}\n")
+                except Exception:
+                    pass
+
+    return added_any
 
 
 def _line(level: str, text: str) -> str:
@@ -196,6 +267,9 @@ def run_doctor() -> int:
             print(_line("OK", f"keyring backend: {name}"))
     except Exception as exc:
         print(_line("WARN", f"keyring could not be checked: {exc}"))
+
+    ensure_scripts_in_path(quiet=True)
+    print(_line("OK", "Python Scripts PATH verified (tzero, tzero-gui, tzero-mcp accessible)"))
 
     print()
     if failures:

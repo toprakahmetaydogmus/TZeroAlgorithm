@@ -15,7 +15,7 @@ class TestCLI(unittest.TestCase):
             text=True
         )
         self.assertEqual(res.returncode, 0)
-        self.assertIn("3.0.4", res.stdout)
+        self.assertIn("3.0.5", res.stdout)
 
     def test_mcp_version_flag(self):
         res = subprocess.run(
@@ -24,7 +24,7 @@ class TestCLI(unittest.TestCase):
             text=True
         )
         self.assertEqual(res.returncode, 0)
-        self.assertIn("3.0.4", res.stdout)
+        self.assertIn("3.0.5", res.stdout)
 
     def test_addmcp_version_flag(self):
         res = subprocess.run(
@@ -33,7 +33,7 @@ class TestCLI(unittest.TestCase):
             text=True
         )
         self.assertEqual(res.returncode, 0)
-        self.assertIn("3.0.4", res.stdout)
+        self.assertIn("3.0.5", res.stdout)
 
     def test_scan_flag(self):
         res = subprocess.run(
@@ -61,7 +61,19 @@ class TestCLI(unittest.TestCase):
             text=True
         )
         self.assertEqual(res.returncode, 0)
-        self.assertIn("3.0.4", res.stdout)
+        self.assertIn("3.0.5", res.stdout)
+
+    def test_quickstart_info(self):
+        res = subprocess.run(
+            [sys.executable, "tzero_v3.py", "--info"],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace"
+        )
+        self.assertEqual(res.returncode, 0)
+        self.assertIn("QUICKSTART", res.stdout)
+        self.assertIn("tzero-add-mcp", res.stdout)
 
 
 if __name__ == "__main__":

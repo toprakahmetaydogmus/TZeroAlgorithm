@@ -29,6 +29,18 @@ import random
 import logging
 import shutil
 
+# Safe UTF-8 reconfiguration for Windows console & piped subprocesses
+if sys.stdout and hasattr(sys.stdout, "reconfigure"):
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+if sys.stderr and hasattr(sys.stderr, "reconfigure"):
+    try:
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 # Install missing third-party packages before they are imported (see tzero_deps.py).
 try:
     import tzero_deps
@@ -4919,12 +4931,12 @@ def main():
     parser.add_argument("--info", "--quickstart", action="store_true", help="Show quickstart guide and simplest installation/usage steps")
     parser.add_argument("--gui", "-g", action="store_true", help="Launch the GUI Dashboard")
     parser.add_argument("--doctor", action="store_true", help="Check Python, dependencies, tkinter, git and keyring (installs missing packages)")
-    parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect V3.0.4")
+    parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect V3.0.5")
 
     def print_quickstart_guide():
         print("""
 ================================================================================
-⚡ SİBER AKADEMİ — T-ZERO CONTEXT ARCHITECT & MCP v3.0.4
+⚡ SİBER AKADEMİ — T-ZERO CONTEXT ARCHITECT & MCP v3.0.5
 ================================================================================
 🎯 %95'e Varan Token Tasarrufu & Otonom Yapay Zeka Mimari Bağlam Motoru
 
@@ -4938,7 +4950,9 @@ def main():
 2️⃣  Terminal Sihirbazını Başlat:
     $ tzero --cli
 
-3️⃣  Masaüstü Grafik Panelini Aç:
+3️⃣  Masaüstü Grafik Panelini Aç (GUI):
+    $ tzero-gui
+    veya:
     $ tzero --gui
 
 4️⃣  Kod Tabanını Tara & Token Tasarrufunu Gör:

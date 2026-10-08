@@ -27,7 +27,19 @@ import inspect
 import logging
 from typing import Dict, List, Optional, Any
 
-SERVER_VERSION = "3.0.4"
+SERVER_VERSION = "3.0.5"
+
+# Safe UTF-8 reconfiguration for Windows console & piped subprocesses
+if sys.stdout and hasattr(sys.stdout, "reconfigure"):
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+if sys.stderr and hasattr(sys.stderr, "reconfigure"):
+    try:
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
 
 # Ensure project root is in sys.path
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -750,7 +762,7 @@ def print_welcome_guide():
     $ tzero --cli
 
 3️⃣  Görsel Masaüstü Paneli (GUI):
-    $ tzero --gui   (veya doğrudan: tzero)
+    $ tzero-gui   (veya: tzero --gui / tzero)
 
 4️⃣  Kod Tabanını Tarayın & Token Tasarrufunu Görün:
     $ tzero --scan .
