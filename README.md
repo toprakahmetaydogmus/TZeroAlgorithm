@@ -6,11 +6,11 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Release-v3.0.4-00ffd8?style=for-the-badge&logo=rocket" alt="Release v3.0.4" />
+  <a href="https://pypi.org/project/tzero-mcp/"><img src="https://img.shields.io/pypi/v/tzero-mcp?color=00ffd8&style=for-the-badge&logo=pypi" alt="PyPI Version" /></a>
   <img src="https://img.shields.io/badge/MCP-13%20Tools%20Ready-ff69b4?style=for-the-badge&logo=anthropic" alt="MCP Server 13 Tools Ready" />
   <img src="https://img.shields.io/badge/Security-100%25%20Zero--Leak%20Keyring-50fa7b?style=for-the-badge&logo=shield" alt="Zero Leak Security" />
   <img src="https://img.shields.io/badge/Python-3.9%20|%203.10%20|%203.11%20|%203.12%20|%203.13%20|%203.14-bd93f9?style=for-the-badge&logo=python" alt="Python Versions" />
-  <img src="https://img.shields.io/badge/Tests-79%20Passing-00f0ff?style=for-the-badge&logo=githubactions" alt="Tests 79 Passing" />
+  <img src="https://img.shields.io/badge/Tests-83%20Passing-00f0ff?style=for-the-badge&logo=githubactions" alt="Tests 83 Passing" />
   <img src="https://img.shields.io/badge/License-MIT-f1fa8c?style=for-the-badge" alt="MIT License" />
   <img src="https://img.shields.io/badge/Platform-Windows%20|%20macOS%20|%20Linux-ff79c6?style=for-the-badge" alt="Platform" />
 </p>
@@ -111,7 +111,43 @@ Reproduce it with: `python -c "from pathlib import Path; from tzero_v3 import To
 
 T-Zero runs as a local stdio server with full support for Cursor, Claude Desktop, Antigravity IDE, VS Code, Windsurf, Cline, and Roo Code.
 
-#### ⚡ Option 1: 1-Click Zero-Dependency Windows Installer (Recommended)
+#### 🚀 Option 1: 1-Minute Quickstart with pip (Official PyPI — Cross-Platform)
+
+The fastest and standard way to install and run T-Zero on Windows, macOS, or Linux:
+
+```bash
+pip install tzero-mcp
+```
+
+Once installed, use any of the available interfaces:
+
+1. **Auto-Configure All Detected IDEs (Cursor, Claude, Antigravity, VS Code, Cline):**
+   ```bash
+   tzero-add-mcp
+   ```
+2. **Interactive Terminal Wizard (CLI):**
+   ```bash
+   tzero --cli
+   ```
+3. **Desktop Cyberpunk GUI Dashboard:**
+   ```bash
+   tzero
+   ```
+4. **Manual MCP Client Configuration:**
+   Simply add this stdio block to your client config (`mcp_config.json`, `claude_desktop_config.json`, or Cursor settings):
+   ```json
+   {
+     "mcpServers": {
+       "tzero": {
+         "command": "tzero-mcp"
+       }
+     }
+   }
+   ```
+
+---
+
+#### ⚡ Option 2: 1-Click Zero-Dependency Windows Installer (Standalone Binary)
 
 Download **`AddMCP.exe`** directly from [Latest Release (v3.0.4)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases):
 - **GUI Mode:** Double-click `AddMCP.exe`. It automatically detects all installed IDEs on your computer and configures them with a single click.
@@ -598,7 +634,43 @@ Tekrar üretmek için: `python -c "from pathlib import Path; from tzero_v3 impor
 
 T-Zero, Cursor, Claude Desktop, Antigravity IDE, VS Code, Windsurf, Cline ve Roo Code için tam destekli yerel bir stdio MCP sunucusu sunar.
 
-#### ⚡ 1. Seçenek: Tek Tıkla Sıfır Gereksinimli Windows Kurulumu (Önerilen)
+#### 🚀 1. Seçenek: pip ile 1 Dakikada En Basit Kurulum (Resmi PyPI Paketi — Çapraz Platform)
+
+Windows, macOS veya Linux üzerinde T-Zero'yu kurmanın ve çalıştırmanın en kolay ve resmi yolu:
+
+```bash
+pip install tzero-mcp
+```
+
+Kurulum tamamlandıktan sonra dilediğiniz gibi kullanabilirsiniz:
+
+1. **Tüm IDE'lerinize (Cursor, Claude, Antigravity, VS Code, Cline) Tek Tıkla Bağlayın:**
+   ```bash
+   tzero-add-mcp
+   ```
+2. **Terminal Sihirbazını (CLI) Çalıştırın:**
+   ```bash
+   tzero --cli
+   ```
+3. **Masaüstü Görsel Panelini Açın (GUI):**
+   ```bash
+   tzero
+   ```
+4. **Manuel MCP Yapılandırması Yapmak İsterseniz:**
+   IDE ayar dosyanıza (`mcp_config.json`, `claude_desktop_config.json` veya Cursor ayarları):
+   ```json
+   {
+     "mcpServers": {
+       "tzero": {
+         "command": "tzero-mcp"
+       }
+     }
+   }
+   ```
+
+---
+
+#### ⚡ 2. Seçenek: Tek Tıkla Sıfır Gereksinimli Windows Kurulumu (Bağımsız Binary)
 
 [Son Sürüm (v3.0.4)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases) sayfasından doğrudan **`AddMCP.exe`** dosyasını indirin:
 - **Grafik Arayüz (GUI):** `AddMCP.exe` dosyasına çift tıklayın. Bilgisayarınızda yüklü tüm IDE'leri otomatik tespit eder ve tek tıkla entegrasyonu tamamlar.

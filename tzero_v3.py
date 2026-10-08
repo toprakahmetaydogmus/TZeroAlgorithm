@@ -4698,7 +4698,10 @@ Custom Requirements:
                 time.sleep(2)
                 cpu = random.uniform(5.0, 30.0)
                 mem = random.uniform(20.0, 45.0)
-                self.root.after(0, lambda c=cpu, m=mem: self.perf_chart.update_values(c, m))
+                try:
+                    self.root.after(0, lambda c=cpu, m=mem: self.perf_chart.update_values(c, m))
+                except Exception:
+                    break
         threading.Thread(target=telemetry, daemon=True).start()
 
 
@@ -4913,16 +4916,61 @@ def main():
     parser.add_argument("--web", nargs="?", const=7300, type=int, default=None, metavar="PORT", help="Launch local Cyberpunk web dashboard on localhost:7300")
     parser.add_argument("--mcp", action="store_true", help="Start Model Context Protocol (MCP) stdio server for Cursor/Claude/Antigravity")
     parser.add_argument("--add-mcp", action="store_true", help="Install T-Zero MCP server into Cursor, Claude Desktop, Antigravity, VS Code, etc.")
+    parser.add_argument("--info", "--quickstart", action="store_true", help="Show quickstart guide and simplest installation/usage steps")
     parser.add_argument("--gui", "-g", action="store_true", help="Launch the GUI Dashboard")
     parser.add_argument("--doctor", action="store_true", help="Check Python, dependencies, tkinter, git and keyring (installs missing packages)")
     parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect V3.0.4")
 
+    def print_quickstart_guide():
+        print("""
+================================================================================
+⚡ SİBER AKADEMİ — T-ZERO CONTEXT ARCHITECT & MCP v3.0.4
+================================================================================
+🎯 %95'e Varan Token Tasarrufu & Otonom Yapay Zeka Mimari Bağlam Motoru
+
+🚀 EN BASİT KULLANIM ADIMLARI (QUICKSTART):
+
+1️⃣  Tüm IDE'lere Otomatik Bağla (Cursor, Claude, Antigravity, VS Code, Cline):
+    $ tzero-add-mcp
+    veya:
+    $ tzero --add-mcp
+
+2️⃣  Terminal Sihirbazını Başlat:
+    $ tzero --cli
+
+3️⃣  Masaüstü Grafik Panelini Aç:
+    $ tzero --gui
+
+4️⃣  Kod Tabanını Tara & Token Tasarrufunu Gör:
+    $ tzero --scan .
+    $ tzero --audit .
+
+5️⃣  Özel Sembol İçin Etki Yarıçapı (Blast Radius) Analizi:
+    $ tzero --impact <FonksiyonVeyaSinifAdi>
+
+6️⃣  Yapay Zeka Kurallarını Üret (.cursorrules, .clinerules, Copilot):
+    $ tzero --export-agent-rules
+
+7️⃣  Yerel Web Paneli (Port 7300):
+    $ tzero --web
+================================================================================
+""")
+
     if len(sys.argv) == 1:
-        launch_gui()
+        if TK_AVAILABLE and (os.name == "nt" or os.environ.get("DISPLAY") or os.environ.get("WAYLAND_DISPLAY")):
+            try:
+                launch_gui()
+                return
+            except Exception:
+                pass
+        print_quickstart_guide()
         return
 
     args = parser.parse_args()
-    if args.doctor:
+    if getattr(args, "info", False):
+        print_quickstart_guide()
+        return
+    elif args.doctor:
         if tzero_deps is None:
             print("[ERROR] tzero_deps.py is missing; reinstall T-Zero to use --doctor.")
             sys.exit(1)

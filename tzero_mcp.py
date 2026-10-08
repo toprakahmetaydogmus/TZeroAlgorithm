@@ -728,19 +728,62 @@ def create_mcp_server():
     return server
 
 
+def print_welcome_guide():
+    """Print a friendly interactive explanation when run directly by a user in terminal."""
+    print(f"""
+================================================================================
+⚡ SİBER AKADEMİ — T-ZERO MCP SERVER v{SERVER_VERSION}
+================================================================================
+🎉 T-Zero MCP ve Context Motoru başarıyla kuruldu ve hazır!
+
+📌 Bu komut (`tzero-mcp`), yapay zeka ajanları (Cursor, Claude Desktop, Antigravity,
+   VS Code, Cline vb.) tarafından arka planda (stdio üzerinden) çalıştırılmak
+   üzere tasarlanmıştır.
+
+🚀 HIZLI BAŞLANGIÇ & KURULUM SEÇENEKLERİ:
+
+1️⃣  Tüm IDE'lerinize Tek Tıkla Bağlayın (Önerilen):
+    $ tzero-add-mcp
+    (Cursor, Claude Desktop, Antigravity, VS Code, Cline'ı otomatik algılar ve bağlar)
+
+2️⃣  Terminal Sihirbazını Açın:
+    $ tzero --cli
+
+3️⃣  Görsel Masaüstü Paneli (GUI):
+    $ tzero --gui   (veya doğrudan: tzero)
+
+4️⃣  Kod Tabanını Tarayın & Token Tasarrufunu Görün:
+    $ tzero --scan .
+    $ tzero --audit .
+
+5️⃣  IDE'lere Manuel Eklemek İçin Yapılandırma:
+    {{
+      "mcpServers": {{
+        "tzero": {{
+          "command": "tzero-mcp"
+        }}
+      }}
+    }}
+
+💡 Bu komutu doğrudan stdio sunucusu olarak test etmek isterseniz:
+    $ tzero-mcp --stdio
+================================================================================
+""")
+
+
 def main():
     """Main execution entrypoint for the T-Zero MCP stdio server."""
     if "--version" in sys.argv[1:]:
         print(f"T-Zero MCP Server {SERVER_VERSION}")
         return
 
-    if "--help" in sys.argv[1:] or "-h" in sys.argv[1:]:
-        print(f"T-Zero MCP Server v{SERVER_VERSION}")
-        print("\nUsage:")
-        print("  tzero-mcp             Run MCP stdio server for AI agents (Cursor, Claude, Antigravity)")
-        print("  tzero-mcp --install   Configure and install T-Zero MCP into detected IDEs")
-        print("  tzero-mcp --doctor    Inspect system environment and auto-install requirements")
-        print("  tzero-mcp --version   Show server version")
+    if "--help" in sys.argv[1:] or "-h" in sys.argv[1:] or "--info" in sys.argv[1:]:
+        print_welcome_guide()
+        return
+
+    # If run by a human directly in terminal (not by an IDE via stdio pipe):
+    if sys.stdin.isatty() and "--stdio" not in sys.argv[1:]:
+        print_welcome_guide()
         return
 
     if "--doctor" in sys.argv[1:]:
