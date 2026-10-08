@@ -19,6 +19,20 @@ class TestGUIInstantiation(unittest.TestCase):
             app = AutoReadmeGUI(root)
             self.assertIsNotNone(app)
             self.assertIsNotNone(app.console_text)
+            self.assertEqual(app.header_search_entry.get(), "Search files...")
+            self.assertTrue(root.bind("<Control-k>"))
+
+            app.scanned_files = ["src/app.py", "README.md"]
+            app.file_sizes = {"src/app.py": 128, "README.md": 64}
+            app.file_snippets = {"src/app.py": "def app(): pass", "README.md": "# App"}
+            app.file_checked = {"src/app.py": True, "README.md": True}
+            app.header_search_entry.delete(0, "end")
+            app.header_search_entry.insert(0, "app.py")
+            app._submit_header_search()
+
+            self.assertEqual(app.active_tab_index, 1)
+            self.assertTrue(app.tree.exists("src/app.py"))
+            self.assertFalse(app.tree.exists("README.md"))
             
             # Verify cycling through all tabs
             for i in range(len(app.tab_frames)):

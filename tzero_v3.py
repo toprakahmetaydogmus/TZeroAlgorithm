@@ -136,24 +136,24 @@ DEV_URL_MAIN = DEV_URL_GITHUB
 # Theme Palettes
 THEME_PALETTES = {
     "Luxury Dashboard": {
-        "bg_start": "#edf2fb",
-        "card_bg": "#ffffff",
-        "card_border": "#dbe3f5",
-        "card_shadow": "#e2e8f0",
-        "card_hover": "#f1f5f9",
-        "sidebar_bg": "#3843a0",
-        "sidebar_fg": "#ffffff",
-        "sidebar_muted": "#a5b4fc",
-        "sidebar_hover": "#4a55ab",
-        "sidebar_active": "#2b3478",
-        "text_main": "#1e293b",
-        "text_muted": "#64748b",
-        "accent_cyan": "#4338ca",
-        "accent_green": "#0d9488",
-        "accent_purple": "#6366f1",
-        "accent_coral": "#f97316",
-        "success": "#10b981",
-        "error": "#ef4444"
+        "bg_start": "#f3f1eb",
+        "card_bg": "#fffdf8",
+        "card_border": "#e5dfd3",
+        "card_shadow": "#ded7ca",
+        "card_hover": "#f4efe5",
+        "sidebar_bg": "#18243b",
+        "sidebar_fg": "#f8f5ef",
+        "sidebar_muted": "#c8b895",
+        "sidebar_hover": "#26344d",
+        "sidebar_active": "#2d3d57",
+        "text_main": "#202633",
+        "text_muted": "#687180",
+        "accent_cyan": "#80643a",
+        "accent_green": "#237d6b",
+        "accent_purple": "#7864a6",
+        "accent_coral": "#c6784b",
+        "success": "#16836b",
+        "error": "#c2413b"
     },
     "Royal Indigo": {
         "bg_start": "#0b0e1d",
@@ -2894,25 +2894,30 @@ class AutoReadmeGUI:
         header_controls.pack(side=tk.RIGHT, fill=tk.Y, padx=10, pady=2)
 
         # Search Pill with dark circle magnifying glass
-        s_pill = tk.Frame(header_controls, bg=PALETTE["card_bg"], highlightthickness=1, highlightbackground=PALETTE["card_border"])
+        s_pill = tk.Frame(header_controls, bg=PALETTE["bg_start"], highlightthickness=1, highlightbackground=PALETTE["card_border"])
         s_pill.pack(side=tk.LEFT, padx=6)
         self.header_search_entry = tk.Entry(
             s_pill,
-            bg=PALETTE.get("bg_start", "#edf2fb"),
-            fg=PALETTE.get("text_main", "#1e293b"),
-            insertbackground=PALETTE.get("text_main", "#1e293b"),
+            bg=PALETTE["bg_start"],
+            fg=PALETTE["text_muted"],
+            insertbackground=PALETTE["text_main"],
             relief=tk.FLAT,
-            font=("Segoe UI", 8),
+            font=("Segoe UI", 9),
             width=20
         )
         self.header_search_entry.pack(side=tk.LEFT, ipady=3, padx=(8, 2))
-        self.header_search_entry.insert(0, "Search codebase...")
+        self.header_search_entry.insert(0, "Search files...")
         self.header_search_entry.bind("<FocusIn>", lambda e: self._on_header_search_focus())
+        self.header_search_entry.bind("<FocusOut>", lambda e: self._on_header_search_blur())
+        self.header_search_entry.bind("<KeyRelease>", lambda e: self._on_header_search_keyrelease())
+        self.header_search_entry.bind("<Return>", lambda e: self._submit_header_search())
+        self.root.bind("<Control-k>", lambda e: self.open_global_search())
 
-        s_btn = tk.Canvas(s_pill, width=22, height=22, bg=PALETTE["card_bg"], highlightthickness=0)
+        s_btn = tk.Canvas(s_pill, width=26, height=26, bg=PALETTE["bg_start"], highlightthickness=0, cursor="hand2")
         s_btn.pack(side=tk.LEFT, padx=(0, 4))
-        s_btn.create_oval(1, 1, 21, 21, fill=PALETTE["sidebar_bg"], outline="")
-        s_btn.create_text(11, 11, text="🔍", fill="#ffffff", font=("Segoe UI Emoji", 8))
+        s_btn.create_oval(2, 2, 24, 24, fill=PALETTE["sidebar_bg"], outline="")
+        s_btn.create_text(13, 13, text="⌕", fill=PALETTE["sidebar_fg"], font=("Segoe UI Symbol", 15, "bold"))
+        s_btn.bind("<Button-1>", lambda e: self._submit_header_search())
 
         is_lux = CURRENT_THEME == "Luxury Dashboard"
         theme_toggle_txt = "🌙 DARK MODE" if is_lux else "☀️ LUXURY MODE"
@@ -3224,9 +3229,41 @@ class AutoReadmeGUI:
 
     def _on_header_search_focus(self):
         if hasattr(self, "header_search_entry"):
-            txt = self.header_search_entry.get().strip()
-            if "Search codebase" in txt:
+            txt = self.header_search_entry.get()
+            if txt == "Search files...":
                 self.header_search_entry.delete(0, tk.END)
+                self.header_search_entry.config(fg=PALETTE["text_main"])
+
+    def _on_header_search_blur(self):
+        if hasattr(self, "header_search_entry") and not self.header_search_entry.get().strip():
+            self.header_search_entry.insert(0, "Search files...")
+            self.header_search_entry.config(fg=PALETTE["text_muted"])
+
+    def _on_header_search_keyrelease(self):
+        if self.active_tab_index == 1 and self.scanned_files:
+            self.search_entry.delete(0, tk.END)
+            self.search_entry.insert(0, self.header_search_entry.get())
+            self.filter_files_tree()
+
+    def open_global_search(self):
+        self.header_search_entry.focus_set()
+        self.header_search_entry.selection_range(0, tk.END)
+        self._on_header_search_focus()
+        return "break"
+
+    def _submit_header_search(self):
+        query = self.header_search_entry.get().strip()
+        if not query or query == "Search files...":
+            return "break"
+
+        self.switch_tab(1)
+        self.search_entry.delete(0, tk.END)
+        self.search_entry.insert(0, query)
+        if self.scanned_files:
+            self.filter_files_tree()
+        else:
+            self.run_scanner()
+        return "break"
 
     def toggle_quick_theme(self):
         play_sfx("click")
@@ -3475,7 +3512,7 @@ class AutoReadmeGUI:
         b_top = tk.Frame(brand, bg=PALETTE["bg_start"])
         b_top.pack(fill=tk.X, padx=10, pady=(4, 2))
         tk.Label(b_top, text="🛡️ SİBER AKADEMİ CREATOR HUB", font=("Segoe UI", 8, "bold"), fg=PALETTE["accent_cyan"], bg=PALETTE["bg_start"]).pack(side=tk.LEFT)
-        tk.Label(b_top, text="v3.0.8", font=("Segoe UI", 8, "bold"), fg=PALETTE["accent_green"], bg=PALETTE["bg_start"]).pack(side=tk.RIGHT)
+        tk.Label(b_top, text="v3.0.9", font=("Segoe UI", 8, "bold"), fg=PALETTE["accent_green"], bg=PALETTE["bg_start"]).pack(side=tk.RIGHT)
 
         b_links = tk.Frame(brand, bg=PALETTE["bg_start"])
         b_links.pack(fill=tk.X, padx=10, pady=(2, 6))
@@ -3911,6 +3948,8 @@ class AutoReadmeGUI:
         
         self.rebuild_selector_tree()
         self.scan_btn.config(state=tk.NORMAL, text=get_text("scan_btn", self.lang))
+        if self.search_entry.get().strip():
+            self.filter_files_tree()
         
         # Update live KPI chips & circular gauge from reference design
         total_tok = sum(len(v) for v in snippets.values()) // 4
@@ -5649,7 +5688,7 @@ def launch_gui():
     style = ttk.Style()
     style.theme_use("clam")
 
-    # Global TTK Styles for Ultra-Crisp Modern Cyberpunk Dark Aesthetic
+    # Global TTK styles follow the active premium theme.
     style.configure(
         "TCombobox",
         fieldbackground=PALETTE["card_bg"],
@@ -5699,15 +5738,15 @@ def launch_gui():
         "Treeview.Heading",
         background=PALETTE["bg_start"],
         foreground=PALETTE["text_muted"],
-        font=("Segoe UI", 9, "bold"),
+        font=("Segoe UI", 10, "bold"),
         relief="flat"
     )
 
     try:
         import tkinter.font as tkfont
         for fname in ("TkDefaultFont", "TkMenuFont", "TkHeadingFont"):
-            tkfont.nametofont(fname).configure(family="Segoe UI", size=9)
-        tkfont.nametofont("TkFixedFont").configure(family="Consolas", size=9)
+            tkfont.nametofont(fname).configure(family="Segoe UI", size=10)
+        tkfont.nametofont("TkFixedFont").configure(family="Consolas", size=10)
     except Exception:
         pass
 
@@ -5911,12 +5950,12 @@ def main():
     parser.add_argument("--info", "--quickstart", action="store_true", help="Show quickstart guide and simplest installation/usage steps")
     parser.add_argument("--gui", "-g", action="store_true", help="Launch the GUI Dashboard")
     parser.add_argument("--doctor", action="store_true", help="Check Python, dependencies, tkinter, git and keyring (installs missing packages)")
-    parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect V3.0.8")
+    parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect V3.0.9")
 
     def print_quickstart_guide():
         print("""
 ================================================================================
-⚡ SİBER AKADEMİ — T-ZERO CONTEXT ARCHITECT & MCP v3.0.8
+⚡ SİBER AKADEMİ — T-ZERO CONTEXT ARCHITECT & MCP v3.0.9
 ================================================================================
 🎯 %95'e Varan Token Tasarrufu & Otonom Yapay Zeka Mimari Bağlam Motoru
 
