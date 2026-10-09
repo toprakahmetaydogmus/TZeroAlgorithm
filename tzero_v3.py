@@ -525,6 +525,80 @@ def validate_directory(path: str) -> bool:
     return os.path.exists(expanded) and os.path.isdir(expanded)
 
 
+class ToastNotification(tk.Toplevel):
+    """Sleek animated glassmorphism toast notification."""
+    def __init__(self, master, title, message, n_type='info'):
+        super().__init__(master)
+        self.overrideredirect(True)
+        self.attributes('-alpha', 0.0)
+        self.attributes('-topmost', True)
+        
+        bg_color = PALETTE['card_bg']
+        accent = PALETTE['accent_cyan']
+        if n_type == 'error': accent = '#ef4444'
+        elif n_type == 'success': accent = '#10b981'
+        elif n_type == 'warning': accent = '#f59e0b'
+        
+        self.configure(bg=bg_color, highlightthickness=1, highlightbackground=accent)
+        
+        lbl_title = tk.Label(self, text=title, bg=bg_color, fg=accent, font=('Segoe UI', 10, 'bold'))
+        lbl_title.pack(anchor='w', padx=16, pady=(12, 2))
+        
+        lbl_msg = tk.Label(self, text=message, bg=bg_color, fg=PALETTE['text_fg'], font=('Segoe UI', 9), justify='left')
+        lbl_msg.pack(anchor='w', padx=16, pady=(0, 12))
+        
+        self.update_idletasks()
+        w = self.winfo_reqwidth()
+        h = self.winfo_reqheight()
+        
+        # Position top right of the master window
+        x = master.winfo_rootx() + master.winfo_width() - w - 24
+        y = master.winfo_rooty() + 24
+        
+        self.geometry(f'{w}x{h}+{x}+{y}')
+        
+        self.alpha = 0.0
+        self.fade_in()
+        self.after(4000, self.fade_out)
+        
+    def fade_in(self):
+        self.alpha += 0.1
+        if self.alpha <= 0.95:
+            self.attributes('-alpha', self.alpha)
+            self.after(16, self.fade_in)
+            
+    def fade_out(self):
+        self.alpha -= 0.1
+        if self.alpha > 0:
+            self.attributes('-alpha', self.alpha)
+            self.after(16, self.fade_out)
+        else:
+            self.destroy()
+
+def _custom_showinfo(title, msg, **kwargs):
+    from tkinter import _default_root
+    r = _default_root
+    if not r: return
+    ToastNotification(r, title, msg, 'success')
+
+def _custom_showerror(title, msg, **kwargs):
+    from tkinter import _default_root
+    r = _default_root
+    if not r: return
+    ToastNotification(r, title, msg, 'error')
+
+def _custom_showwarning(title, msg, **kwargs):
+    from tkinter import _default_root
+    r = _default_root
+    if not r: return
+    ToastNotification(r, title, msg, 'warning')
+
+# Hook into standard messagebox
+messagebox.showinfo = _custom_showinfo
+messagebox.showerror = _custom_showerror
+messagebox.showwarning = _custom_showwarning
+
+
 class ConfigManager:
     """Manages profile loading, backups, secure keyring storage and parameter settings."""
     def __init__(self, config_dir: str = DEFAULT_CONFIG_DIR):
@@ -2148,7 +2222,24 @@ class WaveSplineChart(LuxuryCard):
         tk.Label(self.inner, text=title, font=("Segoe UI", 9, "bold"), fg=PALETTE.get("text_muted", "#64748b"), bg=self.card_bg).pack(anchor=tk.W, pady=(0, 2))
         self.chart_canvas = tk.Canvas(self.inner, height=115, bg=self.card_bg, highlightthickness=0)
         self.chart_canvas.pack(fill=tk.BOTH, expand=True)
-        self.chart_canvas.bind("<Configure>", self._draw_spline)
+        self.anim_progress = 0.0
+        self.anim_task = None
+        self.chart_canvas.bind("<Configure>", self._start_anim)
+
+    def _start_anim(self, event=None):
+        self.anim_progress = 0.0
+        if self.anim_task:
+            self.after_cancel(self.anim_task)
+        self._animate()
+
+    def _animate(self):
+        self.anim_progress += 0.06
+        if self.anim_progress >= 1.0:
+            self.anim_progress = 1.0
+            self._draw_spline()
+        else:
+            self._draw_spline()
+            self.anim_task = self.after(20, self._animate)
 
     def _draw_spline(self, event=None):
         c = self.chart_canvas
@@ -2157,20 +2248,21 @@ class WaveSplineChart(LuxuryCard):
         h = max(20, c.winfo_height())
 
         # Mountain 1: Purple
-        pts1 = [4, h - 15, w * 0.18, h - 55, w * 0.38, h - 25, w * 0.58, h - 75, w * 0.78, h - 35, w - 4, h - 60]
+        a = getattr(self, "anim_progress", 1.0)
+        pts1 = [4, h - 15 * a, w * 0.18, h - 55 * a, w * 0.38, h - 25 * a, w * 0.58, h - 75 * a, w * 0.78, h - 35 * a, w - 4, h - 60 * a]
         fill1 = [4, h] + pts1 + [w - 4, h]
         c.create_polygon(fill1, fill="#ede9fe" if PALETTE.get("bg_start") == "#edf2fb" else PALETTE.get("card_hover", "#2a3055"), outline="", smooth=True)
         c.create_line(pts1, fill=PALETTE.get("accent_purple", "#6366f1"), width=2.5, smooth=True)
 
         # Mountain 2: Coral
-        pts2 = [4, h - 8, w * 0.22, h - 35, w * 0.42, h - 12, w * 0.62, h - 45, w * 0.82, h - 20, w - 4, h - 38]
+        pts2 = [4, h - 8 * a, w * 0.22, h - 35 * a, w * 0.42, h - 12 * a, w * 0.62, h - 45 * a, w * 0.82, h - 20 * a, w - 4, h - 38 * a]
         fill2 = [4, h] + pts2 + [w - 4, h]
         c.create_polygon(fill2, fill="#ffedd5" if PALETTE.get("bg_start") == "#edf2fb" else PALETTE.get("card_border", "#352840"), outline="", smooth=True)
         c.create_line(pts2, fill=PALETTE.get("accent_coral", "#f97316"), width=2.5, smooth=True)
 
-        for px, py in [(w * 0.58, h - 75), (w * 0.78, h - 35)]:
+        for px, py in [(w * 0.58, h - 75 * a), (w * 0.78, h - 35 * a)]:
             c.create_oval(px - 3, py - 3, px + 3, py + 3, fill="#ffffff", outline=PALETTE.get("accent_purple", "#6366f1"), width=2)
-        for px, py in [(w * 0.22, h - 35), (w * 0.62, h - 45)]:
+        for px, py in [(w * 0.22, h - 35 * a), (w * 0.62, h - 45 * a)]:
             c.create_oval(px - 3, py - 3, px + 3, py + 3, fill="#ffffff", outline=PALETTE.get("accent_coral", "#f97316"), width=2)
 
 
@@ -2186,7 +2278,24 @@ class WideSplineChartCard(LuxuryCard):
 
         self.c = tk.Canvas(self.inner, height=140, bg=self.card_bg, highlightthickness=0)
         self.c.pack(fill=tk.BOTH, expand=True)
-        self.c.bind("<Configure>", self._draw)
+        self.anim_progress = 0.0
+        self.anim_task = None
+        self.c.bind("<Configure>", self._start_anim)
+
+    def _start_anim(self, event=None):
+        self.anim_progress = 0.0
+        if self.anim_task:
+            self.after_cancel(self.anim_task)
+        self._animate()
+
+    def _animate(self):
+        self.anim_progress += 0.06
+        if self.anim_progress >= 1.0:
+            self.anim_progress = 1.0
+            self._draw()
+        else:
+            self._draw()
+            self.anim_task = self.after(20, self._animate)
 
         leg = tk.Frame(self.inner, bg=self.card_bg)
         leg.pack(pady=(4, 0))
@@ -2205,19 +2314,20 @@ class WideSplineChartCard(LuxuryCard):
 
         ox = 40
         rw = w - ox - 10
-        pts1 = [ox, h - 30, ox + rw * 0.2, h - 70, ox + rw * 0.45, h - 45, ox + rw * 0.7, h - 110, ox + rw, h - 55]
+        a = getattr(self, "anim_progress", 1.0)
+        pts1 = [ox, h - 30 * a, ox + rw * 0.2, h - 70 * a, ox + rw * 0.45, h - 45 * a, ox + rw * 0.7, h - 110 * a, ox + rw, h - 55 * a]
         fill1 = [ox, h] + pts1 + [ox + rw, h]
         self.c.create_polygon(fill1, fill="#f5f3ff" if PALETTE.get("bg_start") == "#edf2fb" else PALETTE.get("card_hover", "#252b48"), outline="", smooth=True)
         self.c.create_line(pts1, fill=PALETTE.get("accent_purple", "#6366f1"), width=2.5, smooth=True)
 
-        pts2 = [ox, h - 20, ox + rw * 0.25, h - 40, ox + rw * 0.5, h - 25, ox + rw * 0.75, h - 75, ox + rw, h - 35]
+        pts2 = [ox, h - 20 * a, ox + rw * 0.25, h - 40 * a, ox + rw * 0.5, h - 25 * a, ox + rw * 0.75, h - 75 * a, ox + rw, h - 35 * a]
         fill2 = [ox, h] + pts2 + [ox + rw, h]
         self.c.create_polygon(fill2, fill="#fff7ed" if PALETTE.get("bg_start") == "#edf2fb" else PALETTE.get("card_border", "#2f2238"), outline="", smooth=True)
         self.c.create_line(pts2, fill=PALETTE.get("accent_coral", "#f97316"), width=2.5, smooth=True)
 
-        for px, py in [(ox + rw * 0.2, h - 70), (ox + rw * 0.7, h - 110)]:
+        for px, py in [(ox + rw * 0.2, h - 70 * a), (ox + rw * 0.7, h - 110 * a)]:
             self.c.create_oval(px - 4, py - 4, px + 4, py + 4, fill="#ffffff", outline=PALETTE.get("accent_purple", "#6366f1"), width=2)
-        for px, py in [(ox + rw * 0.25, h - 40), (ox + rw * 0.75, h - 75)]:
+        for px, py in [(ox + rw * 0.25, h - 40 * a), (ox + rw * 0.75, h - 75 * a)]:
             self.c.create_oval(px - 4, py - 4, px + 4, py + 4, fill="#ffffff", outline=PALETTE.get("accent_coral", "#f97316"), width=2)
 
 
@@ -2228,7 +2338,24 @@ class MonthlyStackedBarCard(LuxuryCard):
         tk.Label(self.inner, text=title, font=("Segoe UI", 9, "bold"), fg=PALETTE.get("text_main", "#1e293b"), bg=self.card_bg).pack(anchor=tk.W, pady=(0, 6))
         self.c = tk.Canvas(self.inner, height=110, bg=self.card_bg, highlightthickness=0)
         self.c.pack(fill=tk.BOTH, expand=True)
-        self.c.bind("<Configure>", self._draw)
+        self.anim_progress = 0.0
+        self.anim_task = None
+        self.c.bind("<Configure>", self._start_anim)
+        
+    def _start_anim(self, event=None):
+        self.anim_progress = 0.0
+        if self.anim_task:
+            self.after_cancel(self.anim_task)
+        self._animate()
+
+    def _animate(self):
+        self.anim_progress += 0.08
+        if self.anim_progress >= 1.0:
+            self.anim_progress = 1.0
+            self._draw()
+        else:
+            self._draw()
+            self.anim_task = self.after(20, self._animate)
 
     def _draw(self, event=None):
         w = max(20, self.c.winfo_width())
@@ -2243,9 +2370,9 @@ class MonthlyStackedBarCard(LuxuryCard):
             y = start_y + i * spacing
             self.c.create_text(16, y + 5, text=m, font=("Segoe UI", 7, "bold"), fill=PALETTE.get("text_muted", "#64748b"))
             full_w = w - 45
-            w1 = int(full_w * r)
+            w1 = int(full_w * r * self.anim_progress)
             create_rounded_rect(self.c, 34, y, 34 + w1, y + bar_h, radius=4, fill=PALETTE.get("accent_purple", "#6366f1"), outline="")
-            create_rounded_rect(self.c, 34 + w1 + 3, y, 34 + full_w, y + bar_h, radius=4, fill=PALETTE.get("card_hover", "#e0e7ff"), outline="")
+            create_rounded_rect(self.c, 34 + w1 + 3, y, 34 + int(full_w * self.anim_progress), y + bar_h, radius=4, fill=PALETTE.get("card_hover", "#e0e7ff"), outline="")
 
 
 class GroupedVerticalBarCard(LuxuryCard):
@@ -2255,7 +2382,24 @@ class GroupedVerticalBarCard(LuxuryCard):
         tk.Label(self.inner, text=title, font=("Segoe UI", 9, "bold"), fg=PALETTE.get("text_main", "#1e293b"), bg=self.card_bg).pack(anchor=tk.W, pady=(0, 6))
         self.c = tk.Canvas(self.inner, height=110, bg=self.card_bg, highlightthickness=0)
         self.c.pack(fill=tk.BOTH, expand=True)
-        self.c.bind("<Configure>", self._draw)
+        self.anim_progress = 0.0
+        self.anim_task = None
+        self.c.bind("<Configure>", self._start_anim)
+        
+    def _start_anim(self, event=None):
+        self.anim_progress = 0.0
+        if self.anim_task:
+            self.after_cancel(self.anim_task)
+        self._animate()
+
+    def _animate(self):
+        self.anim_progress += 0.08
+        if self.anim_progress >= 1.0:
+            self.anim_progress = 1.0
+            self._draw()
+        else:
+            self._draw()
+            self.anim_task = self.after(20, self._animate)
 
     def _draw(self, event=None):
         w = max(20, self.c.winfo_width())
@@ -2267,8 +2411,10 @@ class GroupedVerticalBarCard(LuxuryCard):
         heights = [(40, 20), (55, 32), (30, 48), (65, 42), (75, 55), (45, 25), (35, 18)]
         for i, (d, (h1, h2)) in enumerate(zip(days, heights)):
             cx = slot_w * (i + 0.5)
-            create_rounded_rect(self.c, cx - 8, base_y - h1, cx - 1, base_y, radius=3, fill=PALETTE.get("accent_coral", "#f97316"), outline="")
-            create_rounded_rect(self.c, cx + 1, base_y - h2, cx + 8, base_y, radius=3, fill=PALETTE.get("card_border", "#fed7aa"), outline="")
+            h1_a = h1 * self.anim_progress
+            h2_a = h2 * self.anim_progress
+            create_rounded_rect(self.c, cx - 8, base_y - h1_a, cx - 1, base_y, radius=3, fill=PALETTE.get("accent_coral", "#f97316"), outline="")
+            create_rounded_rect(self.c, cx + 1, base_y - h2_a, cx + 8, base_y, radius=3, fill=PALETTE.get("card_border", "#fed7aa"), outline="")
             self.c.create_text(cx, base_y + 8, text=d, font=("Segoe UI", 7), fill=PALETTE.get("text_muted", "#94a3b8"))
 
 
