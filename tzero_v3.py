@@ -2963,6 +2963,15 @@ class AutoReadmeGUI:
         self.setup_keyboard_shortcuts()
         self.start_system_telemetry()
         
+    def safe_after(self, ms: int, func, *args):
+        """Thread-safe and lifecycle-safe wrapper around root.after."""
+        try:
+            if hasattr(self, "root") and self.root and self.root.winfo_exists():
+                return self.root.after(ms, func, *args)
+        except Exception:
+            pass
+        return None
+
     def setup_keyboard_shortcuts(self):
         self.root.bind("<Control-s>", lambda e: self.run_scanner())
         self.root.bind("<Control-g>", lambda e: self.start_generation())
@@ -3421,6 +3430,7 @@ class AutoReadmeGUI:
             self.update_lang_distribution_metrics()
             self.git_graph_canvas.draw_graph(len(self.git_checkboxes))
             self.rebuild_file_type_matrix_table()
+            self.rebuild_ast_outline_tree()
         elif idx == 6:
             self.refresh_profile_listbox()
         self.log(f"Switched view layout to index {idx}: {get_text(self.tabs[idx], self.lang)}")
@@ -4091,14 +4101,15 @@ class AutoReadmeGUI:
                 ping_url = f"{url.rstrip('/')}/models"
                 r = requests.get(ping_url, headers=headers, timeout=6)
                 if r.status_code == 200:
-                    self.root.after(0, lambda: self.status_dot.set_status("green"))
-                    self.root.after(0, lambda: messagebox.showinfo("Success", get_text("ping_success", self.lang)))
+                    self.safe_after(0, lambda: self.status_dot.set_status("green"))
+                    self.safe_after(0, lambda: messagebox.showinfo("Success", get_text("ping_success", self.lang)))
                 else:
-                    self.root.after(0, lambda: self.status_dot.set_status("red"))
-                    self.root.after(0, lambda: messagebox.showerror("Failure", f"Code: {r.status_code}\n{r.text}"))
+                    self.safe_after(0, lambda: self.status_dot.set_status("red"))
+                    self.safe_after(0, lambda: messagebox.showerror("Failure", f"Code: {r.status_code}\n{r.text}"))
             except Exception as e:
-                self.root.after(0, lambda: self.status_dot.set_status("red"))
-                self.root.after(0, lambda: messagebox.showerror("Exception", str(e)))
+                err_msg = str(e)
+                self.safe_after(0, lambda: self.status_dot.set_status("red"))
+                self.safe_after(0, lambda msg=err_msg: messagebox.showerror("Exception", msg))
         threading.Thread(target=run, daemon=True).start()
 
     def browse_dir(self):
@@ -4130,10 +4141,11 @@ class AutoReadmeGUI:
         def run_thread():
             try:
                 files, sizes, snippets = self.scanner.scan_directory(target)
-                self.root.after(0, lambda: self.on_scan_finish(files, sizes, snippets))
+                self.safe_after(0, lambda: self.on_scan_finish(files, sizes, snippets))
             except Exception as e:
-                self.root.after(0, lambda: messagebox.showerror("Error", str(e)))
-                self.root.after(0, lambda: self.scan_btn.config(state=tk.NORMAL, text=get_text("scan_btn", self.lang)))
+                err_msg = str(e)
+                self.safe_after(0, lambda msg=err_msg: messagebox.showerror("Error", msg))
+                self.safe_after(0, lambda: self.scan_btn.config(state=tk.NORMAL, text=get_text("scan_btn", self.lang)))
         threading.Thread(target=run_thread, daemon=True).start()
 
     def on_scan_finish(self, files, sizes, snippets):
@@ -4169,6 +4181,9 @@ class AutoReadmeGUI:
         executable_dir = os.path.dirname(sys.executable) if getattr(sys, "frozen", False) else None
         if not self.dir_entry.get().strip():
             self.dir_entry.insert(0, resolve_default_workspace(executable_dir=executable_dir))
+        target = self.dir_entry.get().strip()
+        if target and os.path.isdir(target) and not getattr(self, "has_scanned", False) and "unittest" not in sys.modules:
+            self.safe_after(250, self.run_scanner)
 
     def show_shortcuts_modal(self):
         dialog = tk.Toplevel(self.root)
@@ -4436,7 +4451,22 @@ class AutoReadmeGUI:
         tk.Button(pad, text="Close details", bg=PALETTE["card_border"], fg=PALETTE["text_main"], relief=tk.FLAT, command=dialog.destroy).pack()
 
     def run_duplicity_finder(self):
-        finder = WorkspaceDuplicityFinder(self.file_snippets)
+        target_dir = self.dir_entry.get().strip()
+        snippets = dict(self.file_snippets)
+        if not snippets and target_dir and os.path.isdir(target_dir):
+            for root, dirs, files in os.walk(target_dir):
+                dirs[:] = [d for d in dirs if d not in {".git", ".venv", "venv", "__pycache__", "node_modules", ".gemini", "dist", "build"}]
+                for file in files:
+                    if file.endswith((".py", ".js", ".ts", ".html", ".css", ".json", ".md")):
+                        full_p = os.path.join(root, file)
+                        rel = os.path.relpath(full_p, target_dir).replace("\\", "/")
+                        try:
+                            with open(full_p, "r", encoding="utf-8", errors="ignore") as f:
+                                snippets[rel] = f.read()
+                        except Exception:
+                            pass
+
+        finder = WorkspaceDuplicityFinder(snippets)
         duplicates = finder.find_duplicates()
         
         dialog = tk.Toplevel(self.root)
@@ -4458,15 +4488,27 @@ class AutoReadmeGUI:
         tree.heading("Snippet", text="Snippet Preview")
         tree.pack(fill=tk.BOTH, expand=True, pady=(0, 10))
         
-        for item in duplicates:
-            tree.insert("", "end", values=(item["file1"], item["line1"], item["file2"], item["line2"], item["snippet"]))
+        if not duplicates:
+            tree.insert("", "end", values=("-", "-", "-", "-", "Clean architecture! No duplicate code blocks (6+ lines) detected across workspace."))
+        else:
+            for item in duplicates:
+                tree.insert("", "end", values=(item["file1"], item["line1"], item["file2"], item["line2"], item["snippet"]))
             
         tk.Button(pad, text="Close duplicates finder", bg=PALETTE["card_border"], fg=PALETTE["text_main"], relief=tk.FLAT, command=dialog.destroy).pack()
 
     def run_static_code_audit(self):
-        selected_files = [f for f, v in self.file_checked.items() if v]
         target_dir = self.dir_entry.get().strip()
+        selected_files = [f for f, v in self.file_checked.items() if v]
         
+        # Auto-fallback: if scan hasn't run or no files checked, discover Python files in workspace
+        if not selected_files and target_dir and os.path.isdir(target_dir):
+            for root, dirs, files in os.walk(target_dir):
+                dirs[:] = [d for d in dirs if d not in {".git", ".venv", "venv", "__pycache__", "node_modules", ".gemini", "dist", "build", ".pytest_cache"}]
+                for file in files:
+                    if file.endswith(".py"):
+                        rel = os.path.relpath(os.path.join(root, file), target_dir).replace("\\", "/")
+                        selected_files.append(rel)
+
         dialog = tk.Toplevel(self.root)
         dialog.title("Static Code Smell Audit Report")
         dialog.geometry("750x500")
@@ -4489,6 +4531,7 @@ class AutoReadmeGUI:
         tree.column("Message", width=340)
         tree.pack(fill=tk.BOTH, expand=True, pady=(0, 10))
         
+        issue_count = 0
         for filepath in selected_files:
             ext = os.path.splitext(filepath.lower())[1]
             if ext != ".py":
@@ -4503,9 +4546,17 @@ class AutoReadmeGUI:
                 analyzer.analyze_source(content)
                 
                 for issue in analyzer.issues:
+                    issue_count += 1
                     tree.insert("", "end", values=(filepath, issue["line"], issue["severity"], issue["msg"]))
             except Exception as e:
+                issue_count += 1
                 tree.insert("", "end", values=(filepath, 0, "ERROR", f"Failed analysis: {e}"))
+                
+        if issue_count == 0:
+            if not selected_files:
+                tree.insert("", "end", values=("-", "-", "INFO", "No Python files found in workspace directory."))
+            else:
+                tree.insert("", "end", values=("ALL FILES", "-", "CLEAN", f"Scanned {len(selected_files)} Python files: 0 code smells detected! 100% Clean AST Architecture."))
                 
         tk.Button(pad, text="Close Audit Report", bg=PALETTE["card_border"], fg=PALETTE["text_main"], relief=tk.FLAT, command=dialog.destroy).pack()
 
@@ -4557,6 +4608,12 @@ class AutoReadmeGUI:
                 return
                 
             selected_files = [f for f, v in self.file_checked.items() if v]
+            if not selected_files and target and os.path.isdir(target):
+                for root, dirs, files in os.walk(target):
+                    dirs[:] = [d for d in dirs if d not in {".git", ".venv", "venv", "__pycache__", "node_modules", ".gemini", "dist", "build"}]
+                    for file in files:
+                        rel = os.path.relpath(os.path.join(root, file), target).replace("\\", "/")
+                        selected_files.append(rel)
             for filepath in selected_files:
                 full_path = os.path.join(target, filepath)
                 if not os.path.exists(full_path):
@@ -5462,15 +5519,21 @@ Custom Requirements:
         ]
         
         def update_prog(val, msg):
-            self.root.after(0, lambda: self._update_prog_sync(val, msg))
+            self.safe_after(0, lambda: self._update_prog_sync(val, msg))
             
         try:
             p = PROVIDERS.get(provider_name)
             generator = ContextGenerator(self.cancel_event)
             content = generator.generate_readme(url, key, headers, model, messages, update_prog, provider=p)
-            self.root.after(0, lambda: self.on_gen_success(content))
+            self.safe_after(0, lambda: self.on_gen_success(content))
+        except InterruptedError:
+            self.safe_after(0, self.on_gen_cancelled)
         except Exception as e:
-            self.root.after(0, lambda: self.on_gen_fail(str(e)))
+            if self.cancel_event.is_set():
+                self.safe_after(0, self.on_gen_cancelled)
+            else:
+                err_msg = str(e)
+                self.safe_after(0, lambda msg=err_msg: self.on_gen_fail(msg))
 
     def _update_prog_sync(self, val, msg):
         self.gen_progress["value"] = val
@@ -5487,6 +5550,14 @@ Custom Requirements:
         self.gen_btn.config(state=tk.NORMAL, text=get_text("generate_btn", self.lang))
         self.cancel_btn.pack_forget()
         self.log("README layout generated successfully.")
+
+    def on_gen_cancelled(self):
+        self.gen_progress["value"] = 0
+        self.gen_status_lbl.config(text="Generation cancelled by user.")
+        self.gen_btn.config(state=tk.NORMAL, text=get_text("generate_btn", self.lang))
+        self.cancel_btn.pack_forget()
+        self.log("Payload generation cancelled by user.")
+        self.show_toast("Generation cancelled.", "info")
 
     def on_gen_fail(self, err):
         self.gen_progress["value"] = 0
@@ -5532,6 +5603,11 @@ Custom Requirements:
             self.show_toast("Invalid project directory!", "error")
             return
         selected = [f for f, v in self.file_checked.items() if v]
+        if not selected:
+            for root, dirs, files in os.walk(d):
+                dirs[:] = [dir_n for dir_n in dirs if dir_n not in {".git", ".venv", "venv", "__pycache__", "node_modules", ".gemini", "dist", "build"}]
+                for file_n in files:
+                    selected.append(os.path.relpath(os.path.join(root, file_n), d).replace("\\", "/"))
         p_name = os.path.basename(os.path.abspath(d)) or "Project"
         tree_ascii = "\n".join(f"├── {f}" for f in sorted(selected))
         snippets = get_budgeted_snippets(selected, self.file_snippets)
@@ -5556,6 +5632,11 @@ Custom Requirements:
             self.show_toast("Invalid project directory!", "error")
             return
         selected = [f for f, v in self.file_checked.items() if v]
+        if not selected:
+            for root, dirs, files in os.walk(d):
+                dirs[:] = [dir_n for dir_n in dirs if dir_n not in {".git", ".venv", "venv", "__pycache__", "node_modules", ".gemini", "dist", "build"}]
+                for file_n in files:
+                    selected.append(os.path.relpath(os.path.join(root, file_n), d).replace("\\", "/"))
         p_name = os.path.basename(os.path.abspath(d)) or "Project"
         
         # Build dependency mapping
@@ -5592,8 +5673,21 @@ Custom Requirements:
             self.show_toast("Invalid project directory!", "error")
             return
         selected = [f for f, v in self.file_checked.items() if v]
+        snippets = dict(self.file_snippets)
+        if not selected:
+            for root, dirs, files in os.walk(d):
+                dirs[:] = [dir_n for dir_n in dirs if dir_n not in {".git", ".venv", "venv", "__pycache__", "node_modules", ".gemini", "dist", "build"}]
+                for file_n in files:
+                    rel_p = os.path.relpath(os.path.join(root, file_n), d).replace("\\", "/")
+                    selected.append(rel_p)
+                    if not snippets:
+                        try:
+                            with open(os.path.join(root, file_n), "r", encoding="utf-8", errors="ignore") as fp:
+                                snippets[rel_p] = fp.read()
+                        except Exception:
+                            pass
         p_name = os.path.basename(os.path.abspath(d)) or "Project"
-        content = ContextExportManager.generate_repo_map(p_name, selected, self.file_snippets)
+        content = ContextExportManager.generate_repo_map(p_name, selected, snippets)
         out_path = os.path.join(d, "REPO_MAP.txt")
         try:
             with open(out_path, "w", encoding="utf-8") as f:
@@ -5851,6 +5945,18 @@ Custom Requirements:
         selected_files = [f for f, v in self.file_checked.items() if v]
         target_dir = self.dir_entry.get().strip()
         
+        if not selected_files and target_dir and os.path.isdir(target_dir):
+            for root, dirs, files in os.walk(target_dir):
+                dirs[:] = [d for d in dirs if d not in {".git", ".venv", "venv", "__pycache__", "node_modules", ".gemini", "dist", "build"}]
+                for file in files:
+                    if file.endswith(".py"):
+                        rel = os.path.relpath(os.path.join(root, file), target_dir).replace("\\", "/")
+                        selected_files.append(rel)
+
+        if not selected_files:
+            self.ast_tree.insert("", "end", text="No Python files available. Scan workspace or select directory.")
+            return
+            
         for filepath in selected_files:
             ext = os.path.splitext(filepath.lower())[1]
             if ext != ".py":

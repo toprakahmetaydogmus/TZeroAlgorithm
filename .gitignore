@@ -14,8 +14,12 @@ dist/
 # Virtual Environments
 venv/
 .venv/
+.venv*/
 env/
-.env
+.env*
+*.local
+.vercel/
+brag-output/
 
 # Secrets & Local User Configs
 *.dat
