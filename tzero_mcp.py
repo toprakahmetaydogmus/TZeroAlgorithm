@@ -42,7 +42,7 @@ except ImportError:
     def Field(default=..., description=""):
         return default
 
-SERVER_VERSION = "7.0.0"
+SERVER_VERSION = "7.0.1"
 
 # Safe UTF-8 reconfiguration for Windows console & piped subprocesses
 if sys.stdout and hasattr(sys.stdout, "reconfigure"):
@@ -251,7 +251,7 @@ def create_mcp_server():
             "- 100% Offline: Executes locally without network calls, external embeddings, or LLM billing.\n\n"
             "Usage Guidelines:\n"
             "- When to use: Ingest repository architecture and signatures into prompt context at the start of a coding session or before large refactors (80-95% token savings).\n"
-            "- Sibling Routing: For a fast single-page class/method symbol index, use 'generate_repo_map'. For full implementation of an active file with 1st-degree caller/callee skeletons, use 'get_smart_skeleton_context'. For arbitrary in-memory snippets, use 'prune_code_snippet'.\n\n"
+            "- When NOT to use: Do not use for a fast single-page class/method symbol index (use 'generate_repo_map' instead); do not use for focus file implementation with skeletons (use 'get_smart_skeleton_context' instead); do not use for arbitrary in-memory snippets (use 'prune_code_snippet' instead).\n\n"
             "Returns: Structured Markdown containing directory tree, module outlines, and AST signatures up to max_tokens."),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
     )
@@ -354,7 +354,7 @@ def create_mcp_server():
             "- 100% Offline: Local regex and AST parsing; zero external network requests.\n\n"
             "Usage Guidelines:\n"
             "- When to use: Run before refactoring, moving, or removing a module to inspect inbound dependents (who imports this) and outbound dependencies (what this imports).\n"
-            "- Sibling Routing: For deep recursive function/method call chains (caller -> callee call graph), use 'trace_symbol_call_chain'. To test whether imports violate layer boundary rules, use 'enforce_architecture_boundaries'.\n\n"
+            "- When NOT to use: Do not use for deep recursive function/method call chains (caller -> callee call graph), use 'trace_symbol_call_chain'. To test whether imports violate layer boundary rules, use 'enforce_architecture_boundaries'.\n\n"
             "Returns: Markdown report detailing inbound referrers, outbound imports, and the workspace dependency pool."),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
     )
@@ -450,7 +450,7 @@ def create_mcp_server():
             "- 100% Offline: Local JSON file lookup without remote calls.\n\n"
             "Usage Guidelines:\n"
             "- When to use: Consult before designing new features or adding imports to understand layer isolation rules (e.g. presentation cannot import database models) and avoid architecture violations.\n"
-            "- Sibling Routing: To actively validate workspace code against these rules and detect violations, use 'enforce_architecture_boundaries'. To view complete Mermaid topology blueprints, use 'generate_architecture_blueprint'.\n\n"
+            "- When NOT to use: Do not use to actively validate workspace code against these rules and detect violations, use 'enforce_architecture_boundaries'. To view complete Mermaid topology blueprints, use 'generate_architecture_blueprint'.\n\n"
             "Returns: Markdown specification of architectural layers, allowed/forbidden import directions, and security constraints."),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
     )
@@ -493,7 +493,7 @@ def create_mcp_server():
             "- Cost: 100% free and local by default (use_ai=False). If use_ai=True, uses configured environment API key (e.g. NVIDIA NIM / OpenAI) for enriched architectural narrative.\n\n"
             "Usage Guidelines:\n"
             "- When to use: Create or update system architecture documentation and visual Mermaid flow diagrams for onboarding or RFC review.\n"
-            "- Sibling Routing: For checking rule compliance against defined boundaries, use 'enforce_architecture_boundaries'. For basic dependency trees, use 'query_module_dependencies'.\n\n"
+            "- When NOT to use: Do not use for checking rule compliance against defined boundaries, use 'enforce_architecture_boundaries'. For basic dependency trees, use 'query_module_dependencies'.\n\n"
             "Returns: Comprehensive Markdown document with live Mermaid diagrams, layer classifications, and component interfaces."),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
     )
@@ -555,7 +555,7 @@ def create_mcp_server():
             "- 100% Offline: Local AST extraction; zero external API calls.\n\n"
             "Usage Guidelines:\n"
             "- When to use: Provide the LLM with an immediate high-level index of all classes and functions across the repository in minimal tokens (~5-15 tokens per file).\n"
-            "- Sibling Routing: For full function signatures with parameter types and docstrings, use 'get_project_context_tree'. For 1st-degree context around a specific focus file, use 'get_smart_skeleton_context'.\n\n"
+            "- When NOT to use: Do not use for full function signatures with parameter types and docstrings, use 'get_project_context_tree'. For 1st-degree context around a specific focus file, use 'get_smart_skeleton_context'.\n\n"
             "Returns: Compact Markdown symbol map indexed by file path."),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
     )
@@ -603,7 +603,7 @@ def create_mcp_server():
             "- 100% Offline: Fully private local analysis; zero external requests.\n\n"
             "Usage Guidelines:\n"
             "- When to use: Run as a pre-commit or pre-PR code health audit to identify complex routines (> 30 lines, > 5 args), missing docstrings, architectural boundary violations, and hardcoded secrets.\n"
-            "- Sibling Routing: If you only need to verify zero hardcoded secrets/API keys, use 'verify_zero_leak_security'. If you only want unused function detection, use 'find_dead_code'. If you only want duplicate logic blocks, use 'find_code_duplicity'.\n\n"
+            "- When NOT to use: Do not use if you only need to verify zero hardcoded secrets/API keys, use 'verify_zero_leak_security'. If you only want unused function detection, use 'find_dead_code'. If you only want duplicate logic blocks, use 'find_code_duplicity'.\n\n"
             "Returns: Comprehensive diagnostic Markdown report with severity ratings (T-001 Security, T-002 Boundaries, T-003 Contracts, T-004 Complexity), line numbers, and actionable remediation steps."),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
     )
@@ -723,7 +723,7 @@ def create_mcp_server():
             "- 100% Offline: Fully local execution without network calls.\n\n"
             "Usage Guidelines:\n"
             "- When to use: Run during refactoring sprints to locate redundant copy-pasted code blocks suitable for extraction into shared utility functions.\n"
-            "- Sibling Routing: For full codebase quality and complexity audits, use 'audit_codebase_quality'. For unused unreferenced code, use 'find_dead_code'.\n\n"
+            "- When NOT to use: Do not use for full codebase quality and complexity audits, use 'audit_codebase_quality'. For unused unreferenced code, use 'find_dead_code'.\n\n"
             "Returns: Markdown report detailing duplicate code clusters with file paths, line ranges, and side-by-side code snippets."),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
     )
@@ -789,7 +789,7 @@ def create_mcp_server():
             "- 100% Offline: Uses local pricing tables without external HTTP queries.\n\n"
             "Usage Guidelines:\n"
             "- When to use: Estimate prompt token volume and dollar costs before sending large codebase context to commercial LLM APIs.\n"
-            "- Sibling Routing: To track team monthly/annual cumulative ROI savings and compression metrics over time, use 'get_token_savings_metrics'.\n\n"
+            "- When NOT to use: Do not use to track team monthly/annual cumulative ROI savings and compression metrics over time, use 'get_token_savings_metrics'.\n\n"
             "Returns: Markdown table comparing per-million token rates and total estimated costs across major models."),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
     )
@@ -857,7 +857,7 @@ def create_mcp_server():
             "- 100% Offline: Local AST analysis without remote services.\n\n"
             "Usage Guidelines:\n"
             "- When to use: Run BEFORE renaming, refactoring, or modifying a function or class to determine which caller modules could break.\n"
-            "- Sibling Routing: For deep recursive caller/callee trees with visual Mermaid graphs, use 'trace_symbol_call_chain'. For file-level module dependencies, use 'query_module_dependencies'.\n\n"
+            "- When NOT to use: Do not use for deep recursive caller/callee trees with visual Mermaid graphs, use 'trace_symbol_call_chain'. For file-level module dependencies, use 'query_module_dependencies'.\n\n"
             "Returns: Structured Markdown report with blast radius score, risk tier, direct dependents, and transitive impact paths."),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
     )
@@ -884,7 +884,7 @@ def create_mcp_server():
             "- 100% Offline: Local AST validation without external dependencies.\n\n"
             "Usage Guidelines:\n"
             "- When to use: Run in CI/CD pipelines or before committing to verify that presentation/UI layers do not import internal database/storage modules directly.\n"
-            "- Sibling Routing: To view active boundary rules without evaluating code, use 'query_architecture_boundaries'. For general code quality smells, use 'audit_codebase_quality'.\n\n"
+            "- When NOT to use: Do not use to view active boundary rules without evaluating code, use 'query_architecture_boundaries'. For general code quality smells, use 'audit_codebase_quality'.\n\n"
             "Returns: Compliance report detailing pass/fail status, violating file paths, line numbers, layer names, and allowed import directions."),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
     )
@@ -913,7 +913,7 @@ def create_mcp_server():
             "- 100% Offline & Private: Never sends code or embeddings to external APIs; $0 cost and zero data leakage.\n\n"
             "Usage Guidelines:\n"
             "- When to use: Find functions, classes, or logic snippets using conceptual natural language queries (e.g. 'authentication jwt token verify', 'rate limit algorithm').\n"
-            "- Sibling Routing: For exact string or regex matches, use IDE grep or ripgrep. For finding unused code, use 'find_dead_code'.\n\n"
+            "- When NOT to use: Do not use for exact string or regex matches, use IDE grep or ripgrep. For finding unused code, use 'find_dead_code'.\n\n"
             "Returns: Ranked Markdown list of matching code snippets with file locations, match scores, and surrounding context."),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
     )
@@ -941,7 +941,7 @@ def create_mcp_server():
             "- 100% Offline: Generates rule files locally using built-in templates.\n\n"
             "Usage Guidelines:\n"
             "- When to use: Run when setting up a repository for AI pair-programming with Cursor, Claude Code, Cline, Windsurf, or GitHub Copilot.\n"
-            "- Sibling Routing: To view architectural boundaries without writing files to disk, use 'query_architecture_boundaries'.\n\n"
+            "- When NOT to use: Do not use to view architectural boundaries without writing files to disk, use 'query_architecture_boundaries'.\n\n"
             "Returns: Confirmation message listing all generated rule file paths."),
         annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
     )
@@ -968,7 +968,7 @@ def create_mcp_server():
             "- 100% Offline: Fully local calculation without network access.\n\n"
             "Usage Guidelines:\n"
             "- When to use: Quantify efficiency gains and financial savings from T-Zero context compression for team reports and engineering leadership.\n"
-            "- Sibling Routing: For per-model single-prompt cost comparisons (OpenAI vs Anthropic vs Gemini), use 'estimate_token_cost'.\n\n"
+            "- When NOT to use: Do not use for per-model single-prompt cost comparisons (OpenAI vs Anthropic vs Gemini), use 'estimate_token_cost'.\n\n"
             "Returns: Markdown executive summary with token reduction percentages, monthly developer cost savings, and annual ROI projections."),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
     )
@@ -1005,7 +1005,7 @@ def create_mcp_server():
             "- 100% Offline: Local git CLI and AST processing.\n\n"
             "Usage Guidelines:\n"
             "- When to use: Provide focused context during code review, PR description generation, or bug hunting for pending changes with 98%+ token reduction.\n"
-            "- Sibling Routing: For full repository context, use 'get_project_context_tree'. For single-symbol impact analysis, use 'analyze_change_impact'.\n\n"
+            "- When NOT to use: Do not use for full repository context (use 'get_project_context_tree' instead); do not use for single-symbol impact analysis (use 'analyze_change_impact' instead).\n\n"
             "Returns: Structured Markdown diff context with changed symbol signatures, diff hunks, and caller references."),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
     )
@@ -1032,7 +1032,7 @@ def create_mcp_server():
             "- 100% Offline: Polyglot AST/regex parsers for Python, TypeScript, Go, Rust, Java, C#, C++, Swift, Kotlin.\n\n"
             "Usage Guidelines:\n"
             "- When to use: Compress in-memory code blocks or clipboard buffers before passing them into LLM chat prompts.\n"
-            "- Sibling Routing: To scan and compress entire directories or repositories on disk, use 'get_project_context_tree' or 'get_smart_skeleton_context'.\n\n"
+            "- When NOT to use: Do not use to scan and compress entire directories or repositories on disk, use 'get_project_context_tree' or 'get_smart_skeleton_context'.\n\n"
             "Returns: Markdown fenced code block with pruned signatures and precise token reduction percentage."),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
     )
@@ -1079,7 +1079,7 @@ def create_mcp_server():
             "- 100% Offline & Private: Never transmits inspected text to any remote server; all secret detections are masked.\n\n"
             "Usage Guidelines:\n"
             "- When to use: Run before git commit, push, or public release to guarantee zero secret leaks.\n"
-            "- Sibling Routing: For broad code quality audits including complexity, docstrings, and layer rules, use 'audit_codebase_quality'.\n\n"
+            "- When NOT to use: Do not use for broad code quality audits including complexity, docstrings, and layer rules, use 'audit_codebase_quality'.\n\n"
             "Returns: Security pass/fail report with masked secret snippets, affected file paths, and line numbers."),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
     )
@@ -1146,7 +1146,7 @@ def create_mcp_server():
             "- 100% Offline: Uses local AST indices without remote queries.\n\n"
             "Usage Guidelines:\n"
             "- When to use: Run BEFORE applying AI-generated code to prevent hallucinated module imports, missing functions, or wrong argument counts.\n"
-            "- Sibling Routing: To enforce layer boundary separation rules, use 'enforce_architecture_boundaries'.\n\n"
+            "- When NOT to use: Do not use to enforce layer boundary separation rules, use 'enforce_architecture_boundaries'.\n\n"
             "Returns: Verification status report with specific contract mismatches and 'did you mean' fuzzy suggestions."),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
     )
@@ -1181,7 +1181,7 @@ def create_mcp_server():
             "- 100% Offline: Local AST parsing and signature reduction.\n\n"
             "Usage Guidelines:\n"
             "- When to use: Run when editing a specific file to provide the LLM with full implementation context plus compact interface skeletons of adjacent modules.\n"
-            "- Sibling Routing: For repository-wide context, use 'get_project_context_tree'. For symbol index without file contents, use 'generate_repo_map'.\n\n"
+            "- When NOT to use: Do not use for repository-wide context, use 'get_project_context_tree'. For symbol index without file contents, use 'generate_repo_map'.\n\n"
             "Returns: Structured Markdown with full focus file source code and 1st-degree AST skeletons for imported and caller modules."),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
     )
@@ -1215,7 +1215,7 @@ def create_mcp_server():
             "- 100% Offline: Fully local graph traversal without external dependencies.\n\n"
             "Usage Guidelines:\n"
             "- When to use: Run when exploring an unfamiliar codebase to immediately identify the core architectural modules versus peripheral utilities.\n"
-            "- Sibling Routing: For direct pairwise dependencies of a file, use 'query_module_dependencies'. For blast radius of a single function, use 'analyze_change_impact'.\n\n"
+            "- When NOT to use: Do not use for direct pairwise dependencies of a file, use 'query_module_dependencies'. For blast radius of a single function, use 'analyze_change_impact'.\n\n"
             "Returns: Ranked Markdown table with PageRank centrality scores, inbound/outbound degrees, and architectural significance notes."),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
     )
@@ -1248,7 +1248,7 @@ def create_mcp_server():
             "- 100% Offline: Local AST analysis without external services.\n\n"
             "Usage Guidelines:\n"
             "- When to use: Run when debugging execution flows, tracing data paths into a function, or seeing everything a complex method calls recursively.\n"
-            "- Sibling Routing: For quick single-symbol blast radius scoring (0-100), use 'analyze_change_impact'. For module-level import relations, use 'query_module_dependencies'.\n\n"
+            "- When NOT to use: Do not use for quick single-symbol blast radius scoring (0-100), use 'analyze_change_impact'. For module-level import relations, use 'query_module_dependencies'.\n\n"
             "Returns: Markdown report containing recursive ASCII execution tree, caller/callee counts, and copy-pasteable Mermaid flowchart syntax."),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
     )
@@ -1283,7 +1283,7 @@ def create_mcp_server():
             "- 100% Offline: Local AST reference analysis.\n\n"
             "Usage Guidelines:\n"
             "- When to use: Run during technical debt cleanup to locate deprecated, dead, or forgotten functions and classes ready for safe removal.\n"
-            "- Sibling Routing: For copy-pasted duplicate logic blocks, use 'find_code_duplicity'. For general complexity and linting, use 'audit_codebase_quality'.\n\n"
+            "- When NOT to use: Do not use for copy-pasted duplicate logic blocks, use 'find_code_duplicity'. For general complexity and linting, use 'audit_codebase_quality'.\n\n"
             "Returns: Markdown report listing candidate orphaned symbols with file paths, line numbers, and symbol types."),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
     )
@@ -1307,12 +1307,14 @@ def create_mcp_server():
     @_maybe_tool(
         name="jarvis_compress_semantic_memory",
         description=(
-            "Compresses natural language text, logs, or system instructions into T-Zero's 3-Layer Semantic Memory representation:\n"
-            "- Layer A: Semantic Triplet Extraction with Named Entity Recognition (NER: Hardware, Protocol, IP, Crypto, Vuln, Software)\n"
-            "- Layer B: Vector Quantized (VQ) Codebook discrete index mapping (e.g. #8421)\n"
-            "- Layer C: Dynamic Virtual Memory Token injection (<|tzero:mem:8421|>) for 90-98% token reduction.\n\n"
+            "Compresses natural language text, logs, or system instructions into T-Zero 3-Layer Semantic Memory representation (NER triplets, discrete codebook indices, and virtual memory tokens).\n\n"
+            "Behavior:\n"
+            "- Read-only: Processes in-memory text without modifying repository files.\n"
+            "- Idempotent: Generates deterministic virtual tokens for identical text inputs.\n"
+            "- 100% Offline: Executes entirely locally on CPU without remote LLM APIs.\n\n"
             "Usage Guidelines:\n"
             "- When to use: Compress long conversation histories, system telemetry, hardware setups, or complex architectural instructions into single virtual tokens.\n"
+            "- When NOT to use: Do not use for source code AST file reduction; use 'prune_code_snippet' instead. Do not use for resolving virtual tokens back to text; use 'jarvis_decompress_semantic_memory' instead.\n\n"
             "Returns: Formatted Markdown report with original token count, compressed token count, savings percentage, graph triplets, compact code, and virtual tokens."),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
     )
@@ -1349,8 +1351,14 @@ def create_mcp_server():
     @_maybe_tool(
         name="jarvis_decompress_semantic_memory",
         description=(
-            "Resolves a T-Zero virtual memory token (<|tzero:mem:8421|>) or discrete code ID (e.g. 8421) back into its "
-            "canonical semantic graph representation, entity classifications, and human-readable natural language summary.\n\n"
+            "Resolves a T-Zero virtual memory token (<|tzero:mem:8421|>) or discrete code ID (e.g. 8421) back into its canonical semantic graph representation, entity classifications, and human-readable natural language summary.\n\n"
+            "Behavior:\n"
+            "- Read-only: Resolves code ID from in-memory VQ codebook without altering state.\n"
+            "- Idempotent: Deterministic text reconstruction for identical token IDs.\n"
+            "- 100% Offline: Local memory store resolution with zero network latency.\n\n"
+            "Usage Guidelines:\n"
+            "- When to use: Resolve a previously compressed virtual memory token (<|tzero:mem:ID|>) or code ID back into natural language concepts and knowledge graph triplets.\n"
+            "- When NOT to use: Do not use for compressing new text; use 'jarvis_compress_semantic_memory' instead. Do not use for querying graph relations by keyword; use 'jarvis_query_knowledge_graph' instead.\n\n"
             "Returns: Decoded entity details, graph triplet, and natural language reconstruction."),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
     )
@@ -1386,13 +1394,15 @@ def create_mcp_server():
         description=(
             "Autonomous Master Workspace Orchestrator & Executive AI Pair-Programming Manager.\n\n"
             "Capabilities:\n"
-            "- Planning & Presentation ('plan', 'help', 'what can you do', 'ne yapabilirsin'): Formulates phased engineering execution plans and presents full capability directory.\n"
+            "- Planning & Presentation ('plan', 'help', 'capabilities'): Formulates phased engineering execution plans and presents full capability directory.\n"
             "- Workspace Governance: Automatically configures .cursorrules, AGENT.md, ARCHITECTURE.md, tzero.rules.json.\n"
             "- Autonomous Execution: 3-Layer semantic memory compression, T-Zero AST context reduction, 5-agent PBFT swarm consensus, zero-cost intelligence routing, and self-healing loop.\n\n"
             "Behavior:\n"
-            "- When goal is 'plan', 'help', 'menu', 'capabilities', or empty: presents the executive capabilities and multi-phase engineering plan.\n"
-            "- When goal is a specific engineering task: executes autonomously with self-healing verification.\n"
-            "- 100% Offline, $0.00 Cost, and 100% Zero-Leak security.\n\n"
+            "- State execution: Executes engineering workflows, configures governance files, and coordinates agent tools.\n"
+            "- 100% Offline: Executes locally without unverified external cloud endpoints.\n\n"
+            "Usage Guidelines:\n"
+            "- When to use: Execute high-level complex coding goals across multi-agent swarms, configure agent rule files, or plan phased engineering refactors.\n"
+            "- When NOT to use: Do not use for isolated AST code smells or security checks; use 'audit_codebase_quality' and 'verify_zero_leak_security' instead. Do not use for single-command self-healing; use 'jarvis_self_healing_execute' instead.\n\n"
             "Returns: Formatted Markdown plan or multi-stage execution report with verification logs."),
         annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=False, open_world_hint=True)
     )
@@ -1452,8 +1462,13 @@ def create_mcp_server():
     @_maybe_tool(
         name="jarvis_zero_key_query",
         description=(
-            "Queries the 100% Free, Zero-API-Key intelligence matrix (Local Ollama, Pollinations Free Cloud, OpenRouter Free Whitelist). "
-            "Never requires credit cards, user API keys, or balance.\n\n"
+            "Queries the 100% Free, Zero-API-Key intelligence matrix (Local Ollama, Pollinations Free Cloud, OpenRouter Free Whitelist). Never requires credit cards, user API keys, or balance.\n\n"
+            "Behavior:\n"
+            "- Read-only query: Dispatches inference prompts to free local/cloud endpoints without storing confidential data.\n"
+            "- Zero user cost: Strictly routes through free tiers with zero billing.\n\n"
+            "Usage Guidelines:\n"
+            "- When to use: Query external zero-cost model inference without configuring API keys or paying commercial provider fees.\n"
+            "- When NOT to use: Do not use for local codebase search or AST parsing; use 'search_codebase_semantic' or 'get_project_context_tree' instead.\n\n"
             "Returns: Formatted AI response with selected zero-cost provider telemetry."),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=False, open_world_hint=True)
     )
@@ -1484,11 +1499,14 @@ def create_mcp_server():
     @_maybe_tool(
         name="jarvis_query_knowledge_graph",
         description=(
-            "Searches the T-Zero Jarvis semantic knowledge graph and VQ Codebook memory by entity name, "
-            "predicate, execution context, or general search query.\n\n"
+            "Searches the T-Zero Jarvis semantic knowledge graph and VQ Codebook memory by entity name, predicate, execution context, or general search query.\n\n"
             "Behavior:\n"
-            "- Read-only: Queries local in-memory discrete codes and graph triplets.\n"
+            "- Read-only: Queries local in-memory discrete codes and graph triplets without modifying state.\n"
+            "- Idempotent: Deterministic search results for identical queries.\n"
             "- Zero latency: Instant local retrieval with zero network or cloud costs.\n\n"
+            "Usage Guidelines:\n"
+            "- When to use: Query stored semantic memory graph triplets and discrete codes by entity name, predicate, or freeform concept.\n"
+            "- When NOT to use: Do not use for source code keyword search; use 'search_codebase_semantic' instead. Do not use for saving or loading the memory codebook to disk; use 'jarvis_export_memory_store' instead.\n\n"
             "Returns: Formatted Markdown table of matching knowledge graph triplets and their virtual memory tokens."),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
     )
@@ -1530,12 +1548,14 @@ def create_mcp_server():
     @_maybe_tool(
         name="jarvis_compress_document",
         description=(
-            "Compresses large multi-paragraph technical documents, architectural specifications, "
-            "or conversation logs (1,000+ words) into an interconnected Knowledge Graph and composite "
-            "virtual memory token stream (<|tzero:mem:ID|>).\n\n"
+            "Compresses large multi-paragraph technical documents, architectural specifications, or conversation logs (1,000+ words) into an interconnected Knowledge Graph and composite virtual memory token stream (<|tzero:mem:ID|>).\n\n"
             "Behavior:\n"
             "- High Token Savings: Reaches 85-95% token reduction across multi-sentence paragraphs.\n"
-            "- Topological Deduplication: Identifies shared subjects, protocols, and devices across paragraphs.\n\n"
+            "- Topological Deduplication: Identifies shared subjects, protocols, and devices across paragraphs.\n"
+            "- 100% Offline: Local graph extraction without external LLM calls.\n\n"
+            "Usage Guidelines:\n"
+            "- When to use: Compress long multi-paragraph documents (1,000+ words) or architectural RFCs into unified knowledge graphs and virtual token chains.\n"
+            "- When NOT to use: Do not use for single sentences or short text buffers; use 'jarvis_compress_semantic_memory' instead. Do not use for source code AST files; use 'get_project_context_tree' instead.\n\n"
             "Returns: Comprehensive document compression report, virtual token chain, and node-edge count."),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
     )
@@ -1572,11 +1592,14 @@ def create_mcp_server():
     @_maybe_tool(
         name="jarvis_export_memory_store",
         description=(
-            "Exports or imports the T-Zero Jarvis persistent VQ Codebook and Knowledge Graph "
-            "to/from local disk (zero cloud, 100% private and persistent across IDE restarts).\n\n"
+            "Exports or imports the T-Zero Jarvis persistent VQ Codebook and Knowledge Graph to/from local disk (zero cloud, 100% private and persistent across IDE restarts).\n\n"
             "Behavior:\n"
             "- Save mode: Serializes all active codes to JSON.\n"
-            "- Load mode: Ingests saved codes into the active runtime codebook.\n\n"
+            "- Load mode: Ingests saved codes into the active runtime codebook.\n"
+            "- 100% Offline: Purely local file I/O.\n\n"
+            "Usage Guidelines:\n"
+            "- When to use: Save or load the active persistent Vector Quantized (VQ) memory store to/from local disk across IDE sessions.\n"
+            "- When NOT to use: Do not use for interactive cyberpunk HTML visualization exports; use 'jarvis_export_graph_visualization' instead. Do not use for querying active triples; use 'jarvis_query_knowledge_graph' instead.\n\n"
             "Returns: Status and path of persistent store file."),
         annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=False, open_world_hint=False)
     )
@@ -1606,7 +1629,17 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="jarvis_causal_chain_query",
-        description="Queries 4D Causal and Temporal Knowledge Graph for root causes, downstream effect chains, or safe rollback steps."
+        description=(
+            "Queries 4D Causal and Temporal Knowledge Graph for root causes, downstream effect chains, or safe rollback steps.\n\n"
+            "Behavior:\n"
+            "- Read-only: Traverses local causal knowledge graph without altering nodes.\n"
+            "- Idempotent: Deterministic causal traces for identical target nodes.\n"
+            "- 100% Offline: Local memory graph traversal with zero external API calls.\n\n"
+            "Usage Guidelines:\n"
+            "- When to use: Trace temporal cause-and-effect sequences, diagnose root causes of errors, compute safe rollback orders, or review event timelines.\n"
+            "- When NOT to use: Do not use for general semantic triple queries; use 'jarvis_query_knowledge_graph' instead. Do not use for AST call hierarchy analysis; use 'trace_symbol_call_chain' instead.\n\n"
+            "Returns: Formatted Markdown report detailing root causes, downstream effect chains, or safe rollback steps."),
+        annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
     )
     def _legacy_jarvis_causal_chain_query(
         target_node_id: Annotated[str, Field(description="Target node ID to analyze (e.g. error, event).")],
@@ -1637,7 +1670,16 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="jarvis_self_healing_execute",
-        description="Executes a command or script in a guarded environment with automated AST self-healing and error repair."
+        description=(
+            "Executes a command or script in a guarded environment with automated AST self-healing and error repair.\n\n"
+            "Behavior:\n"
+            "- Subprocess execution: Runs commands in a guarded shell environment and applies surgical AST patches on error.\n"
+            "- 100% Offline: Local error traceback diagnosis and AST healing without remote telemetry.\n\n"
+            "Usage Guidelines:\n"
+            "- When to use: Run test commands or execution scripts with automated traceback diagnosis, AST node repair, and multi-retry self-healing.\n"
+            "- When NOT to use: Do not use for static lint/complexity checks without command execution; use 'audit_codebase_quality' instead. Do not use for multi-agent swarm consensus; use 'jarvis_bft_swarm_consensus' instead.\n\n"
+            "Returns: Execution report with exit code, duration, stdout/stderr, and list of applied AST self-healing patches."),
+        annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=False, open_world_hint=False)
     )
     def _legacy_jarvis_self_healing_execute(
         command: Annotated[str, Field(description="Command or script invocation to execute.")],
@@ -1666,7 +1708,17 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="jarvis_consolidate_memory",
-        description="Performs brain-like hippocampal memory consolidation, contradiction resolution, and macro-triplet synthesis."
+        description=(
+            "Performs brain-like hippocampal memory consolidation, contradiction resolution, and macro-triplet synthesis.\n\n"
+            "Behavior:\n"
+            "- State consolidation: Consolidates episodic working memory into permanent abstracted knowledge in the codebook.\n"
+            "- Idempotent when action='summary'; stateful when action='consolidate'.\n"
+            "- 100% Offline: Purely local hippocampal consolidation algorithms.\n\n"
+            "Usage Guidelines:\n"
+            "- When to use: Consolidate episodic memory traces, resolve contradictions, synthesize macro-triplets, or inspect memory consolidation state.\n"
+            "- When NOT to use: Do not use for exporting memory to disk; use 'jarvis_export_memory_store' instead. Do not use for searching memory triplets; use 'jarvis_hybrid_search' or 'jarvis_query_knowledge_graph' instead.\n\n"
+            "Returns: Formatted Markdown report of memory consolidation cycle metrics, synthesized macro-triplets, or current consolidation summary."),
+        annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=False, open_world_hint=False)
     )
     def _legacy_jarvis_consolidate_memory(
         action: Annotated[str, Field(default="consolidate", description="'consolidate' to run cycle, or 'summary' for status.")] = "consolidate"
@@ -1688,7 +1740,17 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="jarvis_hybrid_search",
-        description="High-speed zero-vector-DB hybrid BM25 and latent codebook (#code) search across code, memory, and events."
+        description=(
+            "High-speed zero-vector-DB hybrid BM25 and latent codebook (#code) search across code, memory, and events.\n\n"
+            "Behavior:\n"
+            "- Read-only: In-memory search without disk writes or index mutation.\n"
+            "- Idempotent: Deterministic ranked output for identical queries.\n"
+            "- 100% Offline: Executes in <0.5 ms on CPU without external vector databases.\n\n"
+            "Usage Guidelines:\n"
+            "- When to use: Perform ultra-fast sub-millisecond hybrid BM25 and latent codebook search across stored memories, code entities, and discrete codes.\n"
+            "- When NOT to use: Do not use for whole-codebase repository file searching; use 'search_codebase_semantic' instead. Do not use for MinHash Jaccard similarity; use 'jarvis_minhash_similarity' instead.\n\n"
+            "Returns: Ranked list of matched memory entries with domain, score, code ID, and content snippets."),
+        annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
     )
     def _legacy_jarvis_hybrid_search(
         query: Annotated[str, Field(description="Search terms, concepts, or discrete codes like '#8421'.")],
@@ -1729,7 +1791,16 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="jarvis_swarm_orchestrate",
-        description="Coordinates a 5-agent autonomous swarm (Security, Embedded, AST Optimizer, DevOps, JARVIS Prime) on a mission."
+        description=(
+            "Coordinates a 5-agent autonomous swarm (Security, Embedded, AST Optimizer, DevOps, JARVIS Prime) on a mission.\n\n"
+            "Behavior:\n"
+            "- Coordination: Spawns and coordinates a 5-agent specialist swarm across defined roles.\n"
+            "- 100% Offline: Local agent coordination without cloud relays or external subscriptions.\n\n"
+            "Usage Guidelines:\n"
+            "- When to use: Dispatch multi-agent mission workflows requiring coordinated review across security, optimization, and architecture specialists.\n"
+            "- When NOT to use: Do not use for Byzantine fault-tolerant voting quorums on specific patches; use 'jarvis_bft_swarm_consensus' instead. Do not use for single-agent goal planning; use 'jarvis_orchestrate_goal' instead.\n\n"
+            "Returns: Swarm mission consensus report with specialist findings, recommendations, and aggregated virtual memory tokens."),
+        annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=False, open_world_hint=False)
     )
     def _legacy_jarvis_swarm_orchestrate(
         mission_goal: Annotated[str, Field(description="The engineering or system goal to achieve.")],
@@ -1763,7 +1834,17 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="jarvis_export_graph_visualization",
-        description="Generates an offline, interactive cyberpunk 2D/3D force-directed HTML graph visualization of knowledge & causality."
+        description=(
+            "Generates an offline, interactive cyberpunk 2D/3D force-directed HTML graph visualization of knowledge & causality.\n\n"
+            "Behavior:\n"
+            "- File export: Generates a self-contained offline HTML5/SVG/Canvas file with 2D/3D force-directed physics.\n"
+            "- Idempotent: Overwrites target visualization file deterministically.\n"
+            "- 100% Offline: Zero external CDN scripts or network tracking.\n\n"
+            "Usage Guidelines:\n"
+            "- When to use: Export an interactive cyberpunk 2D/3D visual HUD of semantic knowledge graphs and causal relations for browser inspection.\n"
+            "- When NOT to use: Do not use for saving raw JSON memory stores; use 'jarvis_export_memory_store' instead. Do not use for generating Mermaid markdown architecture diagrams; use 'generate_architecture_blueprint' instead.\n\n"
+            "Returns: File path confirmation and node count summary for the generated interactive HTML visualization."),
+        annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
     )
     def _legacy_jarvis_export_graph_visualization(
         output_path: Annotated[str, Field(default="", description="Optional target HTML file path. Defaults to 'tzero_graph_hud.html'.")] = ""
@@ -1798,7 +1879,17 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="jarvis_minhash_similarity",
-        description="Calculates sub-microsecond (<1 µs) Jaccard similarity and near-duplicate triplet clusters using MinHash LSH (64 permutations, Mersenne prime)."
+        description=(
+            "Calculates sub-microsecond (<1 µs) Jaccard similarity and near-duplicate triplet clusters using MinHash LSH (64 permutations, Mersenne prime).\n\n"
+            "Behavior:\n"
+            "- Read-only: Calculates Jaccard similarity in <1 us using 64-permutation MinHash LSH and Mersenne prime hashing.\n"
+            "- Idempotent: Deterministic similarity scores for identical inputs.\n"
+            "- 100% Offline: Pure CPU mathematical computation without external dependencies.\n\n"
+            "Usage Guidelines:\n"
+            "- When to use: Compare text or triplet similarity, detect near-duplicate sentences, or find cluster neighbors in the memory codebook.\n"
+            "- When NOT to use: Do not use for multi-line source code duplicity scans; use 'find_code_duplicity' instead. Do not use for BM25 keyword matching; use 'jarvis_hybrid_search' instead.\n\n"
+            "Returns: Jaccard similarity percentage, duplicate/distinct verdict, and matched codebook entries."),
+        annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
     )
     def _legacy_jarvis_minhash_similarity(
         text_a: Annotated[str, Field(description="First text or triplet description")],
@@ -1856,7 +1947,16 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="jarvis_bft_swarm_consensus",
-        description="Executes 3-phase Practical Byzantine Fault-Tolerant (PBFT) multi-agent swarm consensus with 2/3 weighted quorum, outlier detection, and Zero-Leak cryptographic veto."
+        description=(
+            "Executes 3-phase Practical Byzantine Fault-Tolerant (PBFT) multi-agent swarm consensus with 2/3 weighted quorum, outlier detection, and Zero-Leak cryptographic veto.\n\n"
+            "Behavior:\n"
+            "- Consensus validation: Executes 3-phase Practical Byzantine Fault-Tolerant (PBFT) consensus with 2/3 weighted quorum and cryptographic hash certification.\n"
+            "- 100% Offline: Zero-Leak cryptographic verification without external authority.\n\n"
+            "Usage Guidelines:\n"
+            "- When to use: Vote on critical system actions, approve security patches with Byzantine outlier detection, and enforce Zero-Leak cryptographic vetoes.\n"
+            "- When NOT to use: Do not use for exploratory multi-agent brainstorming; use 'jarvis_swarm_orchestrate' instead. Do not use for single-command self-healing; use 'jarvis_self_healing_execute' instead.\n\n"
+            "Returns: Byzantine fault-tolerant swarm certificate with approved/rejected verdict, quorum ratio, detected Byzantine faults, and certificate hash."),
+        annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=False, open_world_hint=False)
     )
     def _legacy_jarvis_bft_swarm_consensus(
         mission_goal: Annotated[str, Field(description="Mission, action, or code patch to evaluate")],
@@ -1887,7 +1987,17 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="jarvis_latent_press_compress",
-        description="Compresses long contexts before prefill using Latent Context Language Model (LCLM / LatentPress), Shannon entropy tracking, and MinHash de-duplication."
+        description=(
+            "Compresses long contexts before prefill using Latent Context Language Model (LCLM / LatentPress), Shannon entropy tracking, and MinHash de-duplication.\n\n"
+            "Behavior:\n"
+            "- Read-only: Compresses text via Shannon entropy estimation and MinHash deduplication into a virtual token stream.\n"
+            "- Idempotent: Deterministic token stream for identical inputs.\n"
+            "- 100% Offline: Local compression without external LLM calls.\n\n"
+            "Usage Guidelines:\n"
+            "- When to use: Compress massive technical context, telemetry logs, or conversational context before LLM prefill to maximize token density.\n"
+            "- When NOT to use: Do not use for source code AST pruning; use 'prune_code_snippet' instead. Do not use for repository-wide context indexing; use 'get_project_context_tree' instead.\n\n"
+            "Returns: LatentPress compression metrics including original tokens, compressed tokens, compression ratio, Shannon entropy, and virtual token stream."),
+        annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
     )
     def _legacy_jarvis_latent_press_compress(
         context_text: Annotated[str, Field(description="Long context, logs, or code to compress")],
@@ -1925,7 +2035,8 @@ def create_mcp_server():
             "- 100% Offline: Executes locally without network calls or external API billing.\n\n"
             "Usage Guidelines:\n"
             "- When to use: Pass large database migration files, k8s manifests, or Terraform configs to an LLM without blowing up the context window.\n"
-            "- Supported types: 'sql', 'yaml', 'dockerfile', 'terraform' (auto-detected if file name provided).\n\n"
+            "- Supported types: 'sql', 'yaml', 'dockerfile', 'terraform' (auto-detected if file name provided).\n"
+            "- When NOT to use: Do not use for programming language source code; use 'prune_code_snippet' instead. Do not use for repository context generation; use 'get_project_context_tree' instead.\n\n"
             "Returns: Compact schema representation with percentage token reduction."
         ),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
@@ -1961,7 +2072,8 @@ def create_mcp_server():
             "- Idempotent: Deterministic output for identical git diffs.\n"
             "- 100% Offline: Executes locally without network calls.\n\n"
             "Usage Guidelines:\n"
-            "- When to use: Compress massive PR diffs or git commit changes before passing them into LLM chat context.\n\n"
+            "- When to use: Compress massive PR diffs or git commit changes before passing them into LLM chat context.\n"
+            "- When NOT to use: Do not use for full file AST compression; use 'prune_code_snippet' instead. Do not use for git diff extraction from commit history; use 'get_incremental_diff_context' instead.\n\n"
             "Returns: High-density micro-patch report with token savings metrics."
         ),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
@@ -1987,7 +2099,8 @@ def create_mcp_server():
             "- Idempotent: Deterministic output for identical codebase states.\n"
             "- 100% Offline: Executes locally without cloud or API dependencies.\n\n"
             "Usage Guidelines:\n"
-            "- When to use: Ingest massive multi-file codebases into an LLM while stripping out 100% of uncalled methods and dead routines (up to 95% token savings).\n\n"
+            "- When to use: Ingest massive multi-file codebases into an LLM while stripping out 100% of uncalled methods and dead routines (up to 95% token savings).\n"
+            "- When NOT to use: Do not use for quick symbol indexing without AST call graphs; use 'generate_repo_map' instead. Do not use for focus-file skeletonization; use 'get_smart_skeleton_context' instead.\n\n"
             "Returns: Zero-waste markdown context with list of reachable/dead symbols and token reduction metrics."
         ),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
@@ -2016,12 +2129,14 @@ def create_mcp_server():
     @_maybe_tool(
         name="compress_stream_tokens",
         description=(
-            "Compresses arbitrary streaming code, unified diffs, database DDL, or infrastructure manifests "
-            "using T-Zero AST reduction pipeline, ideal for CLI pipe flows and clipboard integration.\n\n"
+            "Compresses arbitrary streaming code, unified diffs, database DDL, or infrastructure manifests using T-Zero AST reduction pipeline, ideal for CLI pipe flows and clipboard integration.\n\n"
             "Behavior:\n"
             "- Read-only: In-memory string compression.\n"
             "- Idempotent: Deterministic output for identical content.\n"
             "- 100% Offline: Executes locally without external API billing.\n\n"
+            "Usage Guidelines:\n"
+            "- When to use: Compress arbitrary streaming code, unified diffs, database DDL, or infrastructure manifests via CLI pipe flows and clipboard integration.\n"
+            "- When NOT to use: Do not use for full repository scanning; use 'get_project_context_tree' instead. Do not use for memory graph compression; use 'jarvis_compress_semantic_memory' instead.\n\n"
             "Returns: Compressed code/diff tokens with maximal information density."
         ),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
@@ -2051,11 +2166,13 @@ def create_mcp_server():
     @_maybe_tool(
         name="install_git_security_guard",
         description=(
-            "Installs the automated T-Zero Git Pre-Commit Security Guard into target repository's .git/hooks directory. "
-            "Intercepts git commits to prevent credential leaks (API keys, passwords, tokens) and warns on uncompressed token bloat.\n\n"
+            "Installs the automated T-Zero Git Pre-Commit Security Guard into target repository's .git/hooks directory. Intercepts git commits to prevent credential leaks (API keys, passwords, tokens) and warns on uncompressed token bloat.\n\n"
             "Behavior:\n"
             "- Safe installation: Creates executable .git/hooks/pre-commit and pre-commit.bat.\n"
             "- 100% Local: No cloud telemetry or third-party hook services required.\n\n"
+            "Usage Guidelines:\n"
+            "- When to use: Install the automated pre-commit hook into a git repository to prevent credential leaks and uncompressed token bloat.\n"
+            "- When NOT to use: Do not use for one-time credential scanning of a file or code snippet; use 'verify_zero_leak_security' instead. Do not use for checking architectural boundary rules; use 'enforce_architecture_boundaries' instead.\n\n"
             "Returns: Installation status and path to installed git hook."
         ),
         annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
@@ -2183,7 +2300,7 @@ def create_mcp_server():
             "- 100% Offline: Operates entirely locally with zero telemetry, remote embedding APIs, or cloud billing.\n\n"
             "Usage Guidelines:\n"
             "- When to use: Ingest repository architecture, module indexes, focus file skeletons, or zero-waste prompts at the beginning of an agent coding session or major refactor (80-95% token savings).\n"
-            "- Sibling Routing: For stripping implementation bodies from a single in-memory code string or diff patch, use 'prune_code_snippet'. For querying specific code symbols or text without building a full context tree, use 'search_codebase'.\n\n"
+            "- When NOT to use: Do not use for stripping implementation bodies from a single in-memory code string or diff patch; use 'prune_code_snippet' instead. Do not use for querying specific code symbols or text without building a full context tree; use 'search_codebase' instead.\n\n"
             "Returns: Markdown-formatted context payload including directory trees, module outlines, and compressed AST signatures up to max_tokens."
         ),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
@@ -2229,7 +2346,7 @@ def create_mcp_server():
             "- 100% Offline: Local AST and regex parsers for Python, TypeScript, Go, Rust, Java, C#, C++, SQL, JSON, YAML.\n\n"
             "Usage Guidelines:\n"
             "- When to use: Compress raw code strings, function definitions, SQL queries, or diff patches before embedding them in an LLM prompt to achieve 80-95% token savings.\n"
-            "- Sibling Routing: For scanning full repository files or building hierarchical project context from disk, use 'build_project_context'. To detect code duplication across modules, use 'audit_code_quality'.\n\n"
+            "- When NOT to use: Do not use for scanning full repository files or building hierarchical project context from disk; use 'build_project_context' instead. Do not use for detecting code duplication across modules; use 'audit_code_quality' instead.\n\n"
             "Returns: Compact code snippet retaining only structural signatures, interfaces, and docstrings."
         ),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
@@ -2258,7 +2375,7 @@ def create_mcp_server():
             "- 100% Offline: Local JSON file management without external communication.\n\n"
             "Usage Guidelines:\n"
             "- When to use: Retrieve, inspect, add, update, reset, or delete architectural layer constraints (e.g. presentation -> domain -> persistence rules).\n"
-            "- Sibling Routing: To actively validate codebase files against these rules and detect violations, use 'enforce_architecture_rules'. To generate visual Mermaid architectural topology diagrams, use 'generate_architecture_blueprint'.\n\n"
+            "- When NOT to use: Do not use for actively validating codebase files against these rules; use 'enforce_architecture_rules' instead. Do not use for generating visual Mermaid architectural topology diagrams; use 'generate_architecture_blueprint' instead.\n\n"
             "Returns: JSON or Markdown status report detailing active or updated architectural rules."
         ),
         annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
@@ -2345,7 +2462,7 @@ def create_mcp_server():
             "- 100% Offline: Local import graph validation against configured boundaries.\n\n"
             "Usage Guidelines:\n"
             "- When to use: Run in CI/CD pipelines or before merging PRs to prevent architectural erosion (e.g. presentation layer importing database models or circular module dependencies).\n"
-            "- Sibling Routing: To view or edit architectural boundary definitions, use 'manage_architecture_rules'. To inspect general dependencies between modules, use 'analyze_code_dependencies'.\n\n"
+            "- When NOT to use: Do not use for creating, viewing, or editing architectural boundary definitions; use 'manage_architecture_rules' instead. Do not use for inspecting general dependencies between modules; use 'analyze_code_dependencies' instead.\n\n"
             "Returns: Detailed compliance audit report listing passed layer boundaries, identified architectural violations, and remediation guidance."
         ),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
@@ -2370,7 +2487,7 @@ def create_mcp_server():
             "- 100% Offline by default: Runs local AST analysis; optionally uses configured AI model when use_ai=True.\n\n"
             "Usage Guidelines:\n"
             "- When to use: Create or update system architecture documentation and visual Mermaid flow diagrams for onboarding or RFC review.\n"
-            "- Sibling Routing: For checking rule compliance against defined boundaries, use 'enforce_architecture_rules'. For raw dependency listings, use 'analyze_code_dependencies'.\n\n"
+            "- When NOT to use: Do not use for checking rule compliance against defined boundaries; use 'enforce_architecture_rules' instead. Do not use for raw dependency listings or call chain traces; use 'analyze_code_dependencies' instead.\n\n"
             "Returns: Comprehensive Markdown document with live Mermaid diagrams, layer classifications, and component interfaces."
         ),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
@@ -2396,7 +2513,7 @@ def create_mcp_server():
             "- 100% Offline: Local AST and regex parsers; zero external network requests.\n\n"
             "Usage Guidelines:\n"
             "- When to use: Run before refactoring, moving, or removing a module to inspect inbound dependents, outbound imports, deep symbol call chains, or unreferenced functions.\n"
-            "- Sibling Routing: To estimate the blast radius score of modifying a specific function or class, use 'analyze_change_impact'. To check whether imports violate architectural layer rules, use 'enforce_architecture_rules'.\n\n"
+            "- When NOT to use: Do not use for estimating the blast radius score of modifying a specific function or class; use 'analyze_change_impact' instead. Do not use for validating whether imports violate architectural layer rules; use 'enforce_architecture_rules' instead.\n\n"
             "Returns: Markdown report detailing import graphs, call chains, centrality rankings, or detected dead code."
         ),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
@@ -2432,7 +2549,7 @@ def create_mcp_server():
             "- 100% Offline: Local AST caller/callee traversal without remote API calls.\n\n"
             "Usage Guidelines:\n"
             "- When to use: Run prior to editing a core interface, signature, or shared utility to gauge how many downstream files and tests will be impacted.\n"
-            "- Sibling Routing: For general whole-repository dependency mapping, use 'analyze_code_dependencies'. To audit static code complexity and code smells, use 'audit_code_quality'.\n\n"
+            "- When NOT to use: Do not use for general whole-repository dependency mapping or PageRank centrality; use 'analyze_code_dependencies' instead. Do not use for auditing static code complexity and code smells; use 'audit_code_quality' instead.\n\n"
             "Returns: Markdown report with quantitative blast radius score (0-100), risk tier (LOW/MEDIUM/HIGH/CRITICAL), affected downstream modules, and test recommendations."
         ),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
@@ -2458,7 +2575,7 @@ def create_mcp_server():
             "- 100% Offline: Executes entirely on CPU; no OpenAI/cloud embeddings, zero network egress.\n\n"
             "Usage Guidelines:\n"
             "- When to use: Locate relevant functions, classes, or code implementations across the repository using natural language or code identifier queries.\n"
-            "- Sibling Routing: For querying persistent semantic knowledge graphs or agent memory triples, use 'query_memory_store'. For generating full project context trees, use 'build_project_context'.\n\n"
+            "- When NOT to use: Do not use for querying persistent semantic knowledge graphs or agent memory triples; use 'query_memory_store' instead. Do not use for generating full project context trees; use 'build_project_context' instead.\n\n"
             "Returns: Ranked list of matching code snippets with file paths, line ranges, relevance scores, and matched symbol definitions."
         ),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
@@ -2484,7 +2601,7 @@ def create_mcp_server():
             "- 100% Offline: Pure AST inspection without network calls.\n\n"
             "Usage Guidelines:\n"
             "- When to use: Run before submitting PRs or executing refactors to catch long methods (>30 lines), excessive arguments (>5), missing docstrings, copy-pasted blocks (6+ lines), or hallucinated imports.\n"
-            "- Sibling Routing: For scanning hardcoded secrets and installing git pre-commit security guards, use 'verify_security_guard'. For analyzing module dependencies, use 'analyze_code_dependencies'.\n\n"
+            "- When NOT to use: Do not use for scanning hardcoded secrets or installing git pre-commit security guards; use 'verify_security_guard' instead. Do not use for analyzing module import dependencies; use 'analyze_code_dependencies' instead.\n\n"
             "Returns: Comprehensive diagnostic report with severity ratings (T-001 to T-004), exact file line references, and remediation guidance."
         ),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
@@ -2517,7 +2634,7 @@ def create_mcp_server():
             "- 100% Offline: Zero data transmission; all entropy and pattern checks execute locally.\n\n"
             "Usage Guidelines:\n"
             "- When to use: Ensure zero confidential credentials (OpenAI, Anthropic, Gemini, GitHub tokens, private keys) are exposed in code before committing or sharing context.\n"
-            "- Sibling Routing: For general code quality, cyclomatic complexity, and duplicate code scans, use 'audit_code_quality'. To enforce layer boundary architecture rules, use 'enforce_architecture_rules'.\n\n"
+            "- When NOT to use: Do not use for general code quality, cyclomatic complexity, and duplicate code scans; use 'audit_code_quality' instead. Do not use for enforcing layer boundary architecture rules; use 'enforce_architecture_rules' instead.\n\n"
             "Returns: Security audit report showing 100% Zero-Leak certification or list of detected secret leaks with line numbers, or hook installation confirmation."
         ),
         annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
@@ -2547,7 +2664,7 @@ def create_mcp_server():
             "- 100% Offline: Local pricing lookup table; zero network calls.\n\n"
             "Usage Guidelines:\n"
             "- When to use: Evaluate token consumption, forecast monthly LLM API expenditures, or export agent rule configuration files (.cursorrules, .clinerules).\n"
-            "- Sibling Routing: To actively reduce token consumption by pruning repository code into AST signatures, use 'build_project_context' or 'prune_code_snippet'.\n\n"
+            "- When NOT to use: Do not use for actively reducing token consumption by pruning repository code into AST signatures; use 'build_project_context' or 'prune_code_snippet' instead.\n\n"
             "Returns: Markdown comparison table detailing input/output token counts, estimated USD costs per model provider, and percentage token reduction ROI."
         ),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
@@ -2576,7 +2693,7 @@ def create_mcp_server():
             "- 100% Offline: Local graph and MinHash index lookup without remote endpoints.\n\n"
             "Usage Guidelines:\n"
             "- When to use: Recall past agent decisions, query knowledge graph entity relations, or trace causal dependency chains across reasoning sessions.\n"
-            "- Sibling Routing: For full lifecycle management (compress, export, consolidate, list, reset, delete) of the memory store, use 'manage_memory_store'. For searching source code in the repository, use 'search_codebase'.\n\n"
+            "- When NOT to use: Do not use for modifying, compressing, or deleting memory stores; use 'manage_memory_store' instead. Do not use for searching source code in the repository; use 'search_codebase' instead.\n\n"
             "Returns: Markdown report with extracted semantic triples, graph relationships, or causal inference chains."
         ),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
@@ -2608,7 +2725,7 @@ def create_mcp_server():
             "- 100% Offline: Fully local storage management without external synchronization.\n\n"
             "Usage Guidelines:\n"
             "- When to use: Store new semantic knowledge, consolidate episodic memories, export knowledge graphs to JSON/HTML, list active memory stores, or clear/reset agent memories.\n"
-            "- Sibling Routing: To query existing knowledge triples or causal chains from memory, use 'query_memory_store'. To prune source code snippets, use 'prune_code_snippet'.\n\n"
+            "- When NOT to use: Do not use for querying existing knowledge triples or causal chains from memory; use 'query_memory_store' instead. Do not use for pruning source code snippets or diff streams; use 'prune_code_snippet' instead.\n\n"
             "Returns: Status report confirming memory consolidation, export file path, list of active memory stores, or confirmation of reset/deletion."
         ),
         annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=False, open_world_hint=False)
@@ -2690,7 +2807,7 @@ def create_mcp_server():
             "- 100% Offline: Executes deterministic local multi-agent workflows without unverified cloud relays.\n\n"
             "Usage Guidelines:\n"
             "- When to use: Execute high-level complex coding goals across multi-agent swarms, validate proposals via Byzantine consensus voting (3f+1 quorum), or diagnose and heal test failures.\n"
-            "- Sibling Routing: To query or manage long-term agent memory, use 'query_memory_store' and 'manage_memory_store'. To audit codebase quality before task execution, use 'audit_code_quality'.\n\n"
+            "- When NOT to use: Do not use for querying or managing long-term agent memory; use 'query_memory_store' and 'manage_memory_store' instead. Do not use for auditing codebase quality before task execution; use 'audit_code_quality' instead.\n\n"
             "Returns: Orchestration summary with phased execution plan, agent task allocations, consensus voting tallies, or self-healing patch results."
         ),
         annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=False, open_world_hint=False)
