@@ -6,7 +6,7 @@ discovering reachable symbols from specified entrypoints and pruning unreference
 functions and dead classes to assemble ultra-compact, Zero-Waste LLM prompt contexts.
 
 Developer: Toprak Ahmet Aydoğmuş (Siber Akademi)
-Part of T-Zero Context Architect v6.6.0 Master Edition.
+Part of T-Zero Context Architect v7.0.0 Master Edition.
 """
 
 import ast

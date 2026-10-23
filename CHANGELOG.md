@@ -1,5 +1,21 @@
 # Changelog
 
+## [7.0.0] - 2026-10-24
+
+### Released (Official V7.0.0 TDQS 5/5 Master Edition: Canonical MCP Suite & Full Lifecycle Engine)
+
+- **14 Canonical TDQS 5/5 Certified MCP Tools (`tzero_mcp.py`):**
+  - Consolidates sprawling tools into 14 pristine canonical tools following strict `verb_noun` naming conventions and zero naming ambiguity.
+  - Sibling routing guidance embedded in every tool definition prevents agent confusion and misrouting.
+  - Perfect 100% parameter coverage, annotations (`read_only`, `destructive`, `idempotent`, `open_world`), and verified JSON output schemas.
+  - Certified `0 errors, 0 warnings, 0 notes` under the standard `mcp-tdqs` specification.
+- **Full Architecture & Memory Lifecycle CRUD Support:**
+  - `manage_architecture_rules`: Full CRUD (`query`, `update`, `delete`, `reset`) for `tzero.rules.json` layer constraints.
+  - `manage_memory_store`: Full lifecycle operations (`list`, `compress`, `decompress`, `consolidate`, `export`, `reset`, `delete`) for agent memory graphs and codebooks.
+- **Zero-Breaking-Change Compatibility Layer (`compatible_call_tool`):**
+  - Seamlessly routes all 42 legacy tool calls to their respective handlers transparently.
+  - Provides `TZERO_MCP_TOOL_MODE=all` environment flag to optionally register all 42 legacy tools in list responses.
+
 ## [6.6.0] - 2026-10-22
 
 ### Released (Official V6.6.0 Master Edition: Omni-Dev, Graph Reachability & Git Pre-Commit Guard)

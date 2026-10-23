@@ -7,7 +7,7 @@ Automatically intercepts git commits, scanning staged files for:
 3. Micro-Patch companion suggestion.
 
 Developer: Toprak Ahmet Aydoğmuş (Siber Akademi)
-Part of T-Zero Context Architect v6.6.0 Master Edition.
+Part of T-Zero Context Architect v7.0.0 Master Edition.
 """
 
 import os

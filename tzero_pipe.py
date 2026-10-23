@@ -5,7 +5,7 @@ Enables UNIX pipeline integration (e.g. `cat file.py | tzero --pipe` or `git dif
 for instant terminal token compression and optional clipboard copy.
 
 Developer: Toprak Ahmet Aydoğmuş (Siber Akademi)
-Part of T-Zero Context Architect v6.6.0 Master Edition.
+Part of T-Zero Context Architect v7.0.0 Master Edition.
 """
 
 import sys
