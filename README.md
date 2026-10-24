@@ -26,10 +26,6 @@ Reduces codebase prompt tokens by up to **94.9%** while preserving complete clas
   </a>
 </p>
 
-<p align="center">
-  <img src="assets/benchmark-demo.svg" alt="T-Zero Live AST Context Pruning Benchmark" width="100%">
-</p>
-
 [Why T-Zero](#why-t-zero) &bull; [Quickstart](#quickstart) &bull; [Benchmarks](#reproducible-benchmarks) &bull; [Tools Reference](#mcp-tools-reference) &bull; [Architecture](#architecture) &bull; [Türkçe](#turkce)
 
 </div>
@@ -144,6 +140,10 @@ Opens the local browser dashboard on `http://localhost:8421` featuring interacti
 
 ## Reproducible Benchmarks
 
+<p align="center">
+  <img src="assets/benchmark-demo.svg" alt="T-Zero Live AST Context Pruning Benchmark" width="100%">
+</p>
+
 | Analysis Target | Raw Codebase Tokens | T-Zero AST Payload | Token Savings | Cost per Query (Claude 3.5) | Latency (TTFT) |
 |:---|:---:|:---:|:---:|:---:|:---:|
 | **Full Repository Scan (38K LOC)** | `166,996 tokens` | `8,465 tokens` | **-94.9%** | $0.501 &rarr; $0.025 | 18.4s &rarr; 2.1s |
@@ -181,7 +181,9 @@ Natively integrates the [Superdesign](https://github.com/superdesigndev/superdes
 
 ## MCP Tools Reference
 
-T-Zero provides **47 specialized MCP tools** grouped into clean functional categories:
+> **Tool Architecture:** By default, T-Zero exposes the **14 TDQS-certified Canonical Tools** to prevent context bloat and ensure 5/5 tool coherence. The full 47-tool suite is available on-demand via `tzero-mcp --all` or `TZERO_MCP_TOOL_MODE=all` (and all 47 tools remain dynamically callable via `call_tool()` in both modes).
+
+T-Zero tools grouped by functional category:
 
 <details>
 <summary><strong>1. Context & AST Pruning (6 tools)</strong></summary>
