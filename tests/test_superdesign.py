@@ -138,9 +138,17 @@ class TestSuperdesignOrchestrator(unittest.TestCase):
             self.assertIn("dashboard_v1.html", content)
 
     def test_mcp_tools_registration(self):
-        """Verifies that all 5 Superdesign tools are registered in create_mcp_server()."""
+        """Verifies that all 5 Superdesign tools are registered in create_mcp_server() when in full mode."""
         import tzero_mcp
-        server = tzero_mcp.create_mcp_server()
+        old_mode = os.environ.get("TZERO_MCP_TOOL_MODE")
+        os.environ["TZERO_MCP_TOOL_MODE"] = "all"
+        try:
+            server = tzero_mcp.create_mcp_server()
+        finally:
+            if old_mode is not None:
+                os.environ["TZERO_MCP_TOOL_MODE"] = old_mode
+            else:
+                os.environ.pop("TZERO_MCP_TOOL_MODE", None)
         # FastMCP or MCPServer tool inspection
         tool_names = set()
         if hasattr(server, "_tool_manager") and hasattr(server._tool_manager, "_tools"):

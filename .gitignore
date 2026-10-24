@@ -48,6 +48,9 @@ tzero-showcase/out/
 tzero-showcase/public/*.mp4
 *.mp4
 *.mp3
+!assets/*.mp4
+!assets/*.jpg
+!assets/*.gif
 # Automation & Profiles
 .reddit_profile/
 # Private B2B Gateway & Outreach Engine (Strictly Private - Never Push)

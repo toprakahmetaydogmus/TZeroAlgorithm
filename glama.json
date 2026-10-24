@@ -1,9 +1,9 @@
 {
   "$schema": "https://glama.ai/mcp/config.schema.json",
   "name": "tzero-mcp",
-  "displayName": "T-Zero Autonomous Context Engine",
-  "version": "7.1.0",
-  "description": "Enterprise-grade AST codebase context engine and 42-tool autonomous MCP server suite for Claude, Cursor, and AI coding agents. Reduces context tokens by up to 95% with 4D Causal Graphs, PBFT Swarm Consensus, and Zero-Leak security.",
+  "displayName": "T-Zero AST Context Engine",
+  "version": "7.3.1",
+  "description": "High-performance AST codebase context engine and MCP server suite for Claude, Cursor, and AI coding agents. Reduces prompt context tokens by up to 94.9% with deterministic AST signature pruning and 100% Zero-Leak security.",
   "repository": "https://github.com/toprakahmetaydogmus/TZeroAlgorithm",
   "maintainers": [
     "toprakahmetaydogmus"

@@ -14,21 +14,45 @@ import tzero_mcp
 
 
 class TestAnchor5TDQS(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.server = tzero_mcp.create_mcp_server()
-        manager = getattr(cls.server, "_tool_manager", cls.server)
-        cls.tools = manager.list_tools() if hasattr(manager, "list_tools") else []
+    def test_canonical_14_tool_suite(self):
+        """Audits the TDQS-optimized 14 Canonical Tools against TDQS 5.0 specifications."""
+        import os
+        old_mode = os.environ.get("TZERO_MCP_TOOL_MODE")
+        try:
+            os.environ["TZERO_MCP_TOOL_MODE"] = "canonical"
+            server = tzero_mcp.create_mcp_server()
+            manager = getattr(server, "_tool_manager", server)
+            tools = manager.list_tools() if hasattr(manager, "list_tools") else []
+            self.assertEqual(len(tools), 14, f"Expected 14 canonical tools for TDQS 5/5 coherence, found {len(tools)}")
+            self._audit_tools(tools)
+        finally:
+            if old_mode is not None:
+                os.environ["TZERO_MCP_TOOL_MODE"] = old_mode
+            else:
+                os.environ.pop("TZERO_MCP_TOOL_MODE", None)
 
-    def test_tool_count(self):
-        """Ensure all 47 primary tools are registered."""
-        self.assertEqual(len(self.tools), 47, f"Expected 47 registered tools, found {len(self.tools)}")
+    def test_full_47_tool_suite(self):
+        """Audits the full 47 tools against TDQS 5.0 specifications."""
+        import os
+        old_mode = os.environ.get("TZERO_MCP_TOOL_MODE")
+        try:
+            os.environ["TZERO_MCP_TOOL_MODE"] = "all"
+            server = tzero_mcp.create_mcp_server()
+            manager = getattr(server, "_tool_manager", server)
+            tools = manager.list_tools() if hasattr(manager, "list_tools") else []
+            self.assertEqual(len(tools), 47, f"Expected 47 registered tools in full mode, found {len(tools)}")
+            self._audit_tools(tools)
+        finally:
+            if old_mode is not None:
+                os.environ["TZERO_MCP_TOOL_MODE"] = old_mode
+            else:
+                os.environ.pop("TZERO_MCP_TOOL_MODE", None)
 
-    def test_tdqs_dimensions_all_tools(self):
-        """Audits all 47 tools against the TDQS 5.0/5.0 specification."""
+    def _audit_tools(self, tools):
+        """Audits tools against TDQS 5.0/5.0 criteria."""
         failures = []
 
-        for t in self.tools:
+        for t in tools:
             name = t.name
             desc = t.description or ""
             ann = getattr(t, "annotations", None)

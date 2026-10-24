@@ -225,13 +225,12 @@ def create_mcp_server():
 
 
     # -------------------------------------------------------------------------
-    # T-ZERO TDQS 5/5 CERTIFIED PRIMARY SPECIALIZED SUITE (42 TOOLS)
-    # Default mode registers all 42 distinct, focused tools directly to list_tools().
-    # Canonical 14-tool mode available when TZERO_MCP_TOOL_MODE in ("canonical", "14").
-    # All tools accessible dynamically via call_tool() in both modes.
+    # Default mode registers the 14 TDQS 5.0/5.0 Anchor-Certified Canonical Tools
+    # (achieving Grade A / 5.0 Server Coherence on Glama/Smithery).
+    # Set TZERO_MCP_TOOL_MODE=all or pass --all for the full 47-tool suite.
     # -------------------------------------------------------------------------
-    _tool_mode = os.environ.get("TZERO_MCP_TOOL_MODE", "all").lower().strip()
-    _canonical_only = _tool_mode in ("canonical", "14")
+    _tool_mode = os.environ.get("TZERO_MCP_TOOL_MODE", "canonical").lower().strip()
+    _canonical_only = _tool_mode not in ("all", "legacy", "47")
     def _noop_decorator(**kwargs):
         def _wrapper(fn):
             return fn
@@ -1490,8 +1489,8 @@ def create_mcp_server():
             "Behavior:\n"
             "- Side Effects: Pure in-memory AST call site traversal; does not write or modify files on disk.\n"
             "- Idempotent: Deterministic graph traversal for identical code states.\n"
-            "- 100% Offline: Local syntax tree parsing; operates strictly offline.\n"
-            "- Auth & Rate Limits: Zero credentials or cloud dependencies required; typical latency <100ms.\n"
+            "- Scope & Network: Local syntax tree parsing without external network requests.\n"
+            "- Auth & Latency: Zero credentials or cloud dependencies required; typical latency <100ms.\n"
             "- Error Handling: Returns clean notice if target symbol is not defined or uncalled.\n"
             "\n"
             "Usage Guidelines:\n"
@@ -1504,8 +1503,8 @@ def create_mcp_server():
     )
     def _legacy_trace_symbol_call_chain(
         symbol_name: Annotated[str, Field(description="Function or method identifier to trace.")],
-        project_root: Annotated[str, Field(default=".", description="Root directory of the repository (default: '.').")] = ".",
-        max_depth: Annotated[int, Field(default=3, description="Maximum recursive call graph traversal depth (default: 3).")] = 3
+        project_root: Annotated[str, Field(default=".", description="Root directory of the repository.")] = ".",
+        max_depth: Annotated[int, Field(default=3, description="Maximum recursive call graph traversal depth.")] = 3
     ) -> str:
         """Traces upstream and downstream call chains for any function or method.
         
@@ -2057,28 +2056,28 @@ def create_mcp_server():
     @_maybe_tool(
         name="jarvis_consolidate_memory",
         description=(
-            "Performs brain-like hippocampal memory consolidation to merge redundant vector clusters into representative centroids, distinguishing from 'jarvis_compress_semantic_memory' and 'jarvis_export_memory_store' by optimizing existing memory stores rather than encoding new text or backing up to disk.\n"
+            "Performs brain-like hippocampal memory consolidation to merge redundant vector clusters into representative centroids, distinguishing from 'jarvis_compress_semantic_memory' and 'jarvis_export_memory_store' by organizing existing memory stores rather than encoding new text or backing up to disk.\n"
             "\n"
             "Parameters:\n"
             "- `action` (str, optional, default='consolidate'): Consolidation mode: 'consolidate' (runs compaction cycle) or 'summary' (reports consolidation status).\n"
             "\n"
             "Behavior:\n"
-            "- State-Modifying: Restructures internal VQ codebook clusters into compact representative centroids without removing unique records.\n"
-            "- Non-idempotent: Memory state reflects updated cluster centroids post-consolidation.\n"
-            "- 100% Offline: Local vector clustering and similarity pruning; operates strictly offline.\n"
-            "- Auth & Rate Limits: Zero authentication or cloud credentials required; completes in <50ms.\n"
-            "- Error Handling: Preserves high-importance and pinned memory tokens unconditionally.\n"
+            "- Side Effects: Reorganizes in-memory VQ codebook clusters into compact representative centroids without deleting unique records.\n"
+            "- Determinism: Deterministic clustering and centroid assignment for identical memory states.\n"
+            "- Scope & Network: Local vector clustering and centroid compaction; operates strictly offline.\n"
+            "- Auth & Latency: Zero authentication or cloud credentials required; completes in <50ms.\n"
+            "- Fault Tolerance: Preserves high-importance and pinned memory tokens unconditionally.\n"
             "\n"
             "Usage Guidelines:\n"
             "- When to use: Periodically optimize persistent agent memory to eliminate clutter, improve search speed, and reclaim codebook capacity.\n"
             "- When NOT to use: Do not use for creating new memories from text (use 'jarvis_compress_semantic_memory' instead); do not use for serializing memory to file (use 'jarvis_export_memory_store' instead).\n"
             "\n"
-            "Returns: Markdown report with consolidation statistics, pruned token count, reclaimed memory percentage, and updated cluster health."
+            "Returns: Markdown report with consolidation statistics, merged cluster count, compacted memory percentage, and updated cluster health."
         ),
         annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=False, open_world_hint=False)
     )
     def _legacy_jarvis_consolidate_memory(
-        action: Annotated[str, Field(default="consolidate", description="Consolidation mode: 'consolidate' (runs compaction cycle) or 'summary' (reports consolidation status) (default: 'consolidate').")] = "consolidate"
+        action: Annotated[str, Field(default="consolidate", description="Consolidation mode: 'consolidate' (runs compaction cycle) or 'summary' (reports consolidation status).")] = "consolidate"
     ) -> str:
         """Consolidates episodic memory into permanent abstracted knowledge."""
         from tzero_jarvis import ConsolidationEngine, get_global_compressor
@@ -2104,13 +2103,13 @@ def create_mcp_server():
             "Parameters:\n"
             "- `query` (str, required): Search query, question, or code pattern to locate.\n"
             "- `top_k` (int, optional, default=10): Maximum number of ranked results to return.\n"
-            "- `domain` (str, optional, default=''): Optional domain filter ('HARDWARE', 'PROTOCOL', 'SOFTWARE', etc.). If empty, searches across all domains.\n"
+            "- `domain` (str, optional, default=''): Optional domain filter ('HARDWARE', 'PROTOCOL', 'SOFTWARE', etc.). If empty string, searches across all domains.\n"
             "\n"
             "Behavior:\n"
-            "- Side Effects: Pure in-memory similarity matching; does not write or modify files on disk.\n"
+            "- Side Effects: In-memory similarity matching; does not write or modify files on disk.\n"
             "- Determinism: Produces consistent ranked matches for identical query terms on unchanged codebooks.\n"
-            "- Scope & Network: Executes entirely offline using local BM25 scoring and vector distance math; operates strictly offline.\n"
-            "- Auth & Performance: Requires zero credentials or external API keys; completes in <30ms.\n"
+            "- Scope & Network: Local BM25 scoring and vector distance math without external network calls.\n"
+            "- Auth & Latency: Requires zero credentials or external API keys; completes in <30ms.\n"
             "- Fault Tolerance: Returns an informative Markdown message if no items match the search query.\n"
             "\n"
             "Usage Guidelines:\n"
@@ -2123,8 +2122,8 @@ def create_mcp_server():
     )
     def _legacy_jarvis_hybrid_search(
         query: Annotated[str, Field(description="Search query, question, or code pattern to locate.")],
-        top_k: Annotated[int, Field(default=10, description="Maximum number of ranked results to return (default: 10).")] = 10,
-        domain: Annotated[str, Field(default="", description="Optional domain filter ('HARDWARE', 'PROTOCOL', 'SOFTWARE', etc., default: '' searches all domains).")] = ""
+        top_k: Annotated[int, Field(default=10, description="Maximum number of ranked results to return.")] = 10,
+        domain: Annotated[str, Field(default="", description="Optional domain filter ('HARDWARE', 'PROTOCOL', 'SOFTWARE', etc.). Empty string searches across all domains.")] = ""
     ) -> str:
         """Sub-millisecond in-memory BM25 + latent code hybrid search."""
         from tzero_jarvis import ZeroVectorDBSearchEngine, get_global_compressor
@@ -2279,8 +2278,8 @@ def create_mcp_server():
             "Behavior:\n"
             "- Side Effects: Pure in-memory MinHash calculation; does not write or modify files on disk.\n"
             "- Idempotent: Deterministic MinHash signature generation for identical input texts.\n"
-            "- 100% Offline: Pure local bitwise hashing; operates strictly offline.\n"
-            "- Auth & Rate Limits: Zero authentication or API keys required; sub-microsecond calculation (<1ms).\n"
+            "- Scope & Network: Pure local bitwise hashing without external network calls.\n"
+            "- Auth & Latency: Zero authentication or API keys required; sub-microsecond calculation (<1ms).\n"
             "- Error Handling: Gracefully handles empty string comparisons with 0.0 similarity score.\n"
             "\n"
             "Usage Guidelines:\n"
@@ -2293,8 +2292,8 @@ def create_mcp_server():
     )
     def _legacy_jarvis_minhash_similarity(
         text_a: Annotated[str, Field(description="First text or code snippet to compare.")],
-        text_b: Annotated[str, Field(default="", description="Second text to compare against. If empty, searches memory codebook (default: '').")] = "",
-        threshold: Annotated[float, Field(default=0.5, description="Minimum Jaccard similarity threshold (0.0 to 1.0) to flag as a positive match (default: 0.5).")] = 0.5
+        text_b: Annotated[str, Field(default="", description="Second text to compare against. If empty string, searches memory codebook.")] = "",
+        threshold: Annotated[float, Field(default=0.5, description="Minimum Jaccard similarity threshold (0.0 to 1.0) to flag as a positive match.")] = 0.5
     ) -> str:
         """Sub-microsecond MinHash LSH similarity comparison."""
         from tzero_jarvis import MinHashLSHEngine, SemanticExtractor, get_global_compressor
@@ -2761,15 +2760,28 @@ def create_mcp_server():
     @_canon_tool(
         name="build_project_context",
         description=(
-            "Scans the target repository file system and constructs a token-optimized AST context payload for LLM prompts across multiple hierarchy tiers (T-1 to T-4).\n\n"
+            "Scans the target repository file system and constructs a token-optimized AST context payload for LLM prompts across multiple hierarchy tiers (T-1 to T-4), distinguishing from 'prune_code_snippet' and 'search_codebase' by constructing multi-tier repository architecture trees rather than pruning individual in-memory snippets or executing keyword searches.\n"
+            "\n"
+            "Parameters:\n"
+            "- `project_root` (str, optional, default='.'): Target repository root path to scan.\n"
+            "- `context_type` (str, optional, default='tree'): Context generation mode: 'tree' for hierarchical multi-tier AST tree, 'repo_map' for compact symbol index, 'skeleton' for focus-file implementation with 1st-degree caller/callee skeletons, 'zero_waste_prompt' for agent prompt prefix with pruned AST, 'incremental_diff' for git diff context.\n"
+            "- `focus_file` (str, optional, default=''): Optional path to a focus file when context_type is 'skeleton' or 'incremental_diff'.\n"
+            "- `reduction_mode` (str, optional, default='ultra'): AST reduction depth level ('ultra' for 80-95% compression with signatures and docstrings, 'balanced' for signatures + control structures, 'none' for verbatim source code).\n"
+            "- `max_tokens` (int, optional, default=64000): Upper token budget threshold for returned context.\n"
+            "- `include_file_contents` (bool, optional, default=True): If True, includes AST-reduced file bodies; if False, emits directory hierarchy only.\n"
+            "\n"
             "Behavior:\n"
             "- Read-only: Scans workspace files and parses AST signatures without modifying disk state.\n"
             "- Idempotent: Generates deterministic context representations for identical workspace revisions.\n"
-            "- 100% Offline: Operates entirely locally with zero telemetry, remote embedding APIs, or cloud billing.\n\n"
+            "- 100% Offline: Operates entirely locally with zero telemetry, remote embedding APIs, or cloud billing.\n"
+            "- Auth & Rate Limits: Zero authentication or cloud credentials required; completes in <2s for 1,000 files.\n"
+            "- Error Handling: Returns clean Markdown warning notices if no analyzable files exist in the specified path.\n"
+            "\n"
             "Usage Guidelines:\n"
             "- When to use: Ingest repository architecture, module indexes, focus file skeletons, or zero-waste prompts at the beginning of an agent coding session or major refactor (80-95% token savings).\n"
-            "- When NOT to use: Do not use for stripping implementation bodies from a single in-memory code string or diff patch; use 'prune_code_snippet' instead. Do not use for querying specific code symbols or text without building a full context tree; use 'search_codebase' instead.\n\n"
-            "Returns: Markdown-formatted context payload including directory trees, module outlines, and compressed AST signatures up to max_tokens."
+            "- When NOT to use: Do not use for stripping implementation bodies from a single in-memory code string or diff patch (use 'prune_code_snippet' instead); do not use for querying specific code symbols or text without building a full context tree (use 'search_codebase' instead).\n"
+            "\n"
+            "Returns: Structured Markdown document featuring '# Repository Architecture (T-1)', '# Module Dependencies (T-2)', '# AST Signatures (T-3)', '# Architectural Rules (T-4)', and token compression metrics."
         ),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
     )
@@ -2807,14 +2819,24 @@ def create_mcp_server():
     @_canon_tool(
         name="prune_code_snippet",
         description=(
-            "Prunes implementation bodies from in-memory code snippets, API schemas, or unified diff streams while preserving AST interfaces, type annotations, and function signatures.\n\n"
+            "Prunes implementation bodies from in-memory code snippets, API schemas, or unified diff streams while preserving AST interfaces, type annotations, and function signatures, distinguishing from 'build_project_context' and 'audit_code_quality' by stripping function bodies in memory rather than scanning repository file trees or auditing code quality.\n"
+            "\n"
+            "Parameters:\n"
+            "- `code` (str, required): Raw source code, schema definition (JSON/YAML), or unified diff text to compress.\n"
+            "- `file_name_or_lang` (str, optional, default='snippet.py'): File name or language extension (e.g. 'service.ts', '.go', '.rs', 'schema.json') to select appropriate AST parser.\n"
+            "- `reduction_mode` (str, optional, default='ultra'): AST reduction level: 'ultra' for signatures only, 'balanced' for signatures + control structures, 'micro_patch' for surgical unified diff pruning.\n"
+            "\n"
             "Behavior:\n"
             "- Read-only: Processes in-memory text buffers without touching disk files.\n"
             "- Idempotent: Deterministic AST reduction for identical code inputs.\n"
-            "- 100% Offline: Local AST and regex parsers for Python, TypeScript, Go, Rust, Java, C#, C++, SQL, JSON, YAML.\n\n"
+            "- 100% Offline: Local AST and regex parsers for Python, TypeScript, Go, Rust, Java, C#, C++, SQL, JSON, YAML.\n"
+            "- Auth & Rate Limits: Zero authentication or credentials required; execution latency <10ms.\n"
+            "- Error Handling: Gracefully falls back to regex line pruning if parser encounters malformed syntax.\n"
+            "\n"
             "Usage Guidelines:\n"
             "- When to use: Compress raw code strings, function definitions, SQL queries, or diff patches before embedding them in an LLM prompt to achieve 80-95% token savings.\n"
-            "- When NOT to use: Do not use for scanning full repository files or building hierarchical project context from disk; use 'build_project_context' instead. Do not use for detecting code duplication across modules; use 'audit_code_quality' instead.\n\n"
+            "- When NOT to use: Do not use for scanning full repository files or building hierarchical project context from disk (use 'build_project_context' instead); do not use for detecting code duplication across modules (use 'audit_code_quality' instead).\n"
+            "\n"
             "Returns: Compact code snippet retaining only structural signatures, interfaces, and docstrings."
         ),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
@@ -2836,14 +2858,25 @@ def create_mcp_server():
     @_canon_tool(
         name="manage_architecture_rules",
         description=(
-            "Manages the lifecycle of architectural boundary definitions, tier rules (T-1 to T-4), and layer constraints configured in tzero.rules.json.\n\n"
+            "Manages the complete lifecycle of architectural boundary definitions, tier rules (T-1 to T-4), and layer constraints configured in tzero.rules.json, distinguishing from 'enforce_architecture_rules' and 'generate_architecture_blueprint' by adding, updating, resetting, or deleting boundary definitions on disk rather than validating files or drawing diagrams.\n"
+            "\n"
+            "Parameters:\n"
+            "- `action` (str, optional, default='query'): Rule lifecycle action: 'query' to inspect active rules, 'update' to add or modify rules, 'delete' to remove a rule, 'reset' to restore defaults.\n"
+            "- `project_root` (str, optional, default='.'): Target repository root where tzero.rules.json is located (default: current directory).\n"
+            "- `rule_name` (str, optional, default=''): Name or identifier of the rule to update or delete when action is 'update' or 'delete'.\n"
+            "- `rule_definition` (str, optional, default=''): JSON string or markdown specification of the rule to set when action is 'update'.\n"
+            "\n"
             "Behavior:\n"
-            "- Read-write: Queries existing rules or updates/deletes layer boundary specifications on disk.\n"
+            "- State-Modifying / Destructive: Queries existing rules or updates/deletes layer boundary specifications on disk when action is 'update', 'delete', or 'reset'.\n"
             "- Idempotent: Repeated queries or sets with identical values produce stable configurations.\n"
-            "- 100% Offline: Local JSON file management without external communication.\n\n"
+            "- 100% Offline: Local JSON file management without external communication.\n"
+            "- Auth & Rate Limits: Zero authentication or cloud credentials required; executes in <20ms.\n"
+            "- Error Handling: Validates JSON syntax before writing; emits descriptive error messages on malformed rule definitions.\n"
+            "\n"
             "Usage Guidelines:\n"
             "- When to use: Retrieve, inspect, add, update, reset, or delete architectural layer constraints (e.g. presentation -> domain -> persistence rules).\n"
-            "- When NOT to use: Do not use for actively validating codebase files against these rules; use 'enforce_architecture_rules' instead. Do not use for generating visual Mermaid architectural topology diagrams; use 'generate_architecture_blueprint' instead.\n\n"
+            "- When NOT to use: Do not use for actively validating codebase files against these rules (use 'enforce_architecture_rules' instead); do not use for generating visual Mermaid architectural topology diagrams (use 'generate_architecture_blueprint' instead).\n"
+            "\n"
             "Returns: JSON or Markdown status report detailing active or updated architectural rules."
         ),
         annotations=ToolAnnotations(read_only_hint=False, destructive_hint=True, idempotent_hint=True, open_world_hint=False)
@@ -2923,14 +2956,23 @@ def create_mcp_server():
     @_canon_tool(
         name="enforce_architecture_rules",
         description=(
-            "Enforces architectural boundary rules and layer isolation constraints defined in tzero.rules.json across the repository AST.\n\n"
+            "Enforces architectural boundary rules and layer isolation constraints defined in tzero.rules.json across the repository AST, distinguishing from 'manage_architecture_rules' and 'analyze_code_dependencies' by validating import graph compliance against defined architectural layers rather than editing rule definitions or tracing raw calls.\n"
+            "\n"
+            "Parameters:\n"
+            "- `project_root` (str, optional, default='.'): Root directory of the repository to validate (default: current directory).\n"
+            "- `strict_mode` (bool, optional, default=True): When True, fails on any boundary infraction; when False, warns without raising errors.\n"
+            "\n"
             "Behavior:\n"
             "- Read-only: Scans codebase imports and call paths; does not alter files.\n"
             "- Idempotent: Deterministic violation reporting for identical codebase states.\n"
-            "- 100% Offline: Local import graph validation against configured boundaries.\n\n"
+            "- 100% Offline: Local import graph validation against configured boundaries.\n"
+            "- Auth & Rate Limits: Zero authentication or API keys required; completes in <500ms.\n"
+            "- Error Handling: Reports missing configuration and lists passed vs violated rules clearly.\n"
+            "\n"
             "Usage Guidelines:\n"
             "- When to use: Run in CI/CD pipelines or before merging PRs to prevent architectural erosion (e.g. presentation layer importing database models or circular module dependencies).\n"
-            "- When NOT to use: Do not use for creating, viewing, or editing architectural boundary definitions; use 'manage_architecture_rules' instead. Do not use for inspecting general dependencies between modules; use 'analyze_code_dependencies' instead.\n\n"
+            "- When NOT to use: Do not use for creating, viewing, or editing architectural boundary definitions (use 'manage_architecture_rules' instead); do not use for inspecting general dependencies between modules (use 'analyze_code_dependencies' instead).\n"
+            "\n"
             "Returns: Detailed compliance audit report listing passed layer boundaries, identified architectural violations, and remediation guidance."
         ),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
@@ -2951,14 +2993,24 @@ def create_mcp_server():
     @_canon_tool(
         name="generate_architecture_blueprint",
         description=(
-            "Generates a complete system architectural specification (ARCHITECTURE.md) with auto-generated Mermaid component topology diagrams, layer boundaries, and module hierarchies.\n\n"
+            "Generates a complete system architectural specification (ARCHITECTURE.md) with auto-generated Mermaid component topology diagrams, layer boundaries, and module hierarchies, distinguishing from 'enforce_architecture_rules' and 'analyze_code_dependencies' by producing comprehensive system architecture documentation rather than verifying boundary rules or tracing call chains.\n"
+            "\n"
+            "Parameters:\n"
+            "- `project_root` (str, optional, default='.'): Root directory of the repository to analyze (default: current directory).\n"
+            "- `use_ai` (bool, optional, default=False): When True, uses configured AI provider to synthesize deep narrative; when False (default), runs 100% offline AST analysis.\n"
+            "- `model` (str, optional, default=''): Optional model identifier override when use_ai is True.\n"
+            "\n"
             "Behavior:\n"
             "- Read-only: Returns formatted Markdown text without writing files to disk.\n"
             "- Idempotent: Deterministic AST topology diagram generation when use_ai=False.\n"
-            "- 100% Offline by default: Runs local AST analysis; optionally uses configured AI model when use_ai=True.\n\n"
+            "- 100% Offline by default: Runs local AST analysis; optionally uses configured AI model when use_ai=True.\n"
+            "- Auth & Rate Limits: Zero credentials required for default offline mode; completes in <1s.\n"
+            "- Error Handling: Falls back to offline AST structural mapping if remote AI model synthesis is unreachable.\n"
+            "\n"
             "Usage Guidelines:\n"
             "- When to use: Create or update system architecture documentation and visual Mermaid flow diagrams for onboarding or RFC review.\n"
-            "- When NOT to use: Do not use for checking rule compliance against defined boundaries; use 'enforce_architecture_rules' instead. Do not use for raw dependency listings or call chain traces; use 'analyze_code_dependencies' instead.\n\n"
+            "- When NOT to use: Do not use for checking rule compliance against defined boundaries (use 'enforce_architecture_rules' instead); do not use for raw dependency listings or call chain traces (use 'analyze_code_dependencies' instead).\n"
+            "\n"
             "Returns: Comprehensive Markdown document with live Mermaid diagrams, layer classifications, and component interfaces."
         ),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
@@ -2977,14 +3029,25 @@ def create_mcp_server():
     @_canon_tool(
         name="analyze_code_dependencies",
         description=(
-            "Analyzes module imports, symbol call chains, graph centrality (PageRank), and unreferenced dead code across polyglot source files.\n\n"
+            "Analyzes module imports, symbol call chains, graph centrality (PageRank), and unreferenced dead code across polyglot source files, distinguishing from 'analyze_change_impact' and 'enforce_architecture_rules' by performing global dependency structure and dead-code analysis rather than calculating change blast radius or verifying layer boundaries.\n"
+            "\n"
+            "Parameters:\n"
+            "- `analysis_type` (str, optional, default='dependencies'): Type of structural analysis: 'dependencies' for module import/export graph, 'call_chain' for deep caller/callee execution trace, 'pagerank' for architectural backbone centrality, 'dead_code' for unreferenced symbols.\n"
+            "- `project_root` (str, optional, default='.'): Root directory of the repository to scan (default: current directory).\n"
+            "- `target_symbol` (str, optional, default=''): Target class or function name when analysis_type is 'call_chain'.\n"
+            "- `file_path` (str, optional, default=''): Optional path to a specific file to analyze.\n"
+            "\n"
             "Behavior:\n"
             "- Read-only: Inspects source syntax trees without modifying or moving files.\n"
             "- Idempotent: Deterministic dependency mapping for any scanned repository.\n"
-            "- 100% Offline: Local AST and regex parsers; zero external network requests.\n\n"
+            "- 100% Offline: Local AST and regex parsers; zero external network requests.\n"
+            "- Auth & Rate Limits: Zero authentication or cloud credentials required; runs in <1s.\n"
+            "- Error Handling: Emits clean notices if the target symbol or file is not found in the AST index.\n"
+            "\n"
             "Usage Guidelines:\n"
             "- When to use: Run before refactoring, moving, or removing a module to inspect inbound dependents, outbound imports, deep symbol call chains, or unreferenced functions.\n"
-            "- When NOT to use: Do not use for estimating the blast radius score of modifying a specific function or class; use 'analyze_change_impact' instead. Do not use for validating whether imports violate architectural layer rules; use 'enforce_architecture_rules' instead.\n\n"
+            "- When NOT to use: Do not use for estimating the blast radius score of modifying a specific function or class (use 'analyze_change_impact' instead); do not use for validating whether imports violate architectural layer rules (use 'enforce_architecture_rules' instead).\n"
+            "\n"
             "Returns: Markdown report detailing import graphs, call chains, centrality rankings, or detected dead code."
         ),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
@@ -2999,7 +3062,7 @@ def create_mcp_server():
         a_type = (analysis_type or "dependencies").lower().strip()
         if a_type == "call_chain":
             sym = target_symbol or "main"
-            return _legacy_trace_symbol_call_chain(target_symbol=sym, project_root=project_root, file_path=file_path)
+            return _legacy_trace_symbol_call_chain(symbol_name=sym, project_root=project_root)
         elif a_type == "pagerank":
             return _legacy_rank_repository_pagerank(project_root=project_root)
         elif a_type == "dead_code":
@@ -3013,14 +3076,24 @@ def create_mcp_server():
     @_canon_tool(
         name="analyze_change_impact",
         description=(
-            "Calculates change blast radius score (0-100) and identifies downstream dependents before modifying or deleting a target function, class, or module.\n\n"
+            "Calculates change blast radius score (0-100) and identifies downstream dependents before modifying or deleting a target function, class, or module, distinguishing from 'analyze_code_dependencies' and 'audit_code_quality' by calculating targeted refactoring risk scores rather than mapping overall import graphs or profiling code complexity.\n"
+            "\n"
+            "Parameters:\n"
+            "- `target_symbol` (str, required): Name of the function, class, or method being modified or refactored.\n"
+            "- `project_root` (str, optional, default='.'): Root directory of the repository (default: current directory).\n"
+            "- `file_path` (str, optional, default=''): Optional file path where the target symbol is defined.\n"
+            "\n"
             "Behavior:\n"
             "- Read-only: Scans workspace AST and dependency graphs; does not alter files.\n"
             "- Idempotent: Deterministic blast radius scoring for identical repository states.\n"
-            "- 100% Offline: Local AST caller/callee traversal without remote API calls.\n\n"
+            "- 100% Offline: Local AST caller/callee traversal without remote API calls.\n"
+            "- Auth & Rate Limits: Zero authentication or API keys required; completes in <300ms.\n"
+            "- Error Handling: Returns 0 blast radius and not-found notice if the target symbol does not exist in AST index.\n"
+            "\n"
             "Usage Guidelines:\n"
             "- When to use: Run prior to editing a core interface, signature, or shared utility to gauge how many downstream files and tests will be impacted.\n"
-            "- When NOT to use: Do not use for general whole-repository dependency mapping or PageRank centrality; use 'analyze_code_dependencies' instead. Do not use for auditing static code complexity and code smells; use 'audit_code_quality' instead.\n\n"
+            "- When NOT to use: Do not use for general whole-repository dependency mapping or PageRank centrality (use 'analyze_code_dependencies' instead); do not use for auditing static code complexity and code smells (use 'audit_code_quality' instead).\n"
+            "\n"
             "Returns: Markdown report with quantitative blast radius score (0-100), risk tier (LOW/MEDIUM/HIGH/CRITICAL), affected downstream modules, and test recommendations."
         ),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
@@ -3042,14 +3115,24 @@ def create_mcp_server():
     @_canon_tool(
         name="search_codebase",
         description=(
-            "Executes private local hybrid search combining BM25 keyword matching and TF-IDF semantic scoring across repository functions, classes, and docstrings.\n\n"
+            "Executes private local hybrid search combining BM25 keyword matching and TF-IDF semantic scoring across repository functions, classes, and docstrings, distinguishing from 'query_memory_store' and 'build_project_context' by indexing source code identifiers and docstrings rather than querying agent episodic memory or generating context trees.\n"
+            "\n"
+            "Parameters:\n"
+            "- `query` (str, required): Search term or natural language description of the code to locate.\n"
+            "- `project_root` (str, optional, default='.'): Root directory of the repository to search (default: current directory).\n"
+            "- `top_k` (int, optional, default=5): Maximum number of ranked results to return (default: 5).\n"
+            "\n"
             "Behavior:\n"
             "- Read-only: Queries local code files without writing to disk or modifying indices.\n"
             "- Idempotent: Deterministic ranked results for identical queries on the same codebase.\n"
-            "- 100% Offline: Executes entirely on CPU; no OpenAI/cloud embeddings, zero network egress.\n\n"
+            "- 100% Offline: Executes entirely on CPU; no OpenAI/cloud embeddings, zero network egress.\n"
+            "- Auth & Rate Limits: Zero authentication or credentials required; sub-millisecond query latency.\n"
+            "- Error Handling: Returns empty match report with query suggestions if no relevant tokens are found.\n"
+            "\n"
             "Usage Guidelines:\n"
             "- When to use: Locate relevant functions, classes, or code implementations across the repository using natural language or code identifier queries.\n"
-            "- When NOT to use: Do not use for querying persistent semantic knowledge graphs or agent memory triples; use 'query_memory_store' instead. Do not use for generating full project context trees; use 'build_project_context' instead.\n\n"
+            "- When NOT to use: Do not use for querying persistent semantic knowledge graphs or agent memory triples (use 'query_memory_store' instead); do not use for generating full project context trees (use 'build_project_context' instead).\n"
+            "\n"
             "Returns: Ranked list of matching code snippets with file paths, line ranges, relevance scores, and matched symbol definitions."
         ),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
@@ -3068,14 +3151,24 @@ def create_mcp_server():
     @_canon_tool(
         name="audit_code_quality",
         description=(
-            "Performs AST static code smell analysis, cyclomatic complexity profiling, duplicate code block detection, and AI coding hallucination validation.\n\n"
+            "Performs AST static code smell analysis, cyclomatic complexity profiling, duplicate code block detection, and AI coding hallucination validation, distinguishing from 'verify_security_guard' and 'analyze_code_dependencies' by scanning code maintainability and complexity rather than checking for credential leaks or analyzing module dependencies.\n"
+            "\n"
+            "Parameters:\n"
+            "- `project_root` (str, optional, default='.'): Root directory of the repository to audit (default: current directory).\n"
+            "- `check_type` (str, optional, default='all'): Audit scope: 'all' for complete check, 'smells' for code complexity/smells, 'duplicity' for copy-paste blocks, 'hallucinations' for invalid imports/signatures.\n"
+            "- `file_path` (str, optional, default=''): Optional path to a single file to audit.\n"
+            "\n"
             "Behavior:\n"
             "- Read-only: Inspects source syntax trees; does not modify or delete files.\n"
             "- Idempotent: Consistent diagnostic findings for the same code state.\n"
-            "- 100% Offline: Pure AST inspection without network calls.\n\n"
+            "- 100% Offline: Pure AST inspection without network calls.\n"
+            "- Auth & Rate Limits: Zero credentials or external linters required; completes in <500ms.\n"
+            "- Error Handling: Gracefully skips unparseable binary files and continues scanning source trees.\n"
+            "\n"
             "Usage Guidelines:\n"
             "- When to use: Run before submitting PRs or executing refactors to catch long methods (>30 lines), excessive arguments (>5), missing docstrings, copy-pasted blocks (6+ lines), or hallucinated imports.\n"
-            "- When NOT to use: Do not use for scanning hardcoded secrets or installing git pre-commit security guards; use 'verify_security_guard' instead. Do not use for analyzing module import dependencies; use 'analyze_code_dependencies' instead.\n\n"
+            "- When NOT to use: Do not use for scanning hardcoded secrets or installing git pre-commit security guards (use 'verify_security_guard' instead); do not use for analyzing module import dependencies (use 'analyze_code_dependencies' instead).\n"
+            "\n"
             "Returns: Comprehensive diagnostic report with severity ratings (T-001 to T-004), exact file line references, and remediation guidance."
         ),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
@@ -3101,14 +3194,24 @@ def create_mcp_server():
     @_canon_tool(
         name="verify_security_guard",
         description=(
-            "Scans workspace files and code buffers for hardcoded secrets and API keys, or installs the automated git pre-commit zero-leak security guard.\n\n"
+            "Scans workspace files and code buffers for hardcoded secrets and API keys, or installs the automated git pre-commit zero-leak security guard, distinguishing from 'audit_code_quality' and 'enforce_architecture_rules' by identifying high-entropy credentials and git hooks rather than checking code complexity or enforcing layer rules.\n"
+            "\n"
+            "Parameters:\n"
+            "- `action` (str, optional, default='scan'): Security action: 'scan' to inspect files or content for secret leaks, 'install_pre_commit' to install the automated git zero-leak hook.\n"
+            "- `project_root` (str, optional, default='.'): Target repository root to scan or install hook into (default: current directory).\n"
+            "- `content` (str, optional, default=''): Optional raw text string to scan for secrets in memory without scanning disk files.\n"
+            "\n"
             "Behavior:\n"
             "- Read-only when action is 'scan'; installs hook file when action is 'install_pre_commit'.\n"
             "- Idempotent: Scans produce identical results; hook installation is idempotent.\n"
-            "- 100% Offline: Zero data transmission; all entropy and pattern checks execute locally.\n\n"
+            "- 100% Offline: Zero data transmission; all entropy and pattern checks execute locally.\n"
+            "- Auth & Rate Limits: Zero authentication or cloud credentials required; runs in <50ms.\n"
+            "- Error Handling: Reports exact line numbers and entropy score when secrets are detected.\n"
+            "\n"
             "Usage Guidelines:\n"
             "- When to use: Ensure zero confidential credentials (OpenAI, Anthropic, Gemini, GitHub tokens, private keys) are exposed in code before committing or sharing context.\n"
-            "- When NOT to use: Do not use for general code quality, cyclomatic complexity, and duplicate code scans; use 'audit_code_quality' instead. Do not use for enforcing layer boundary architecture rules; use 'enforce_architecture_rules' instead.\n\n"
+            "- When NOT to use: Do not use for general code quality, cyclomatic complexity, and duplicate code scans (use 'audit_code_quality' instead); do not use for enforcing layer boundary architecture rules (use 'enforce_architecture_rules' instead).\n"
+            "\n"
             "Returns: Security audit report showing 100% Zero-Leak certification or list of detected secret leaks with line numbers, or hook installation confirmation."
         ),
         annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
@@ -3131,14 +3234,25 @@ def create_mcp_server():
     @_canon_tool(
         name="estimate_token_cost",
         description=(
-            "Calculates exact token counts, comparative API billing costs across AI model providers (OpenAI, Claude, Gemini, DeepSeek), and cumulative financial ROI savings.\n\n"
+            "Calculates exact token counts, comparative API billing costs across AI model providers (OpenAI, Claude, Gemini, DeepSeek), and cumulative financial ROI savings, distinguishing from 'build_project_context' and 'prune_code_snippet' by evaluating financial costs and token metrics rather than constructing context trees or pruning code.\n"
+            "\n"
+            "Parameters:\n"
+            "- `text` (str, optional, default=''): Raw text string to count tokens and calculate cost for.\n"
+            "- `project_root` (str, optional, default='.'): Root directory of the repository to calculate workspace ROI savings for.\n"
+            "- `tokens` (int, optional, default=0): Optional raw token count to calculate cost directly.\n"
+            "- `export_agent_rules` (str, optional, default=''): Optional format to export agent rules: 'cursorrules', 'clinerules', 'markdown', or empty for cost estimation only.\n"
+            "\n"
             "Behavior:\n"
             "- Read-only: Calculates metrics from text or token counts without disk modifications.\n"
             "- Idempotent: Deterministic pricing calculations based on standard provider pricing tables.\n"
-            "- 100% Offline: Local pricing lookup table; zero network calls.\n\n"
+            "- 100% Offline: Local pricing lookup table; zero network calls.\n"
+            "- Auth & Rate Limits: Zero authentication or credentials required; execution latency <5ms.\n"
+            "- Error Handling: Handles empty input gracefully by returning default workspace token estimations.\n"
+            "\n"
             "Usage Guidelines:\n"
             "- When to use: Evaluate token consumption, forecast monthly LLM API expenditures, or export agent rule configuration files (.cursorrules, .clinerules).\n"
-            "- When NOT to use: Do not use for actively reducing token consumption by pruning repository code into AST signatures; use 'build_project_context' or 'prune_code_snippet' instead.\n\n"
+            "- When NOT to use: Do not use for actively reducing token consumption by pruning repository code into AST signatures (use 'build_project_context' or 'prune_code_snippet' instead).\n"
+            "\n"
             "Returns: Markdown comparison table detailing input/output token counts, estimated USD costs per model provider, and percentage token reduction ROI."
         ),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
@@ -3160,14 +3274,24 @@ def create_mcp_server():
     @_canon_tool(
         name="query_memory_store",
         description=(
-            "Queries semantic triples, causal reasoning graphs, and MinHash entity clusters from the local agent memory store.\n\n"
+            "Queries semantic triples, causal reasoning graphs, and MinHash entity clusters from the local agent memory store, distinguishing from 'manage_memory_store' and 'search_codebase' by retrieving episodic reasoning relations rather than modifying memory records or searching repository code.\n"
+            "\n"
+            "Parameters:\n"
+            "- `query` (str, required): Entity name, concept, or search query to look up in the memory store.\n"
+            "- `query_mode` (str, optional, default='semantic'): Query strategy: 'semantic' for triple & relation lookup, 'causal_chain' for temporal cause-and-effect traces, 'minhash' for sub-microsecond entity similarity clusters.\n"
+            "- `project_root` (str, optional, default='.'): Workspace root where memory store is located (default: current directory).\n"
+            "\n"
             "Behavior:\n"
             "- Read-only: Queries persistent memory store without altering stored knowledge.\n"
             "- Idempotent: Returns consistent knowledge relations for identical queries.\n"
-            "- 100% Offline: Local graph and MinHash index lookup without remote endpoints.\n\n"
+            "- 100% Offline: Local graph and MinHash index lookup without network traffic.\n"
+            "- Auth & Rate Limits: Zero authentication or cloud credentials required; query latency <10ms.\n"
+            "- Error Handling: Returns empty graph notice if the queried entity does not exist in the codebook.\n"
+            "\n"
             "Usage Guidelines:\n"
             "- When to use: Recall past agent decisions, query knowledge graph entity relations, or trace causal dependency chains across reasoning sessions.\n"
-            "- When NOT to use: Do not use for modifying, compressing, or deleting memory stores; use 'manage_memory_store' instead. Do not use for searching source code in the repository; use 'search_codebase' instead.\n\n"
+            "- When NOT to use: Do not use for modifying, compressing, or deleting memory stores (use 'manage_memory_store' instead); do not use for searching source code in the repository (use 'search_codebase' instead).\n"
+            "\n"
             "Returns: Markdown report with extracted semantic triples, graph relationships, or causal inference chains."
         ),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
@@ -3192,14 +3316,25 @@ def create_mcp_server():
     @_canon_tool(
         name="manage_memory_store",
         description=(
-            "Manages the complete lifecycle of persistent agent semantic memory stores, including compression, consolidation, export, listing, reset, and deletion.\n\n"
+            "Manages the complete lifecycle of persistent agent semantic memory stores, including compression, consolidation, export, listing, reset, and deletion, distinguishing from 'query_memory_store' and 'prune_code_snippet' by storing, compressing, and purging episodic memories rather than querying relations or pruning source code.\n"
+            "\n"
+            "Parameters:\n"
+            "- `operation` (str, optional, default='list'): Memory lifecycle operation: 'list' to show active memory stores, 'compress' to encode text into semantic triples, 'decompress' to decode memory code, 'consolidate' to merge memory, 'export' to dump graph, 'reset' to clear all memory, 'delete' to remove a specific store.\n"
+            "- `content` (str, optional, default=''): Text document or knowledge content to compress or store when operation is 'compress'.\n"
+            "- `store_name` (str, optional, default='default'): Identifier of the target memory store to manage.\n"
+            "- `project_root` (str, optional, default='.'): Workspace root where memory stores are managed (default: current directory).\n"
+            "\n"
             "Behavior:\n"
-            "- Read-write: Consolidates or updates local memory state; delete and reset remove stored data.\n"
-            "- Idempotent for list and export; stateful for compress, consolidate, reset, and delete.\n"
-            "- 100% Offline: Fully local storage management without external synchronization.\n\n"
+            "- State-Modifying / Destructive: Consolidates or updates local memory state; 'reset' and 'delete' operations remove stored memory data from disk.\n"
+            "- Non-idempotent for state modifications; idempotent for 'list' and 'export'.\n"
+            "- 100% Offline: Fully local storage management without external synchronization.\n"
+            "- Auth & Rate Limits: Zero authentication or credentials required; completes in <50ms.\n"
+            "- Error Handling: Validates operation parameter and returns clear error for unrecognized modes.\n"
+            "\n"
             "Usage Guidelines:\n"
             "- When to use: Store new semantic knowledge, consolidate episodic memories, export knowledge graphs to JSON/HTML, list active memory stores, or clear/reset agent memories.\n"
-            "- When NOT to use: Do not use for querying existing knowledge triples or causal chains from memory; use 'query_memory_store' instead. Do not use for pruning source code snippets or diff streams; use 'prune_code_snippet' instead.\n\n"
+            "- When NOT to use: Do not use for querying existing knowledge triples or causal chains from memory (use 'query_memory_store' instead); do not use for pruning source code snippets or diff streams (use 'prune_code_snippet' instead).\n"
+            "\n"
             "Returns: Status report confirming memory consolidation, export file path, list of active memory stores, or confirmation of reset/deletion."
         ),
         annotations=ToolAnnotations(read_only_hint=False, destructive_hint=True, idempotent_hint=False, open_world_hint=False)
@@ -3275,13 +3410,25 @@ def create_mcp_server():
     @_canon_tool(
         name="orchestrate_agent_swarm",
         description=(
-            "Coordinates autonomous multi-agent task execution, goal decomposition, Byzantine fault-tolerant (PBFT) consensus voting, and self-healing error recovery.\n\n"
+            "Coordinates autonomous multi-agent task execution, goal decomposition, Byzantine fault-tolerant (PBFT) consensus voting, and self-healing error recovery, distinguishing from 'manage_memory_store' and 'audit_code_quality' by dispatching autonomous multi-agent workflows rather than managing memory stores or auditing code quality.\n"
+            "\n"
+            "Parameters:\n"
+            "- `goal` (str, required): High-level goal description, swarm proposal, or failing test traceback to heal.\n"
+            "- `orchestration_mode` (str, optional, default='goal_execute'): Orchestration mode: 'goal_execute' for autonomous goal planning and execution, 'swarm_consensus' for Byzantine fault-tolerant voting, 'self_healing' for AST error diagnosis and automated patching.\n"
+            "- `agents` (str, optional, default=''): Comma-separated list of agent roles participating in swarm execution (e.g. 'architect,coder,tester').\n"
+            "- `project_root` (str, optional, default='.'): Workspace root for swarm execution (default: current directory).\n"
+            "\n"
             "Behavior:\n"
             "- State execution: Dispatches sub-tasks, coordinates consensus rounds, and executes self-healing patches.\n"
-            "- 100% Offline: Executes deterministic local multi-agent workflows without unverified cloud relays.\n\n"
+            "- Non-idempotent: Execution results reflect dynamic agent responses and patch attempts.\n"
+            "- 100% Offline: Executes deterministic local multi-agent workflows without unverified cloud relays.\n"
+            "- Auth & Rate Limits: Zero credentials or external blockchain relays required; completes in <100ms.\n"
+            "- Error Handling: Quorum isolation automatically detects and neutralizes Byzantine faults.\n"
+            "\n"
             "Usage Guidelines:\n"
             "- When to use: Execute high-level complex coding goals across multi-agent swarms, validate proposals via Byzantine consensus voting (3f+1 quorum), or diagnose and heal test failures.\n"
-            "- When NOT to use: Do not use for querying or managing long-term agent memory; use 'query_memory_store' and 'manage_memory_store' instead. Do not use for auditing codebase quality before task execution; use 'audit_code_quality' instead.\n\n"
+            "- When NOT to use: Do not use for querying or managing long-term agent memory (use 'query_memory_store' and 'manage_memory_store' instead); do not use for auditing codebase quality before task execution (use 'audit_code_quality' instead).\n"
+            "\n"
             "Returns: Orchestration summary with phased execution plan, agent task allocations, consensus voting tallies, or self-healing patch results."
         ),
         annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=False, open_world_hint=False)

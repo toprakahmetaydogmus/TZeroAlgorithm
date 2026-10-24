@@ -18,7 +18,16 @@ def tool_result_text(result):
 class TestMCPServer(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
+        cls._old_tool_mode = os.environ.get("TZERO_MCP_TOOL_MODE")
+        os.environ["TZERO_MCP_TOOL_MODE"] = "all"
         cls.server = tzero_mcp.create_mcp_server()
+
+    @classmethod
+    def tearDownClass(cls):
+        if cls._old_tool_mode is not None:
+            os.environ["TZERO_MCP_TOOL_MODE"] = cls._old_tool_mode
+        else:
+            os.environ.pop("TZERO_MCP_TOOL_MODE", None)
 
     def run_async(self, coro):
         return asyncio.run(coro)
@@ -694,21 +703,26 @@ diff --git a/core.py b/core.py
             self.assertIn("T-Zero", tool_result_text(res))
 
     def test_legacy_mode_environment_variable(self):
-        """Verifies that TZERO_MCP_TOOL_MODE=canonical registers the 14 canonical tools, and default registers 42 tools."""
-        os.environ["TZERO_MCP_TOOL_MODE"] = "canonical"
+        """Verifies that default registers the 14 canonical tools, and TZERO_MCP_TOOL_MODE=all registers 47 tools."""
+        # Clean env to test true default behavior
+        old_val = os.environ.pop("TZERO_MCP_TOOL_MODE", None)
         try:
-            canon_server = tzero_mcp.create_mcp_server()
-            tools = self.run_async(canon_server.list_tools())
-            tool_names = [t.name for t in tools]
+            default_server = tzero_mcp.create_mcp_server()
+            tools_def = self.run_async(default_server.list_tools())
+            tool_names = [t.name for t in tools_def]
             self.assertEqual(len(tool_names), 14)
             self.assertIn("build_project_context", tool_names)
             self.assertIn("manage_memory_store", tool_names)
-        finally:
-            os.environ.pop("TZERO_MCP_TOOL_MODE", None)
 
-        default_server = tzero_mcp.create_mcp_server()
-        tools_def = self.run_async(default_server.list_tools())
-        self.assertEqual(len(tools_def), 47)
+            os.environ["TZERO_MCP_TOOL_MODE"] = "all"
+            full_server = tzero_mcp.create_mcp_server()
+            tools_all = self.run_async(full_server.list_tools())
+            self.assertEqual(len(tools_all), 47)
+        finally:
+            if old_val is not None:
+                os.environ["TZERO_MCP_TOOL_MODE"] = old_val
+            else:
+                os.environ.pop("TZERO_MCP_TOOL_MODE", None)
 
 
 if __name__ == "__main__":
