@@ -17,18 +17,18 @@ from tzero_jarvis.causal_graph import CausalTemporalGraph
 
 
 DOMAIN_COLORS = {
-    "HARDWARE": "#00ffcc",
-    "PROTOCOL": "#ff00ff",
-    "SOFTWARE": "#00e5ff",
-    "VULN": "#ff1744",
-    "BIO": "#76ff03",
-    "CRYPTO": "#ffd600",
-    "QUANTUM": "#d500f9",
-    "AEROSPACE": "#ff6d00",
-    "AUTOMOTIVE": "#00b0ff",
-    "FINANCE": "#00e676",
-    "ROBOTICS": "#ff3d00",
-    "GENERIC": "#80d8ff"
+    "HARDWARE": "#38bdf8",
+    "PROTOCOL": "#818cf8",
+    "SOFTWARE": "#60a5fa",
+    "VULN": "#f43f5e",
+    "BIO": "#34d399",
+    "CRYPTO": "#fbbf24",
+    "QUANTUM": "#a78bfa",
+    "AEROSPACE": "#fb923c",
+    "AUTOMOTIVE": "#38bdf8",
+    "FINANCE": "#4ade80",
+    "ROBOTICS": "#f87171",
+    "GENERIC": "#94a3b8"
 }
 
 
@@ -55,9 +55,9 @@ class CyberpunkGraphVisualizer:
     <style>
         * {{ margin: 0; padding: 0; box-sizing: border-box; }}
         body {{
-            background: radial-gradient(circle at 50% 50%, #0d1117 0%, #05070a 100%);
-            color: #00ffcc;
-            font-family: 'Consolas', 'Courier New', monospace;
+            background: #090d16;
+            color: #f8fafc;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             overflow: hidden;
             height: 100vh;
             width: 100vw;
@@ -67,45 +67,54 @@ class CyberpunkGraphVisualizer:
             top: 15px;
             left: 20px;
             z-index: 100;
-            background: rgba(10, 15, 25, 0.85);
+            background: rgba(15, 23, 42, 0.88);
+            backdrop-filter: blur(8px);
             padding: 12px 20px;
-            border: 1px solid #00ffcc;
-            border-radius: 6px;
-            box-shadow: 0 0 15px rgba(0, 255, 204, 0.3);
+            border: 1px solid #1e293b;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
             pointer-events: auto;
         }}
-        #header h1 {{ font-size: 16px; letter-spacing: 2px; color: #00ffcc; text-shadow: 0 0 8px #00ffcc; }}
-        #header p {{ font-size: 11px; color: #80d8ff; margin-top: 4px; }}
+        #header h1 {{ font-size: 15px; font-weight: 600; letter-spacing: 0.5px; color: #f8fafc; }}
+        #header p {{ font-size: 12px; color: #94a3b8; margin-top: 4px; }}
         #controls {{
             position: absolute;
             top: 15px;
             right: 20px;
             z-index: 100;
-            background: rgba(10, 15, 25, 0.85);
+            background: rgba(15, 23, 42, 0.88);
+            backdrop-filter: blur(8px);
             padding: 10px 15px;
-            border: 1px solid #ff00ff;
-            border-radius: 6px;
-            box-shadow: 0 0 15px rgba(255, 0, 255, 0.3);
+            border: 1px solid #1e293b;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
         }}
         input[type="text"] {{
-            background: #05070a;
-            border: 1px solid #00ffcc;
-            color: #fff;
-            padding: 6px 10px;
-            border-radius: 4px;
+            background: #0b1120;
+            border: 1px solid #334155;
+            color: #f8fafc;
+            padding: 7px 12px;
+            border-radius: 6px;
             font-family: monospace;
+            font-size: 12px;
             outline: none;
+            transition: border-color 0.15s ease;
+        }}
+        input[type="text"]:focus {{
+            border-color: #38bdf8;
         }}
         #stats-bar {{
             position: absolute;
             bottom: 15px;
             left: 20px;
             z-index: 100;
-            background: rgba(10, 15, 25, 0.85);
-            padding: 8px 15px;
-            border: 1px solid #00e5ff;
-            font-size: 11px;
-            border-radius: 4px;
+            background: rgba(15, 23, 42, 0.88);
+            backdrop-filter: blur(8px);
+            padding: 8px 16px;
+            border: 1px solid #1e293b;
+            font-size: 12px;
+            color: #94a3b8;
+            border-radius: 6px;
         }}
         #inspector {{
             position: absolute;
@@ -115,12 +124,14 @@ class CyberpunkGraphVisualizer:
             width: 320px;
             max-height: 250px;
             overflow-y: auto;
-            background: rgba(10, 15, 25, 0.9);
-            border: 1px solid #ffd600;
-            padding: 12px;
-            font-size: 11px;
-            border-radius: 6px;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid #334155;
+            padding: 14px;
+            font-size: 12px;
+            border-radius: 8px;
             display: none;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
         }}
         canvas {{ display: block; width: 100%; height: 100%; }}
     </style>
@@ -136,14 +147,14 @@ class CyberpunkGraphVisualizer:
     </div>
 
     <div id="stats-bar">
-        Düğümler: <span id="nodeCount" style="color:#00ffcc">0</span> | 
-        Bağlar: <span id="edgeCount" style="color:#ff00ff">0</span> | 
-        FPS: <span id="fpsCount" style="color:#ffd600">60</span>
+        Düğümler: <span id="nodeCount" style="color:#38bdf8">0</span> | 
+        Bağlar: <span id="edgeCount" style="color:#818cf8">0</span> | 
+        FPS: <span id="fpsCount" style="color:#fbbf24">60</span>
     </div>
 
     <div id="inspector">
-        <h3 id="insTitle" style="color:#ffd600; margin-bottom:6px;">Detay</h3>
-        <p id="insBody" style="color:#e0f7fa; line-height:1.4;"></p>
+        <h3 id="insTitle" style="color:#38bdf8; margin-bottom:6px;">Detay</h3>
+        <p id="insBody" style="color:#cbd5e1; line-height:1.5;"></p>
     </div>
 
     <canvas id="graphCanvas"></canvas>

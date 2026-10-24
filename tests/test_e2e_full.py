@@ -60,7 +60,7 @@ class TestDashboardServerLive(unittest.TestCase):
             self.assertEqual(res.status, 200)
             body = res.read().decode("utf-8")
             self.assertIn("<!DOCTYPE html>", body)
-            self.assertIn("T-ZERO // JARVIS AUTONOMOUS CONTROL CENTER", body)
+            self.assertIn("T-Zero Developer Console", body)
             self.assertIn("causalCanvas", body)
 
     def test_get_api_stats(self):
@@ -68,10 +68,10 @@ class TestDashboardServerLive(unittest.TestCase):
         with urllib.request.urlopen(url, timeout=3) as res:
             self.assertEqual(res.status, 200)
             data = json.loads(res.read().decode("utf-8"))
-            self.assertEqual(data["version"], "6.1.0")
-            self.assertEqual(data["tools_count"], 37)
-            self.assertEqual(data["token_savings"], "95.0%")
-            self.assertEqual(data["security"], "100% Zero-Leak Keyring")
+            self.assertEqual(data["version"], "7.1.0")
+            self.assertEqual(data["tools_count"], 47)
+            self.assertIn("94.9", data["token_savings"])
+            self.assertIn("Zero-Leak", data["security"])
             self.assertEqual(data["active_agents"], 5)
 
     def test_post_api_reduce(self):

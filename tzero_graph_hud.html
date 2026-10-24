@@ -3,57 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>T-Zero Causal &amp; Knowledge Graph HUD</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>T-ZERO JARVIS KNOWLEDGE & CAUSAL GRAPH</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             background: #090d16;
             color: #f8fafc;
-            font-family: 'Inter', -apple-system, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             overflow: hidden;
             height: 100vh;
             width: 100vw;
         }
         #header {
             position: absolute;
-            top: 20px;
-            left: 24px;
+            top: 15px;
+            left: 20px;
             z-index: 100;
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(16px);
-            padding: 14px 20px;
+            background: rgba(15, 23, 42, 0.88);
+            backdrop-filter: blur(8px);
+            padding: 12px 20px;
             border: 1px solid #1e293b;
             border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
             pointer-events: auto;
         }
-        #header h1 { font-size: 15px; font-weight: 700; letter-spacing: -0.01em; color: #f8fafc; }
-        #header p { font-size: 11px; color: #94a3b8; margin-top: 3px; font-family: 'Fira Code', monospace; }
+        #header h1 { font-size: 15px; font-weight: 600; letter-spacing: 0.5px; color: #f8fafc; }
+        #header p { font-size: 12px; color: #94a3b8; margin-top: 4px; }
         #controls {
             position: absolute;
-            top: 20px;
-            right: 24px;
+            top: 15px;
+            right: 20px;
             z-index: 100;
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(16px);
-            padding: 10px 14px;
+            background: rgba(15, 23, 42, 0.88);
+            backdrop-filter: blur(8px);
+            padding: 10px 15px;
             border: 1px solid #1e293b;
             border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
         }
         input[type="text"] {
-            background: #090d16;
-            border: 1px solid #1e293b;
+            background: #0b1120;
+            border: 1px solid #334155;
             color: #f8fafc;
             padding: 7px 12px;
             border-radius: 6px;
-            font-family: 'Fira Code', monospace;
+            font-family: monospace;
             font-size: 12px;
             outline: none;
-            width: 240px;
             transition: border-color 0.15s ease;
         }
         input[type="text"]:focus {
@@ -61,63 +57,62 @@
         }
         #stats-bar {
             position: absolute;
-            bottom: 20px;
-            left: 24px;
+            bottom: 15px;
+            left: 20px;
             z-index: 100;
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(16px);
+            background: rgba(15, 23, 42, 0.88);
+            backdrop-filter: blur(8px);
             padding: 8px 16px;
             border: 1px solid #1e293b;
             font-size: 12px;
-            font-family: 'Fira Code', monospace;
-            border-radius: 6px;
             color: #94a3b8;
+            border-radius: 6px;
         }
         #inspector {
             position: absolute;
-            bottom: 20px;
-            right: 24px;
+            bottom: 15px;
+            right: 20px;
             z-index: 100;
             width: 320px;
             max-height: 250px;
             overflow-y: auto;
-            background: rgba(15, 23, 42, 0.92);
-            backdrop-filter: blur(16px);
-            border: 1px solid #1e293b;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid #334155;
             padding: 14px;
             font-size: 12px;
             border-radius: 8px;
             display: none;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
         }
         canvas { display: block; width: 100%; height: 100%; }
     </style>
 </head>
 <body>
     <div id="header">
-        <h1>T-Zero Causal &amp; Knowledge Graph</h1>
-        <p>Deterministic AST Transitions &bull; Zero-Leak Offline Engine</p>
+        <h1>⚡ T-ZERO 4D KNOWLEDGE & CAUSAL GRAPH</h1>
+        <p>Developer: Toprak Ahmet Aydoğmuş | Zero-Cost Neural Engine</p>
     </div>
 
     <div id="controls">
-        <input type="text" id="searchInput" placeholder="Search node or code..." oninput="filterGraph()">
+        <input type="text" id="searchInput" placeholder="Düğüm / Kod ara (örn: ESP32, #8421)..." oninput="filterGraph()">
     </div>
 
     <div id="stats-bar">
-        Nodes: <span id="nodeCount" style="color:#38bdf8;font-weight:600;">0</span> &bull; 
-        Edges: <span id="edgeCount" style="color:#818cf8;font-weight:600;">0</span> &bull; 
-        FPS: <span id="fpsCount" style="color:#34d399;font-weight:600;">60</span>
+        Düğümler: <span id="nodeCount" style="color:#38bdf8">0</span> | 
+        Bağlar: <span id="edgeCount" style="color:#818cf8">0</span> | 
+        FPS: <span id="fpsCount" style="color:#fbbf24">60</span>
     </div>
 
     <div id="inspector">
-        <h3 id="insTitle" style="color:#38bdf8; margin-bottom:6px; font-size:13px; font-weight:600;">Detail</h3>
-        <p id="insBody" style="color:#cbd5e1; line-height:1.5; font-size:12px;"></p>
+        <h3 id="insTitle" style="color:#38bdf8; margin-bottom:6px;">Detay</h3>
+        <p id="insBody" style="color:#cbd5e1; line-height:1.5;"></p>
     </div>
 
     <canvas id="graphCanvas"></canvas>
 
     <script>
-        const graphData = {"nodes": [{"id": "node_8421", "label": "Code #8421: (Toprak)->[test_etti]->(ESP32:HARDWARE + nRF24L01:HARDWARE | SPI:PROTOCOL | laboratuvar)", "group": "HARDWARE", "code": 8421, "timestamp": 1792792014.1448894}, {"id": "node_8422", "label": "Code #8422: (Geliştirici)->[deploy_etti]->(Kubernetes:SOFTWARE + PostgreSQL:SOFTWARE | Docker:SOFTWARE | production)", "group": "SOFTWARE", "code": 8422, "timestamp": 1792792014.1448953}, {"id": "node_8423", "label": "Code #8423: (Analist)->[tespit_etti]->(CVE-2024-1234:VULN + BufferOverflow:VULN | DMZ | Exploit:SOFTWARE)", "group": "VULN", "code": 8423, "timestamp": 1792792014.1448975}, {"id": "node_8424", "label": "Code #8424: (Fizikçi)->[dolaşıklaştırdı]->(Qubit:QUANTUM + BellState:QUANTUM | Kriyostat:QUANTUM | Qiskit:QUANTUM)", "group": "QUANTUM", "code": 8424, "timestamp": 1792792014.1448994}, {"id": "node_8425", "label": "Code #8425: (Genetikçi)->[modifiye_etti]->(CRISPR:BIO + Exon:BIO | AlphaFold:BIO | hücre:BIO)", "group": "BIO", "code": 8425, "timestamp": 1792792014.144901}, {"id": "node_8426", "label": "Code #8426: (Mühendis)->[kalibre_etti]->(Telemetry:AEROSPACE + Gyroscope:AEROSPACE | yörünge:AEROSPACE | Uydu:AEROSPACE)", "group": "AEROSPACE", "code": 8426, "timestamp": 1792792014.144903}, {"id": "node_8427", "label": "Code #8427: (Sürücü_Yazılımı)->[denetledi]->(ECU:AUTOMOTIVE + LiDAR:AUTOMOTIVE | CAN:PROTOCOL | otoyol:AUTOMOTIVE)", "group": "AUTOMOTIVE", "code": 8427, "timestamp": 1792792014.1449053}, {"id": "node_8428", "label": "Code #8428: (AlgoTrader)->[arbitraj_yaptı]->(OrderBook:FINANCE + Derivative:FINANCE | Borsa:FINANCE | NASDAQ:FINANCE)", "group": "FINANCE", "code": 8428, "timestamp": 1792792014.1449075}, {"id": "node_8429", "label": "Code #8429: (Kontrolcü)->[harekete_geçirdi]->(Actuator:ROBOTICS + Manipulator:ROBOTICS | ROS:SOFTWARE | fabrika:ROBOTICS)", "group": "ROBOTICS", "code": 8429, "timestamp": 1792792014.1449096}, {"id": "node_8430", "label": "Code #8430: (Kriptograf)->[doğruladı]->(ZK-SNARK:CRYPTO + SHA-256:CRYPTO | TLS:PROTOCOL | Blockchain:CRYPTO)", "group": "CRYPTO", "code": 8430, "timestamp": 1792792014.1449118}, {"id": "node_8431", "label": "Code #8431: (Araştırmacı)->[fine_tune_etti]->(Transformer:SOFTWARE + Weights:SOFTWARE | LoRA:SOFTWARE | GPU_Cluster:HARDWARE)", "group": "SOFTWARE", "code": 8431, "timestamp": 1792792014.144914}, {"id": "node_8432", "label": "Code #8432: (İnsan)->[araştırdı]->(Bilgi + Hipotez | Evren | Kütüphane)", "group": "GENERIC", "code": 8432, "timestamp": 1792792014.1449163}, {"id": "node_5093", "label": "Code #5093: (Developer)->[islem_yapti]->(implemented + token + reduction)", "group": "GENERIC", "code": 5093, "timestamp": 1792792014.1449184}, {"id": "node_10562", "label": "Code #10562: (Audit)->[islem_yapti]->(project)", "group": "GENERIC", "code": 10562, "timestamp": 1792792014.1449208}, {"id": "node_21144", "label": "Code #21144: (Paragraph)->[islem_yapti]->(1 + about)", "group": "GENERIC", "code": 21144, "timestamp": 1792792014.1449234}, {"id": "node_14518", "label": "Code #14518: (Paragraph)->[islem_yapti]->(2 + about)", "group": "GENERIC", "code": 14518, "timestamp": 1792792014.1449256}, {"id": "node_4168", "label": "Code #4168: (SecuritySentinel)->[test_etti]->(Verify + swarm + orchestration + güvenliğin)", "group": "GENERIC", "code": 4168, "timestamp": 1792792014.144928}, {"id": "node_39813", "label": "Code #39813: (EmbeddedHardwar)->[yapilandirdi]->(Verify + swarm + orchestration + donanım + mimarisin)", "group": "GENERIC", "code": 39813, "timestamp": 1792792014.1449308}, {"id": "node_75051", "label": "Code #75051: (ASTOptimizer)->[islem_yapti]->(Verify + swarm + orchestration + token + mimarisin)", "group": "GENERIC", "code": 75051, "timestamp": 1792792014.1449332}, {"id": "node_28308", "label": "Code #28308: (AutonomousDevOps)->[test_etti]->(Verify + swarm + orchestration + test + build | ortamın)", "group": "GENERIC", "code": 28308, "timestamp": 1792792014.1449358}], "links": [], "stats": {"total_nodes": 20, "total_edges": 0, "timeline_events": 20}};
+        const graphData = {"nodes": [{"id": "node_8421", "label": "Code #8421: (Toprak)->[test_etti]->(ESP32:HARDWARE + nRF24L01:HARDWARE | SPI:PROTOCOL | laboratuvar)", "group": "HARDWARE", "code": 8421, "timestamp": 1792826928.3599024}, {"id": "node_8422", "label": "Code #8422: (Geliştirici)->[deploy_etti]->(Kubernetes:SOFTWARE + PostgreSQL:SOFTWARE | Docker:SOFTWARE | production)", "group": "SOFTWARE", "code": 8422, "timestamp": 1792826928.3599117}, {"id": "node_8423", "label": "Code #8423: (Analist)->[tespit_etti]->(CVE-2024-1234:VULN + BufferOverflow:VULN | DMZ | Exploit:SOFTWARE)", "group": "VULN", "code": 8423, "timestamp": 1792826928.359914}, {"id": "node_8424", "label": "Code #8424: (Fizikçi)->[dolaşıklaştırdı]->(Qubit:QUANTUM + BellState:QUANTUM | Kriyostat:QUANTUM | Qiskit:QUANTUM)", "group": "QUANTUM", "code": 8424, "timestamp": 1792826928.3599162}, {"id": "node_8425", "label": "Code #8425: (Genetikçi)->[modifiye_etti]->(CRISPR:BIO + Exon:BIO | AlphaFold:BIO | hücre:BIO)", "group": "BIO", "code": 8425, "timestamp": 1792826928.3599186}, {"id": "node_8426", "label": "Code #8426: (Mühendis)->[kalibre_etti]->(Telemetry:AEROSPACE + Gyroscope:AEROSPACE | yörünge:AEROSPACE | Uydu:AEROSPACE)", "group": "AEROSPACE", "code": 8426, "timestamp": 1792826928.359921}, {"id": "node_8427", "label": "Code #8427: (Sürücü_Yazılımı)->[denetledi]->(ECU:AUTOMOTIVE + LiDAR:AUTOMOTIVE | CAN:PROTOCOL | otoyol:AUTOMOTIVE)", "group": "AUTOMOTIVE", "code": 8427, "timestamp": 1792826928.359923}, {"id": "node_8428", "label": "Code #8428: (AlgoTrader)->[arbitraj_yaptı]->(OrderBook:FINANCE + Derivative:FINANCE | Borsa:FINANCE | NASDAQ:FINANCE)", "group": "FINANCE", "code": 8428, "timestamp": 1792826928.3599255}, {"id": "node_8429", "label": "Code #8429: (Kontrolcü)->[harekete_geçirdi]->(Actuator:ROBOTICS + Manipulator:ROBOTICS | ROS:SOFTWARE | fabrika:ROBOTICS)", "group": "ROBOTICS", "code": 8429, "timestamp": 1792826928.3599277}, {"id": "node_8430", "label": "Code #8430: (Kriptograf)->[doğruladı]->(ZK-SNARK:CRYPTO + SHA-256:CRYPTO | TLS:PROTOCOL | Blockchain:CRYPTO)", "group": "CRYPTO", "code": 8430, "timestamp": 1792826928.3599298}, {"id": "node_8431", "label": "Code #8431: (Araştırmacı)->[fine_tune_etti]->(Transformer:SOFTWARE + Weights:SOFTWARE | LoRA:SOFTWARE | GPU_Cluster:HARDWARE)", "group": "SOFTWARE", "code": 8431, "timestamp": 1792826928.3599322}, {"id": "node_8432", "label": "Code #8432: (İnsan)->[araştırdı]->(Bilgi + Hipotez | Evren | Kütüphane)", "group": "GENERIC", "code": 8432, "timestamp": 1792826928.3599348}, {"id": "node_5093", "label": "Code #5093: (Developer)->[islem_yapti]->(implemented + token + reduction)", "group": "GENERIC", "code": 5093, "timestamp": 1792826928.359937}, {"id": "node_10562", "label": "Code #10562: (Audit)->[islem_yapti]->(project)", "group": "GENERIC", "code": 10562, "timestamp": 1792826928.3599396}, {"id": "node_21144", "label": "Code #21144: (Paragraph)->[islem_yapti]->(1 + about)", "group": "GENERIC", "code": 21144, "timestamp": 1792826928.359942}, {"id": "node_14518", "label": "Code #14518: (Paragraph)->[islem_yapti]->(2 + about)", "group": "GENERIC", "code": 14518, "timestamp": 1792826928.359944}, {"id": "node_4168", "label": "Code #4168: (SecuritySentinel)->[test_etti]->(Verify + swarm + orchestration + güvenliğin)", "group": "GENERIC", "code": 4168, "timestamp": 1792826928.359948}, {"id": "node_39813", "label": "Code #39813: (EmbeddedHardwar)->[yapilandirdi]->(Verify + swarm + orchestration + donanım + mimarisin)", "group": "GENERIC", "code": 39813, "timestamp": 1792826928.3599524}, {"id": "node_75051", "label": "Code #75051: (ASTOptimizer)->[islem_yapti]->(Verify + swarm + orchestration + token + mimarisin)", "group": "GENERIC", "code": 75051, "timestamp": 1792826928.3599563}, {"id": "node_28308", "label": "Code #28308: (AutonomousDevOps)->[test_etti]->(Verify + swarm + orchestration + test + build | ortamın)", "group": "GENERIC", "code": 28308, "timestamp": 1792826928.3599606}], "links": [], "stats": {"total_nodes": 20, "total_edges": 0, "timeline_events": 20}};
         const domainColors = {"HARDWARE": "#38bdf8", "PROTOCOL": "#818cf8", "SOFTWARE": "#60a5fa", "VULN": "#f43f5e", "BIO": "#34d399", "CRYPTO": "#fbbf24", "QUANTUM": "#a78bfa", "AEROSPACE": "#fb923c", "AUTOMOTIVE": "#38bdf8", "FINANCE": "#4ade80", "ROBOTICS": "#f87171", "GENERIC": "#94a3b8"};
 
         const canvas = document.getElementById('graphCanvas');

@@ -63,5 +63,7 @@ auto_onprem_outreach.py
 onprem_outreach_status.json
 .tzero_cache.db
 *.db
+used_permalinks.json
+.superpowers/
 
 
