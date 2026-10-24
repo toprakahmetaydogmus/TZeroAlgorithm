@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 252 42" width="252" height="42">
+  <defs>
+    <linearGradient id="btnBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#161b22" />
+      <stop offset="100%" stop-color="#0d1117" />
+    </linearGradient>
+    <linearGradient id="borderGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#30363d" />
+      <stop offset="50%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#30363d" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Button Pill Container -->
+  <rect x="1" y="1" width="250" height="40" rx="20" fill="url(#btnBg)" stroke="url(#borderGrad)" stroke-width="1.2" />
+
+  <!-- Live Pulse Dot -->
+  <circle cx="22" cy="21" r="4" fill="#34d399" filter="url(#glow)">
+    <animate attributeName="opacity" values="1;0.35;1" dur="2s" repeatCount="indefinite" />
+  </circle>
+
+  <!-- Button Label -->
+  <text x="36" y="25" fill="#f8fafc" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" letter-spacing="0.2">
+    Try Live Interactive Demo
+  </text>
+
+  <!-- External Arrow Icon -->
+  <path d="M 228 17 L 236 17 L 236 25 M 236 17 L 227 26" fill="none" stroke="#38bdf8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+</svg>

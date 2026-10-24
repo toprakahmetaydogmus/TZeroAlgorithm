@@ -21,8 +21,9 @@ Reduces codebase prompt tokens by up to **94.9%** while preserving complete clas
 </p>
 
 <p align="center">
-  <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm/raw/main/assets/brag.mp4">▶ <strong>Watch Full 1080p Video with Audio (assets/brag.mp4)</strong></a> &bull;
-  <a href="https://huggingface.co/spaces/toprakke4/tzero-token-reducer">⚡ <strong>Live Interactive Demo</strong></a>
+  <a href="https://huggingface.co/spaces/toprakke4/tzero-token-reducer">
+    <img src="assets/live-demo-button.svg" alt="Try Live Interactive Demo" height="38">
+  </a>
 </p>
 
 <p align="center">
