@@ -468,7 +468,7 @@ def calculate_token_cost(token_count: int, provider_name: str) -> float:
 # i18n Translations
 TRANSLATIONS: Dict[str, Dict[str, str]] = {
     "en": {
-        "title": "T-Zero Developer Console & Context Architect v7.3.1",
+        "title": "T-Zero Developer Console & Context Architect v7.3.2",
         "subtitle": f"Developer: {DEV_NAME} | {DEV_URL_MAIN} | {DEV_URL_BIO}",
         "overview_tab": "🏠 Overview Dashboard",
         "setup_tab": "⚡ Setup & AI Models",
@@ -505,7 +505,7 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "audit_btn": "🛡️ SECURITY AUDIT"
     },
     "tr": {
-        "title": "T-Zero Geliştirici Konsolu & Bağlam Mimarı v7.3.1",
+        "title": "T-Zero Geliştirici Konsolu & Bağlam Mimarı v7.3.2",
         "subtitle": f"Geliştirici: {DEV_NAME} | {DEV_URL_MAIN} | {DEV_URL_BIO}",
         "overview_tab": "🏠 Genel Bakış",
         "setup_tab": "⚡ Kurulum & Model",
@@ -8265,7 +8265,7 @@ def main():
     parser.add_argument("--export-agents", nargs="?", const="AGENTS.md", default=None, metavar="FILE", help="Generate AI agent blueprint (AGENTS.md / CLAUDE.md)")
     parser.add_argument("--export-arch", nargs="?", const="ARCHITECTURE.md", default=None, metavar="FILE", help="Generate Mermaid architecture blueprint (ARCHITECTURE.md)")
     parser.add_argument("--export-repomap", nargs="?", const="REPO_MAP.txt", default=None, metavar="FILE", help="Generate compact token repository map (REPO_MAP.txt)")
-    parser.add_argument("--export-html", nargs="?", const="README.html", default=None, metavar="FILE", help="Generate styled Cyberpunk dark HTML preview")
+    parser.add_argument("--export-html", nargs="?", const="README.html", default=None, metavar="FILE", help="Generate styled dark-mode HTML architecture preview")
     parser.add_argument("--dir", default=".", help="Target project workspace directory (default: current dir)")
     parser.add_argument("--output", "-o", default="README.md", help="Output filepath for generated markdown (default: README.md)")
     parser.add_argument("--provider", "-p", choices=list(PROVIDERS.keys()), help="AI Provider to use (default: active profile)")
@@ -8273,10 +8273,10 @@ def main():
     parser.add_argument("--enforce-boundaries", "--enforce-rules", nargs="?", const="tzero.rules.json", default=None, metavar="CONFIG", dest="enforce_boundaries", help="Enforce architectural boundary rules in CI (exits with code 1 if violated)")
     parser.add_argument("--search", metavar="QUERY", help="Run private local hybrid semantic code search (BM25 RAG)")
     parser.add_argument("--export-agent-rules", action="store_true", help="Generate all native AI agent rules (.cursorrules, .cursor/rules/*.mdc, .clinerules, Copilot)")
-    parser.add_argument("--orchestrate-workspace", "--jarvis-orchestrate", nargs="?", const=".", default=None, metavar="DIR", dest="orchestrate_workspace", help="Autonomous Master Workspace Orchestration & Executive Governance (.cursorrules, AGENT.md, ARCHITECTURE.md, PBFT Swarm)")
+    parser.add_argument("--orchestrate-workspace", "--jarvis-orchestrate", nargs="?", const=".", default=None, metavar="DIR", dest="orchestrate_workspace", help="Autonomous Master Workspace Orchestration (.cursorrules, AGENTS.md, ARCHITECTURE.md)")
     parser.add_argument("--savings", action="store_true", help="Calculate token reduction metrics and economic developer team ROI")
     parser.add_argument("--diff", "--pr", nargs="?", const="HEAD~1", default=None, metavar="REF", help="Generate incremental git diff context payload (98%%+ token savings)")
-    parser.add_argument("--web", "--dashboard", nargs="?", const=8421, type=int, default=None, metavar="PORT", dest="web", help="Launch local JARVIS Cyberpunk web dashboard on localhost:8421")
+    parser.add_argument("--web", "--dashboard", nargs="?", const=8421, type=int, default=None, metavar="PORT", dest="web", help="Launch local web dashboard on localhost:8421")
     parser.add_argument("--format", choices=["text", "json", "sarif"], default="text", help="Output format for audit/scan reports (default: text)")
     parser.add_argument("--pr-report", nargs="?", const="HEAD~1", default=None, metavar="REF", help="Generate GitHub PR summary report with Blast Radius and Security tables")
     parser.add_argument("--mcp", action="store_true", help="Start Model Context Protocol (MCP) stdio server for Cursor/Claude/Antigravity")
@@ -8287,12 +8287,12 @@ def main():
     parser.add_argument("--pipe", nargs="?", const="", default=None, metavar="FILENAME_HINT", help="Read code/diff/schema from stdin, compress tokens, and output to stdout")
     parser.add_argument("--clip", "--copy", action="store_true", help="Copy output of --pipe or command directly to system clipboard")
     parser.add_argument("--init-hooks", nargs="?", const=".", default=None, metavar="REPO_DIR", dest="init_hooks", help="Install zero-leak & token security pre-commit hook into .git/hooks")
-    parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect v7.3.1 Master Edition (engine v4.1.0)")
+    parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect v7.3.2 Master Edition (engine v4.1.0)")
 
     def print_quickstart_guide():
         print("""
 ================================================================================
-⚡ SİBER AKADEMİ — T-ZERO CONTEXT ARCHITECT & MCP v7.3.1 MASTER (engine v4.1.0)
+⚡ SİBER AKADEMİ — T-ZERO CONTEXT ARCHITECT & MCP v7.3.2 MASTER (engine v4.1.0)
 ================================================================================
 🎯 %95'e Varan Token Tasarrufu & Otonom Yapay Zeka Mimari Bağlam Motoru
 

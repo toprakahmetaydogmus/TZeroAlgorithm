@@ -33,7 +33,7 @@ class TestTZeroDashboard(unittest.TestCase):
         with urllib.request.urlopen(url) as resp:
             self.assertEqual(resp.status, 200)
             data = json.loads(resp.read().decode("utf-8"))
-            self.assertEqual(data["version"], "7.3.1")
+            self.assertEqual(data["version"], "7.3.2")
             self.assertEqual(data["tools_count"], 47)
 
     def test_post_api_reduce(self):

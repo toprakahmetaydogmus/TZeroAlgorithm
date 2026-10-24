@@ -19,7 +19,7 @@ flowchart TD
     Node_api --> Node_services
     Node_services --> Node_core
     Node_cli --> Node_core
-    Node_core --> Node_tests
+    Node_tests --> Node_core
 ```
 
 ## 3. Layer Breakdown & Boundaries

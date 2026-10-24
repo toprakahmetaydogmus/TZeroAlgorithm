@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tzero-mcp"
-version = "7.3.1"
+version = "7.3.2"
 description = "Enterprise Codebase Context Builder, AST Signatures Analyzer, & Token Reducer for LLMs"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -44,7 +44,6 @@ dependencies = [
     "darkdetect>=0.8.0",
     "pygments>=2.14.0",
     "Pillow>=9.0.0",
-    "pyinstaller>=6.0.0",
     "mcp>=1.0.0",
     "typer>=0.9.0"
 ]

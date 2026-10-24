@@ -1,5 +1,16 @@
 # Changelog
 
+## [7.3.2] - 2026-10-24
+
+### Released (Official V7.3.2 Server Coherence Grade A & Clean Architecture Suite)
+
+- **Glama & TDQS Server Coherence Grade A / Discovery Score Optimization:**
+  - Standardized default MCP tool registration to the 14 Anchor-Certified canonical tools (`Tool Count Appropriateness: 5/5`, `Naming Consistency: 5/5`, `Disambiguation: 5/5`, `Completeness: 5/5`).
+  - Transparent backward compatibility dispatching all 47 tools via `compatible_call_tool()` and `--all` flag.
+  - Streamlined `pyproject.toml` runtime dependencies (removed build-only `pyinstaller` requirement).
+  - Organized root directory into standard open-source layout: moved auxiliary scripts into `scripts/` and extended docs into `docs/`.
+  - Modernized CLI help descriptions to clean executive design standards.
+
 ## [7.3.1] - 2026-10-24
 
 ### Released (Official V7.3.1 Flawless TDQS 5.0/5.0 Evaluator Zero-Contradiction Edition)

@@ -18,7 +18,7 @@ class TestCLI(unittest.TestCase):
         )
         self.assertEqual(res.returncode, 0)
         self.assertIn("4.1.0", res.stdout)
-        self.assertIn("7.3.1", res.stdout)
+        self.assertIn("7.3.2", res.stdout)
 
     def test_mcp_version_flag(self):
         res = subprocess.run(
@@ -76,7 +76,7 @@ class TestCLI(unittest.TestCase):
         )
         self.assertEqual(res.returncode, 0)
         self.assertIn("4.1.0", res.stdout)
-        self.assertIn("7.3.1", res.stdout)
+        self.assertIn("7.3.2", res.stdout)
 
     def test_quickstart_info(self):
         res = subprocess.run(
