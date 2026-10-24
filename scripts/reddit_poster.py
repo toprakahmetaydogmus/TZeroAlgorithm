@@ -14,37 +14,39 @@ PROFILE_DIR = Path(__file__).resolve().parent / ".reddit_profile"
 
 TEMPLATES = {
     "LocalLLaMA": {
-        "title": "T-Zero: Cut LLM context bloat by up to 95% with local AST pruning (Open-Source, 0 external APIs)",
+        "title": "T-Zero: Cut LLM context bloat by up to 94.9% with local AST pruning (48 MCP Tools, TDQS Grade A, 0 cloud APIs)",
         "body": """Hey r/LocalLLaMA,
 
-When feeding full repositories or large codebases into local LLMs (Llama 3, Qwen 2.5, DeepSeek) or coding agents, 50k+ tokens are wasted on boilerplate function bodies and imports, destroying the context window and burning VRAM/tokens.
+When feeding full repositories into local LLMs (Llama 3, Qwen 2.5, DeepSeek) or coding agents (Cursor, Claude Code, Cline), 50k+ tokens are wasted on boilerplate function bodies and imports, destroying the context window and burning VRAM/tokens.
 
-I built **T-Zero** (tzero-mcp) — a 100% offline, enterprise AST context pruning engine & 37-tool MCP server.
+I built **T-Zero** (tzero-mcp) — a 100% offline, enterprise AST context pruning engine & 48-tool MCP server (TDQS Grade A certified).
 
 **How it works:**
 - Slices target codebases into hierarchical AST interface signatures (preserves types, function signatures, classes, docstrings; strips heavy internal bodies).
-- Multi-tier context generation (T-1 to T-4) achieving up to 95% context reduction.
+- Multi-tier context generation (T-1 to T-4) achieving up to 94.9% context reduction.
 - Built-in BM25 hybrid semantic search without needing external cloud embedding APIs.
+- Master Autonomous Omni-Tool (`execute_codebase_workflow`) executes end-to-end security audits, blueprints, and token reduction in a single call.
 - 100% Zero-Leak OS Keyring security (secrets and credentials are never injected into LLM context).
 
 - **GitHub:** https://github.com/toprakahmetaydogmus/TZeroAlgorithm
-- **PyPI:** `pip install tzero-mcp`
+- **Quickstart:** `uvx tzero-mcp` or `pip install tzero-mcp`
 
 Would love your thoughts, feedback, and benchmarks!"""
     },
     "ClaudeAI": {
-        "title": "Built a 37-tool MCP Server that cuts Claude's context usage by up to 95% with AST Skeletons",
+        "title": "Built a 48-tool MCP Server suite that cuts Claude's context usage by up to 94.9% with AST Skeletons (TDQS Grade A)",
         "body": """Hey r/ClaudeAI,
 
-Working with Claude 3.5 Sonnet on large projects often hits the 200k context limit fast, leading to high API costs or degraded attention quality.
+Working with Claude 3.5 Sonnet on large projects often hits the context limit fast, leading to high token costs, slower responses, or degraded attention quality.
 
-I created **T-Zero**, an open-source Model Context Protocol (MCP) server designed specifically for AI coding agents.
+I created **T-Zero**, an open-source Model Context Protocol (MCP) server suite designed specifically for AI coding agents:
 
 **Highlights:**
-- **AST Pruning:** Slices full codebases into interface skeletons, reducing raw code tokens by 80-95% while keeping all critical architecture context.
-- **37 Native MCP Tools:** Includes dynamic skeletonizing, blast-radius impact analysis, dead-code detection, and PBFT consensus for swarms.
-- **Works with Claude Desktop & Cursor:** One-line install via `pip install tzero-mcp` or Smithery registry.
+- **AST Pruning:** Slices full codebases into interface skeletons, reducing raw code tokens by 80-94.9% while keeping all critical architecture context.
+- **48 Native MCP Tools & Master Omni-Tool:** Includes dynamic skeletonizing, blast-radius impact analysis, dead-code detection, Superdesign UI canvas, and `execute_codebase_workflow`.
+- **Works with Claude Desktop, Claude Code & Cursor:** Instant run via `uvx tzero-mcp` or `pip install tzero-mcp`.
 - **100% Zero-Leak:** Blocks sensitive API keys or environment variables from leaking into prompt context.
+- **TDQS Grade A:** Certified 5.0/5.0 tool coherence and parameter completeness.
 
 - **GitHub:** https://github.com/toprakahmetaydogmus/TZeroAlgorithm
 - **PyPI:** `pip install tzero-mcp`
@@ -59,27 +61,28 @@ Cursor is amazing, but referencing entire files (@Files / codebase index) can qu
 
 I built **T-Zero** (tzero-mcp), an open-source AST context engine & MCP server:
 
-- **Smart AST Skeletons:** Preserves full class & function signatures with types while stripping inner code blocks.
+- **Smart AST Skeletons:** Preserves full class & function signatures with types while stripping inner code blocks (-94.9% tokens).
 - **Instant .cursorrules Generator:** Analyzes repository architecture and exports optimized agent rules.
 - **Zero Hallucination Guard:** Validates AST imports before generating code suggestions.
-- **95% Token Reduction:** Feed large codebases without hitting token degradation.
+- **Master Omni-Tool (`execute_codebase_workflow`):** One unified tool to audit, blueprint, and optimize your codebase.
 
 - **GitHub:** https://github.com/toprakahmetaydogmus/TZeroAlgorithm
-- **PyPI:** `pip install tzero-mcp`
+- **Quickstart:** `uvx tzero-mcp` or `pip install tzero-mcp`
 
 Give it a try and feel free to star the repo if you like it!"""
     },
     "Python": {
-        "title": "T-Zero: Enterprise AST Codebase Context Engine & Token Pruner for AI Agents",
+        "title": "T-Zero: High-Performance AST Codebase Context Pruner & MCP Server for AI Agents (-94.9% Tokens)",
         "body": """Hey r/Python,
 
-I've been working on **T-Zero** (tzero-mcp), an open-source Python tool that parses codebases using `ast` and converts them into ultra-compact context trees for LLMs, achieving up to 95% token savings.
+I've been working on **T-Zero** (tzero-mcp), an open-source Python tool that parses codebases using `ast` and converts them into ultra-compact context trees for LLMs, achieving up to 94.9% token savings.
 
 Features:
 - Pure Python & Polyglot AST analysis (preserves types, classes, docstrings).
-- 37-tool autonomous Model Context Protocol (MCP) server.
+- 48-tool Model Context Protocol (MCP) server suite with TDQS Grade A rating.
 - Zero-leak security scanner for API keys.
 - Completely local and offline — 0 external API dependencies.
+- Zero installation run via `uvx tzero-mcp`.
 
 - **GitHub:** https://github.com/toprakahmetaydogmus/TZeroAlgorithm
 - **PyPI:** `pip install tzero-mcp`
