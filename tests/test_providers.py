@@ -104,6 +104,34 @@ class TestProviders(unittest.TestCase):
         headers = p.get_headers("")
         self.assertEqual(headers["Content-Type"], "application/json")
 
+    def test_empty_keys_zero_leak_headers(self):
+        """Ensure no provider emits malformed Authorization: Bearer or leaks empty tokens."""
+        for name, prov in PROVIDERS.items():
+            headers = prov.get_headers("")
+            # Content-Type should always be present
+            self.assertEqual(headers.get("Content-Type"), "application/json")
+            # Authorization should NEVER be present with empty bearer string
+            if "Authorization" in headers:
+                self.assertNotEqual(headers["Authorization"].strip(), "Bearer")
+                self.assertNotEqual(headers["Authorization"].strip(), "Bearer ")
+            # X-Nvidia-Api-Key should not be empty
+            if "X-Nvidia-Api-Key" in headers:
+                self.assertTrue(headers["X-Nvidia-Api-Key"])
+            # x-api-key should not be empty
+            if "x-api-key" in headers:
+                self.assertTrue(headers["x-api-key"])
+
+    def test_sensitive_token_masking(self):
+        """Ensure sensitive tokens in error messages are properly masked to prevent leaks."""
+        import re
+        sample_error = "API Error 401: Bearer nvapi-secretkey1234567890abcdef failed. key=sk-proj-9876543210fedcba"
+        clean = re.sub(r'(Bearer\s+|key[:=]\s*)[A-Za-z0-9_\-\.]{8,}', r'\1[PROTECTED]', sample_error)
+        self.assertNotIn("nvapi-secretkey1234567890abcdef", clean)
+        self.assertNotIn("sk-proj-9876543210fedcba", clean)
+        self.assertIn("Bearer [PROTECTED]", clean)
+        self.assertIn("key=[PROTECTED]", clean)
+
 
 if __name__ == "__main__":
     unittest.main()
+

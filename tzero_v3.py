@@ -1007,7 +1007,7 @@ class AnthropicProvider(BaseProvider):
         clean_key = (api_key or "").strip().strip('"').strip("'")
         headers = {
             "anthropic-version": "2023-06-01",
-            "content-type": "application/json",
+            "Content-Type": "application/json",
             "Referer": DEV_URL_GITHUB,
             "User-Agent": f"TZeroAlgorithmV4/4.2 (Toprak Ahmet Aydogmus; {DEV_URL_GITHUB})"
         }

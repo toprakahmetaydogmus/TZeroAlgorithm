@@ -80,6 +80,42 @@ class TestGUIInstantiation(unittest.TestCase):
                 self.assertTrue(app.has_scanned)
                 if hasattr(app, "kpi_card") and hasattr(app.kpi_card, "lbl_prim"):
                     self.assertIn("2", app.kpi_card.lbl_prim.cget("text"))
+
+                # Verify Graph Tab & NodeGraphCanvas
+                app.switch_tab(5)
+                root.update()
+                self.assertIsNotNone(app.node_canvas)
+                self.assertIn("root", app.node_canvas.nodes)
+                self.assertGreater(len(app.node_canvas.nodes), 1)
+
+                # Test affine transform inversion
+                sx, sy = app.node_canvas.to_screen(50.0, 75.0)
+                wx, wy = app.node_canvas.to_world(sx, sy)
+                self.assertAlmostEqual(wx, 50.0, places=2)
+                self.assertAlmostEqual(wy, 75.0, places=2)
+
+                # Test zoom clamping
+                initial_sf = app.node_canvas.scale_factor
+                app.node_canvas.zoom(1.5)
+                self.assertGreater(app.node_canvas.scale_factor, initial_sf)
+                app.node_canvas.zoom(100.0)
+                self.assertLessEqual(app.node_canvas.scale_factor, 5.0)
+                app.node_canvas.zoom(0.001)
+                self.assertGreaterEqual(app.node_canvas.scale_factor, 0.15)
+                app.node_canvas.reset_view()
+
+                # Test collision avoidance pass
+                app.node_canvas.resolve_collisions()
+                root.update()
+
+                # Test full screen maximize toggle
+                self.assertFalse(app.graph_maximized)
+                app.toggle_graph_maximize()
+                self.assertTrue(app.graph_maximized)
+                self.assertTrue(app.node_canvas.is_fullscreen)
+                app.toggle_graph_maximize()
+                self.assertFalse(app.graph_maximized)
+                self.assertFalse(app.node_canvas.is_fullscreen)
         finally:
             try:
                 root.destroy()
@@ -88,3 +124,4 @@ class TestGUIInstantiation(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
