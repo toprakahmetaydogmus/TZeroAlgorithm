@@ -332,7 +332,7 @@ HTML_PAGE = """<!DOCTYPE html>
       <div class="brand-logo">T0</div>
       <div>
         <div class="brand-title">T-Zero Developer Console</div>
-        <div class="brand-sub">Enterprise AST Context Architect &bull; v7.1.0</div>
+        <div class="brand-sub">Enterprise AST Context Architect &bull; v7.2.0</div>
       </div>
     </div>
     <div class="header-actions">
@@ -420,6 +420,7 @@ HTML_PAGE = """<!DOCTYPE html>
         <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
           <input type="text" id="filenameInput" value="main.rs" style="background:#060910; border:1px solid var(--border); color:#fff; padding:8px 12px; border-radius:6px; font-family:var(--font-code); font-size:13px; width: 180px;">
           <button class="btn-run" onclick="runReduction()">Prune Context (-94.9%)</button>
+          <button class="btn-run" onclick="copyResult()" style="background:var(--surface-card); color:var(--text-main); border:1px solid var(--border);">📋 Copy</button>
           <span id="savingsLabel" style="font-family:var(--font-code); color:var(--emerald); font-weight:600; font-size:13px;"></span>
         </div>
         <textarea id="codeInput" placeholder="Paste source code here...">pub struct SwarmCluster {
@@ -440,10 +441,33 @@ impl SwarmCluster {
         <div class="result-box" id="resultOutput">// Pruned AST structural output will appear here...</div>
       </div>
     </div>
+
+    <!-- Superdesign Studio -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Superdesign Studio &bull; Autonomous UI / Component Generator</div>
+        <span class="panel-badge">Zero API Key &bull; Local Execution</span>
+      </div>
+      <div class="sandbox-container">
+        <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+          <select id="superType" style="background:#060910; border:1px solid var(--border); color:#fff; padding:8px 12px; border-radius:6px; font-family:var(--font-code); font-size:13px;">
+            <option value="ui">Full UI Screen</option>
+            <option value="component">Interactive Component</option>
+            <option value="wireframe">Wireframe</option>
+            <option value="svg_logo">Vector SVG Logo</option>
+          </select>
+          <input type="text" id="superPrompt" value="Modern SaaS analytics card with metric counters and trend badges" style="background:#060910; border:1px solid var(--border); color:#fff; padding:8px 12px; border-radius:6px; font-family:var(--font-code); font-size:13px; flex: 1; min-width: 260px;">
+          <button class="btn-run" onclick="generateSuperdesign()" style="background:var(--emerald); color:#090d16;">Generate Spec</button>
+          <button class="btn-run" onclick="copySuperResult()" style="background:var(--surface-card); color:var(--text-main); border:1px solid var(--border);">📋 Copy</button>
+        </div>
+        <div id="superStatus" style="font-size:12px; color:var(--text-muted); font-family:var(--font-code);">Ready to generate. Executed via T-Zero Superdesign Orchestrator.</div>
+        <div class="result-box" id="superOutput" style="min-height:100px; color:var(--emerald);">// Click "Generate Spec" to invoke tzero_superdesign local pipeline...</div>
+      </div>
+    </div>
   </main>
 
   <footer>
-    T-Zero Context Architect v7.1.0 &bull; Developer: Toprak Ahmet Aydoğmuş &bull; Siber Akademi
+    T-Zero Context Architect v7.2.0 &bull; Developer: Toprak Ahmet Aydoğmuş &bull; Siber Akademi
   </footer>
 
   <script>
@@ -522,6 +546,48 @@ impl SwarmCluster {
       document.getElementById('resultOutput').textContent = data.reduced;
       document.getElementById('savingsLabel').textContent = `Savings: ${data.savings}% Tokens Saved!`;
     }
+
+    function copyResult() {
+      const text = document.getElementById('resultOutput').textContent;
+      navigator.clipboard.writeText(text);
+      const btn = event.target;
+      btn.textContent = '✓ Copied!';
+      setTimeout(() => btn.textContent = '📋 Copy', 1500);
+    }
+
+    async function generateSuperdesign() {
+      const design_type = document.getElementById('superType').value;
+      const prompt = document.getElementById('superPrompt').value;
+      const status = document.getElementById('superStatus');
+      const out = document.getElementById('superOutput');
+      status.textContent = 'Generating component spec via T-Zero Superdesign...';
+      out.textContent = '// Running local pipeline...';
+      try {
+        const res = await fetch('/api/superdesign/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ design_type, prompt })
+        });
+        const data = await res.json();
+        if (data.success) {
+          status.textContent = `Generated successfully! Iteration: ${data.data.iteration_file}`;
+          out.textContent = JSON.stringify(data.data, null, 2);
+        } else {
+          status.textContent = `Error: ${data.error}`;
+          out.textContent = data.error;
+        }
+      } catch (err) {
+        status.textContent = `Request failed: ${err.message}`;
+      }
+    }
+
+    function copySuperResult() {
+      const text = document.getElementById('superOutput').textContent;
+      navigator.clipboard.writeText(text);
+      const btn = event.target;
+      btn.textContent = '✓ Copied!';
+      setTimeout(() => btn.textContent = '📋 Copy', 1500);
+    }
   </script>
 </body>
 </html>
@@ -547,7 +613,7 @@ class DashboardRequestHandler(http.server.BaseHTTPRequestHandler):
             self.send_header("Content-Type", "application/json")
             self.end_headers()
             stats = {
-                "version": "7.1.0",
+                "version": "7.2.0",
                 "tools_count": 47,
                 "token_savings": "94.9%",
                 "security": "100% Zero-Leak Guard",
@@ -599,6 +665,23 @@ class DashboardRequestHandler(http.server.BaseHTTPRequestHandler):
             self.send_header("Content-Type", "application/json")
             self.end_headers()
             self.wfile.write(json.dumps(resp).encode("utf-8"))
+        elif parsed.path == "/api/superdesign/generate":
+            content_length = int(self.headers.get("Content-Length", 0))
+            body = self.rfile.read(content_length).decode("utf-8")
+            try:
+                payload = json.loads(body)
+                design_type = payload.get("design_type", "component")
+                prompt = payload.get("prompt", "")
+                import tzero_superdesign
+                res = tzero_superdesign.superdesign_generate(prompt=prompt, design_type=design_type, workspace_path=".")
+                resp = {"success": True, "data": res}
+            except Exception as e:
+                resp = {"success": False, "error": str(e)}
+
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps(resp, ensure_ascii=False).encode("utf-8"))
         else:
             self.send_response(404)
             self.end_headers()

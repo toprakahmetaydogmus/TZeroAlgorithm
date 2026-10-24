@@ -33,7 +33,7 @@ class TestTZeroDashboard(unittest.TestCase):
         with urllib.request.urlopen(url) as resp:
             self.assertEqual(resp.status, 200)
             data = json.loads(resp.read().decode("utf-8"))
-            self.assertEqual(data["version"], "7.1.0")
+            self.assertEqual(data["version"], "7.2.0")
             self.assertEqual(data["tools_count"], 47)
 
     def test_post_api_reduce(self):
@@ -45,6 +45,16 @@ class TestTZeroDashboard(unittest.TestCase):
             data = json.loads(resp.read().decode("utf-8"))
             self.assertIn("reduced", data)
             self.assertIn("pub fn hello()", data["reduced"])
+
+    def test_post_api_superdesign(self):
+        url = f"http://localhost:{self.test_port}/api/superdesign/generate"
+        payload = json.dumps({"design_type": "component", "prompt": "metric card"}).encode("utf-8")
+        req = urllib.request.Request(url, data=payload, headers={"Content-Type": "application/json"})
+        with urllib.request.urlopen(req) as resp:
+            self.assertEqual(resp.status, 200)
+            data = json.loads(resp.read().decode("utf-8"))
+            self.assertTrue(data.get("success"))
+            self.assertIn("files_to_create", data["data"])
 
 if __name__ == "__main__":
     unittest.main()

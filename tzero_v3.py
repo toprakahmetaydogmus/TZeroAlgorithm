@@ -172,6 +172,26 @@ DEV_URL_MAIN = DEV_URL_GITHUB
 
 # Theme Palettes
 THEME_PALETTES = {
+    "Slate 950 (Linear Standard)": {
+        "bg_start": "#090d16",
+        "card_bg": "#0f172a",
+        "card_border": "#1e293b",
+        "card_shadow": "#05070d",
+        "card_hover": "#1e293b",
+        "sidebar_bg": "#0b1120",
+        "sidebar_fg": "#f8fafc",
+        "sidebar_muted": "#94a3b8",
+        "sidebar_hover": "#1e293b",
+        "sidebar_active": "#162032",
+        "text_main": "#f8fafc",
+        "text_muted": "#94a3b8",
+        "accent_cyan": "#38bdf8",
+        "accent_green": "#34d399",
+        "accent_purple": "#818cf8",
+        "accent_coral": "#fb923c",
+        "success": "#34d399",
+        "error": "#f43f5e"
+    },
     "Luxury Dashboard": {
         "bg_start": "#f3f1eb",
         "card_bg": "#fffdf8",
@@ -395,7 +415,7 @@ THEME_PALETTES = {
 }
 
 # Default Active Palette
-CURRENT_THEME = "Glass Dark"
+CURRENT_THEME = "Slate 950 (Linear Standard)"
 PALETTE = THEME_PALETTES[CURRENT_THEME]
 
 def update_colors(theme_name: str):
@@ -448,7 +468,7 @@ def calculate_token_cost(token_count: int, provider_name: str) -> float:
 # i18n Translations
 TRANSLATIONS: Dict[str, Dict[str, str]] = {
     "en": {
-        "title": "SİBER AKADEMİ — T-ZERO CONTEXT ARCHITECT V3",
+        "title": "T-Zero Developer Console & Context Architect v7.2.0",
         "subtitle": f"Developer: {DEV_NAME} | {DEV_URL_MAIN} | {DEV_URL_BIO}",
         "overview_tab": "🏠 Overview Dashboard",
         "setup_tab": "⚡ Setup & AI Models",
@@ -485,7 +505,7 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "audit_btn": "🛡️ SECURITY AUDIT"
     },
     "tr": {
-        "title": "SİBER AKADEMİ — T-ZERO BAĞLAM MİMARI V3",
+        "title": "T-Zero Geliştirici Konsolu & Bağlam Mimarı v7.2.0",
         "subtitle": f"Geliştirici: {DEV_NAME} | {DEV_URL_MAIN} | {DEV_URL_BIO}",
         "overview_tab": "🏠 Genel Bakış",
         "setup_tab": "⚡ Kurulum & Model",
@@ -3446,7 +3466,7 @@ class StarfieldCanvas(tk.Canvas):
         cfg = {"highlightthickness": 0}
         cfg.update(kwargs)
         super().__init__(parent, **cfg)
-        self.mode = "solid" if CURRENT_THEME == "Luxury Dashboard" else "stars"  # "stars", "matrix", "grid", "solid"
+        self.mode = "solid" if CURRENT_THEME in ("Luxury Dashboard", "Slate 950 (Linear Standard)") else "stars"  # "stars", "matrix", "grid", "solid"
         self.stars: List[Dict[str, Any]] = []
         self.matrix_drops: List[Dict[str, Any]] = []
         self.grid_offset = 0.0
@@ -4050,11 +4070,11 @@ class AutoReadmeGUI:
                 except Exception:
                     pass
 
-        saved_theme = _config_mgr.get_profile().get("theme", "Glass Dark")
+        saved_theme = _config_mgr.get_profile().get("theme", "Slate 950 (Linear Standard)")
         if saved_theme in THEME_PALETTES:
             update_colors(saved_theme)
         else:
-            update_colors("Glass Dark")
+            update_colors("Slate 950 (Linear Standard)")
 
         self.root.title(get_text("title", self.lang))
         self.root.configure(bg=PALETTE["bg_start"])
@@ -4231,6 +4251,19 @@ class AutoReadmeGUI:
         )
         self.audit_btn.pack(side=tk.LEFT, padx=3)
 
+        self.web_console_btn = CanvasPillButton(
+            header_controls,
+            text="🌐 WEB KONSOLU",
+            command=self.open_web_console,
+            height=28,
+            radius=14,
+            bg_color=PALETTE["card_border"],
+            text_color=PALETTE.get("accent_cyan", "#38bdf8"),
+            font=("Segoe UI", 7, "bold"),
+            width=115
+        )
+        self.web_console_btn.pack(side=tk.LEFT, padx=3)
+
         # 3. MAIN CONTENT FRAME
         self.content = tk.Frame(self.bg_canvas, bg=PALETTE["bg_start"], bd=0)
         self.content.place(x=82, y=62, relwidth=1.0, width=-92, relheight=1.0, height=-94)
@@ -4343,6 +4376,21 @@ class AutoReadmeGUI:
             self.root.after(duration_ms, fade)
         except Exception:
             pass
+
+    def open_web_console(self):
+        play_sfx("click")
+        try:
+            from tzero_dashboard import start_dashboard_server, DASHBOARD_PORT
+            if not getattr(self, "_web_server_started", False):
+                try:
+                    threading.Thread(target=lambda: start_dashboard_server(DASHBOARD_PORT, open_browser=False), daemon=True).start()
+                    self._web_server_started = True
+                except Exception:
+                    pass
+            webbrowser.open(f"http://localhost:{DASHBOARD_PORT}")
+            self.show_toast("T-Zero Web Konsolu & Superdesign açıldı", "success")
+        except Exception:
+            webbrowser.open("http://localhost:8421")
 
     def run_quick_security_audit(self):
         self.open_security_audit_dialog()
