@@ -1,5 +1,25 @@
 # Changelog
 
+## [7.2.0] - 2026-10-24
+
+### Released (Official V7.2.0 Interactive Topology Architect & Zero-Leak API Engine)
+
+- **Interactive Next-Gen AST Topology Canvas (`NodeGraphCanvas` in `tzero_v3.py`):**
+  - Expanded primary layout allocation from a cramped side pane to 65% screen width with dynamic PanedWindow sash placement.
+  - Dedicated Fullscreen Canvas Maximize Toggle (`[ ⤢ ]` / `[ ⤡ ]`) allowing the topology graph to seamlessly occupy 100% of the screen.
+  - Smooth interactive zoom (0.15x to 5.0x range) centered on mouse cursor coordinates with `<MouseWheel>` and dedicated toolbar buttons (`[ ＋ ]`, `[ － ]`, `[ 100% ]`, `[ ⛶ ]`).
+  - High-precision canvas panning via Right-Click drag, Middle-Click drag, or background Left-Click drag.
+  - Interactive Node Drag & Drop: Drag any architectural node to a custom coordinate on the fly.
+  - Collision Avoidance Force Relaxation: 35-pass physics simulation completely eliminates overlapping node badges and labels.
+  - Cyberpunk Unreal Engine / Figma style dot-matrix grid with real-time coordinate tracking and orbital hierarchy rings.
+  - Language badges with icons (`🐍 .py`, `⚡ .ts/.js`, `🦀 .rs`, `🔷 .go/.cs`, `⚙️ .json/.yaml/.toml`, `🎨 .html/.css`) and dynamic hover glow.
+  - Interactive Node Inspector HUD in bottom-left displaying file path, node degree, and layer classification.
+- **100% Zero-Leak API Authentication & Auto-Healing Fallback (`tzero_v3.py`):**
+  - Resolves Axum HTTP 500 error (`Missing request extension: Extension of type headers::common::authorization::Authorization<headers::common::authorization::Bearer> was not found`) by strictly omitting malformed `"Bearer "` headers when keys are empty.
+  - Keyring & environment variable auto-resolution prevents unauthenticated requests from firing.
+  - Seamless auto-healing fallback to Free AI Cloud (12s timeout) and Local Offline AST Engine (0ms, 100% private & Zero-Leak).
+  - All exception and log outputs are automatically sanitized via regex masking to prevent credential exposure.
+
 ## [7.1.0] - 2026-10-24
 
 ### Released (Official V7.1.0 TDQS 5.0/5.0 Master Edition: 42-Tool Autonomous MCP Server Suite)

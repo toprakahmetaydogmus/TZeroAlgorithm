@@ -858,12 +858,16 @@ class BaseProvider:
 
     def get_headers(self, api_key: str) -> Dict[str, str]:
         clean_key = (api_key or "").strip().strip('"').strip("'")
-        return {
-            "Authorization": f"Bearer {clean_key}",
+        headers = {
             "Content-Type": "application/json",
             "Referer": DEV_URL_GITHUB,
-            "User-Agent": f"TZeroAlgorithmV3/3.0 (Toprak Ahmet Aydogmus; {DEV_URL_GITHUB})"
+            "User-Agent": f"TZeroAlgorithmV4/4.2 (Toprak Ahmet Aydogmus; {DEV_URL_GITHUB})"
         }
+        if clean_key:
+            headers["Authorization"] = f"Bearer {clean_key}"
+            headers["x-api-key"] = clean_key
+            headers["api-key"] = clean_key
+        return headers
 
     def get_endpoint_url(self, api_base: str) -> str:
         base = api_base.rstrip('/')
@@ -911,11 +915,11 @@ class NvidiaProvider(BaseProvider):
     def get_headers(self, api_key: str) -> Dict[str, str]:
         clean_key = (api_key or "").strip().strip('"').strip("'")
         headers = {
-            "Authorization": f"Bearer {clean_key}",
             "Content-Type": "application/json",
-            "User-Agent": f"TZeroAlgorithmV4/4.1 (Toprak Ahmet Aydogmus; {DEV_URL_GITHUB})"
+            "User-Agent": f"TZeroAlgorithmV4/4.2 (Toprak Ahmet Aydogmus; {DEV_URL_GITHUB})"
         }
         if clean_key:
+            headers["Authorization"] = f"Bearer {clean_key}"
             headers["X-Nvidia-Api-Key"] = clean_key
         return headers
 
@@ -1000,13 +1004,17 @@ class AnthropicProvider(BaseProvider):
         )
 
     def get_headers(self, api_key: str) -> Dict[str, str]:
-        return {
-            "x-api-key": api_key,
+        clean_key = (api_key or "").strip().strip('"').strip("'")
+        headers = {
             "anthropic-version": "2023-06-01",
             "content-type": "application/json",
             "Referer": DEV_URL_GITHUB,
-            "User-Agent": f"TZeroAlgorithmV4/4.1 (Toprak Ahmet Aydogmus; {DEV_URL_GITHUB})"
+            "User-Agent": f"TZeroAlgorithmV4/4.2 (Toprak Ahmet Aydogmus; {DEV_URL_GITHUB})"
         }
+        if clean_key:
+            headers["x-api-key"] = clean_key
+            headers["Authorization"] = f"Bearer {clean_key}"
+        return headers
 
     def get_endpoint_url(self, api_base: str) -> str:
         base = api_base.rstrip('/')
@@ -2654,7 +2662,8 @@ class ContextGenerator:
         model: str, 
         messages: List[Dict[str, str]], 
         progress_cb: Optional[Callable] = None,
-        provider: Optional[BaseProvider] = None
+        provider: Optional[BaseProvider] = None,
+        timeout: int = 40
     ) -> str:
         if self.cancel_event.is_set():
             raise InterruptedError("Process cancelled by user.")
@@ -2678,7 +2687,7 @@ class ContextGenerator:
             if progress_cb:
                 progress_cb(60, "Streaming LLM generated output...")
             
-            r = requests.post(url, json=provider_payload, headers=headers, timeout=120)
+            r = requests.post(url, json=provider_payload, headers=headers, timeout=timeout)
             
             if self.cancel_event.is_set():
                 raise InterruptedError("Process cancelled by user.")
@@ -2699,7 +2708,7 @@ class ContextGenerator:
                 if progress_cb:
                     progress_cb(65, "Model reached end-of-life, auto-retrying with deepseek-ai/deepseek-v4.1-flash...")
                 fallback_payload = provider.format_payload("deepseek-ai/deepseek-v4.1-flash", messages)
-                r_fallback = requests.post(url, json=fallback_payload, headers=headers, timeout=120)
+                r_fallback = requests.post(url, json=fallback_payload, headers=headers, timeout=timeout)
                 if r_fallback.status_code == 200:
                     data = r_fallback.json()
                     content = provider.parse_response(data)
@@ -2718,7 +2727,8 @@ class ContextGenerator:
                     err_text = err_json["detail"]
             except Exception:
                 pass
-            raise IOError(f"API Error code HTTP {r.status_code}: {err_text}")
+            clean_err = re.sub(r'(Bearer\s+|key[:=]\s*)[A-Za-z0-9_\-\.]{8,}', r'\1[PROTECTED]', str(err_text))
+            raise IOError(f"API Error code HTTP {r.status_code}: {clean_err}")
         except Exception as e:
             if self.cancel_event.is_set():
                 raise InterruptedError("Process cancelled.")
@@ -3597,23 +3607,179 @@ class StarfieldCanvas(tk.Canvas):
 
 
 class NodeGraphCanvas(tk.Canvas):
+    """Next-Generation Interactive AST Topology & Code Architecture Canvas.
+    
+    Features:
+    - Interactive Smooth Zoom (Mousewheel, +/- buttons, scale factor 0.15x to 5.0x)
+    - Full Canvas Panning (Right-click drag, Middle-click drag, or click-drag on canvas background)
+    - Individual Node Drag & Drop (Click and drag any node to custom position)
+    - Collision Avoidance Force Relaxation: Iterative physics pass preventing label overlap
+    - Clean Hierarchical Multi-Orbit Layout: Core Workspace -> Directory Rings -> Satellite File Orbits
+    - Floating Glassmorphism Toolbar: Zoom in (+), Zoom out (-), Reset (100%), Fit to View (⛶), Fullscreen Toggle (⤢)
+    - File Type Color Coding & Badges with icons (.py, .ts, .rs, .go, .json, .html, etc.)
+    - Dynamic Hover Glow & Connected Link Highlighting
+    - Interactive Node Inspector HUD in bottom-left corner
+    """
     def __init__(self, parent, **kwargs):
-        cfg = {"bg": PALETTE["bg_start"], "highlightthickness": 0}
+        cfg = {"bg": PALETTE.get("bg_start", "#090d16"), "highlightthickness": 0}
         cfg.update(kwargs)
         super().__init__(parent, **cfg)
         self.nodes: Dict[str, Dict[str, Any]] = {}
         self.links: List[Tuple[str, str]] = []
         self.selected_node: Optional[str] = None
         self.hovered_node: Optional[str] = None
+        self.hovered_btn: Optional[str] = None
         self.files_cache: List[str] = []
-        self.bind("<Button-1>", self.on_click)
-        self.bind("<B1-Motion>", self.on_drag)
+
+        # Interactive Transform State
+        self.scale_factor: float = 1.0
+        self.pan_x: float = 0.0
+        self.pan_y: float = 0.0
+        self.is_panning: bool = False
+        self.pan_start_x: float = 0.0
+        self.pan_start_y: float = 0.0
+        self.dragged_node: Optional[str] = None
+        self.has_auto_fitted: bool = False
+        self.is_fullscreen: bool = False
+        self.hud_buttons: List[Dict[str, Any]] = []
+
+        # Mouse and Gesture Bindings
+        self.bind("<Button-1>", self.on_mouse_down)
+        self.bind("<B1-Motion>", self.on_mouse_drag)
+        self.bind("<ButtonRelease-1>", self.on_mouse_up)
+        self.bind("<Button-3>", self.on_right_down)
+        self.bind("<B3-Motion>", self.on_right_drag)
+        self.bind("<ButtonRelease-3>", self.on_right_up)
+        self.bind("<Button-2>", self.on_right_down)
+        self.bind("<B2-Motion>", self.on_right_drag)
+        self.bind("<ButtonRelease-2>", self.on_right_up)
+        self.bind("<MouseWheel>", self.on_mousewheel)
+        self.bind("<Button-4>", lambda e: self.zoom(1.18, e.x, e.y))
+        self.bind("<Button-5>", lambda e: self.zoom(0.82, e.x, e.y))
         self.bind("<Motion>", self.on_motion)
         self.bind("<Configure>", self.on_resize)
+        self.bind("<Double-Button-1>", self.on_double_click)
+
+    def to_screen(self, wx: float, wy: float) -> Tuple[float, float]:
+        return (wx * self.scale_factor + self.pan_x, wy * self.scale_factor + self.pan_y)
+
+    def to_world(self, sx: float, sy: float) -> Tuple[float, float]:
+        sf = max(0.01, self.scale_factor)
+        return ((sx - self.pan_x) / sf, (sy - self.pan_y) / sf)
+
+    def zoom(self, factor: float, cx: Optional[float] = None, cy: Optional[float] = None):
+        if cx is None:
+            cx = self.winfo_width() / 2 if self.winfo_width() > 1 else 450
+        if cy is None:
+            cy = self.winfo_height() / 2 if self.winfo_height() > 1 else 350
+        old_sf = self.scale_factor
+        new_sf = max(0.15, min(5.0, old_sf * factor))
+        if abs(new_sf - old_sf) < 1e-4:
+            return
+        self.pan_x = cx - (cx - self.pan_x) * (new_sf / old_sf)
+        self.pan_y = cy - (cy - self.pan_y) * (new_sf / old_sf)
+        self.scale_factor = new_sf
+        self.draw()
+
+    def reset_view(self):
+        self.scale_factor = 1.0
+        cw = max(400, self.winfo_width())
+        ch = max(350, self.winfo_height())
+        self.pan_x = cw / 2
+        self.pan_y = ch / 2
+        self.draw()
+
+    def fit_to_view(self):
+        if not self.nodes:
+            self.reset_view()
+            return
+        min_x = min(n["x"] - (n.get("w", 70) / 2) for n in self.nodes.values())
+        max_x = max(n["x"] + (n.get("w", 70) / 2) for n in self.nodes.values())
+        min_y = min(n["y"] - 30 for n in self.nodes.values())
+        max_y = max(n["y"] + 30 for n in self.nodes.values())
+
+        graph_w = max(100.0, max_x - min_x)
+        graph_h = max(100.0, max_y - min_y)
+        cw = max(500, self.winfo_width())
+        ch = max(400, self.winfo_height())
+
+        avail_w = max(260, cw - 140)
+        avail_h = max(220, ch - 140)
+
+        sf = min(avail_w / graph_w, avail_h / graph_h, 1.45)
+        sf = max(0.25, sf)
+
+        center_x = (min_x + max_x) / 2
+        center_y = (min_y + max_y) / 2
+
+        self.scale_factor = sf
+        self.pan_x = (cw / 2) - (center_x * sf)
+        self.pan_y = (ch / 2) - (center_y * sf)
+        self.draw()
 
     def on_resize(self, event=None):
-        if self.files_cache:
+        if self.files_cache and not self.has_auto_fitted:
             self.set_data(self.files_cache)
+        else:
+            self.draw()
+
+    def get_file_color(self, name: str) -> str:
+        lower = name.lower()
+        if lower.endswith(".py"): return "#38bdf8"
+        if lower.endswith((".ts", ".tsx", ".js", ".jsx")): return "#818cf8"
+        if lower.endswith((".rs", ".toml")): return "#fb923c"
+        if lower.endswith(".go"): return "#34d399"
+        if lower.endswith((".json", ".yaml", ".yml")): return "#fbbf24"
+        if lower.endswith((".html", ".css", ".scss")): return "#f43f5e"
+        if lower.endswith((".md", ".txt", ".rst")): return "#a78bfa"
+        if lower.endswith((".c", ".cpp", ".h", ".cs", ".java", ".kt", ".swift")): return "#60a5fa"
+        return "#94a3b8"
+
+    def get_file_icon(self, name: str) -> str:
+        lower = name.lower()
+        if lower.endswith(".py"): return "🐍"
+        if lower.endswith((".ts", ".tsx", ".js", ".jsx")): return "⚡"
+        if lower.endswith(".rs"): return "🦀"
+        if lower.endswith(".go"): return "🔷"
+        if lower.endswith((".json", ".yaml", ".yml", ".toml")): return "⚙️"
+        if lower.endswith((".html", ".css", ".scss")): return "🎨"
+        if lower.endswith((".md", ".txt")): return "📝"
+        if lower.endswith((".c", ".cpp", ".h")): return "⚙️"
+        if lower.endswith(".cs"): return "🔷"
+        if lower.endswith(".java"): return "☕"
+        if lower.endswith(".kt"): return "🎯"
+        if lower.endswith(".swift"): return "🕊️"
+        return "📄"
+
+    def resolve_collisions(self):
+        # Multi-pass repulsion relaxation to prevent pill and label overlaps
+        node_list = list(self.nodes.values())
+        for _ in range(35):
+            for i in range(len(node_list)):
+                n1 = node_list[i]
+                w1 = n1.get("w", 70)
+                h1 = n1.get("h", 26)
+                for j in range(i + 1, len(node_list)):
+                    n2 = node_list[j]
+                    w2 = n2.get("w", 70)
+                    h2 = n2.get("h", 26)
+                    dx = n2["x"] - n1["x"]
+                    dy = n2["y"] - n1["y"]
+                    min_dx = (w1 + w2) / 2 + 18
+                    min_dy = (h1 + h2) / 2 + 14
+                    if abs(dx) < min_dx and abs(dy) < min_dy:
+                        overlap_x = min_dx - abs(dx)
+                        overlap_y = min_dy - abs(dy)
+                        if overlap_x < overlap_y:
+                            sign_x = 1 if dx >= 0 else -1
+                            shift = (overlap_x / 2) * sign_x
+                            n2["x"] += shift
+                            n1["x"] -= shift
+                        else:
+                            sign_y = 1 if dy >= 0 else -1
+                            shift = (overlap_y / 2) * sign_y
+                            n2["y"] += shift
+                            n1["y"] -= shift
 
     def set_data(self, files: List[str]):
         self.files_cache = files
@@ -3623,143 +3789,385 @@ class NodeGraphCanvas(tk.Canvas):
             self.draw()
             return
 
-        w = max(600, self.winfo_width() if self.winfo_width() > 1 else 650)
-        h = max(500, self.winfo_height() if self.winfo_height() > 1 else 550)
-        cx, cy = w / 2, h / 2
-
-        self.nodes["root"] = {
-            "x": cx,
-            "y": cy,
-            "type": "root",
-            "size": 16,
-            "color": PALETTE["accent_cyan"],
-            "label": "Workspace"
-        }
-
-        # Filter out noisy vendor/cache dirs from graph
-        filtered_files = []
+        clean_files = []
         for f in files:
             norm = f.replace("\\", "/")
-            if any(part in {".git", ".cache", "puppeteer", "node_modules", ".venv", "venv", "__pycache__", "dist", "build"} for part in norm.split("/")):
+            parts = norm.split("/")
+            if any(p in {".git", ".cache", "puppeteer", "node_modules", ".venv", "venv", "__pycache__", "dist", "build"} for p in parts):
                 continue
-            filtered_files.append(norm)
+            clean_files.append(norm)
 
-        target_files = filtered_files[:35] if filtered_files else [f.replace("\\", "/") for f in files[:25]]
+        target_files = clean_files[:55] if clean_files else [f.replace("\\", "/") for f in files[:40]]
+
+        # Center Workspace Root
+        self.nodes["root"] = {
+            "x": 0.0,
+            "y": 0.0,
+            "type": "root",
+            "size": 20,
+            "color": PALETTE.get("accent_cyan", "#38bdf8"),
+            "label": "🏢 Workspace Core",
+            "w": 160,
+            "h": 36
+        }
 
         # Group by top directory
         top_dirs: Dict[str, List[str]] = {}
         for f in target_files:
             parts = f.split("/")
-            if len(parts) > 1:
-                top = parts[0]
-                top_dirs.setdefault(top, []).append(f)
-            else:
-                top_dirs.setdefault(".", []).append(f)
+            top = parts[0] if len(parts) > 1 else "."
+            top_dirs.setdefault(top, []).append(f)
 
-        dir_count = max(1, len(top_dirs))
-        dir_radius = min(cx, cy) * 0.45
+        dir_names = sorted(top_dirs.keys(), key=lambda d: (d == ".", -len(top_dirs[d]), d))
+        num_dirs = max(1, len([d for d in dir_names if d != "."]))
+        dir_radius = max(280, 200 + num_dirs * 38)
 
-        for d_idx, (d_name, d_files) in enumerate(top_dirs.items()):
-            d_angle = (2 * math.pi * d_idx) / dir_count
-            dx = cx + dir_radius * math.cos(d_angle)
-            dy = cy + dir_radius * math.sin(d_angle)
-
+        dir_idx = 0
+        for d_name in dir_names:
+            d_files = top_dirs[d_name]
             if d_name != ".":
+                angle = (2 * math.pi * dir_idx) / num_dirs
+                dir_idx += 1
+                dx = dir_radius * math.cos(angle)
+                dy = dir_radius * math.sin(angle)
                 d_id = f"dir_{d_name}"
+                badge_w = min(190, 36 + len(d_name) * 8.0)
                 self.nodes[d_id] = {
                     "x": dx,
                     "y": dy,
                     "type": "dir",
-                    "size": 11,
-                    "color": PALETTE["accent_purple"],
-                    "label": f"📁 {d_name}"
+                    "size": 14,
+                    "color": PALETTE.get("accent_purple", "#a78bfa"),
+                    "label": f"📁 {d_name}/",
+                    "w": badge_w,
+                    "h": 28
                 }
                 self.links.append(("root", d_id))
                 parent_id = d_id
                 base_x, base_y = dx, dy
+                base_angle = angle
             else:
                 parent_id = "root"
-                base_x, base_y = cx, cy
+                base_x, base_y = 0.0, 0.0
+                base_angle = math.pi / 2
 
             file_count = len(d_files)
-            file_dist = min(95, max(50, 20 + file_count * 8))
             for f_idx, f_path in enumerate(d_files):
-                sub_angle = d_angle - 0.7 + (1.4 * (f_idx + 0.5) / max(1, file_count))
-                fx = base_x + file_dist * math.cos(sub_angle)
-                fy = base_y + file_dist * math.sin(sub_angle)
                 short_name = f_path.split("/")[-1]
-                ext_color = PALETTE["accent_green"] if short_name.endswith(".py") else PALETTE.get("accent_coral", PALETTE["accent_cyan"])
+                tier_ring = f_idx % 3
+                tier_dist = 135 + (tier_ring * 85)
+                fan_spread = min(2.2, 0.5 + file_count * 0.18)
+                fan_angle = base_angle - (fan_spread / 2) + (fan_spread * (f_idx + 0.5) / max(1, file_count))
+                fx = base_x + tier_dist * math.cos(fan_angle)
+                fy = base_y + tier_dist * math.sin(fan_angle)
+
+                ext_color = self.get_file_color(short_name)
+                icon = self.get_file_icon(short_name)
+                badge_w = min(220, 34 + len(short_name) * 7.2)
+
                 self.nodes[f_path] = {
                     "x": fx,
                     "y": fy,
                     "type": "file",
-                    "size": 6,
+                    "size": 8,
                     "color": ext_color,
-                    "label": short_name
+                    "label": f"{icon} {short_name}",
+                    "raw_label": short_name,
+                    "full_path": f_path,
+                    "w": badge_w,
+                    "h": 24
                 }
                 self.links.append((parent_id, f_path))
 
-        self.draw()
+        self.resolve_collisions()
+        self.has_auto_fitted = True
+        self.fit_to_view()
 
     def draw(self):
         self.delete("all")
-        w = max(600, self.winfo_width())
-        h = max(500, self.winfo_height())
+        w = max(450, self.winfo_width())
+        h = max(380, self.winfo_height())
 
-        hud_text = f"⚡ T-ZERO AST TOPOLOGY GRAPH  •  {len(self.nodes)} Düğüm  •  {len(self.links)} Bağlantı"
-        self.create_text(16, 16, text=hud_text, anchor="nw", fill=PALETTE.get("accent_cyan", "#38bdf8"), font=("Segoe UI", 9, "bold"))
-        self.create_text(16, 32, text="Düğümleri fareyle sürükleyebilir ve mimari ilişki haritasını inceleyebilirsiniz.", anchor="nw", fill=PALETTE["text_muted"], font=("Segoe UI", 7))
+        card_bg = PALETTE.get("card_bg", "#0f172a")
+        card_border = PALETTE.get("card_border", "#1e293b")
+        text_main = PALETTE.get("text_main", "#f8fafc")
+        text_muted = PALETTE.get("text_muted", "#64748b")
+        accent_cyan = PALETTE.get("accent_cyan", "#38bdf8")
 
+        # 1. Subtle High-Tech Dot Matrix Grid
+        grid_step = 36 * max(0.5, min(2.0, self.scale_factor))
+        if grid_step > 14:
+            start_x = (self.pan_x % grid_step)
+            start_y = (self.pan_y % grid_step)
+            dot_color = "#162032"
+            gx = start_x
+            while gx < w:
+                gy = start_y
+                while gy < h:
+                    self.create_rectangle(gx, gy, gx + 1.5, gy + 1.5, fill=dot_color, outline="")
+                    gy += grid_step
+                gx += grid_step
+
+        # 2. Orbital Hierarchy Rings around root
+        root_sx, root_sy = self.to_screen(0.0, 0.0)
+        for r_orbit, ring_lbl in ((250, "DIR ORBIT"), (440, "MODULE ORBIT"), (660, "SATELLITE ORBIT")):
+            sr = r_orbit * self.scale_factor
+            if sr > 20:
+                self.create_oval(
+                    root_sx - sr, root_sy - sr, root_sx + sr, root_sy + sr,
+                    outline="#1b2539", width=1, dash=(3, 7)
+                )
+
+        # 3. Draw Edges / Links with Midpoint Glowing Pulse
         for start, end in self.links:
             if start in self.nodes and end in self.nodes:
                 n1, n2 = self.nodes[start], self.nodes[end]
-                is_hi = (start == self.selected_node or end == self.selected_node)
-                l_color = PALETTE["accent_cyan"] if is_hi else PALETTE["card_border"]
-                l_width = 2 if is_hi else 1
-                self.create_line(n1["x"], n1["y"], n2["x"], n2["y"], fill=l_color, width=l_width)
+                sx1, sy1 = self.to_screen(n1["x"], n1["y"])
+                sx2, sy2 = self.to_screen(n2["x"], n2["y"])
 
+                is_hi = (
+                    start == self.selected_node or end == self.selected_node or
+                    start == self.hovered_node or end == self.hovered_node
+                )
+                l_color = accent_cyan if is_hi else "#1e293b"
+                l_width = 2.5 if is_hi else 1.2
+                self.create_line(sx1, sy1, sx2, sy2, fill=l_color, width=l_width)
+
+                if is_hi:
+                    mid_x = (sx1 + sx2) / 2
+                    mid_y = (sy1 + sy2) / 2
+                    self.create_oval(mid_x - 3, mid_y - 3, mid_x + 3, mid_y + 3, fill=accent_cyan, outline="")
+
+        # 4. Draw Nodes as Sleek Rounded Badge Pills
+        sf_badge = min(1.25, max(0.65, self.scale_factor))
         for node_id, node in self.nodes.items():
-            x, y, size = node["x"], node["y"], node["size"]
+            sx, sy = self.to_screen(node["x"], node["y"])
+            bw = (node.get("w", 70) / 2) * sf_badge
+            bh = (node.get("h", 26) / 2) * sf_badge
             color = node["color"]
-            is_sel = (node_id == self.selected_node or node_id == self.hovered_node)
+            is_sel = (node_id == self.selected_node)
+            is_hov = (node_id == self.hovered_node)
 
-            if is_sel:
-                self.create_oval(x - size - 5, y - size - 5, x + size + 5, y + size + 5, outline=PALETTE["accent_cyan"], width=2)
-            self.create_oval(x - size, y - size, x + size, y + size, fill=color, outline="#ffffff" if is_sel else PALETTE["card_border"], width=1.5 if is_sel else 1)
+            # Outer glow
+            if is_sel or is_hov:
+                glow_pad = 5 * sf_badge
+                glow_col = "#a855f7" if is_sel else accent_cyan
+                self.create_rectangle(
+                    sx - bw - glow_pad, sy - bh - glow_pad,
+                    sx + bw + glow_pad, sy + bh + glow_pad,
+                    outline=glow_col, width=2, fill=""
+                )
 
+            # Pill Body
+            pill_border = "#ffffff" if is_sel else (accent_cyan if is_hov else "#26354a")
+            self.create_rectangle(
+                sx - bw, sy - bh, sx + bw, sy + bh,
+                fill=card_bg, outline=pill_border, width=1.5 if (is_sel or is_hov) else 1.0
+            )
+
+            # Left accent dot
+            dot_r = 4.0 * sf_badge
+            dot_x = sx - bw + 9 * sf_badge
+            self.create_oval(dot_x - dot_r, sy - dot_r, dot_x + dot_r, sy + dot_r, fill=color, outline="")
+
+            # Text Label
             lbl = node["label"]
-            if len(lbl) > 22:
-                lbl = lbl[:20] + "…"
-            ty = y + size + 9
-            lbl_w = len(lbl) * 5.2
-            self.create_rectangle(x - lbl_w, ty - 6, x + lbl_w, ty + 6, fill=PALETTE["card_bg"], outline=PALETTE["card_border"], width=1)
-            self.create_text(x, ty, text=lbl, fill=PALETTE["text_main"] if is_sel else PALETTE["text_muted"], font=("Segoe UI", 7, "bold" if is_sel else "normal"))
+            font_size = max(7, int(8.5 * sf_badge))
+            font_weight = "bold" if (is_sel or is_hov or node["type"] in ("root", "dir")) else "normal"
+            self.create_text(
+                sx + 4 * sf_badge, sy,
+                text=lbl,
+                fill=text_main if (is_sel or is_hov or node["type"] == "root") else text_muted,
+                font=("Segoe UI", font_size, font_weight)
+            )
 
-    def on_click(self, event):
+        # 5. Top-Left Floating Info HUD Badge
+        hud_box_w = 460
+        self.create_rectangle(14, 12, 14 + hud_box_w, 56, fill=card_bg, outline="#1e293b", width=1)
+        scale_pct = int(self.scale_factor * 100)
+        hud_title = f"⚡ T-ZERO AST TOPOLOGY GRAPH  •  {len(self.nodes)} Düğüm  •  {len(self.links)} Bağlantı  •  %{scale_pct} Ölçek"
+        self.create_text(26, 24, text=hud_title, anchor="w", fill=accent_cyan, font=("Segoe UI", 9, "bold"))
+        self.create_text(26, 42, text="🖱️ Sol Sürükle: Düğüm Taşı/Tuval Kaydır  |  Tekerlek: Yakınlaştır  |  Çift Tık: Odaklan  |  Sağ Tık: Kaydır", anchor="w", fill=text_muted, font=("Segoe UI", 7))
+
+        # 6. Top-Right Floating Control Toolbar (Zoom +, Zoom -, Reset, Fit, Maximize)
+        self.hud_buttons = []
+        is_max = getattr(self, "is_fullscreen", False)
+        btn_defs = [
+            ("plus", "＋", "Yakınlaştır", self.btn_zoom_in),
+            ("minus", "－", "Uzaklaştır", self.btn_zoom_out),
+            ("reset", "100%", "Orijinal Boyut", self.btn_reset),
+            ("fit", "⛶", "Ekrana Sığdır", self.btn_fit),
+            ("max", "⤢" if not is_max else "⤡", "Genişlet / Tam Ekran", self.btn_toggle_fullscreen),
+        ]
+        btn_w, btn_h, gap = 38, 30, 6
+        total_bar_w = len(btn_defs) * (btn_w + gap) - gap + 16
+        bx_start = w - total_bar_w - 16
+        by = 14
+
+        self.create_rectangle(bx_start - 6, by - 2, w - 10, by + btn_h + 2, fill=card_bg, outline="#1e293b", width=1)
+
+        for b_idx, (b_id, symbol, label, action) in enumerate(btn_defs):
+            bx = bx_start + b_idx * (btn_w + gap)
+            is_btn_hov = (self.hovered_btn == b_id)
+            btn_fill = accent_cyan if is_btn_hov else "#192233"
+            btn_fg = "#000000" if is_btn_hov else text_main
+
+            self.create_rectangle(bx, by, bx + btn_w, by + btn_h, fill=btn_fill, outline=accent_cyan if is_btn_hov else "#2a374d", width=1)
+            self.create_text(bx + btn_w / 2, by + btn_h / 2, text=symbol, fill=btn_fg, font=("Segoe UI", 10, "bold"))
+            self.hud_buttons.append({"id": b_id, "rect": (bx, by, bx + btn_w, by + btn_h), "action": action, "label": label})
+
+        # 7. Bottom-Left Node Inspector HUD (if hovering/selected)
+        active_id = self.hovered_node or self.selected_node
+        if active_id and active_id in self.nodes:
+            active_node = self.nodes[active_id]
+            node_deg = sum(1 for (s, e) in self.links if s == active_id or e == active_id)
+            info_h = 32
+            info_y = h - info_h - 14
+            info_text = f"DÜĞÜM: {active_node['label']}  |  TÜR: {active_node['type'].upper()}  |  BAĞLANTILAR: {node_deg}"
+            if "full_path" in active_node:
+                info_text += f"  |  YOL: {active_node['full_path']}"
+            info_w = min(w - 28, max(280, len(info_text) * 6.5 + 26))
+            self.create_rectangle(14, info_y, 14 + info_w, info_y + info_h, fill=card_bg, outline=accent_cyan, width=1)
+            self.create_text(24, info_y + info_h / 2, text=info_text, anchor="w", fill=text_main, font=("Segoe UI", 8, "bold"))
+
+    def btn_zoom_in(self):
+        self.zoom(1.25)
+
+    def btn_zoom_out(self):
+        self.zoom(0.80)
+
+    def btn_reset(self):
+        self.reset_view()
+
+    def btn_fit(self):
+        self.fit_to_view()
+
+    def btn_toggle_fullscreen(self):
+        p = self.master
+        while p:
+            if hasattr(p, "toggle_graph_maximize"):
+                p.toggle_graph_maximize()
+                return
+            p = getattr(p, "master", None)
+
+    def on_mouse_down(self, event):
+        # 1. Check HUD buttons click
+        for btn in self.hud_buttons:
+            x1, y1, x2, y2 = btn["rect"]
+            if x1 <= event.x <= x2 and y1 <= event.y <= y2:
+                btn["action"]()
+                return
+
+        # 2. Check Node click
         self.selected_node = None
+        self.dragged_node = None
+        sf_badge = min(1.25, max(0.65, self.scale_factor))
+
         for node_id, node in self.nodes.items():
-            dist = math.hypot(event.x - node["x"], event.y - node["y"])
-            if dist <= node["size"] + 6:
+            sx, sy = self.to_screen(node["x"], node["y"])
+            bw = (node.get("w", 70) / 2) * sf_badge
+            bh = (node.get("h", 26) / 2) * sf_badge
+            if (sx - bw - 5) <= event.x <= (sx + bw + 5) and (sy - bh - 5) <= event.y <= (sy + bh + 5):
                 self.selected_node = node_id
+                self.dragged_node = node_id
                 break
+
+        # 3. If no node clicked, start canvas panning
+        if not self.dragged_node:
+            self.is_panning = True
+            self.pan_start_x = event.x
+            self.pan_start_y = event.y
+
         self.draw()
 
-    def on_motion(self, event):
-        old_hov = self.hovered_node
-        self.hovered_node = None
-        for node_id, node in self.nodes.items():
-            dist = math.hypot(event.x - node["x"], event.y - node["y"])
-            if dist <= node["size"] + 6:
-                self.hovered_node = node_id
-                break
-        if old_hov != self.hovered_node:
+    def on_mouse_drag(self, event):
+        if self.dragged_node and self.dragged_node in self.nodes:
+            wx, wy = self.to_world(event.x, event.y)
+            self.nodes[self.dragged_node]["x"] = wx
+            self.nodes[self.dragged_node]["y"] = wy
+            self.draw()
+        elif self.is_panning:
+            dx = event.x - self.pan_start_x
+            dy = event.y - self.pan_start_y
+            self.pan_x += dx
+            self.pan_y += dy
+            self.pan_start_x = event.x
+            self.pan_start_y = event.y
             self.draw()
 
-    def on_drag(self, event):
-        if self.selected_node and self.selected_node in self.nodes:
-            self.nodes[self.selected_node]["x"] = event.x
-            self.nodes[self.selected_node]["y"] = event.y
+    def on_mouse_up(self, event):
+        self.dragged_node = None
+        self.is_panning = False
+
+    def on_right_down(self, event):
+        self.is_panning = True
+        self.pan_start_x = event.x
+        self.pan_start_y = event.y
+
+    def on_right_drag(self, event):
+        if self.is_panning:
+            dx = event.x - self.pan_start_x
+            dy = event.y - self.pan_start_y
+            self.pan_x += dx
+            self.pan_y += dy
+            self.pan_start_x = event.x
+            self.pan_start_y = event.y
             self.draw()
+
+    def on_right_up(self, event):
+        self.is_panning = False
+
+    def on_mousewheel(self, event):
+        delta = event.delta
+        factor = 1.18 if delta > 0 else 0.82
+        self.zoom(factor, event.x, event.y)
+
+    def on_motion(self, event):
+        old_hov_node = self.hovered_node
+        old_hov_btn = self.hovered_btn
+        self.hovered_node = None
+        self.hovered_btn = None
+
+        # Check HUD buttons hover
+        for btn in self.hud_buttons:
+            x1, y1, x2, y2 = btn["rect"]
+            if x1 <= event.x <= x2 and y1 <= event.y <= y2:
+                self.hovered_btn = btn["id"]
+                self.config(cursor="hand2")
+                if self.hovered_btn != old_hov_btn:
+                    self.draw()
+                return
+
+        # Check nodes hover
+        sf_badge = min(1.25, max(0.65, self.scale_factor))
+        for node_id, node in self.nodes.items():
+            sx, sy = self.to_screen(node["x"], node["y"])
+            bw = (node.get("w", 70) / 2) * sf_badge
+            bh = (node.get("h", 26) / 2) * sf_badge
+            if (sx - bw - 5) <= event.x <= (sx + bw + 5) and (sy - bh - 5) <= event.y <= (sy + bh + 5):
+                self.hovered_node = node_id
+                self.config(cursor="hand2")
+                break
+
+        if not self.hovered_node and not self.hovered_btn:
+            self.config(cursor="fleur" if self.is_panning else "")
+
+        if old_hov_node != self.hovered_node or old_hov_btn != self.hovered_btn:
+            self.draw()
+
+    def on_double_click(self, event):
+        if self.hovered_node and self.hovered_node in self.nodes:
+            # Zoom and center on hovered node
+            node = self.nodes[self.hovered_node]
+            cw = self.winfo_width() / 2
+            ch = self.winfo_height() / 2
+            self.scale_factor = 1.8
+            self.pan_x = cw - (node["x"] * self.scale_factor)
+            self.pan_y = ch - (node["y"] * self.scale_factor)
+            self.draw()
+        else:
+            self.fit_to_view()
+
 
 
 class PerformanceChartCanvas(tk.Canvas):
@@ -4777,6 +5185,8 @@ class AutoReadmeGUI:
             self.git_graph_canvas.draw_graph(len(self.git_checkboxes))
             self.rebuild_file_type_matrix_table()
             self.rebuild_ast_outline_tree()
+            self.safe_after(50, lambda: self._place_graph_sash(0.65))
+            self.safe_after(120, lambda: self.node_canvas.fit_to_view())
         elif idx == 6:
             self.refresh_profile_listbox()
         self.log(f"Switched view layout to index {idx}: {get_text(self.tabs[idx], self.lang)}")
@@ -6777,7 +7187,13 @@ class AutoReadmeGUI:
     def async_generate_payload(self, url: str, key: str, selected_files: List[str]):
         provider_name = self.provider_var.get()
         p = PROVIDERS.get(provider_name, NvidiaProvider())
-        headers = p.get_headers(key)
+
+        # If key is empty in UI entry, attempt secure lookup from keyring / environment
+        if not key:
+            saved_key = _config_mgr.get_credential(provider_name)
+            if saved_key:
+                key = saved_key.strip()
+
         model = self.model_var.get()
         
         snippets = get_budgeted_snippets(selected_files, self.file_snippets)
@@ -6830,10 +7246,39 @@ Custom Requirements:
         def update_prog(val, msg):
             self.safe_after(0, lambda: self._update_prog_sync(val, msg))
             
+        generator = ContextGenerator(self.cancel_event)
+        target_dir = self.dir_entry.get().strip() or os.getcwd()
+
+        # If commercial provider has no key at all, skip doomed HTTP failure and auto-heal immediately!
+        if not key and p.name not in ("Free AI Cloud (No Key Required)", "Local Ollama"):
+            self.log(f"Harici API anahtarı girilmedi ({provider_name}). Otomatik Siber Free AI Cloud ve Yerel AST Motoruna aktarılıyor...")
+            free_p = FreePollinationsProvider()
+            free_url = f"{free_p.get_base_url().rstrip('/')}/chat/completions"
+            free_headers = free_p.get_headers("")
+            try:
+                content = generator.generate_readme(
+                    free_url, "", free_headers, "openai", messages, update_prog, provider=free_p, timeout=12
+                )
+                self.log("Canlı AI mimari analizi Ücretsiz Siber AI Cloud ile başarıyla üretildi.")
+                self.safe_after(0, lambda: self.on_gen_success(content))
+                self.safe_after(0, lambda: self.show_toast(
+                    "⚡ API anahtarı gerekmeden Ücretsiz Siber AI Cloud ile canlı bağlam üretildi!",
+                    "info"
+                ))
+                return
+            except Exception as free_err:
+                self.log(f"Ücretsiz Bulut yanıt vermedi ({free_err}). Yerel Çevrimdışı AST Motoru (%100 Ücretsiz & Sıfır Sızıntı) çalıştırılıyor...")
+                offline_content = generate_offline_context(target_dir, selected_files, self.file_snippets)
+                self.safe_after(0, lambda: self.on_gen_success(offline_content))
+                self.safe_after(0, lambda: self.show_toast(
+                    "⚡ Yerel Çevrimdışı AST Motoru (%100 Ücretsiz & Sıfır Sızıntı) ile eksiksiz bağlam derlendi!",
+                    "success"
+                ))
+                return
+
+        headers = p.get_headers(key)
         try:
-            p = PROVIDERS.get(provider_name)
-            generator = ContextGenerator(self.cancel_event)
-            content = generator.generate_readme(url, key, headers, model, messages, update_prog, provider=p)
+            content = generator.generate_readme(url, key, headers, model, messages, update_prog, provider=p, timeout=40)
             self.safe_after(0, lambda: self.on_gen_success(content))
         except InterruptedError:
             self.safe_after(0, self.on_gen_cancelled)
@@ -6841,42 +7286,45 @@ Custom Requirements:
             if self.cancel_event.is_set():
                 self.safe_after(0, self.on_gen_cancelled)
             else:
-                err_msg = str(e)
-                target_dir = self.dir_entry.get().strip() or os.getcwd()
-                self.log(f"Remote API call returned: {err_msg}")
-                self.log("Auto-Healing activated: Falling back to Siber Free AI Cloud Engine (No Key Required)...")
+                raw_err = str(e)
+                clean_err = re.sub(r'(Bearer\s+|key[:=]\s*)[A-Za-z0-9_\-\.]{8,}', r'\1[PROTECTED]', raw_err)
+                self.log(f"Uzak API yanıtı: {clean_err}")
+                self.log("Otomatik İyileştirme Devrede: Siber Free AI Cloud & Yerel AST Motoruna aktarılıyor...")
                 try:
                     free_p = FreePollinationsProvider()
                     free_url = f"{free_p.get_base_url().rstrip('/')}/chat/completions"
                     free_headers = free_p.get_headers("")
                     content = generator.generate_readme(
-                        free_url, "", free_headers, "openai", messages, update_prog, provider=free_p
+                        free_url, "", free_headers, "openai", messages, update_prog, provider=free_p, timeout=12
                     )
-                    self.log("Live AI architecture analysis generated successfully via Free AI Cloud.")
+                    self.log("Canlı AI mimari analizi Ücretsiz Siber AI Cloud ile başarıyla tamamlandı.")
                     self.safe_after(0, lambda: self.on_gen_success(content))
                     self.safe_after(0, lambda: self.show_toast(
-                        "⚡ Harici API anahtarı geçersiz olduğu için Ücretsiz Siber AI Cloud ile canlı AI mimari taraması tamamlandı!",
+                        "⚡ Harici API bağlantısı yerine Ücretsiz Siber AI Cloud ile canlı bağlam üretildi!",
                         "info"
                     ))
                     return
                 except Exception as free_err:
-                    self.log(f"Free AI Cloud unreachable ({free_err}). Activating Local Offline AST Context Engine (%100 Free & Zero-Leak)...")
+                    clean_free_err = re.sub(r'(Bearer\s+|key[:=]\s*)[A-Za-z0-9_\-\.]{8,}', r'\1[PROTECTED]', str(free_err))
+                    self.log(f"Ücretsiz Bulut yanıt vermedi ({clean_free_err}). Yerel Çevrimdışı AST Motoru devrede (%100 Free & Sıfır Sızıntı)...")
 
                 try:
                     offline_content = generate_offline_context(target_dir, selected_files, self.file_snippets)
                     self.safe_after(0, lambda: self.on_gen_success(offline_content))
-                    if "401" in err_msg:
+                    if "401" in raw_err:
                         warn_reason = "Uzak API 401 yetkilendirme hatası (API anahtarınız geçersiz veya süresi dolmuş)"
-                    elif "403" in err_msg:
+                    elif "403" in raw_err:
                         warn_reason = "Uzak API 403 yetkilendirme hatası"
+                    elif "500" in raw_err:
+                        warn_reason = "Uzak API sunucu hatası (HTTP 500)"
                     else:
                         warn_reason = "Uzak API bağlantı sorunu"
                     self.safe_after(0, lambda: self.show_toast(
-                        f"⚡ {warn_reason} nedeniyle T-Zero Çevrimdışı AST Motoru ile eksiksiz bağlam üretildi!",
-                        "warning"
+                        f"⚡ {warn_reason} nedeniyle T-Zero Yerel Çevrimdışı AST Motoru ile eksiksiz bağlam üretildi!",
+                        "info"
                     ))
                 except Exception as offline_err:
-                    self.safe_after(0, lambda msg=f"{err_msg}\nOffline Error: {offline_err}": self.on_gen_fail(msg))
+                    self.safe_after(0, lambda msg=f"{clean_err}\nOffline Error: {offline_err}": self.on_gen_fail(msg))
 
     def _update_prog_sync(self, val, msg):
         self.gen_progress["value"] = val
@@ -7207,18 +7655,22 @@ Custom Requirements:
     # --- TAB 6: GRAPH & AST OUTLINE ANALYSIS ---
     def setup_tab_graph(self):
         f = self.tab_frames[5]
-        f.columnconfigure(0, weight=2)
+        f.columnconfigure(0, weight=3)
         f.columnconfigure(1, weight=1)
         f.rowconfigure(0, weight=1)
         
         paned = tk.PanedWindow(f, orient=tk.HORIZONTAL, bg=PALETTE["bg_start"], bd=0, sashwidth=6, sashrelief=tk.FLAT)
         paned.grid(row=0, column=0, columnspan=2, sticky="nsew")
+        self.graph_paned = paned
+        self.graph_maximized = False
+        self._graph_sash_locked = False
         
         self.node_canvas = NodeGraphCanvas(paned)
-        paned.add(self.node_canvas, minsize=480)
+        paned.add(self.node_canvas, minsize=550, stretch="always")
         
         # Right scrollable analytics panel
         right_container = ScrollableGlassPanel(paned, bg_color=PALETTE["bg_start"])
+        self.graph_right_container = right_container
         right = right_container.inner
 
         pad = GlassCard(right)
@@ -7288,9 +7740,43 @@ Custom Requirements:
         ast_scroll.pack(side=tk.RIGHT, fill=tk.Y)
         self.ast_tree.config(yscrollcommand=ast_scroll.set)
         
-        paned.add(right_container, minsize=380)
+        paned.add(right_container, minsize=320, stretch="never")
         
+        def _on_paned_config(event=None):
+            if not getattr(self, "_graph_sash_locked", False):
+                self._place_graph_sash(0.65)
+        paned.bind("<Configure>", _on_paned_config)
         self.root.bind("<<NotebookTabChanged>>", self.on_graph_tab_visible)
+
+    def _place_graph_sash(self, ratio: float = 0.65):
+        if not hasattr(self, "graph_paned") or getattr(self, "_graph_sash_locked", False):
+            return
+        try:
+            total_w = self.graph_paned.winfo_width()
+            if total_w > 500:
+                sash_pos = max(450, int(total_w * ratio))
+                self.graph_paned.sash_place(0, sash_pos, 0)
+        except Exception:
+            pass
+
+    def toggle_graph_maximize(self):
+        if not hasattr(self, "graph_paned"):
+            return
+        total_w = self.graph_paned.winfo_width()
+        if not getattr(self, "graph_maximized", False):
+            self.graph_maximized = True
+            self._graph_sash_locked = True
+            try:
+                self.graph_paned.sash_place(0, max(50, total_w - 18), 0)
+            except Exception:
+                pass
+        else:
+            self.graph_maximized = False
+            self._graph_sash_locked = False
+            self._place_graph_sash(0.65)
+        if hasattr(self, "node_canvas"):
+            self.node_canvas.is_fullscreen = self.graph_maximized
+            self.node_canvas.draw()
 
     def rebuild_file_type_matrix_table(self):
         for item in self.matrix_tree.get_children():
@@ -7323,6 +7809,8 @@ Custom Requirements:
             self.update_lang_distribution_metrics()
             self.git_graph_canvas.draw_graph(len(self.git_checkboxes))
             self.rebuild_file_type_matrix_table()
+            self.safe_after(50, lambda: self._place_graph_sash(0.65))
+            self.safe_after(100, lambda: self.node_canvas.fit_to_view())
 
     def rebuild_ast_outline_tree(self):
         for item in self.ast_tree.get_children():
