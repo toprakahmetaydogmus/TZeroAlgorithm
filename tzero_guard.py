@@ -107,15 +107,24 @@ exit /b 0
         violations = []
         warnings = []
 
+        placeholder_markers = (
+            "DEMO", "MOCK", "EXAMPLE", "YOUR-", "YOUR_", "ENTER_YOUR",
+            "PLACEHOLDER", "000000000000", "1234567890", "TEST_KEY", "DUMMY", "SAMPLE"
+        )
+
         for filename, content in files_map.items():
             # Check secret patterns
             for label, pattern in SECRET_PATTERNS:
-                matches = pattern.findall(content)
-                if matches:
+                raw_matches = pattern.findall(content)
+                real_matches = [
+                    m for m in raw_matches
+                    if not any(marker in str(m).upper() for marker in placeholder_markers)
+                ]
+                if real_matches:
                     violations.append({
                         "file": filename,
                         "type": label,
-                        "match_count": len(matches)
+                        "match_count": len(real_matches)
                     })
 
             # Check token bloat
@@ -132,6 +141,30 @@ exit /b 0
             "warnings": warnings,
             "files_scanned": len(files_map)
         }
+
+    @classmethod
+    def scan_directory(cls, repo_dir: str = ".") -> Dict[str, Any]:
+        """Scans all repository files for hardcoded secrets, keys, and credentials."""
+        abs_repo = os.path.abspath(repo_dir)
+        files_map: Dict[str, str] = {}
+        skip_dirs = {".git", "__pycache__", ".pytest_cache", "target", "dist", "build", ".venv", "venv", ".egg-info", "node_modules"}
+        code_exts = {".py", ".rs", ".js", ".ts", ".jsx", ".tsx", ".go", ".java", ".json", ".toml", ".yaml", ".yml", ".env"}
+
+        for root, dirs, files in os.walk(abs_repo):
+            dirs[:] = [d for d in dirs if d not in skip_dirs]
+            for f in files:
+                _, ext = os.path.splitext(f)
+                if ext.lower() in code_exts or f.startswith(".env"):
+                    fpath = os.path.join(root, f)
+                    rel_path = os.path.relpath(fpath, abs_repo).replace("\\", "/")
+                    if "test" in rel_path.lower():
+                        continue
+                    try:
+                        with open(fpath, "r", encoding="utf-8", errors="replace") as fp:
+                            files_map[rel_path] = fp.read()
+                    except Exception:
+                        pass
+        return cls.scan_staged_content(files_map)
 
     @classmethod
     def run_cli_check(cls, repo_dir: str = ".") -> int:
