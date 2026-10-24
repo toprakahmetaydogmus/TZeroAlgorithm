@@ -24,25 +24,53 @@ class TestMCPServer(unittest.TestCase):
         return asyncio.run(coro)
 
     def test_mcp_tools_and_prompts_registration(self):
-        """Verifies that all 25 MCP tools and grounding prompt are properly registered."""
+        """Verifies that all 42 specialized MCP tools and grounding prompt are properly registered."""
         tools = self.run_async(self.server.list_tools())
         tool_names = [t.name for t in tools]
-        self.assertEqual(len(tool_names), 14)
+        self.assertEqual(len(tool_names), 42)
         expected_tools = [
-            "build_project_context",
-            "prune_code_snippet",
-            "manage_architecture_rules",
-            "enforce_architecture_rules",
+            "get_project_context_tree",
+            "query_module_dependencies",
+            "query_architecture_boundaries",
             "generate_architecture_blueprint",
-            "analyze_code_dependencies",
-            "analyze_change_impact",
-            "search_codebase",
-            "audit_code_quality",
-            "verify_security_guard",
+            "generate_repo_map",
+            "audit_codebase_quality",
+            "find_code_duplicity",
             "estimate_token_cost",
-            "query_memory_store",
-            "manage_memory_store",
-            "orchestrate_agent_swarm",
+            "analyze_change_impact",
+            "enforce_architecture_boundaries",
+            "search_codebase_semantic",
+            "export_agent_rules",
+            "get_token_savings_metrics",
+            "get_incremental_diff_context",
+            "prune_code_snippet",
+            "verify_zero_leak_security",
+            "verify_hallucination_guard",
+            "get_smart_skeleton_context",
+            "rank_repository_pagerank",
+            "trace_symbol_call_chain",
+            "find_dead_code",
+            "jarvis_compress_semantic_memory",
+            "jarvis_decompress_semantic_memory",
+            "jarvis_orchestrate_goal",
+            "jarvis_zero_key_query",
+            "jarvis_query_knowledge_graph",
+            "jarvis_compress_document",
+            "jarvis_export_memory_store",
+            "jarvis_causal_chain_query",
+            "jarvis_self_healing_execute",
+            "jarvis_consolidate_memory",
+            "jarvis_hybrid_search",
+            "jarvis_swarm_orchestrate",
+            "jarvis_export_graph_visualization",
+            "jarvis_minhash_similarity",
+            "jarvis_bft_swarm_consensus",
+            "jarvis_latent_press_compress",
+            "prune_schema_definition",
+            "generate_smart_micro_patch",
+            "generate_zero_waste_prompt_context",
+            "compress_stream_tokens",
+            "install_git_security_guard",
         ]
         for exp in expected_tools:
             self.assertIn(exp, tool_names)
@@ -661,17 +689,21 @@ diff --git a/core.py b/core.py
             self.assertIn("T-Zero", tool_result_text(res))
 
     def test_legacy_mode_environment_variable(self):
-        """Verifies that TZERO_MCP_TOOL_MODE=all registers all 42 legacy tools."""
-        os.environ["TZERO_MCP_TOOL_MODE"] = "all"
+        """Verifies that TZERO_MCP_TOOL_MODE=canonical registers the 14 canonical tools, and default registers 42 tools."""
+        os.environ["TZERO_MCP_TOOL_MODE"] = "canonical"
         try:
-            full_server = tzero_mcp.create_mcp_server()
-            tools = self.run_async(full_server.list_tools())
+            canon_server = tzero_mcp.create_mcp_server()
+            tools = self.run_async(canon_server.list_tools())
             tool_names = [t.name for t in tools]
-            self.assertGreaterEqual(len(tool_names), 42)
-            self.assertIn("get_project_context_tree", tool_names)
+            self.assertEqual(len(tool_names), 14)
             self.assertIn("build_project_context", tool_names)
+            self.assertIn("manage_memory_store", tool_names)
         finally:
             os.environ.pop("TZERO_MCP_TOOL_MODE", None)
+
+        default_server = tzero_mcp.create_mcp_server()
+        tools_def = self.run_async(default_server.list_tools())
+        self.assertEqual(len(tools_def), 42)
 
 
 if __name__ == "__main__":

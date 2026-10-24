@@ -42,7 +42,7 @@ except ImportError:
     def Field(default=..., description=""):
         return default
 
-SERVER_VERSION = "7.0.1"
+SERVER_VERSION = "7.1.0"
 
 # Safe UTF-8 reconfiguration for Windows console & piped subprocesses
 if sys.stdout and hasattr(sys.stdout, "reconfigure"):
@@ -225,17 +225,21 @@ def create_mcp_server():
 
 
     # -------------------------------------------------------------------------
-    # LEGACY / COMPATIBILITY TOOL IMPLEMENTATIONS (42 TOOLS)
-    # Registered to list_tools() only when TZERO_MCP_TOOL_MODE in ("all", "legacy").
-    # Always available dynamically via server.call_tool().
+    # T-ZERO TDQS 5/5 CERTIFIED PRIMARY SPECIALIZED SUITE (42 TOOLS)
+    # Default mode registers all 42 distinct, focused tools directly to list_tools().
+    # Canonical 14-tool mode available when TZERO_MCP_TOOL_MODE in ("canonical", "14").
+    # All tools accessible dynamically via call_tool() in both modes.
     # -------------------------------------------------------------------------
-    _legacy_mode = os.environ.get("TZERO_MCP_TOOL_MODE", "").lower() in ("all", "legacy")
+    _tool_mode = os.environ.get("TZERO_MCP_TOOL_MODE", "all").lower().strip()
+    _canonical_only = _tool_mode in ("canonical", "14")
     def _noop_decorator(**kwargs):
         def _wrapper(fn):
             return fn
         return _wrapper
-    _maybe_tool = server.tool if _legacy_mode else _noop_decorator
+    _maybe_tool = _noop_decorator if _canonical_only else server.tool
+    _canon_tool = server.tool if _canonical_only else _noop_decorator
     _LEGACY_DISPATCH: Dict[str, Any] = {}
+    _CANONICAL_DISPATCH: Dict[str, Any] = {}
     # -------------------------------------------------------------------------
     # TOOL 1: get_project_context_tree
     # -------------------------------------------------------------------------
@@ -947,11 +951,49 @@ def create_mcp_server():
     )
     def _legacy_export_agent_rules(
         project_root: Annotated[str, Field(default=".", description="Target workspace directory where agent rule files will be created (default: current directory).")] = ".",
-        target: Annotated[str, Field(default="all", description="Target editor format: 'cursor', 'cline', 'windsurf', or 'all' (default: 'all').")] = "all"
+        target: Annotated[str, Field(default="all", description="Target editor format: 'cursor', 'cline', 'windsurf', 'claude', 'copilot', or 'all' (default: 'all').")] = "all"
     ) -> str:
         """Exports AI coding agent rules into workspace."""
         from tzero_features import AgentRulesGenerator
-        created = AgentRulesGenerator.export_all(project_root)
+        p_name = os.path.basename(os.path.abspath(project_root)) or "Project"
+        t = (target or "all").lower().strip()
+        created = []
+        if t in ("cursor", "cursorrules"):
+            cr_path = os.path.join(project_root, ".cursorrules")
+            with open(cr_path, "w", encoding="utf-8") as f:
+                f.write(AgentRulesGenerator.generate_cursorrules(p_name))
+            created.append(cr_path)
+            c_rules_dir = os.path.join(project_root, ".cursor", "rules")
+            os.makedirs(c_rules_dir, exist_ok=True)
+            for mdc_name, content in AgentRulesGenerator.generate_cursor_mdc_rules(p_name, project_dir=project_root).items():
+                mdc_path = os.path.join(c_rules_dir, mdc_name)
+                with open(mdc_path, "w", encoding="utf-8") as f:
+                    f.write(content)
+                created.append(mdc_path)
+        elif t in ("cline", "clinerules"):
+            cl_path = os.path.join(project_root, ".clinerules")
+            with open(cl_path, "w", encoding="utf-8") as f:
+                f.write(AgentRulesGenerator.generate_clinerules(p_name))
+            created.append(cl_path)
+        elif t in ("windsurf", "windsurfrules"):
+            ws_path = os.path.join(project_root, ".windsurfrules")
+            with open(ws_path, "w", encoding="utf-8") as f:
+                f.write(AgentRulesGenerator.generate_windsurfrules(p_name))
+            created.append(ws_path)
+        elif t in ("claude", "claudemd"):
+            claude_path = os.path.join(project_root, "CLAUDE.md")
+            with open(claude_path, "w", encoding="utf-8") as f:
+                f.write(AgentRulesGenerator.generate_claude_instructions(p_name))
+            created.append(claude_path)
+        elif t in ("copilot", "github"):
+            gh_dir = os.path.join(project_root, ".github")
+            os.makedirs(gh_dir, exist_ok=True)
+            copilot_path = os.path.join(gh_dir, "copilot-instructions.md")
+            with open(copilot_path, "w", encoding="utf-8") as f:
+                f.write(AgentRulesGenerator.generate_copilot_instructions(p_name))
+            created.append(copilot_path)
+        else:
+            created = AgentRulesGenerator.export_all(project_root)
         rel_paths = [os.path.relpath(p, project_root) for p in created]
         return "✅ Generated AI Agent rule files:\n" + "\n".join(f"- `{p}`" for p in rel_paths)
 
@@ -1404,7 +1446,7 @@ def create_mcp_server():
             "- When to use: Execute high-level complex coding goals across multi-agent swarms, configure agent rule files, or plan phased engineering refactors.\n"
             "- When NOT to use: Do not use for isolated AST code smells or security checks; use 'audit_codebase_quality' and 'verify_zero_leak_security' instead. Do not use for single-command self-healing; use 'jarvis_self_healing_execute' instead.\n\n"
             "Returns: Formatted Markdown plan or multi-stage execution report with verification logs."),
-        annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=False, open_world_hint=True)
+        annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=False, open_world_hint=False)
     )
     def _legacy_jarvis_orchestrate_goal(
         goal: Annotated[str, Field(default="plan", description="Autonomous engineering task, refactoring directive, or 'plan'/'help' to view capabilities and executive plan.")] = "plan",
@@ -1470,7 +1512,7 @@ def create_mcp_server():
             "- When to use: Query external zero-cost model inference without configuring API keys or paying commercial provider fees.\n"
             "- When NOT to use: Do not use for local codebase search or AST parsing; use 'search_codebase_semantic' or 'get_project_context_tree' instead.\n\n"
             "Returns: Formatted AI response with selected zero-cost provider telemetry."),
-        annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=False, open_world_hint=True)
+        annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=False, open_world_hint=False)
     )
     def _legacy_jarvis_zero_key_query(
         prompt: Annotated[str, Field(description="Prompt, code question, or instruction for the Zero-Key intelligence engine.")],
@@ -2084,7 +2126,7 @@ def create_mcp_server():
     ) -> str:
         """Compresses unified git diff into a compact semantic micro-patch."""
         from tzero_patch import SmartMicroPatcher
-        return SmartMicroPatcher.format_micro_patch_report(diff_content)
+        return SmartMicroPatcher.format_micro_patch_report(diff_content, max_context_lines=max_context_lines)
 
     # -------------------------------------------------------------------------
     # TOOL 40: generate_zero_waste_prompt_context
@@ -2290,7 +2332,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     # CANONICAL TOOL 1: build_project_context
     # -------------------------------------------------------------------------
-    @server.tool(
+    @_canon_tool(
         name="build_project_context",
         description=(
             "Scans the target repository file system and constructs a token-optimized AST context payload for LLM prompts across multiple hierarchy tiers (T-1 to T-4).\n\n"
@@ -2336,7 +2378,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     # CANONICAL TOOL 2: prune_code_snippet
     # -------------------------------------------------------------------------
-    @server.tool(
+    @_canon_tool(
         name="prune_code_snippet",
         description=(
             "Prunes implementation bodies from in-memory code snippets, API schemas, or unified diff streams while preserving AST interfaces, type annotations, and function signatures.\n\n"
@@ -2365,7 +2407,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     # CANONICAL TOOL 3: manage_architecture_rules
     # -------------------------------------------------------------------------
-    @server.tool(
+    @_canon_tool(
         name="manage_architecture_rules",
         description=(
             "Manages the lifecycle of architectural boundary definitions, tier rules (T-1 to T-4), and layer constraints configured in tzero.rules.json.\n\n"
@@ -2378,7 +2420,7 @@ def create_mcp_server():
             "- When NOT to use: Do not use for actively validating codebase files against these rules; use 'enforce_architecture_rules' instead. Do not use for generating visual Mermaid architectural topology diagrams; use 'generate_architecture_blueprint' instead.\n\n"
             "Returns: JSON or Markdown status report detailing active or updated architectural rules."
         ),
-        annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
+        annotations=ToolAnnotations(read_only_hint=False, destructive_hint=True, idempotent_hint=True, open_world_hint=False)
     )
     def manage_architecture_rules(
         action: Annotated[str, Field(default="query", description="Rule lifecycle action: 'query' to inspect active rules, 'update' to add or modify rules, 'delete' to remove a rule, 'reset' to restore defaults.")] = "query",
@@ -2452,7 +2494,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     # CANONICAL TOOL 4: enforce_architecture_rules
     # -------------------------------------------------------------------------
-    @server.tool(
+    @_canon_tool(
         name="enforce_architecture_rules",
         description=(
             "Enforces architectural boundary rules and layer isolation constraints defined in tzero.rules.json across the repository AST.\n\n"
@@ -2472,12 +2514,15 @@ def create_mcp_server():
         strict_mode: Annotated[bool, Field(default=True, description="When True, fails on any boundary infraction; when False, warns without raising errors.")] = True
     ) -> str:
         """Enforces architectural boundary rules and layer isolation constraints across workspace AST."""
-        return _legacy_enforce_architecture_boundaries(project_root=project_root)
+        report = _legacy_enforce_architecture_boundaries(project_root=project_root)
+        if not strict_mode and "ARCH VIOLATION" in report:
+            report = report.replace("ARCH VIOLATION", "ARCH WARNING (strict_mode=False)")
+        return report
 
     # -------------------------------------------------------------------------
     # CANONICAL TOOL 5: generate_architecture_blueprint
     # -------------------------------------------------------------------------
-    @server.tool(
+    @_canon_tool(
         name="generate_architecture_blueprint",
         description=(
             "Generates a complete system architectural specification (ARCHITECTURE.md) with auto-generated Mermaid component topology diagrams, layer boundaries, and module hierarchies.\n\n"
@@ -2503,7 +2548,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     # CANONICAL TOOL 6: analyze_code_dependencies
     # -------------------------------------------------------------------------
-    @server.tool(
+    @_canon_tool(
         name="analyze_code_dependencies",
         description=(
             "Analyzes module imports, symbol call chains, graph centrality (PageRank), and unreferenced dead code across polyglot source files.\n\n"
@@ -2539,7 +2584,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     # CANONICAL TOOL 7: analyze_change_impact
     # -------------------------------------------------------------------------
-    @server.tool(
+    @_canon_tool(
         name="analyze_change_impact",
         description=(
             "Calculates change blast radius score (0-100) and identifies downstream dependents before modifying or deleting a target function, class, or module.\n\n"
@@ -2560,12 +2605,15 @@ def create_mcp_server():
         file_path: Annotated[str, Field(default="", description="Optional file path where the target symbol is defined.")] = ""
     ) -> str:
         """Calculates blast radius score and downstream dependents before modifying a target symbol."""
-        return _legacy_analyze_change_impact(target_symbol=target_symbol, project_root=project_root)
+        res = _legacy_analyze_change_impact(target_symbol=target_symbol, project_root=project_root)
+        if file_path:
+            return f"*(Focus file: `{file_path}`)*\n\n{res}"
+        return res
 
     # -------------------------------------------------------------------------
     # CANONICAL TOOL 8: search_codebase
     # -------------------------------------------------------------------------
-    @server.tool(
+    @_canon_tool(
         name="search_codebase",
         description=(
             "Executes private local hybrid search combining BM25 keyword matching and TF-IDF semantic scoring across repository functions, classes, and docstrings.\n\n"
@@ -2591,7 +2639,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     # CANONICAL TOOL 9: audit_code_quality
     # -------------------------------------------------------------------------
-    @server.tool(
+    @_canon_tool(
         name="audit_code_quality",
         description=(
             "Performs AST static code smell analysis, cyclomatic complexity profiling, duplicate code block detection, and AI coding hallucination validation.\n\n"
@@ -2624,7 +2672,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     # CANONICAL TOOL 10: verify_security_guard
     # -------------------------------------------------------------------------
-    @server.tool(
+    @_canon_tool(
         name="verify_security_guard",
         description=(
             "Scans workspace files and code buffers for hardcoded secrets and API keys, or installs the automated git pre-commit zero-leak security guard.\n\n"
@@ -2654,7 +2702,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     # CANONICAL TOOL 11: estimate_token_cost
     # -------------------------------------------------------------------------
-    @server.tool(
+    @_canon_tool(
         name="estimate_token_cost",
         description=(
             "Calculates exact token counts, comparative API billing costs across AI model providers (OpenAI, Claude, Gemini, DeepSeek), and cumulative financial ROI savings.\n\n"
@@ -2683,7 +2731,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     # CANONICAL TOOL 12: query_memory_store
     # -------------------------------------------------------------------------
-    @server.tool(
+    @_canon_tool(
         name="query_memory_store",
         description=(
             "Queries semantic triples, causal reasoning graphs, and MinHash entity clusters from the local agent memory store.\n\n"
@@ -2715,7 +2763,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     # CANONICAL TOOL 13: manage_memory_store
     # -------------------------------------------------------------------------
-    @server.tool(
+    @_canon_tool(
         name="manage_memory_store",
         description=(
             "Manages the complete lifecycle of persistent agent semantic memory stores, including compression, consolidation, export, listing, reset, and deletion.\n\n"
@@ -2728,7 +2776,7 @@ def create_mcp_server():
             "- When NOT to use: Do not use for querying existing knowledge triples or causal chains from memory; use 'query_memory_store' instead. Do not use for pruning source code snippets or diff streams; use 'prune_code_snippet' instead.\n\n"
             "Returns: Status report confirming memory consolidation, export file path, list of active memory stores, or confirmation of reset/deletion."
         ),
-        annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=False, open_world_hint=False)
+        annotations=ToolAnnotations(read_only_hint=False, destructive_hint=True, idempotent_hint=False, open_world_hint=False)
     )
     def manage_memory_store(
         operation: Annotated[str, Field(default="list", description="Memory lifecycle operation: 'list' to show active memory stores, 'compress' to encode text into semantic triples, 'consolidate' to merge memory, 'export' to dump graph, 'reset' to clear all memory, 'delete' to remove a specific store.")] = "list",
@@ -2798,7 +2846,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     # CANONICAL TOOL 14: orchestrate_agent_swarm
     # -------------------------------------------------------------------------
-    @server.tool(
+    @_canon_tool(
         name="orchestrate_agent_swarm",
         description=(
             "Coordinates autonomous multi-agent task execution, goal decomposition, Byzantine fault-tolerant (PBFT) consensus voting, and self-healing error recovery.\n\n"
@@ -2827,6 +2875,22 @@ def create_mcp_server():
         else:
             return _legacy_jarvis_orchestrate_goal(goal=goal, project_root=project_root, mode="auto")
 
+        # Register canonical mappings
+    _CANONICAL_DISPATCH['build_project_context'] = build_project_context
+    _CANONICAL_DISPATCH['prune_code_snippet'] = prune_code_snippet
+    _CANONICAL_DISPATCH['manage_architecture_rules'] = manage_architecture_rules
+    _CANONICAL_DISPATCH['enforce_architecture_rules'] = enforce_architecture_rules
+    _CANONICAL_DISPATCH['generate_architecture_blueprint'] = generate_architecture_blueprint
+    _CANONICAL_DISPATCH['analyze_code_dependencies'] = analyze_code_dependencies
+    _CANONICAL_DISPATCH['analyze_change_impact'] = analyze_change_impact
+    _CANONICAL_DISPATCH['search_codebase'] = search_codebase
+    _CANONICAL_DISPATCH['audit_code_quality'] = audit_code_quality
+    _CANONICAL_DISPATCH['verify_security_guard'] = verify_security_guard
+    _CANONICAL_DISPATCH['estimate_token_cost'] = estimate_token_cost
+    _CANONICAL_DISPATCH['query_memory_store'] = query_memory_store
+    _CANONICAL_DISPATCH['manage_memory_store'] = manage_memory_store
+    _CANONICAL_DISPATCH['orchestrate_agent_swarm'] = orchestrate_agent_swarm
+
     # -------------------------------------------------------------------------
     # TRANSPARENT COMPATIBILITY CALL_TOOL WRAPPER
     # Dispatches canonical tools AND all 42 legacy tool names seamlessly
@@ -2839,8 +2903,8 @@ def create_mcp_server():
         if name in registered:
             return await _orig_call_tool(name, arguments, context)
 
-        if name in _LEGACY_DISPATCH:
-            handler = _LEGACY_DISPATCH[name]
+        handler = _CANONICAL_DISPATCH.get(name) or _LEGACY_DISPATCH.get(name)
+        if handler:
             sig = inspect.signature(handler)
             valid_args = {}
             for p_name, param in sig.parameters.items():

@@ -112,9 +112,9 @@ class SmartMicroPatcher:
         return compact_res, savings
 
     @staticmethod
-    def format_micro_patch_report(raw_diff: str) -> str:
+    def format_micro_patch_report(raw_diff: str, max_context_lines: int = 1) -> str:
         """Formats an AI-ready Markdown report containing the micro-patch."""
-        compact, savings = SmartMicroPatcher.compress_diff(raw_diff)
+        compact, savings = SmartMicroPatcher.compress_diff(raw_diff, max_context_lines=max_context_lines)
         approx_orig_tokens = max(1, int(len(raw_diff) / 3.8))
         approx_compact_tokens = max(1, int(len(compact) / 3.8))
 
