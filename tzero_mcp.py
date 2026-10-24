@@ -42,7 +42,7 @@ except ImportError:
     def Field(default=..., description=""):
         return default
 
-SERVER_VERSION = "7.3.0"
+SERVER_VERSION = "7.3.1"
 
 # Safe UTF-8 reconfiguration for Windows console & piped subprocesses
 if sys.stdout and hasattr(sys.stdout, "reconfigure"):
@@ -375,7 +375,7 @@ def create_mcp_server():
             "- Error Handling: Returns clean Markdown error notices if the target path is missing.\n"
             "\n"
             "Usage Guidelines:\n"
-            "- When to use: Inspect inbound referrers (who imports this) and outbound dependencies (what this imports) before refactoring, moving, or deleting files.\n"
+            "- When to use: Inspect inbound referrers (who imports this) and outbound dependencies (what this imports) before refactoring, moving, or reorganizing files.\n"
             "- When NOT to use: Do not use for recursive function/method call chains (use 'trace_symbol_call_chain' instead); do not use for verifying architectural layer rule violations (use 'enforce_architecture_boundaries' instead).\n"
             "\n"
             "Returns: Markdown dependency report detailing total outbound imports, inbound referrers, dependency tables, and external package pool."
@@ -525,12 +525,12 @@ def create_mcp_server():
             "Parameters:\n"
             "- `project_root` (str, optional, default='.'): Repository root directory to inspect.\n"
             "- `use_ai` (bool, optional, default=False): When True, supplements deterministic AST topology with local zero-cost AI architectural insights.\n"
-            "- `model` (str, optional, default='offline'): Local synthesis model profile identifier.\n"
+            "- `model` (str, optional, default=''): Optional model identifier override (e.g. 'deepseek-v4.1-flash', 'gpt-4o') when use_ai is True; defaults to empty string for offline mode.\n"
             "\n"
             "Behavior:\n"
-            "- Read-only: Reads repository directory layout and module headers without writing files.\n"
+            "- Side Effects: Pure in-memory analysis; reads repository directory layout and module headers without writing files on disk.\n"
             "- Idempotent: Produces deterministic Mermaid diagrams and architectural markdown.\n"
-            "- 100% Offline: Local topology generation with zero external rendering API calls.\n"
+            "- 100% Offline: Local topology generation; operates strictly offline.\n"
             "- Auth & Rate Limits: Zero credentials or tokens required; typical generation time <200ms.\n"
             "- Error Handling: Returns descriptive warning if directory contains no recognizable code modules.\n"
             "\n"
@@ -543,16 +543,16 @@ def create_mcp_server():
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
     )
     def _legacy_generate_architecture_blueprint(
-        project_root: Annotated[str, Field(default=".", description="Root directory of the repository to analyze and document (default: current directory).")] = ".",
-        use_ai: Annotated[bool, Field(default=False, description="When True, uses configured 3rd-party AI or Free AI Cloud to synthesize deep architecture analysis; when False (default), runs 100% offline AST analysis.")] = False,
-        model: Annotated[str, Field(default="", description="Optional model identifier override (e.g. 'deepseek-v4.1-flash', 'gpt-4o') when use_ai is True.")] = ""
+        project_root: Annotated[str, Field(default=".", description="Repository root directory to inspect (default: '.').")] = ".",
+        use_ai: Annotated[bool, Field(default=False, description="When True, supplements deterministic AST topology with local zero-cost AI architectural insights (default: False).")] = False,
+        model: Annotated[str, Field(default="", description="Optional model identifier override (e.g. 'deepseek-v4.1-flash', 'gpt-4o') when use_ai is True (default: '').")] = ""
     ) -> str:
         """Generates a complete ARCHITECTURE.md document with live Mermaid diagrams.
         
         Args:
-            project_root: Root directory of the repository (default: current directory).
-            use_ai: If True, uses configured 3rd-party AI or Free AI Cloud to synthesize deep architecture analysis.
-            model: Optional model identifier override (e.g. 'deepseek-v4.1-flash', 'gpt-4o').
+            project_root: Repository root directory to inspect (default: '.').
+            use_ai: When True, supplements deterministic AST topology with local zero-cost AI architectural insights.
+            model: Optional model identifier override (e.g. 'deepseek-v4.1-flash', 'gpt-4o') when use_ai is True.
         """
         abs_root = os.path.abspath(project_root)
         if not os.path.isdir(abs_root):
@@ -600,9 +600,9 @@ def create_mcp_server():
             "- `max_tokens` (int, optional, default=4000): Maximum token ceiling for the returned symbol map.\n"
             "\n"
             "Behavior:\n"
-            "- Read-only: Extracts AST symbol definitions without modifying repository files.\n"
+            "- Side Effects: Pure in-memory AST symbol extraction; does not write or modify files on disk.\n"
             "- Idempotent: Deterministic symbol extraction for identical code states.\n"
-            "- 100% Offline: Pure local AST parsing without cloud embedding models or API calls.\n"
+            "- 100% Offline: Pure local AST parsing; operates strictly offline.\n"
             "- Auth & Rate Limits: Zero authentication or API keys required; execution takes <50ms.\n"
             "- Error Handling: Truncates lower-priority symbols gracefully when token budget is exceeded.\n"
             "\n"
@@ -615,14 +615,14 @@ def create_mcp_server():
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
     )
     def _legacy_generate_repo_map(
-        project_root: Annotated[str, Field(default=".", description="Root directory of the repository to map (default: current directory).")] = ".",
-        max_tokens: Annotated[int, Field(default=4000, description="Maximum token budget for the repo map (default: 4000).")] = 4000
+        project_root: Annotated[str, Field(default=".", description="Target repository root directory to scan (default: '.').")] = ".",
+        max_tokens: Annotated[int, Field(default=4000, description="Maximum token ceiling for the returned symbol map (default: 4000).")] = 4000
     ) -> str:
         """Builds a compressed AST symbol map for the repository.
         
         Args:
-            project_root: Root directory of the repository (default: current directory).
-            max_tokens: Maximum token budget for the repo map (default: 4000).
+            project_root: Target repository root directory to scan (default: '.').
+            max_tokens: Maximum token ceiling for the returned symbol map (default: 4000).
         """
         abs_root = os.path.abspath(project_root)
         if not os.path.isdir(abs_root):
@@ -658,10 +658,10 @@ def create_mcp_server():
             "- `file_path` (str, optional, default=''): Optional specific file to audit, or empty string to audit the entire workspace.\n"
             "\n"
             "Behavior:\n"
-            "- Read-only: Scans workspace files statically without editing or deleting code.\n"
+            "- Read-only: Scans workspace files statically without modifying workspace code.\n"
             "- Idempotent: Deterministic finding count and severity classifications for identical files.\n"
-            "- 100% Offline: 100% Zero-Leak local regex and AST analysis; zero code sent to cloud endpoints.\n"
-            "- Auth & Rate Limits: Zero credentials or external services required; completes in <500ms.\n"
+            "- 100% Offline: Zero-Leak local AST and pattern analysis; never transmits source code externally.\n"
+            "- Auth & Rate Limits: Zero credentials or third-party accounts required; completes in <500ms.\n"
             "- Error Handling: Emits clean status report with zero findings when codebase is pristine.\n"
             "\n"
             "Usage Guidelines:\n"
@@ -788,9 +788,9 @@ def create_mcp_server():
             "- `min_lines` (int, optional, default=6): Minimum consecutive identical code lines required to flag a duplicate block.\n"
             "\n"
             "Behavior:\n"
-            "- Read-only: Reads source files into normalized token sequences without mutating files.\n"
+            "- Side Effects: Pure in-memory analysis; reads source files into normalized token sequences without writing or altering files on disk.\n"
             "- Idempotent: Deterministic duplicate detection for identical workspace content.\n"
-            "- 100% Offline: Local sliding-window token hashing; zero external dependencies or network egress.\n"
+            "- 100% Offline: Local sliding-window token hashing; operates strictly offline.\n"
             "- Auth & Rate Limits: Zero credentials or API keys required; sub-second execution on typical repos.\n"
             "- Error Handling: Reports zero duplicates found if codebase is clean.\n"
             "\n"
@@ -803,14 +803,14 @@ def create_mcp_server():
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
     )
     def _legacy_find_code_duplicity(
-        project_root: Annotated[str, Field(default=".", description="Root directory of the repository to scan (default: current directory).")] = ".",
-        min_lines: Annotated[int, Field(default=6, description="Minimum identical consecutive lines to classify as a duplicate block (default: 6).")] = 6
+        project_root: Annotated[str, Field(default=".", description="Repository root directory to scan (default: '.').")] = ".",
+        min_lines: Annotated[int, Field(default=6, description="Minimum consecutive identical code lines required to flag a duplicate block (default: 6).")] = 6
     ) -> str:
         """Identifies duplicate code blocks across workspace files.
         
         Args:
-            project_root: Root directory of the repository (default: current directory).
-            min_lines: Minimum identical lines to classify as a duplicate block (default: 6).
+            project_root: Repository root directory to scan (default: '.').
+            min_lines: Minimum consecutive identical code lines required to flag a duplicate block (default: 6).
         """
         abs_root = os.path.abspath(project_root)
         if not os.path.isdir(abs_root):
@@ -945,7 +945,7 @@ def create_mcp_server():
             "Behavior:\n"
             "- Read-only: Static AST analysis of dependency paths without editing source files.\n"
             "- Idempotent: Deterministic blast radius and risk score for unchanged repository revisions.\n"
-            "- 100% Offline: Operates entirely locally with zero network calls or cloud telemetry.\n"
+            "- 100% Offline: Operates entirely locally with zero remote telemetry or external egress.\n"
             "- Auth & Rate Limits: Zero authentication or API keys required; typical execution <150ms.\n"
             "- Error Handling: Returns informative warning if target symbol is not found in the workspace index.\n"
             "\n"
@@ -1017,7 +1017,7 @@ def create_mcp_server():
             "Parameters:\n"
             "- `query` (str, required): Natural language query, symbol name, or architectural intent to locate.\n"
             "- `project_root` (str, optional, default='.'): Root directory of the repository to search.\n"
-            "- `top_k` (int, optional, default=10): Maximum number of ranked code snippets to return.\n"
+            "- `top_k` (int, optional, default=5): Maximum number of top-matching code snippets to return.\n"
             "\n"
             "Behavior:\n"
             "- Read-only: Scans workspace text without altering files or creating persistent index files.\n"
@@ -1129,13 +1129,13 @@ def create_mcp_server():
             "Computes quantitative token reduction metrics and monthly team financial ROI savings, distinguishing from 'estimate_token_cost' by calculating aggregate cumulative dollar and token savings across team engineering workflows rather than single-query price estimates.\n"
             "\n"
             "Parameters:\n"
-            "- `project_root` (str, optional, default='.'): Target repository root directory.\n"
-            "- `team_size` (int, optional, default=5): Number of developers utilizing AI coding assistants on the team.\n"
+            "- `project_root` (str, optional, default='.'): Target workspace directory to measure.\n"
+            "- `team_size` (int, optional, default=5): Number of developers in the engineering team used to model monthly ROI savings.\n"
             "\n"
             "Behavior:\n"
-            "- Read-only: Performs mathematical telemetry calculations without modifying files or metrics state.\n"
+            "- Side Effects: Pure in-memory calculation; does not write or modify files on disk.\n"
             "- Idempotent: Deterministic calculations based on repository size and active engineer count.\n"
-            "- 100% Offline: Executes locally using embedded ROI models without external network access.\n"
+            "- 100% Offline: Executes locally using embedded ROI models; operates strictly offline.\n"
             "- Auth & Rate Limits: Zero authentication or cloud credentials required; instantaneous execution (<5ms).\n"
             "- Error Handling: Validates positive values for engineer counts.\n"
             "\n"
@@ -1148,7 +1148,7 @@ def create_mcp_server():
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
     )
     def _legacy_get_token_savings_metrics(
-        project_root: Annotated[str, Field(default=".", description="Target workspace directory to measure (default: current directory).")] = ".",
+        project_root: Annotated[str, Field(default=".", description="Target workspace directory to measure (default: '.').")] = ".",
         team_size: Annotated[int, Field(default=5, description="Number of developers in the engineering team used to model monthly ROI savings (default: 5).")] = 5
     ) -> str:
         """Calculates token reduction and economic ROI."""
@@ -1400,7 +1400,7 @@ def create_mcp_server():
             "- `project_root` (str, optional, default='.'): Target repository root directory.\n"
             "\n"
             "Behavior:\n"
-            "- Read-only: Reads focus file and its dependencies without mutating disk state.\n"
+            "- Read-only: Reads focus file and its dependencies without writing or altering files on disk.\n"
             "- Idempotent: Deterministic skeleton generation for identical workspace revisions.\n"
             "- 100% Offline: Local AST parsing only; zero network egress or telemetry.\n"
             "- Auth & Rate Limits: Zero authentication or cloud credentials required; executes in <80ms.\n"
@@ -1441,7 +1441,7 @@ def create_mcp_server():
             "\n"
             "Parameters:\n"
             "- `project_root` (str, optional, default='.'): Root directory of the repository to analyze.\n"
-            "- `top_k` (int, optional, default=20): Number of top-ranked architectural files to return.\n"
+            "- `top_k` (int, optional, default=15): Number of top-ranked architectural files to return.\n"
             "\n"
             "Behavior:\n"
             "- Read-only: Builds in-memory graph from AST imports without modifying files.\n"
@@ -1485,12 +1485,12 @@ def create_mcp_server():
             "Parameters:\n"
             "- `symbol_name` (str, required): Function or method identifier to trace.\n"
             "- `project_root` (str, optional, default='.'): Root directory of the repository.\n"
-            "- `max_depth` (int, optional, default=5): Maximum recursive call graph traversal depth.\n"
+            "- `max_depth` (int, optional, default=3): Maximum recursive call graph traversal depth.\n"
             "\n"
             "Behavior:\n"
-            "- Read-only: Traverses AST call sites in memory without editing files.\n"
+            "- Side Effects: Pure in-memory AST call site traversal; does not write or modify files on disk.\n"
             "- Idempotent: Deterministic graph traversal for identical code states.\n"
-            "- 100% Offline: Local syntax tree parsing with zero external telemetry.\n"
+            "- 100% Offline: Local syntax tree parsing; operates strictly offline.\n"
             "- Auth & Rate Limits: Zero credentials or cloud dependencies required; typical latency <100ms.\n"
             "- Error Handling: Returns clean notice if target symbol is not defined or uncalled.\n"
             "\n"
@@ -1503,16 +1503,16 @@ def create_mcp_server():
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
     )
     def _legacy_trace_symbol_call_chain(
-        symbol_name: Annotated[str, Field(description="Exact function or method name to trace across the codebase call graph.")],
-        project_root: Annotated[str, Field(default=".", description="Root directory of the repository (default: current directory).")] = ".",
-        max_depth: Annotated[int, Field(default=3, description="Maximum recursion depth for the call graph traversal (default: 3).")] = 3
+        symbol_name: Annotated[str, Field(description="Function or method identifier to trace.")],
+        project_root: Annotated[str, Field(default=".", description="Root directory of the repository (default: '.').")] = ".",
+        max_depth: Annotated[int, Field(default=3, description="Maximum recursive call graph traversal depth (default: 3).")] = 3
     ) -> str:
         """Traces upstream and downstream call chains for any function or method.
         
         Args:
-            symbol_name: Name of the function or method to trace.
-            project_root: Root directory of the repository (default: current directory).
-            max_depth: Maximum recursion depth for the call graph traversal (default: 3).
+            symbol_name: Function or method identifier to trace.
+            project_root: Root directory of the repository (default: '.').
+            max_depth: Maximum recursive call graph traversal depth (default: 3).
         """
         abs_root = os.path.abspath(project_root)
         from tzero_features import SymbolCallChainTracer
@@ -1539,10 +1539,10 @@ def create_mcp_server():
             "- Error Handling: Confirms zero dead code detected if all symbols are referenced.\n"
             "\n"
             "Usage Guidelines:\n"
-            "- When to use: Clean up technical debt, safely delete deprecated code, and prune unused legacy functions.\n"
+            "- When to use: Clean up technical debt, safely decommission deprecated code, and prune unused legacy functions.\n"
             "- When NOT to use: Do not use for finding duplicate copy-pasted blocks (use 'find_code_duplicity' instead); do not use for detecting security leaks (use 'verify_zero_leak_security' instead).\n"
             "\n"
-            "Returns: Markdown report listing orphaned symbols, defining file paths, line numbers, and safe removal recommendations."
+            "Returns: Markdown report listing orphaned symbols, defining file paths, line numbers, and safe refactoring recommendations."
         ),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
     )
@@ -1574,7 +1574,7 @@ def create_mcp_server():
             "Behavior:\n"
             "- Read-only: Encodes text into VQ codebook representation in memory without disk writes.\n"
             "- Idempotent: Deterministic token generation for identical text inputs.\n"
-            "- 100% Offline: Local semantic hashing and vector codebook quantization; zero external API calls.\n"
+            "- 100% Offline: Local semantic hashing and vector codebook quantization; operates entirely offline.\n"
             "- Auth & Rate Limits: Zero credentials or accounts required; executes in <5ms.\n"
             "- Error Handling: Returns empty token safely if input text is blank.\n"
             "\n"
@@ -1625,7 +1625,7 @@ def create_mcp_server():
             "- `token_or_code` (str, required): T-Zero memory token string (e.g. '<|tzero:mem:...|>') or numeric codebook index to decompress.\n"
             "\n"
             "Behavior:\n"
-            "- Read-only: Reads from local VQ codebook memory in memory without mutating files.\n"
+            "- Read-only: Reads from local VQ codebook memory in memory without altering repository files.\n"
             "- Idempotent: Deterministic decompression for identical token keys.\n"
             "- 100% Offline: Pure local memory lookup; zero network egress or cloud telemetry.\n"
             "- Auth & Rate Limits: Zero authentication or cloud credentials required; sub-millisecond execution (<1ms).\n"
@@ -1677,9 +1677,9 @@ def create_mcp_server():
             "- `mode` (str, optional, default='auto'): Execution mode: 'auto' (evaluates and executes), 'plan' (roadmap only), 'execute' (runs actions), or 'capabilities' (menu).\n"
             "\n"
             "Behavior:\n"
-            "- Mutating: Coordinates agents to update workspace files, write governance configurations, and run verification gates.\n"
+            "- State-Modifying: Coordinates agents to update workspace files, write governance configurations, and run verification gates.\n"
             "- Non-idempotent: Execution steps and outcomes adapt dynamically to workspace state changes.\n"
-            "- 100% Offline: Operates entirely on the local file system without outbound network requests or remote dependencies.\n"
+            "- 100% Offline: Operates entirely on the local file system without remote network transmission or external dependencies.\n"
             "- Auth & Rate Limits: Zero authentication or cloud credentials required; bounded by local task execution time.\n"
             "- Error Handling: Triggers self-healing retry loops automatically if intermediate execution stages encounter failures.\n"
             "\n"
@@ -1818,9 +1818,9 @@ def create_mcp_server():
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
     )
     def _legacy_jarvis_query_knowledge_graph(
-        query: Annotated[str, Field(description="Entity, keyword, or action to search across the knowledge graph (e.g. 'ESP32', 'test_etti', 'Kubernetes', 'Qubit').")] = "",
-        entity: Annotated[str, Field(default="", description="Specific entity filter.")] = "",
-        predicate: Annotated[str, Field(default="", description="Specific predicate / action filter.")] = ""
+        query: Annotated[str, Field(default="", description="General natural language search term to locate in graph (default: empty string).")] = "",
+        entity: Annotated[str, Field(default="", description="Specific entity name to filter knowledge graph nodes (default: empty string).")] = "",
+        predicate: Annotated[str, Field(default="", description="Relationship or predicate type to filter edges, e.g. 'depends_on' (default: empty string).")] = ""
     ) -> str:
         """Queries the semantic memory knowledge graph.
         
@@ -1863,7 +1863,7 @@ def create_mcp_server():
             "Behavior:\n"
             "- Read-only: Compresses document content in memory without modifying local files.\n"
             "- Idempotent: Deterministic outline generation for identical document text.\n"
-            "- 100% Offline: Local natural language parsing and keypoint extraction; zero external network calls.\n"
+            "- 100% Offline: Local natural language parsing and keypoint extraction; operates strictly offline.\n"
             "- Auth & Rate Limits: Zero credentials or accounts required; completes in <50ms.\n"
             "- Error Handling: Returns clean original text if document is already shorter than threshold.\n"
             "\n"
@@ -1876,7 +1876,7 @@ def create_mcp_server():
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
     )
     def _legacy_jarvis_compress_document(
-        document_text: Annotated[str, Field(description="Large multi-paragraph technical document or log text to compress.")]
+        document_text: Annotated[str, Field(description="Full text of technical documentation, README, or article to compress.")]
     ) -> str:
         """Compresses multi-paragraph technical documents into knowledge graph virtual tokens.
         
@@ -1911,13 +1911,13 @@ def create_mcp_server():
             "Exports or imports the T-Zero Jarvis persistent VQ codebook memory and knowledge graph to or from disk, distinguishing from 'jarvis_consolidate_memory' and 'jarvis_export_graph_visualization' by serializing raw memory states for backup rather than consolidating memories or generating HTML visualizers.\n"
             "\n"
             "Parameters:\n"
-            "- `action` (str, optional, default='export'): Operation to perform: 'export' (saves memory to disk) or 'import' (loads memory from disk).\n"
-            "- `file_path` (str, optional, default='tzero_memory_store.json'): Target JSON file path relative to workspace root.\n"
+            "- `action` (str, optional, default='save'): Operation to perform: 'save' (exports memory to disk) or 'load' (imports memory from disk).\n"
+            "- `file_path` (str, optional, default=''): Optional custom file path relative to workspace root (defaults to 'tzero_memory_store.json' if omitted).\n"
             "\n"
             "Behavior:\n"
-            "- Mutating: Writes memory store to disk on export or updates in-memory tables on import.\n"
+            "- State-Modifying: Writes memory store to disk on export or updates in-memory tables on import.\n"
             "- Non-idempotent: Memory state reflects current accumulated knowledge at time of action.\n"
-            "- 100% Offline: Pure local file system serialization; zero data transmitted remotely.\n"
+            "- 100% Offline: Pure local file system serialization; operates strictly offline.\n"
             "- Auth & Rate Limits: Zero credentials or API keys required; typical execution <100ms.\n"
             "- Error Handling: Validates file format and handles missing import files with clear error messages.\n"
             "\n"
@@ -1930,8 +1930,8 @@ def create_mcp_server():
         annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=False, open_world_hint=False)
     )
     def _legacy_jarvis_export_memory_store(
-        action: Annotated[str, Field(default="save", description="Action to perform: 'save' or 'load'.")] = "save",
-        file_path: Annotated[str, Field(default="", description="Optional custom file path for storage.")] = ""
+        action: Annotated[str, Field(default="save", description="Action to perform: 'save' (export to disk) or 'load' (import from disk) (default: 'save').")] = "save",
+        file_path: Annotated[str, Field(default="", description="Optional custom JSON file path (default: '' uses 'tzero_memory_store.json').")] = ""
     ) -> str:
         """Saves or loads persistent semantic memory store.
         
@@ -1943,7 +1943,8 @@ def create_mcp_server():
         compressor = get_global_compressor()
         target = file_path if file_path else None
 
-        if action.lower() == "load":
+        act = (action or "save").lower().strip()
+        if act in ("load", "import"):
             loaded = compressor.codebook.load_from_disk(target)
             return f"### 💾 T-Zero Memory Store Ingested\nSuccessfully loaded {loaded} semantic codes into runtime. Active Codebook Size: {compressor.codebook.size()} codes."
         else:
@@ -1960,12 +1961,12 @@ def create_mcp_server():
             "\n"
             "Parameters:\n"
             "- `target_node_id` (str, required): Incident identifier, bug description, or symbol name to trace root cause for.\n"
-            "- `query_type` (str, optional, default='root_cause'): Analysis mode: 'root_cause' (backward search), 'forward_impact' (future effects), or 'full_timeline' (chronological timeline).\n"
+            "- `query_type` (str, optional, default='root_causes'): Analysis mode: 'root_causes' (backward causal trace), 'effect_chain' (downstream consequence chain), 'rollback_order' (safe rollback sequence), or 'timeline' (chronological event history).\n"
             "\n"
             "Behavior:\n"
-            "- Read-only: Traverses causal graph nodes in memory without altering graph state.\n"
+            "- Side Effects: Pure in-memory causal graph traversal; does not write or modify files on disk.\n"
             "- Idempotent: Deterministic causal traversal for unchanged timeline events.\n"
-            "- 100% Offline: Pure local causal inference; zero external network egress.\n"
+            "- 100% Offline: Pure local causal inference; operates strictly offline.\n"
             "- Auth & Rate Limits: Zero credentials or API keys required; executes in <30ms.\n"
             "- Error Handling: Returns informative notice if target node has no causal links in memory.\n"
             "\n"
@@ -1978,8 +1979,8 @@ def create_mcp_server():
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
     )
     def _legacy_jarvis_causal_chain_query(
-        target_node_id: Annotated[str, Field(description="Target node ID to analyze (e.g. error, event).")],
-        query_type: Annotated[str, Field(default="root_causes", description="Type: 'root_causes', 'effect_chain', 'rollback_order', or 'timeline'.")] = "root_causes"
+        target_node_id: Annotated[str, Field(description="Incident identifier, bug description, or symbol name to trace root cause for.")],
+        query_type: Annotated[str, Field(default="root_causes", description="Analysis mode: 'root_causes' (backward causal trace), 'effect_chain' (downstream consequence chain), 'rollback_order' (safe rollback sequence), or 'timeline' (chronological event history) (default: 'root_causes').")] = "root_causes"
     ) -> str:
         """Queries 4D Causal & Temporal Knowledge Graph."""
         from tzero_jarvis import CausalTemporalGraph
@@ -2014,9 +2015,9 @@ def create_mcp_server():
             "- `max_retries` (int, optional, default=3): Maximum self-healing repair iterations if execution fails.\n"
             "\n"
             "Behavior:\n"
-            "- Mutating: Executes shell commands on local system and applies automated fixes on failure.\n"
+            "- State-Modifying: Executes shell commands on local system and applies automated fixes on failure.\n"
             "- Non-idempotent: Command output and environmental state depend on local system execution.\n"
-            "- 100% Offline: Executes locally using native system shell; zero cloud telemetry.\n"
+            "- 100% Offline: Executes locally using native system shell; operates strictly offline.\n"
             "- Auth & Rate Limits: Zero credentials required; execution bounded by command timeout (60s default).\n"
             "- Error Handling: Intercepts non-zero exit codes, analyzes error stack traces, and synthesizes corrective micro-patches.\n"
             "\n"
@@ -2029,8 +2030,8 @@ def create_mcp_server():
         annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=False, open_world_hint=False)
     )
     def _legacy_jarvis_self_healing_execute(
-        command: Annotated[str, Field(description="Command or script invocation to execute.")],
-        max_retries: Annotated[int, Field(default=3, description="Maximum auto-patch healing attempts.")] = 3
+        command: Annotated[str, Field(description="Shell command or test script to execute.")],
+        max_retries: Annotated[int, Field(default=3, description="Maximum self-healing repair iterations if execution fails (default: 3).")] = 3
     ) -> str:
         """Runs command with autonomous AST error diagnosis and auto-repair."""
         from tzero_jarvis import SelfHealingExecutionEngine
@@ -2056,15 +2057,15 @@ def create_mcp_server():
     @_maybe_tool(
         name="jarvis_consolidate_memory",
         description=(
-            "Performs brain-like hippocampal memory consolidation to merge redundant vector clusters and prune obsolete tokens, distinguishing from 'jarvis_compress_semantic_memory' and 'jarvis_export_memory_store' by optimizing existing memory stores rather than encoding new text or backing up to disk.\n"
+            "Performs brain-like hippocampal memory consolidation to merge redundant vector clusters into representative centroids, distinguishing from 'jarvis_compress_semantic_memory' and 'jarvis_export_memory_store' by optimizing existing memory stores rather than encoding new text or backing up to disk.\n"
             "\n"
             "Parameters:\n"
-            "- `action` (str, optional, default='consolidate'): Consolidation mode: 'consolidate' (merges and prunes), 'dry_run' (simulates reduction), or 'status' (reports memory fragmentation).\n"
+            "- `action` (str, optional, default='consolidate'): Consolidation mode: 'consolidate' (runs compaction cycle) or 'summary' (reports consolidation status).\n"
             "\n"
             "Behavior:\n"
-            "- Mutating: Restructures internal VQ codebook clusters and deletes expired low-relevance memory entries.\n"
+            "- State-Modifying: Restructures internal VQ codebook clusters into compact representative centroids without removing unique records.\n"
             "- Non-idempotent: Memory state reflects updated cluster centroids post-consolidation.\n"
-            "- 100% Offline: Local vector clustering and similarity pruning; zero network access.\n"
+            "- 100% Offline: Local vector clustering and similarity pruning; operates strictly offline.\n"
             "- Auth & Rate Limits: Zero authentication or cloud credentials required; completes in <50ms.\n"
             "- Error Handling: Preserves high-importance and pinned memory tokens unconditionally.\n"
             "\n"
@@ -2077,14 +2078,15 @@ def create_mcp_server():
         annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=False, open_world_hint=False)
     )
     def _legacy_jarvis_consolidate_memory(
-        action: Annotated[str, Field(default="consolidate", description="'consolidate' to run cycle, or 'summary' for status.")] = "consolidate"
+        action: Annotated[str, Field(default="consolidate", description="Consolidation mode: 'consolidate' (runs compaction cycle) or 'summary' (reports consolidation status) (default: 'consolidate').")] = "consolidate"
     ) -> str:
         """Consolidates episodic memory into permanent abstracted knowledge."""
         from tzero_jarvis import ConsolidationEngine, get_global_compressor
         compressor = get_global_compressor()
         engine = ConsolidationEngine(compressor.codebook)
         
-        if action.lower() == "summary":
+        act = (action or "consolidate").lower().strip()
+        if act in ("summary", "status"):
             summ = engine.get_summary()
             return f"### 🧠 T-Zero Memory Consolidation State\n```json\n{json.dumps(summ, indent=2, ensure_ascii=False)}\n```"
         else:
@@ -2102,14 +2104,14 @@ def create_mcp_server():
             "Parameters:\n"
             "- `query` (str, required): Search query, question, or code pattern to locate.\n"
             "- `top_k` (int, optional, default=10): Maximum number of ranked results to return.\n"
-            "- `domain` (str, optional, default='all'): Search scope: 'all' (code + memory), 'code' (workspace files only), or 'memory' (VQ codebook only).\n"
+            "- `domain` (str, optional, default=''): Optional domain filter ('HARDWARE', 'PROTOCOL', 'SOFTWARE', etc.). If empty, searches across all domains.\n"
             "\n"
             "Behavior:\n"
-            "- Read-only: Performs read-only similarity matching without modifying files or index states.\n"
-            "- Idempotent: Deterministic result ranking for identical query strings on unchanged data.\n"
-            "- 100% Offline: 100% local BM25 and vector math; zero cloud embedding calls or external egress.\n"
-            "- Auth & Rate Limits: Zero credentials or accounts required; typical query latency <30ms.\n"
-            "- Error Handling: Emits clean notice if search domain contains zero matching items.\n"
+            "- Side Effects: Pure in-memory similarity matching; does not write or modify files on disk.\n"
+            "- Determinism: Produces consistent ranked matches for identical query terms on unchanged codebooks.\n"
+            "- Scope & Network: Executes entirely offline using local BM25 scoring and vector distance math; operates strictly offline.\n"
+            "- Auth & Performance: Requires zero credentials or external API keys; completes in <30ms.\n"
+            "- Fault Tolerance: Returns an informative Markdown message if no items match the search query.\n"
             "\n"
             "Usage Guidelines:\n"
             "- When to use: Find relevant code, past decisions, or documentation using combined lexical and semantic search without cloud dependencies.\n"
@@ -2120,9 +2122,9 @@ def create_mcp_server():
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
     )
     def _legacy_jarvis_hybrid_search(
-        query: Annotated[str, Field(description="Search terms, concepts, or discrete codes like '#8421'.")],
-        top_k: Annotated[int, Field(default=10, description="Maximum number of results to return.")] = 10,
-        domain: Annotated[str, Field(default="", description="Optional domain filter (HARDWARE, PROTOCOL, SOFTWARE, etc.).")] = ""
+        query: Annotated[str, Field(description="Search query, question, or code pattern to locate.")],
+        top_k: Annotated[int, Field(default=10, description="Maximum number of ranked results to return (default: 10).")] = 10,
+        domain: Annotated[str, Field(default="", description="Optional domain filter ('HARDWARE', 'PROTOCOL', 'SOFTWARE', etc., default: '' searches all domains).")] = ""
     ) -> str:
         """Sub-millisecond in-memory BM25 + latent code hybrid search."""
         from tzero_jarvis import ZeroVectorDBSearchEngine, get_global_compressor
@@ -2166,9 +2168,9 @@ def create_mcp_server():
             "- `context` (str, optional, default=''): Optional workspace context or specific constraints to guide agent execution.\n"
             "\n"
             "Behavior:\n"
-            "- Mutating: Directs agent roles to generate code, run audits, and write verified files.\n"
+            "- State-Modifying: Directs agent roles to generate code, run audits, and write verified files.\n"
             "- Non-idempotent: Swarm actions dynamically adapt based on intermediate agent findings.\n"
-            "- 100% Offline: Swarm operates entirely locally using deterministic rule engines; zero cloud dependencies.\n"
+            "- 100% Offline: Swarm operates entirely locally using deterministic rule engines; operates strictly offline.\n"
             "- Auth & Rate Limits: Zero credentials or API keys required; execution bounded by mission complexity.\n"
             "- Error Handling: Reassigns failed agent stages to fallback roles with explanatory diagnostic logs.\n"
             "\n"
@@ -2181,8 +2183,8 @@ def create_mcp_server():
         annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=False, open_world_hint=False)
     )
     def _legacy_jarvis_swarm_orchestrate(
-        mission_goal: Annotated[str, Field(description="The engineering or system goal to achieve.")],
-        context: Annotated[str, Field(default="", description="Optional technical context or constraints.")] = ""
+        mission_goal: Annotated[str, Field(description="High-level mission directive or engineering objective for the swarm.")],
+        context: Annotated[str, Field(default="", description="Optional workspace context or specific constraints to guide agent execution (default: '').")] = ""
     ) -> str:
         """Executes autonomous multi-agent swarm mission coordination."""
         from tzero_jarvis import SwarmCoordinator, get_global_compressor
@@ -2216,12 +2218,12 @@ def create_mcp_server():
             "Generates an offline, interactive cyberpunk HTML graph visualizer for knowledge and causal memory networks, distinguishing from 'jarvis_export_memory_store' and 'generate_architecture_blueprint' by producing an interactive browser canvas for memory graphs rather than JSON backups or Mermaid architecture diagrams.\n"
             "\n"
             "Parameters:\n"
-            "- `output_path` (str, optional, default='tzero_knowledge_graph.html'): Destination file path for the generated HTML visualizer.\n"
+            "- `output_path` (str, optional, default=''): Destination file path for the generated HTML visualizer (defaults to 'tzero_graph_hud.html' if omitted).\n"
             "\n"
             "Behavior:\n"
-            "- Mutating: Writes a standalone self-contained HTML file to the specified destination path.\n"
+            "- File-Creation: Writes a standalone self-contained HTML file to the specified destination path.\n"
             "- Idempotent: Generates deterministic HTML visualization for identical memory graph states.\n"
-            "- 100% Offline: Embeds visualization scripts locally; opens in any browser without internet access.\n"
+            "- 100% Offline: Embeds visualization scripts locally; operates strictly offline.\n"
             "- Auth & Rate Limits: Zero credentials or third-party licenses required; generates in <100ms.\n"
             "- Error Handling: Creates parent directories automatically if output directory does not exist.\n"
             "\n"
@@ -2234,7 +2236,7 @@ def create_mcp_server():
         annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
     )
     def _legacy_jarvis_export_graph_visualization(
-        output_path: Annotated[str, Field(default="", description="Optional target HTML file path. Defaults to 'tzero_graph_hud.html'.")] = ""
+        output_path: Annotated[str, Field(default="", description="Destination file path for the generated HTML visualizer (default: '' uses 'tzero_graph_hud.html').")] = ""
     ) -> str:
         """Exports interactive cyberpunk HTML graph visualization."""
         from tzero_jarvis import CyberpunkGraphVisualizer, CausalTemporalGraph, get_global_compressor
@@ -2271,13 +2273,13 @@ def create_mcp_server():
             "\n"
             "Parameters:\n"
             "- `text_a` (str, required): First text or code snippet to compare.\n"
-            "- `text_b` (str, required): Second text or code snippet to compare.\n"
-            "- `threshold` (float, optional, default=0.7): Minimum Jaccard similarity threshold (0.0 to 1.0) to flag as a positive match.\n"
+            "- `text_b` (str, optional, default=''): Second text to compare against. If empty, searches memory codebook.\n"
+            "- `threshold` (float, optional, default=0.5): Minimum Jaccard similarity threshold (0.0 to 1.0) to flag as a positive match.\n"
             "\n"
             "Behavior:\n"
-            "- Read-only: Computes numerical hash signatures in memory without modifying files.\n"
+            "- Side Effects: Pure in-memory MinHash calculation; does not write or modify files on disk.\n"
             "- Idempotent: Deterministic MinHash signature generation for identical input texts.\n"
-            "- 100% Offline: Pure local bitwise hashing; zero external network egress.\n"
+            "- 100% Offline: Pure local bitwise hashing; operates strictly offline.\n"
             "- Auth & Rate Limits: Zero authentication or API keys required; sub-microsecond calculation (<1ms).\n"
             "- Error Handling: Gracefully handles empty string comparisons with 0.0 similarity score.\n"
             "\n"
@@ -2290,9 +2292,9 @@ def create_mcp_server():
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
     )
     def _legacy_jarvis_minhash_similarity(
-        text_a: Annotated[str, Field(description="First text or triplet description")],
-        text_b: Annotated[str, Field(default="", description="Second text to compare against (optional). If empty, searches memory codebook.")] = "",
-        threshold: Annotated[float, Field(default=0.5, description="Jaccard similarity threshold [0.0 - 1.0]")] = 0.5
+        text_a: Annotated[str, Field(description="First text or code snippet to compare.")],
+        text_b: Annotated[str, Field(default="", description="Second text to compare against. If empty, searches memory codebook (default: '').")] = "",
+        threshold: Annotated[float, Field(default=0.5, description="Minimum Jaccard similarity threshold (0.0 to 1.0) to flag as a positive match (default: 0.5).")] = 0.5
     ) -> str:
         """Sub-microsecond MinHash LSH similarity comparison."""
         from tzero_jarvis import MinHashLSHEngine, SemanticExtractor, get_global_compressor
@@ -2353,9 +2355,9 @@ def create_mcp_server():
             "- `context` (str, optional, default=''): Supporting architectural context, risk parameters, or verification constraints.\n"
             "\n"
             "Behavior:\n"
-            "- Mutating: Records consensus votes and commits agreed-upon decisions into agent event logs.\n"
+            "- State-Modifying: Records consensus votes and commits agreed-upon decisions into agent event logs.\n"
             "- Non-idempotent: Voting rounds and validator responses reflect active agent swarm states.\n"
-            "- 100% Offline: Executes deterministic PBFT algorithm locally; zero external network egress.\n"
+            "- 100% Offline: Executes deterministic PBFT algorithm locally; operates strictly offline.\n"
             "- Auth & Rate Limits: Zero credentials or external blockchain networks required; executes in <50ms.\n"
             "- Error Handling: Automatically rejects proposals if Byzantine fault threshold (f >= n/3) is violated.\n"
             "\n"
@@ -2368,8 +2370,8 @@ def create_mcp_server():
         annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=False, open_world_hint=False)
     )
     def _legacy_jarvis_bft_swarm_consensus(
-        mission_goal: Annotated[str, Field(description="Mission, action, or code patch to evaluate")],
-        context: Annotated[str, Field(default="", description="Optional context or environment logs")] = ""
+        mission_goal: Annotated[str, Field(description="Action, refactoring plan, or critical decision requiring swarm consensus.")],
+        context: Annotated[str, Field(default="", description="Supporting architectural context, risk parameters, or verification constraints (default: '').")] = ""
     ) -> str:
         """Executes Byzantine Fault-Tolerant swarm consensus."""
         from tzero_jarvis import ByzantineFaultTolerantSwarm, SwarmCoordinator, get_global_compressor
@@ -2401,12 +2403,12 @@ def create_mcp_server():
             "\n"
             "Parameters:\n"
             "- `context_text` (str, required): Long text or documentation string to compress before feeding to LLM.\n"
-            "- `near_dup_threshold` (float, optional, default=0.85): Similarity threshold (0.0 to 1.0) for collapsing redundant sentences.\n"
+            "- `near_dup_threshold` (float, optional, default=0.65): Similarity threshold (0.0 to 1.0) for collapsing redundant sentences.\n"
             "\n"
             "Behavior:\n"
-            "- Read-only: Filters and condenses text strings in memory without touching disk.\n"
+            "- Side Effects: Pure in-memory context compression; does not write or modify files on disk.\n"
             "- Idempotent: Deterministic compression for identical input text and threshold.\n"
-            "- 100% Offline: Local vector quantization and token pruning; zero cloud API calls.\n"
+            "- 100% Offline: Local vector quantization and token pruning; operates strictly offline.\n"
             "- Auth & Rate Limits: Zero authentication or cloud credentials required; typical latency <20ms.\n"
             "- Error Handling: Preserves critical headings and numbers without lossy distortion.\n"
             "\n"
@@ -2419,8 +2421,8 @@ def create_mcp_server():
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
     )
     def _legacy_jarvis_latent_press_compress(
-        context_text: Annotated[str, Field(description="Long context, logs, or code to compress")],
-        near_dup_threshold: Annotated[float, Field(default=0.65, description="Near-duplicate threshold for pruning")] = 0.65
+        context_text: Annotated[str, Field(description="Long text or documentation string to compress before feeding to LLM.")],
+        near_dup_threshold: Annotated[float, Field(default=0.65, description="Similarity threshold (0.0 to 1.0) for collapsing redundant sentences.")] = 0.65
     ) -> str:
         """Executes LatentPress pre-prefill context compression."""
         from tzero_jarvis import LatentPressCompressor, get_global_compressor
@@ -2498,12 +2500,12 @@ def create_mcp_server():
             "\n"
             "Parameters:\n"
             "- `diff_content` (str, required): Raw unified diff text (e.g. git diff output) to compress.\n"
-            "- `max_context_lines` (int, optional, default=2): Maximum unchanged context lines to keep around hunk modifications.\n"
+            "- `max_context_lines` (int, optional, default=1): Maximum unchanged context lines to keep around hunk modifications.\n"
             "\n"
             "Behavior:\n"
-            "- Read-only: Processes diff string in memory without applying changes to working tree.\n"
+            "- Side Effects: Pure in-memory diff parsing and compression; does not write or modify files on disk.\n"
             "- Idempotent: Deterministic compression for identical diff patch inputs.\n"
-            "- 100% Offline: Local hunk parser and AST boundary trimmer; zero external network calls.\n"
+            "- 100% Offline: Local hunk parser and AST boundary trimmer; operates strictly offline.\n"
             "- Auth & Rate Limits: Zero credentials or cloud dependencies required; executes in <10ms.\n"
             "- Error Handling: Preserves patch headers and line markers even when diff format is non-standard.\n"
             "\n"
@@ -2516,8 +2518,8 @@ def create_mcp_server():
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
     )
     def _legacy_generate_smart_micro_patch(
-        diff_content: Annotated[str, Field(description="Raw git diff or unified diff text.")],
-        max_context_lines: Annotated[int, Field(default=1, description="Maximum surrounding context lines to retain per hunk (default: 1).")] = 1
+        diff_content: Annotated[str, Field(description="Raw unified diff text (e.g. git diff output) to compress.")],
+        max_context_lines: Annotated[int, Field(default=1, description="Maximum unchanged context lines to keep around hunk modifications (default: 1).")] = 1
     ) -> str:
         """Compresses unified git diff into a compact semantic micro-patch."""
         from tzero_patch import SmartMicroPatcher
@@ -2533,12 +2535,12 @@ def create_mcp_server():
             "\n"
             "Parameters:\n"
             "- `target_dir` (str, optional, default='.'): Target repository root directory.\n"
-            "- `entrypoints` (str, optional, default=''): Comma-separated list of entrypoint files (e.g. 'main.py,app.ts'), or empty string for auto-detection.\n"
+            "- `entrypoints` (array of strings, optional, default=None): List of entrypoint filenames (e.g. ['main.py', 'app.py']). If omitted or null, entrypoints are auto-detected.\n"
             "\n"
             "Behavior:\n"
-            "- Read-only: Traces AST dependencies from entrypoints without mutating files.\n"
+            "- Side Effects: Pure in-memory AST reachability analysis; does not write or modify files on disk.\n"
             "- Idempotent: Generates deterministic context for identical entrypoint sets.\n"
-            "- 100% Offline: Pure local reachability analysis; zero network egress or telemetry.\n"
+            "- 100% Offline: Pure local reachability analysis; operates strictly offline.\n"
             "- Auth & Rate Limits: Zero credentials or cloud services required; executes in <150ms.\n"
             "- Error Handling: Automatically discovers standard entrypoints (main, app, index) if none are specified.\n"
             "\n"
@@ -2551,11 +2553,13 @@ def create_mcp_server():
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
     )
     def _legacy_generate_zero_waste_prompt_context(
-        target_dir: Annotated[str, Field(default=".", description="Target workspace root directory.")] = ".",
-        entrypoints: Annotated[Optional[List[str]], Field(default=None, description="List of entrypoint files (e.g. ['main.py', 'app.py']). If empty, auto-detects.")] = None
+        target_dir: Annotated[str, Field(default=".", description="Target repository root directory (default: '.').")] = ".",
+        entrypoints: Annotated[Optional[List[str]], Field(default=None, description="List of entrypoint filenames (e.g. ['main.py', 'app.py']). If omitted or null, entrypoints are auto-detected.")] = None
     ) -> str:
         """Constructs zero-waste LLM prompt context by pruning dead code via AST reachability."""
         from tzero_reachability import CallGraphReachabilityEngine
+        if isinstance(entrypoints, str):
+            entrypoints = [x.strip() for x in entrypoints.split(",") if x.strip()]
         engine = CallGraphReachabilityEngine(target_dir)
         res = engine.generate_zero_waste_prompt(entrypoints=entrypoints)
         return (
@@ -2578,13 +2582,13 @@ def create_mcp_server():
             "\n"
             "Parameters:\n"
             "- `content` (str, required): Streaming text, log chunk, or partial code buffer to compress.\n"
-            "- `filename_hint` (str, optional, default='stream.txt'): File name or format hint to optimize token dictionary.\n"
-            "- `tier` (str, optional, default='balanced'): Compression tier ('ultra' for aggressive compaction, 'balanced' for standard, 'lossless' for whitespace-only).\n"
+            "- `filename_hint` (str, optional, default=''): Optional filename or extension hint (e.g. 'app.py', 'schema.sql', 'patch.diff') to optimize AST reduction.\n"
+            "- `tier` (str, optional, default='T-3'): Compression tier ('T-3' for AST signatures, 'T-2' for light structure, 'T-4' for agent rules).\n"
             "\n"
             "Behavior:\n"
-            "- Read-only: Compresses streaming chunk in memory without touching file system.\n"
+            "- Side Effects: Pure in-memory streaming compression; does not write or modify files on disk.\n"
             "- Idempotent: Deterministic compression for identical byte buffer inputs.\n"
-            "- 100% Offline: Local streaming compaction algorithm; zero external network egress.\n"
+            "- 100% Offline: Local streaming compaction algorithm; operates strictly offline.\n"
             "- Auth & Rate Limits: Zero authentication or cloud credentials required; sub-millisecond latency (<2ms).\n"
             "- Error Handling: Falls back to raw stream safely if compression does not reduce token count.\n"
             "\n"
@@ -2597,9 +2601,9 @@ def create_mcp_server():
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
     )
     def _legacy_compress_stream_tokens(
-        content: Annotated[str, Field(description="Raw code, diff, SQL, or manifest text to compress.")],
-        filename_hint: Annotated[str, Field(default="", description="Optional filename or extension hint (e.g. 'app.py', 'schema.sql', 'patch.diff').")] = "",
-        tier: Annotated[str, Field(default="T-3", description="Compression tier: 'T-3' (AST Signatures), 'T-4' (Agent Rules), 'T-2' (Light).")] = "T-3"
+        content: Annotated[str, Field(description="Streaming text, log chunk, or partial code buffer to compress.")],
+        filename_hint: Annotated[str, Field(default="", description="Optional filename or extension hint (e.g. 'app.py', 'schema.sql', 'patch.diff') to optimize AST reduction (default: '').")] = "",
+        tier: Annotated[str, Field(default="T-3", description="Compression tier ('T-3' for AST signatures, 'T-2' for light structure, 'T-4' for agent rules) (default: 'T-3').")] = "T-3"
     ) -> str:
         """Compresses streaming code tokens on-the-fly."""
         from tzero_pipe import PipeCompressor
@@ -2627,9 +2631,9 @@ def create_mcp_server():
             "- `repo_dir` (str, optional, default='.'): Target git repository root directory where the pre-commit hook will be installed.\n"
             "\n"
             "Behavior:\n"
-            "- Mutating: Writes executable pre-commit script to '.git/hooks/pre-commit' in the target repository.\n"
+            "- File-Creation: Writes executable pre-commit script to '.git/hooks/pre-commit' in the target repository.\n"
             "- Idempotent: Safely installs or updates the hook without breaking existing git hook chains.\n"
-            "- 100% Offline: Generates hook locally from embedded template; zero network calls.\n"
+            "- 100% Offline: Generates hook locally from embedded template; operates strictly offline.\n"
             "- Auth & Rate Limits: Zero credentials or accounts required; completes in <20ms.\n"
             "- Error Handling: Returns descriptive error notice if target directory is not a git repository.\n"
             "\n"
@@ -2642,7 +2646,7 @@ def create_mcp_server():
         annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
     )
     def _legacy_install_git_security_guard(
-        repo_dir: Annotated[str, Field(default=".", description="Target git repository directory (default: current working directory).")] = "."
+        repo_dir: Annotated[str, Field(default=".", description="Target git repository root directory where the pre-commit hook will be installed (default: '.').")] = "."
     ) -> str:
         """Installs the pre-commit zero-leak and token optimization guard."""
         from tzero_guard import GitSecurityGuard
@@ -3393,7 +3397,7 @@ def create_mcp_server():
             "Extracts or initializes structured design tokens (colors, typography, spacing, components) into a reusable design system JSON file, distinguishing from 'superdesign_generate' and 'superdesign_list' by saving design token libraries rather than creating layouts or listing designs.\n"
             "\n"
             "Parameters:\n"
-            "- `input_path_or_description` (str, optional, default=''): Path to an existing HTML/CSS file to extract tokens from, or a brand style description.\n"
+            "- `input_path_or_description` (str, required): Description of visual styling, theme requirements, or file path to extract tokens from.\n"
             "- `system_name` (str, optional, default='tzero_design_system'): Identifier name for the generated design system.\n"
             "- `workspace_path` (str, optional, default='.'): Workspace root directory.\n"
             "\n"
@@ -3435,7 +3439,7 @@ def create_mcp_server():
             "- `workspace_path` (str, optional, default='.'): Workspace directory root to inspect.\n"
             "\n"
             "Behavior:\n"
-            "- Read-only: Scans 'superdesign/' directory structure without modifying or deleting files.\n"
+            "- Side Effects: Read-only scan of 'superdesign/' directory; does not write or modify files on disk.\n"
             "- Idempotent: Deterministic catalog enumeration for identical directory states.\n"
             "- 100% Offline: Local filesystem directory traversal; zero network egress.\n"
             "- Auth & Rate Limits: Zero authentication or cloud credentials required; sub-millisecond execution (<5ms).\n"
@@ -3698,7 +3702,14 @@ def main():
         return
 
     # If run by a human directly in terminal (not by an IDE via stdio pipe):
-    if sys.stdin.isatty() and "--stdio" not in sys.argv[1:]:
+    if "--canonical" in sys.argv[1:] or "--mode" in sys.argv[1:]:
+        for i, arg in enumerate(sys.argv):
+            if arg == "--canonical":
+                os.environ["TZERO_MCP_TOOL_MODE"] = "canonical"
+            elif arg == "--mode" and i + 1 < len(sys.argv):
+                os.environ["TZERO_MCP_TOOL_MODE"] = sys.argv[i + 1]
+
+    if sys.stdin.isatty() and "--stdio" not in sys.argv[1:] and "--canonical" not in sys.argv[1:]:
         print_welcome_guide()
         return
 

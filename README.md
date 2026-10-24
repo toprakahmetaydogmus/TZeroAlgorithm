@@ -1,7 +1,7 @@
 <a id="top"></a>
 <div align="center">
 
-# T-Zero Context Architect &bull; v7.3.0
+# T-Zero Context Architect &bull; v7.3.1
 
 **Enterprise Codebase Context Engine &amp; 47-Tool Autonomous MCP Server**
 
