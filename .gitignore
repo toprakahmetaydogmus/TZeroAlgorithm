@@ -68,5 +68,8 @@ onprem_outreach_status.json
 *.db
 used_permalinks.json
 .superpowers/
+scripts/reddit_poster.py
+*reddit*.py
+.reddit_profile/
 
 
