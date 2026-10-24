@@ -15,15 +15,13 @@ Reduces codebase prompt tokens by up to **94.9%** while preserving complete clas
 <br>
 
 <p align="center">
-  <video src="assets/brag.mp4" poster="assets/brag.jpg" width="100%" controls autoplay loop muted playsinline style="max-width: 900px; border-radius: 12px; box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);">
-    <a href="assets/brag.mp4">
-      <img src="assets/brag-preview.gif" alt="T-Zero 20s Launch Demo Video" width="100%" style="border-radius: 12px;">
-    </a>
-  </video>
+  <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm/raw/main/assets/brag.mp4">
+    <img src="assets/brag-preview.gif" alt="T-Zero 20s Launch Demo Video" width="100%" style="max-width: 850px; border-radius: 12px; box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);">
+  </a>
 </p>
 
 <p align="center">
-  <a href="assets/brag.mp4">▶ <strong>Watch 1080p Launch Video (assets/brag.mp4)</strong></a> &bull;
+  <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm/raw/main/assets/brag.mp4">▶ <strong>Watch Full 1080p Video with Audio (assets/brag.mp4)</strong></a> &bull;
   <a href="https://huggingface.co/spaces/toprakke4/tzero-token-reducer">⚡ <strong>Live Interactive Demo</strong></a>
 </p>
 
