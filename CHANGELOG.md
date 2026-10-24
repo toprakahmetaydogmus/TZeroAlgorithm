@@ -1,5 +1,18 @@
 # Changelog
 
+## [7.3.4] - 2026-10-24
+
+### Released (Official V7.3.4 PyPI SEO, Discoverability & CI/CD Multiplier Suite)
+
+- **PyPI Organic Discoverability & Search Optimization:**
+  - Expanded `pyproject.toml` keywords with high-intent queries: `mcp`, `mcp-server`, `model-context-protocol`, `claude`, `claude-code`, `claude-desktop`, `cursor`, `windsurf`, `cline`, `token-reduction`, `token-optimizer`, `ast-analysis`, `codebase-context`, `zero-leak`, `security-guard`, `pre-commit`.
+  - Added full PyPI classifiers for `Environment :: Console`, `Intended Audience :: Developers`, `Intended Audience :: Information Technology`, `Topic :: Software Development :: Build Tools`, `Topic :: Software Development :: Quality Assurance`, `Topic :: Security`.
+  - Added official PyPI sidebar links for `Homepage`, `Bug Tracker`, `Changelog`, `Discussions`, `Live Demo`.
+- **Pre-Commit & CI/CD Adoption Flywheel:**
+  - Added `tzero-guard` executable entrypoint (`tzero_guard:main`) in `[project.scripts]` and `.pre-commit-hooks.yaml` for instant pre-commit credential leak prevention.
+  - Made GitHub Action `action.yml` completely self-contained using installed package modules (`CodeSmellAuditor` & `GitSecurityGuard`), enabling any external repository to adopt T-Zero in 3 lines of YAML and driving recursive automated package downloads on CI.
+  - Added social proof badges (`PyPI Downloads`, `TDQS Grade A 5.0/5.0`) and one-click integration cards to `README.md`.
+
 ## [7.3.3] - 2026-10-24
 
 ### Released (Official V7.3.3 Autonomous Master Omni-Tool & Universal Package Suite)

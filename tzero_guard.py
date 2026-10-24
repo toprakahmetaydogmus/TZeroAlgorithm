@@ -184,6 +184,11 @@ exit /b 0
         return 0
 
 
-if __name__ == "__main__":
+def main():
     target = sys.argv[1] if len(sys.argv) > 1 else "."
     sys.exit(GitSecurityGuard.run_cli_check(target))
+
+
+if __name__ == "__main__":
+    main()
+

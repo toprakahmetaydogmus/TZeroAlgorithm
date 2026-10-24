@@ -7,7 +7,9 @@
 Reduces codebase prompt tokens by up to **94.9%** while preserving complete class contracts, typed signatures, and cross-file dependencies.
 
 [![PyPI Version](https://img.shields.io/pypi/v/tzero-mcp?color=38bdf8&style=flat-square&logo=pypi)](https://pypi.org/project/tzero-mcp/)
-[![Python Version](https://img.shields.io/badge/python-3.10%2B-blue?style=flat-square)](https://pypi.org/project/tzero-mcp/)
+[![PyPI Downloads](https://img.shields.io/pypi/dm/tzero-mcp?color=818cf8&style=flat-square&logo=pypi)](https://pypi.org/project/tzero-mcp/)
+[![Python Version](https://img.shields.io/badge/python-3.11%2B-blue?style=flat-square)](https://pypi.org/project/tzero-mcp/)
+[![TDQS Score](https://img.shields.io/badge/TDQS-Grade%20A%20(5.0%2F5.0)-34d399?style=flat-square&logo=checkmarx)](https://glama.ai/mcp/servers)
 [![Tests](https://img.shields.io/badge/tests-222%20passing-34d399?style=flat-square&logo=githubactions)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions)
 [![Security](https://img.shields.io/badge/security-100%25%20Zero--Leak-38bdf8?style=flat-square&logo=shield)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm#security-architecture)
 [![License](https://img.shields.io/badge/license-MIT-f8fafc?style=flat-square)](LICENSE)
@@ -135,6 +137,39 @@ claude mcp add --scope user tzero uvx tzero-mcp
 tzero --dashboard
 ```
 Opens the local browser dashboard on `http://localhost:8421` featuring interactive dependency graphs and the live AST pruner sandbox.
+
+### 6. 🛡️ Pre-Commit Hook (Auto Zero-Leak & Token Guard)
+
+Prevent accidental credential leaks and token bloat before code ever leaves developer machines. Add to your `.pre-commit-config.yaml`:
+
+```yaml
+repos:
+  - repo: https://github.com/toprakahmetaydogmus/TZeroAlgorithm
+    rev: v7.3.4
+    hooks:
+      - id: tzero-guard
+      - id: tzero-audit
+```
+
+### 7. ⚡ GitHub Actions CI/CD Integration
+
+Automatically audit repositories for zero hardcoded secrets and generate token optimization summaries on every commit and PR:
+
+```yaml
+# .github/workflows/tzero.yml
+name: T-Zero Codebase Guard
+on: [push, pull_request]
+
+jobs:
+  tzero-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: toprakahmetaydogmus/TZeroAlgorithm@main
+        with:
+          workspace-dir: '.'
+          audit-level: 'strict'
+```
 
 ---
 

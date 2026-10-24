@@ -1,7 +1,7 @@
 {
   "$schema": "https://smithery.ai/docs/config/schema.json",
   "name": "tzero-mcp",
-  "version": "7.3.3",
+  "version": "7.3.4",
   "displayName": "T-Zero AST Context Engine & MCP Server",
   "description": "High-performance AST codebase context engine and MCP server suite for Claude, Cursor, and AI agents. Reduces prompt context tokens by up to 94.9% with deterministic AST signature pruning and 100% Zero-Leak security.",
   "repository": "https://github.com/toprakahmetaydogmus/TZeroAlgorithm",

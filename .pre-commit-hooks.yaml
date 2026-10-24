@@ -1,3 +1,10 @@
+- id: tzero-guard
+  name: T-Zero Zero-Leak Security Guard
+  description: Intercepts git commits, scanning staged changes for API keys, tokens, and secrets
+  entry: tzero-guard .
+  language: python
+  pass_filenames: false
+
 - id: tzero-audit
   name: T-Zero Code Quality & Security Audit
   description: AST static analysis, code smell detection, and zero hardcoded secrets verification
