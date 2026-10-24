@@ -1,0 +1,80 @@
+{
+  "$schema": "https://superdesign.dev/schema/design-system.json",
+  "name": "Superdesign System: Tzero Design System",
+  "version": "1.0.0",
+  "theme": "dark",
+  "colors": {
+    "background": {
+      "canvas": "#090d16",
+      "surface": "#0f172a",
+      "surface_hover": "#1e293b",
+      "surface_active": "#334155"
+    },
+    "border": {
+      "subtle": "#1e293b",
+      "strong": "#334155",
+      "focus": "#6366f1"
+    },
+    "text": {
+      "primary": "#f8fafc",
+      "secondary": "#94a3b8",
+      "tertiary": "#64748b",
+      "inverse": "#090d16"
+    },
+    "accent": {
+      "primary": "#38bdf8",
+      "primary_hover": "#0ea5e9",
+      "secondary": "#818cf8",
+      "success": "#34d399",
+      "warning": "#fbbf24",
+      "danger": "#f87171"
+    }
+  },
+  "typography": {
+    "fonts": {
+      "ui": "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+      "mono": "'Fira Code', 'Geist Mono', Consolas, Monaco, monospace",
+      "heading": "Inter, -apple-system, BlinkMacSystemFont, sans-serif"
+    },
+    "scale": {
+      "xs": "0.75rem",
+      "sm": "0.875rem",
+      "base": "1rem",
+      "lg": "1.125rem",
+      "xl": "1.25rem",
+      "2xl": "1.5rem",
+      "3xl": "1.875rem",
+      "4xl": "2.25rem"
+    },
+    "weights": {
+      "normal": "400",
+      "medium": "500",
+      "semibold": "600",
+      "bold": "700"
+    }
+  },
+  "spacing": {
+    "1": "0.25rem",
+    "2": "0.5rem",
+    "3": "0.75rem",
+    "4": "1rem",
+    "6": "1.5rem",
+    "8": "2rem",
+    "12": "3rem",
+    "16": "4rem"
+  },
+  "radii": {
+    "sm": "0.25rem",
+    "md": "0.5rem",
+    "lg": "0.75rem",
+    "xl": "1rem",
+    "full": "9999px"
+  },
+  "shadows": {
+    "sm": "0 1px 2px 0 rgba(0, 0, 0, 0.4)",
+    "md": "0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.5)",
+    "lg": "0 10px 15px -3px rgba(0, 0, 0, 0.6), 0 4px 6px -4px rgba(0, 0, 0, 0.6)"
+  },
+  "description": "Extracted design system for: T-Zero Modern Design System",
+  "extracted_at": "2026-10-24T07:18:04Z"
+}

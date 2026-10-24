@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
-"""Siber Akademi T-Zero — Futuristic JARVIS Control Center Dashboard.
+"""Siber Akademi T-Zero — Modern Developer Console & Control Center.
 
-Runs a zero-dependency local web server on port 8421 serving an ultra-modern,
-cyberpunk control room interface with real-time 4D Causal-Temporal Graph visualization,
-PBFT Swarm Consensus radar, Hippocampus memory inspector, and live Polyglot Token Reducer.
+Runs a zero-dependency local web server on port 8421 serving a modern,
+clean developer interface with real-time 4D Causal-Temporal Graph visualization,
+PBFT Multi-Agent Swarm Consensus, Superdesign Canvas launcher, and live
+Polyglot Token Reducer sandbox.
 
 Developer: Toprak Ahmet Aydoğmuş (Siber Akademi)
 License: MIT
 """
+
+from __future__ import annotations
 
 import http.server
 import json
@@ -29,49 +32,49 @@ HTML_PAGE = """<!DOCTYPE html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>⚡ T-ZERO // JARVIS AUTONOMOUS CONTROL CENTER</title>
+  <title>T-Zero Developer Console — Enterprise Context Architect</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-dark: #0a0b10;
-      --bg-card: #12141e;
-      --bg-card-hover: #181b29;
-      --border: #232738;
-      --border-glow: #00ffd844;
-      --cyan: #00ffd8;
-      --purple: #9d4edd;
-      --pink: #ff2a85;
-      --emerald: #00f59b;
-      --amber: #ffb703;
-      --text-main: #f0f3fa;
-      --text-dim: #8b92a8;
-      --font-ui: 'Outfit', -apple-system, sans-serif;
-      --font-code: 'Fira Code', monospace;
+      --bg-canvas: #090d16;
+      --bg-surface: #0f172a;
+      --bg-surface-elevated: #1e293b;
+      --border: #1e293b;
+      --border-hover: #334155;
+      --border-focus: #38bdf8;
+      --sky: #38bdf8;
+      --indigo: #818cf8;
+      --emerald: #34d399;
+      --amber: #fbbf24;
+      --rose: #f43f5e;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-sub: #64748b;
+      --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-code: 'Fira Code', Consolas, Monaco, monospace;
+      --radius: 10px;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      background: var(--bg-dark);
+      background: var(--bg-canvas);
       color: var(--text-main);
       font-family: var(--font-ui);
       min-height: 100vh;
       overflow-x: hidden;
-      background-image: 
-        radial-gradient(ellipse at 15% 0%, #9d4edd18 0%, transparent 60%),
-        radial-gradient(ellipse at 85% 100%, #00ffd815 0%, transparent 60%),
-        linear-gradient(to right, #12141e08 1px, transparent 1px),
-        linear-gradient(to bottom, #12141e08 1px, transparent 1px);
-      background-size: 100% 100%, 100% 100%, 30px 30px, 30px 30px;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
     }
     header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 16px 32px;
+      padding: 16px 36px;
       border-bottom: 1px solid var(--border);
-      backdrop-filter: blur(12px);
-      background: #0a0b10cc;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(16px);
       position: sticky;
       top: 0;
       z-index: 100;
@@ -79,57 +82,81 @@ HTML_PAGE = """<!DOCTYPE html>
     .brand {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
     }
     .brand-logo {
-      width: 36px;
-      height: 36px;
+      width: 34px;
+      height: 34px;
       border-radius: 8px;
-      background: linear-gradient(135deg, var(--cyan), var(--purple));
+      background: linear-gradient(135deg, var(--sky), var(--indigo));
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 900;
-      font-size: 20px;
-      color: #000;
-      box-shadow: 0 0 16px var(--border-glow);
+      font-weight: 800;
+      font-size: 16px;
+      color: #090d16;
+      letter-spacing: -0.05em;
     }
     .brand-title {
-      font-size: 20px;
-      font-weight: 800;
-      letter-spacing: 1px;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--text-main);
     }
     .brand-sub {
       font-size: 11px;
-      color: var(--cyan);
+      color: var(--text-sub);
       font-family: var(--font-code);
-      letter-spacing: 2px;
+      margin-top: 1px;
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
     .status-badge {
       display: flex;
       align-items: center;
       gap: 8px;
-      padding: 6px 14px;
-      border-radius: 20px;
-      background: #00ffd812;
-      border: 1px solid var(--cyan);
+      padding: 5px 12px;
+      border-radius: 6px;
+      background: rgba(56, 189, 248, 0.08);
+      border: 1px solid rgba(56, 189, 248, 0.25);
       font-size: 12px;
       font-family: var(--font-code);
-      color: var(--cyan);
+      color: var(--sky);
+      font-weight: 500;
     }
     .status-pulse {
-      width: 8px;
-      height: 8px;
+      width: 7px;
+      height: 7px;
       border-radius: 50%;
-      background: var(--cyan);
-      box-shadow: 0 0 8px var(--cyan);
-      animation: pulse 1.8s infinite;
+      background: var(--sky);
+      box-shadow: 0 0 6px rgba(56, 189, 248, 0.8);
     }
-    @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.8); } }
+    .btn-superdesign {
+      background: var(--bg-surface-elevated);
+      color: var(--text-main);
+      border: 1px solid var(--border);
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+    .btn-superdesign:hover {
+      border-color: var(--sky);
+      color: var(--sky);
+    }
     main {
-      padding: 32px;
-      max-width: 1400px;
+      padding: 32px 36px;
+      max-width: 1440px;
       margin: 0 auto;
+      width: 100%;
       display: flex;
       flex-direction: column;
       gap: 28px;
@@ -137,49 +164,48 @@ HTML_PAGE = """<!DOCTYPE html>
     .kpi-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 20px;
+      gap: 16px;
     }
     .kpi-card {
-      background: var(--bg-card);
+      background: var(--bg-surface);
       border: 1px solid var(--border);
-      border-radius: 14px;
+      border-radius: var(--radius);
       padding: 20px;
       position: relative;
-      overflow: hidden;
-      transition: all 0.25s ease;
+      transition: border-color 0.2s ease, transform 0.2s ease;
     }
     .kpi-card:hover {
-      border-color: var(--cyan);
+      border-color: var(--border-hover);
       transform: translateY(-2px);
-      box-shadow: 0 8px 24px #00ffd810;
     }
-    .kpi-val {
-      font-size: 36px;
-      font-weight: 800;
-      color: var(--text-main);
-      margin-top: 8px;
-      font-family: var(--font-code);
-    }
-    .kpi-val.cyan { color: var(--cyan); }
-    .kpi-val.purple { color: var(--purple); }
-    .kpi-val.emerald { color: var(--emerald); }
-    .kpi-val.amber { color: var(--amber); }
     .kpi-label {
       font-size: 12px;
-      color: var(--text-dim);
+      font-weight: 500;
+      color: var(--text-muted);
       text-transform: uppercase;
-      letter-spacing: 1px;
+      letter-spacing: 0.04em;
     }
+    .kpi-val {
+      font-size: 32px;
+      font-weight: 700;
+      margin-top: 6px;
+      font-family: var(--font-code);
+      letter-spacing: -0.03em;
+    }
+    .kpi-val.sky { color: var(--sky); }
+    .kpi-val.indigo { color: var(--indigo); }
+    .kpi-val.emerald { color: var(--emerald); }
+    .kpi-val.amber { color: var(--amber); }
     .main-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 24px;
     }
-    @media (max-width: 992px) { .main-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 1024px) { .main-grid { grid-template-columns: 1fr; } }
     .panel {
-      background: var(--bg-card);
+      background: var(--bg-surface);
       border: 1px solid var(--border);
-      border-radius: 16px;
+      border-radius: var(--radius);
       padding: 24px;
       display: flex;
       flex-direction: column;
@@ -190,110 +216,113 @@ HTML_PAGE = """<!DOCTYPE html>
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid var(--border);
-      padding-bottom: 12px;
+      padding-bottom: 14px;
     }
     .panel-title {
-      font-size: 16px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
     }
     .panel-badge {
       font-size: 11px;
       font-family: var(--font-code);
       padding: 3px 8px;
-      border-radius: 6px;
-      background: #232738;
-      color: var(--cyan);
+      border-radius: 4px;
+      background: var(--bg-surface-elevated);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
     }
     .graph-canvas {
       width: 100%;
-      height: 320px;
-      background: #08090d;
-      border-radius: 10px;
+      height: 300px;
+      background: #060910;
+      border-radius: 8px;
       border: 1px solid var(--border);
       position: relative;
     }
     .swarm-list {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
     }
     .swarm-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 12px 16px;
-      background: #0b0d14;
+      padding: 12px 14px;
+      background: #080c14;
       border: 1px solid var(--border);
-      border-radius: 8px;
+      border-radius: 6px;
       font-family: var(--font-code);
       font-size: 13px;
     }
     .badge-approved {
-      background: #00f59b20;
+      background: rgba(52, 211, 153, 0.12);
       color: var(--emerald);
-      border: 1px solid var(--emerald);
+      border: 1px solid rgba(52, 211, 153, 0.3);
       padding: 2px 8px;
       border-radius: 4px;
       font-size: 11px;
+      font-weight: 500;
     }
     .sandbox-container {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 14px;
     }
     textarea {
       width: 100%;
-      height: 140px;
-      background: #08090d;
+      height: 150px;
+      background: #060910;
       border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--cyan);
+      border-radius: 6px;
+      color: var(--text-main);
       font-family: var(--font-code);
       font-size: 13px;
-      padding: 12px;
+      padding: 14px;
       resize: vertical;
       outline: none;
+      line-height: 1.5;
     }
-    textarea:focus { border-color: var(--cyan); }
+    textarea:focus { border-color: var(--border-focus); }
     .btn-run {
-      background: linear-gradient(135deg, var(--cyan), #00b4d8);
-      color: #000;
-      font-weight: 700;
-      padding: 10px 20px;
+      background: var(--sky);
+      color: #090d16;
+      font-weight: 600;
+      font-size: 13px;
+      padding: 9px 18px;
       border: none;
-      border-radius: 8px;
+      border-radius: 6px;
       cursor: pointer;
       font-family: var(--font-ui);
-      letter-spacing: 0.5px;
-      transition: all 0.2s;
+      transition: background 0.15s ease;
     }
     .btn-run:hover {
-      box-shadow: 0 0 16px var(--cyan);
-      transform: scale(1.02);
+      background: #0ea5e9;
     }
     .result-box {
-      background: #08090d;
+      background: #060910;
       border: 1px solid var(--border);
-      border-radius: 8px;
+      border-radius: 6px;
       padding: 14px;
       font-family: var(--font-code);
       font-size: 12px;
-      color: #9d4edd;
-      max-height: 140px;
+      color: var(--indigo);
+      max-height: 150px;
       overflow-y: auto;
       white-space: pre-wrap;
+      line-height: 1.5;
     }
     footer {
       text-align: center;
       padding: 24px;
       font-size: 12px;
-      color: var(--text-dim);
+      color: var(--text-sub);
       border-top: 1px solid var(--border);
-      margin-top: 40px;
+      margin-top: auto;
     }
   </style>
 </head>
@@ -302,13 +331,18 @@ HTML_PAGE = """<!DOCTYPE html>
     <div class="brand">
       <div class="brand-logo">T0</div>
       <div>
-        <div class="brand-title">T-ZERO // JARVIS</div>
-        <div class="brand-sub">AUTONOMOUS SOTA ARCHITECT V6.0</div>
+        <div class="brand-title">T-Zero Developer Console</div>
+        <div class="brand-sub">Enterprise AST Context Architect &bull; v7.1.0</div>
       </div>
     </div>
-    <div class="status-badge">
-      <div class="status-pulse"></div>
-      ALL 37 MCP TOOLS OPERATIONAL
+    <div class="header-actions">
+      <a href="/superdesign/gallery.html" target="_blank" class="btn-superdesign">
+        <span>&Sigma;</span> Superdesign Canvas
+      </a>
+      <div class="status-badge">
+        <div class="status-pulse"></div>
+        47 MCP TOOLS OPERATIONAL
+      </div>
     </div>
   </header>
 
@@ -316,11 +350,11 @@ HTML_PAGE = """<!DOCTYPE html>
     <div class="kpi-grid">
       <div class="kpi-card">
         <div class="kpi-label">Active MCP Tools</div>
-        <div class="kpi-val cyan">37</div>
+        <div class="kpi-val sky">47</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-label">Token Pruning Rate</div>
-        <div class="kpi-val purple">95.0%</div>
+        <div class="kpi-val indigo">94.9%</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-label">PBFT Swarm Quorum</div>
@@ -336,19 +370,19 @@ HTML_PAGE = """<!DOCTYPE html>
       <!-- 4D Causal-Temporal Graph -->
       <div class="panel">
         <div class="panel-header">
-          <div class="panel-title">⏳ 4D Causal-Temporal Graph</div>
+          <div class="panel-title">4D Causal-Temporal Graph</div>
           <span class="panel-badge">Root Cause &amp; Rollback</span>
         </div>
         <canvas id="causalCanvas" class="graph-canvas"></canvas>
-        <div style="font-size: 12px; color: var(--text-dim); font-family: var(--font-code);">
-          Visualizing deterministic causality chains. Drag or inspect nodes in real time.
+        <div style="font-size: 12px; color: var(--text-muted); font-family: var(--font-code);">
+          Deterministic causality chains across AST transitions. Verified offline.
         </div>
       </div>
 
       <!-- PBFT Swarm Consensus -->
       <div class="panel">
         <div class="panel-header">
-          <div class="panel-title">🗳️ PBFT Multi-Agent Swarm Consensus</div>
+          <div class="panel-title">PBFT Multi-Agent Consensus</div>
           <span class="panel-badge">Quorum: 100%</span>
         </div>
         <div class="swarm-list">
@@ -369,7 +403,7 @@ HTML_PAGE = """<!DOCTYPE html>
             <span class="badge-approved">APPROVED (100%)</span>
           </div>
           <div class="swarm-item">
-            <span>Agent 5 // Latent Codebook Verifier</span>
+            <span>Agent 5 // Superdesign Orchestrator</span>
             <span class="badge-approved">APPROVED (100%)</span>
           </div>
         </div>
@@ -379,14 +413,14 @@ HTML_PAGE = """<!DOCTYPE html>
     <!-- Live Universal Polyglot Reducer Sandbox -->
     <div class="panel">
       <div class="panel-header">
-        <div class="panel-title">⚡ Universal Polyglot AST Reducer Sandbox</div>
-        <span class="panel-badge">Python • Rust • Go • C++ • Solidity</span>
+        <div class="panel-title">Universal Polyglot AST Reducer Sandbox</div>
+        <span class="panel-badge">Python &bull; Rust &bull; TypeScript &bull; Go &bull; C++</span>
       </div>
       <div class="sandbox-container">
-        <div style="display: flex; gap: 12px; align-items: center;">
-          <input type="text" id="filenameInput" value="main.rs" style="background:#08090d; border:1px solid var(--border); color:#fff; padding:8px 12px; border-radius:6px; font-family:var(--font-code); font-size:13px; width: 180px;">
-          <button class="btn-run" onclick="runReduction()">Prune Context (-95%)</button>
-          <span id="savingsLabel" style="font-family:var(--font-code); color:var(--emerald); font-weight:700;"></span>
+        <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+          <input type="text" id="filenameInput" value="main.rs" style="background:#060910; border:1px solid var(--border); color:#fff; padding:8px 12px; border-radius:6px; font-family:var(--font-code); font-size:13px; width: 180px;">
+          <button class="btn-run" onclick="runReduction()">Prune Context (-94.9%)</button>
+          <span id="savingsLabel" style="font-family:var(--font-code); color:var(--emerald); font-weight:600; font-size:13px;"></span>
         </div>
         <textarea id="codeInput" placeholder="Paste source code here...">pub struct SwarmCluster {
     pub id: u64,
@@ -409,7 +443,7 @@ impl SwarmCluster {
   </main>
 
   <footer>
-    T-Zero Context Architect v6.0.0 Master • Developer: Toprak Ahmet Aydoğmuş • Siber Akademi
+    T-Zero Context Architect v7.1.0 &bull; Developer: Toprak Ahmet Aydoğmuş &bull; Siber Akademi
   </footer>
 
   <script>
@@ -418,17 +452,17 @@ impl SwarmCluster {
     const ctx = canvas.getContext('2d');
     function resizeCanvas() {
       canvas.width = canvas.parentElement.clientWidth - 48;
-      canvas.height = 320;
+      canvas.height = 300;
     }
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
     const nodes = [
-      { id: 'T1', x: 60, y: 160, label: 'Prompt', color: '#9d4edd' },
-      { id: 'T2', x: 180, y: 100, label: 'AST Parse', color: '#00ffd8' },
-      { id: 'T3', x: 180, y: 220, label: 'LSH Hash', color: '#00f59b' },
-      { id: 'T4', x: 300, y: 160, label: 'Swarm BFT', color: '#ffb703' },
-      { id: 'T5', x: 420, y: 160, label: 'Zero-Cost Output', color: '#00ffd8' }
+      { id: 'T1', x: 60, y: 150, label: 'Prompt', color: '#818cf8' },
+      { id: 'T2', x: 180, y: 90, label: 'AST Parse', color: '#38bdf8' },
+      { id: 'T3', x: 180, y: 210, label: 'LSH Hash', color: '#34d399' },
+      { id: 'T4', x: 300, y: 150, label: 'Swarm BFT', color: '#fbbf24' },
+      { id: 'T5', x: 420, y: 150, label: 'Zero-Cost Context', color: '#38bdf8' }
     ];
     const edges = [
       [0, 1], [0, 2], [1, 3], [2, 3], [3, 4]
@@ -439,39 +473,36 @@ impl SwarmCluster {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       t += 0.02;
 
-      // Draw Edges with glowing pulses
-      ctx.lineWidth = 2;
+      // Draw Edges
+      ctx.lineWidth = 1.5;
       edges.forEach(([u, v]) => {
-        ctx.strokeStyle = '#232738';
+        ctx.strokeStyle = '#1e293b';
         ctx.beginPath();
         ctx.moveTo(nodes[u].x, nodes[u].y);
         ctx.lineTo(nodes[v].x, nodes[v].y);
         ctx.stroke();
 
-        // Pulsing dot
+        // Pulsing particle
         const prog = (t + u * 0.3) % 1;
         const px = nodes[u].x + (nodes[v].x - nodes[u].x) * prog;
         const py = nodes[u].y + (nodes[v].y - nodes[u].y) * prog;
-        ctx.fillStyle = '#00ffd8';
+        ctx.fillStyle = '#38bdf8';
         ctx.beginPath();
-        ctx.arc(px, py, 3, 0, Math.PI * 2);
+        ctx.arc(px, py, 2.5, 0, Math.PI * 2);
         ctx.fill();
       });
 
       // Draw Nodes
       nodes.forEach(n => {
         ctx.fillStyle = n.color;
-        ctx.shadowColor = n.color;
-        ctx.shadowBlur = 12;
         ctx.beginPath();
-        ctx.arc(n.x, n.y, 14, 0, Math.PI * 2);
+        ctx.arc(n.x, n.y, 10, 0, Math.PI * 2);
         ctx.fill();
-        ctx.shadowBlur = 0;
 
-        ctx.fillStyle = '#fff';
-        ctx.font = '12px Outfit';
+        ctx.fillStyle = '#f8fafc';
+        ctx.font = '12px Inter, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(n.label, n.x, n.y + 28);
+        ctx.fillText(n.label, n.x, n.y + 24);
       });
 
       requestAnimationFrame(drawGraph);
@@ -516,13 +547,34 @@ class DashboardRequestHandler(http.server.BaseHTTPRequestHandler):
             self.send_header("Content-Type", "application/json")
             self.end_headers()
             stats = {
-                "version": "6.1.0",
-                "tools_count": 37,
-                "token_savings": "95.0%",
-                "security": "100% Zero-Leak Keyring",
+                "version": "7.1.0",
+                "tools_count": 47,
+                "token_savings": "94.9%",
+                "security": "100% Zero-Leak Guard",
+                "superdesign": "Enabled (5 Orchestrator Tools)",
                 "active_agents": 5
             }
             self.wfile.write(json.dumps(stats).encode("utf-8"))
+        elif parsed.path == "/superdesign/gallery.html":
+            # Serve Superdesign gallery if available
+            gallery_path = os.path.join(".", "superdesign", "gallery.html")
+            if not os.path.exists(gallery_path):
+                # Auto-generate gallery if missing
+                try:
+                    import tzero_superdesign
+                    tzero_superdesign.superdesign_gallery(".")
+                except Exception:
+                    pass
+
+            if os.path.exists(gallery_path):
+                self.send_response(200)
+                self.send_header("Content-Type", "text/html; charset=utf-8")
+                self.end_headers()
+                with open(gallery_path, "rb") as gf:
+                    self.wfile.write(gf.read())
+            else:
+                self.send_response(404)
+                self.end_headers()
         else:
             self.send_response(404)
             self.end_headers()
@@ -558,8 +610,8 @@ def start_dashboard_server(port: int = DASHBOARD_PORT, open_browser: bool = True
     server = http.server.HTTPServer(server_address, DashboardRequestHandler)
     
     url = f"http://localhost:{port}"
-    print(f"\n[⚡ T-ZERO JARVIS DASHBOARD] Running at {url}")
-    print("[⚡ T-ZERO JARVIS DASHBOARD] Press Ctrl+C to terminate server.\n")
+    print(f"\n[⚡ T-ZERO DEVELOPER CONSOLE] Running at {url}")
+    print("[⚡ T-ZERO DEVELOPER CONSOLE] Press Ctrl+C to terminate server.\n")
 
     if open_browser:
         threading.Thread(target=lambda: (time.sleep(0.5), webbrowser.open(url)), daemon=True).start()
@@ -573,7 +625,7 @@ def main():
     try:
         server.serve_forever()
     except KeyboardInterrupt:
-        print("\n[⚡ T-ZERO JARVIS DASHBOARD] Shutting down.")
+        print("\n[⚡ T-ZERO DEVELOPER CONSOLE] Shutting down.")
         server.server_close()
 
 

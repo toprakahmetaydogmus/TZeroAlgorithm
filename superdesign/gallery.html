@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Superdesign Gallery — T-Zero Design Canvas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090d16;
+      --surface: #0f172a;
+      --surface-elevated: #1e293b;
+      --border: #1e293b;
+      --border-focus: #38bdf8;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-indigo: #818cf8;
+      --radius: 10px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      padding: 20px 36px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(16px);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-logo {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-indigo));
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: #090d16;
+    }
+    .brand-title {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .filter-bar {
+      display: flex;
+      gap: 8px;
+    }
+    .filter-btn {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .filter-btn:hover, .filter-btn.active {
+      background: var(--surface-elevated);
+      color: var(--text);
+      border-color: var(--accent);
+    }
+    main {
+      flex: 1;
+      padding: 36px;
+      max-width: 1440px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 24px;
+    }
+    .gallery-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .gallery-card:hover {
+      transform: translateY(-3px);
+      border-color: #334155;
+      box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.6);
+    }
+    .card-preview {
+      height: 220px;
+      background: #060910;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .preview-iframe {
+      width: 200%;
+      height: 200%;
+      transform: scale(0.5);
+      transform-origin: top left;
+      border: none;
+      pointer-events: none;
+    }
+    .svg-frame {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .svg-frame svg {
+      max-width: 100%;
+      max-height: 100%;
+    }
+    .preview-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(9, 13, 22, 0.7);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    .card-preview:hover .preview-overlay {
+      opacity: 1;
+    }
+    .btn-action {
+      background: var(--accent);
+      color: #090d16;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .card-meta {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .badge-ui { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+    .badge-wireframe { background: rgba(148, 163, 184, 0.15); color: #94a3b8; }
+    .badge-component { background: rgba(129, 140, 248, 0.15); color: #818cf8; }
+    .badge-logo, .badge-icon { background: rgba(52, 211, 153, 0.15); color: #34d399; }
+    .card-date {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-family: 'Fira Code', monospace;
+    }
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 4px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+    }
+    .btn-copy {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .btn-copy:hover {
+      color: var(--text);
+      border-color: #334155;
+    }
+    .btn-link {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+    }
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 80px 20px;
+      color: var(--text-muted);
+    }
+    .empty-state h3 {
+      color: var(--text);
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
+    /* Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(9, 13, 22, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal-container {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      width: 90vw;
+      height: 85vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .modal-header {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-body {
+      flex: 1;
+      background: #fff;
+    }
+    .modal-body iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    .btn-close {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 22px;
+      cursor: pointer;
+    }
+    .btn-close:hover { color: var(--text); }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="brand-logo">&Sigma;</div>
+      <div class="brand-title">Superdesign Canvas</div>
+    </div>
+    <div class="filter-bar">
+      <button class="filter-btn active" onclick="filterGallery('all')">All</button>
+      <button class="filter-btn" onclick="filterGallery('ui')">UI</button>
+      <button class="filter-btn" onclick="filterGallery('component')">Components</button>
+      <button class="filter-btn" onclick="filterGallery('wireframe')">Wireframes</button>
+      <button class="filter-btn" onclick="filterGallery('logo')">Logos &amp; Icons</button>
+    </div>
+  </header>
+  <main>
+    <div class="gallery-grid" id="gallery-grid">
+      <div class='empty-state'><h3>No Designs Yet</h3><p>Run <code>superdesign_generate</code> to create your first clean UI, wireframe, or component.</p></div>
+    </div>
+  </main>
+
+  <div class="modal-backdrop" id="preview-modal" onclick="closeModal(event)">
+    <div class="modal-container" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <span id="modal-title" style="font-weight:600;font-size:14px;"></span>
+        <button class="btn-close" onclick="closeModalDirect()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <iframe id="modal-frame" src="about:blank"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function filterGallery(type) {
+      document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+      const cards = document.querySelectorAll('.gallery-card');
+      cards.forEach(card => {
+        if (type === 'all' || card.dataset.type === type || (type === 'logo' && (card.dataset.type === 'logo' || card.dataset.type === 'icon'))) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+    function openModal(src, title) {
+      document.getElementById('modal-title').textContent = title;
+      document.getElementById('modal-frame').src = src;
+      document.getElementById('preview-modal').classList.add('open');
+    }
+    function closeModal(e) {
+      if (e.target.id === 'preview-modal') {
+        closeModalDirect();
+      }
+    }
+    function closeModalDirect() {
+      document.getElementById('preview-modal').classList.remove('open');
+      document.getElementById('modal-frame').src = 'about:blank';
+    }
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeModalDirect();
+    });
+    function copyPath(text, btn) {
+      navigator.clipboard.writeText(text).then(() => {
+        const original = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = original; }, 1500);
+      });
+    }
+  </script>
+</body>
+</html>

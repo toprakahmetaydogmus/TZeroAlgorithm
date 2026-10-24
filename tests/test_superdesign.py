@@ -137,6 +137,30 @@ class TestSuperdesignOrchestrator(unittest.TestCase):
             self.assertIn("Superdesign Gallery", content)
             self.assertIn("dashboard_v1.html", content)
 
+    def test_mcp_tools_registration(self):
+        """Verifies that all 5 Superdesign tools are registered in create_mcp_server()."""
+        import tzero_mcp
+        server = tzero_mcp.create_mcp_server()
+        # FastMCP or MCPServer tool inspection
+        tool_names = set()
+        if hasattr(server, "_tool_manager") and hasattr(server._tool_manager, "_tools"):
+            tool_names = set(server._tool_manager._tools.keys())
+        elif hasattr(server, "list_tools"):
+            import asyncio
+            tools = asyncio.run(server.list_tools())
+            tool_names = {t.name for t in tools}
+
+        expected_tools = {
+            "superdesign_generate",
+            "superdesign_iterate",
+            "superdesign_extract_system",
+            "superdesign_list",
+            "superdesign_gallery",
+        }
+        for et in expected_tools:
+            self.assertIn(et, tool_names, f"Expected MCP tool '{et}' to be registered on server")
+
 
 if __name__ == "__main__":
     unittest.main()
+
