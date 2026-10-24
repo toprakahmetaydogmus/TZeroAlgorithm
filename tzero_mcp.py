@@ -2875,7 +2875,144 @@ def create_mcp_server():
         else:
             return _legacy_jarvis_orchestrate_goal(goal=goal, project_root=project_root, mode="auto")
 
-        # Register canonical mappings
+    # -------------------------------------------------------------------------
+    # SUPERDESIGN ORCHESTRATOR TOOLS (Anchor-5 TDQS Certified)
+    # -------------------------------------------------------------------------
+    @_maybe_tool(
+        name="superdesign_generate",
+        description=(
+            "Generates structured design specifications, system prompt templates, file patterns, and design tokens for the AI agent to execute.\n\n"
+            "Behavior:\n"
+            "- Operates as a design orchestrator rather than a blind generator, providing structured specifications (UI, wireframe, component, logo, icon).\n"
+            "- 100% Offline: Generates clean, accessible design blueprints following Superdesign principles without requiring external API keys.\n\n"
+            "Usage Guidelines:\n"
+            "- When to use: Generate full responsive web app UIs, minimalist wireframes, reusable React/Vue/HTML components, or vector SVG logos and icons.\n"
+            "- When NOT to use: Do not use for applying feedback to existing design files; use 'superdesign_iterate' instead. Do not use for listing existing iterations; use 'superdesign_list' instead.\n\n"
+            "Returns: Structured dictionary containing target file paths, design system references, file specifications, and execution instructions for the IDE LLM."
+        ),
+        annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
+    )
+    def superdesign_generate(
+        prompt: Annotated[str, Field(description="Description of what design to create (e.g. 'modern developer platform dashboard with analytics').")],
+        design_type: Annotated[str, Field(default="ui", description="Type of design: 'ui' (full responsive web app), 'wireframe' (monochrome wireframe), 'component' (modular component), 'logo' (SVG logo), or 'icon' (SVG icon).")] = "ui",
+        variations: Annotated[int, Field(default=3, description="Number of variations to generate (1 to 5, default 3).")] = 3,
+        framework: Annotated[str, Field(default="html", description="Component framework: 'html', 'react', or 'vue'.")] = "html",
+        workspace_path: Annotated[str, Field(default=".", description="Workspace directory root for output files (default: current directory).")] = "."
+    ) -> str:
+        """Returns structured specifications for the AI coding agent to generate designs."""
+        import tzero_superdesign
+        res = tzero_superdesign.superdesign_generate(
+            prompt=prompt,
+            design_type=design_type,
+            variations=variations,
+            framework=framework,
+            workspace_path=workspace_path
+        )
+        return json.dumps(res, indent=2, ensure_ascii=False)
+
+    @_maybe_tool(
+        name="superdesign_iterate",
+        description=(
+            "Generates structured iteration instructions to improve, refine, or polish existing design files.\n\n"
+            "Behavior:\n"
+            "- Reads the specified design file, applies surgical visual/UX feedback, and produces versioned iteration targets.\n"
+            "- Preserves design system consistency (grid, typography, contrast) across iterations.\n\n"
+            "Usage Guidelines:\n"
+            "- When to use: Refine typography, adjust layout spacing, fix accessibility/contrast issues, or polish micro-interactions on existing HTML/SVG files.\n"
+            "- When NOT to use: Do not use for creating brand new designs from scratch; use 'superdesign_generate' instead.\n\n"
+            "Returns: Iteration specifications including original design snippet, feedback guidelines, and target file paths."
+        ),
+        annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
+    )
+    def superdesign_iterate(
+        design_file: Annotated[str, Field(description="Path to the existing HTML, SVG, or component design file to iterate on.")],
+        feedback: Annotated[str, Field(description="Improvement instructions or feedback to apply (e.g. 'Refine card contrast and add responsive navbar').")],
+        variations: Annotated[int, Field(default=1, description="Number of new iterative variations to generate (1 to 5).")] = 1,
+        workspace_path: Annotated[str, Field(default=".", description="Workspace root (default: current directory).")] = "."
+    ) -> str:
+        """Returns iteration instructions for the AI coding agent to refine existing designs."""
+        import tzero_superdesign
+        res = tzero_superdesign.superdesign_iterate(
+            design_file=design_file,
+            feedback=feedback,
+            variations=variations,
+            workspace_path=workspace_path
+        )
+        return json.dumps(res, indent=2, ensure_ascii=False)
+
+    @_maybe_tool(
+        name="superdesign_extract_system",
+        description=(
+            "Extracts or initializes structured design tokens (colors, typography, spacing, radii, elevation) into reusable JSON schema.\n\n"
+            "Behavior:\n"
+            "- Generates cohesive design token specifications saved to 'superdesign/design_system/<name>.json'.\n"
+            "- 100% Offline: Provides standards-compliant design tokens for multi-framework consumption.\n\n"
+            "Usage Guidelines:\n"
+            "- When to use: Extract design system tokens from screenshots, establish brand color palettes, or define typographic scales.\n"
+            "- When NOT to use: Do not use for generating HTML gallery previews; use 'superdesign_gallery' instead.\n\n"
+            "Returns: Extracted design system JSON and file location."
+        ),
+        annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
+    )
+    def superdesign_extract_system(
+        input_path_or_description: Annotated[str, Field(description="Description of visual styling, theme requirements, or image path to extract tokens from.")],
+        system_name: Annotated[str, Field(default="tzero_design_system", description="Identifier for the design system (saved to superdesign/design_system/<name>.json).")] = "tzero_design_system",
+        workspace_path: Annotated[str, Field(default=".", description="Workspace root (default: current directory).")] = "."
+    ) -> str:
+        """Extracts and saves structured design systems from screenshots or descriptions."""
+        import tzero_superdesign
+        res = tzero_superdesign.superdesign_extract_system(
+            input_path_or_description=input_path_or_description,
+            system_name=system_name,
+            workspace_path=workspace_path
+        )
+        return json.dumps(res, indent=2, ensure_ascii=False)
+
+    @_maybe_tool(
+        name="superdesign_list",
+        description=(
+            "Discovers and enumerates all Superdesign creations and extracted design systems in the workspace.\n\n"
+            "Behavior:\n"
+            "- Scans 'superdesign/design_iterations/' and 'superdesign/design_system/' for created designs.\n"
+            "- Returns metadata including file type, size, modification timestamps, and paths.\n\n"
+            "Usage Guidelines:\n"
+            "- When to use: Inspect available design iterations or list active design systems before building new pages.\n"
+            "- When NOT to use: Do not use to generate interactive browser previews; use 'superdesign_gallery' instead.\n\n"
+            "Returns: JSON summary of all iterations and design system tokens."
+        ),
+        annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
+    )
+    def superdesign_list(
+        workspace_path: Annotated[str, Field(default=".", description="Workspace directory root (default: current directory).")] = "."
+    ) -> str:
+        """Lists all Superdesign iterations and design systems in the workspace."""
+        import tzero_superdesign
+        res = tzero_superdesign.superdesign_list(workspace_path=workspace_path)
+        return json.dumps(res, indent=2, ensure_ascii=False)
+
+    @_maybe_tool(
+        name="superdesign_gallery",
+        description=(
+            "Generates an interactive, responsive HTML gallery previewing all designs in 'superdesign/design_iterations/'.\n\n"
+            "Behavior:\n"
+            "- Generates 'superdesign/gallery.html' with responsive cards, live iframe previews, SVG renderers, and modal inspection.\n"
+            "- 100% Offline: Requires zero network connections; opens directly in any standard browser via file:// URI.\n\n"
+            "Usage Guidelines:\n"
+            "- When to use: Provide the user or developer with a visual design canvas to review, compare, and copy paths of generated UIs.\n"
+            "- When NOT to use: Do not use when only a text-based JSON list is needed; use 'superdesign_list' instead.\n\n"
+            "Returns: Path to generated gallery HTML and item summary."
+        ),
+        annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
+    )
+    def superdesign_gallery(
+        workspace_path: Annotated[str, Field(default=".", description="Workspace directory root (default: current directory).")] = "."
+    ) -> str:
+        """Generates an interactive HTML gallery to preview all created designs."""
+        import tzero_superdesign
+        res = tzero_superdesign.superdesign_gallery(workspace_path=workspace_path)
+        return json.dumps(res, indent=2, ensure_ascii=False)
+
+    # Register canonical mappings
     _CANONICAL_DISPATCH['build_project_context'] = build_project_context
     _CANONICAL_DISPATCH['prune_code_snippet'] = prune_code_snippet
     _CANONICAL_DISPATCH['manage_architecture_rules'] = manage_architecture_rules
@@ -2890,6 +3027,12 @@ def create_mcp_server():
     _CANONICAL_DISPATCH['query_memory_store'] = query_memory_store
     _CANONICAL_DISPATCH['manage_memory_store'] = manage_memory_store
     _CANONICAL_DISPATCH['orchestrate_agent_swarm'] = orchestrate_agent_swarm
+    _CANONICAL_DISPATCH['superdesign_generate'] = superdesign_generate
+    _CANONICAL_DISPATCH['superdesign_iterate'] = superdesign_iterate
+    _CANONICAL_DISPATCH['superdesign_extract_system'] = superdesign_extract_system
+    _CANONICAL_DISPATCH['superdesign_list'] = superdesign_list
+    _CANONICAL_DISPATCH['superdesign_gallery'] = superdesign_gallery
+
 
     # -------------------------------------------------------------------------
     # TRANSPARENT COMPATIBILITY CALL_TOOL WRAPPER

@@ -24,10 +24,10 @@ class TestMCPServer(unittest.TestCase):
         return asyncio.run(coro)
 
     def test_mcp_tools_and_prompts_registration(self):
-        """Verifies that all 42 specialized MCP tools and grounding prompt are properly registered."""
+        """Verifies that all 47 specialized MCP tools and grounding prompt are properly registered."""
         tools = self.run_async(self.server.list_tools())
         tool_names = [t.name for t in tools]
-        self.assertEqual(len(tool_names), 42)
+        self.assertEqual(len(tool_names), 47)
         expected_tools = [
             "get_project_context_tree",
             "query_module_dependencies",
@@ -71,6 +71,11 @@ class TestMCPServer(unittest.TestCase):
             "generate_zero_waste_prompt_context",
             "compress_stream_tokens",
             "install_git_security_guard",
+            "superdesign_generate",
+            "superdesign_iterate",
+            "superdesign_extract_system",
+            "superdesign_list",
+            "superdesign_gallery",
         ]
         for exp in expected_tools:
             self.assertIn(exp, tool_names)
@@ -703,7 +708,7 @@ diff --git a/core.py b/core.py
 
         default_server = tzero_mcp.create_mcp_server()
         tools_def = self.run_async(default_server.list_tools())
-        self.assertEqual(len(tools_def), 42)
+        self.assertEqual(len(tools_def), 47)
 
 
 if __name__ == "__main__":
