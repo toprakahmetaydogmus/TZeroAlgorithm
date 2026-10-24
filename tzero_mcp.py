@@ -42,7 +42,7 @@ except ImportError:
     def Field(default=..., description=""):
         return default
 
-SERVER_VERSION = "7.3.4"
+SERVER_VERSION = "8.0.1"
 
 # Safe UTF-8 reconfiguration for Windows console & piped subprocesses
 if sys.stdout and hasattr(sys.stdout, "reconfigure"):
@@ -660,11 +660,11 @@ def create_mcp_server():
             "- Read-only: Scans workspace files statically without modifying workspace code.\n"
             "- Idempotent: Deterministic finding count and severity classifications for identical files.\n"
             "- 100% Offline: Zero-Leak local AST and pattern analysis; never transmits source code externally.\n"
-            "- Auth & Rate Limits: Zero credentials or third-party accounts required; completes in <500ms.\n"
+            "- Auth & Rate Limits: Zero credentials or external accounts required; completes in <500ms.\n"
             "- Error Handling: Emits clean status report with zero findings when codebase is pristine.\n"
             "\n"
             "Usage Guidelines:\n"
-            "- When to use: Run pre-commit or CI/CD quality gates to catch security leaks (OpenAI, Anthropic, AWS, GitHub tokens), long functions (>50 lines), deep nesting (>4 levels), and high cyclomatic complexity.\n"
+            "- When to use: Run pre-commit or CI/CD quality gates to catch security leaks (cloud provider keys, AWS credentials, GitHub tokens), long functions (>50 lines), deep nesting (>4 levels), and high cyclomatic complexity.\n"
             "- When NOT to use: Do not use for architectural tier import enforcement (use 'enforce_architecture_boundaries' instead); do not use for detecting copy-pasted duplicate blocks (use 'find_code_duplicity' instead).\n"
             "\n"
             "Returns: Markdown audit report with Quality Score (0-100), Zero-Leak security status, classified smell lists, and remediation suggestions."
@@ -874,7 +874,7 @@ def create_mcp_server():
             "- When to use: Estimate financial expenses before dispatching large context payloads or batch evaluations to commercial AI models.\n"
             "- When NOT to use: Do not use for aggregate team-level monthly ROI savings calculations (use 'get_token_savings_metrics' instead); do not use for compressing prompt tokens (use 'get_project_context_tree' or 'prune_code_snippet' instead).\n"
             "\n"
-            "Returns: Formatted Markdown comparison table showing per-query and per-million token costs across OpenAI, Anthropic, Google, and DeepSeek."
+            "Returns: Formatted Markdown comparison table showing per-query and per-million token costs across major foundation model families."
         ),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
     )
@@ -1282,7 +1282,7 @@ def create_mcp_server():
             "- Error Handling: Confirms 100% Zero-Leak certified status if no credentials are found.\n"
             "\n"
             "Usage Guidelines:\n"
-            "- When to use: Verify that proposed code edits, diffs, or commits contain zero leaked API keys (OpenAI, Anthropic, AWS, GitHub, Stripe, SSH).\n"
+            "- When to use: Verify that proposed code edits, diffs, or commits contain zero leaked API keys (cloud provider keys, AWS secrets, GitHub tokens, Stripe keys, SSH keys).\n"
             "- When NOT to use: Do not use for detecting hallucinated methods or imports (use 'verify_hallucination_guard' instead); do not use for git pre-commit hook installation (use 'install_git_security_guard' instead).\n"
             "\n"
             "Returns: Markdown report with Zero-Leak certification badge, list of detected secrets with line numbers and masked previews, and remediation guidance."
@@ -1445,7 +1445,7 @@ def create_mcp_server():
             "Behavior:\n"
             "- Read-only: Builds in-memory graph from AST imports without modifying files.\n"
             "- Idempotent: Deterministic PageRank power-iteration for identical import topologies.\n"
-            "- 100% Offline: Local numerical linear algebra; zero cloud API calls.\n"
+            "- 100% Offline: Local numerical linear algebra; zero remote network calls.\n"
             "- Auth & Rate Limits: Zero credentials or accounts required; executes in <150ms.\n"
             "- Error Handling: Emits notice if workspace contains no inter-module imports.\n"
             "\n"
@@ -2062,7 +2062,7 @@ def create_mcp_server():
             "- `action` (str, optional, default='consolidate'): Consolidation mode: 'consolidate' (runs compaction cycle) or 'summary' (reports consolidation status).\n"
             "\n"
             "Behavior:\n"
-            "- Side Effects: Reorganizes in-memory VQ codebook clusters into compact representative centroids without deleting unique records.\n"
+            "- Side Effects: Reorganizes in-memory VQ codebook clusters into compact representative centroids while preserving all unique records.\n"
             "- Determinism: Deterministic clustering and centroid assignment for identical memory states.\n"
             "- Scope & Network: Local vector clustering and centroid compaction; operates strictly offline.\n"
             "- Auth & Latency: Zero authentication or cloud credentials required; completes in <50ms.\n"
@@ -2109,7 +2109,7 @@ def create_mcp_server():
             "- Side Effects: In-memory similarity matching; does not write or modify files on disk.\n"
             "- Determinism: Produces consistent ranked matches for identical query terms on unchanged codebooks.\n"
             "- Scope & Network: Local BM25 scoring and vector distance math without external network calls.\n"
-            "- Auth & Latency: Requires zero credentials or external API keys; completes in <30ms.\n"
+            "- Auth & Latency: Requires zero credentials or remote access tokens; completes in <30ms.\n"
             "- Fault Tolerance: Returns an informative Markdown message if no items match the search query.\n"
             "\n"
             "Usage Guidelines:\n"
@@ -2223,7 +2223,7 @@ def create_mcp_server():
             "- File-Creation: Writes a standalone self-contained HTML file to the specified destination path.\n"
             "- Idempotent: Generates deterministic HTML visualization for identical memory graph states.\n"
             "- 100% Offline: Embeds visualization scripts locally; operates strictly offline.\n"
-            "- Auth & Rate Limits: Zero credentials or third-party licenses required; generates in <100ms.\n"
+            "- Auth & Rate Limits: Zero credentials or external software licenses required; generates in <100ms.\n"
             "- Error Handling: Creates parent directories automatically if output directory does not exist.\n"
             "\n"
             "Usage Guidelines:\n"
@@ -2661,8 +2661,59 @@ def create_mcp_server():
         else:
             return f"❌ **Failed to install pre-commit guard:** {res.get('message')}"
 
+    # -------------------------------------------------------------------------
+    # TOOL 43: suggest_reusable_helpers
+    # -------------------------------------------------------------------------
+    @_maybe_tool(
+        name="suggest_reusable_helpers",
+        description=(
+            "Discovers and surfaces existing reusable helper and utility functions across the repository AST, distinguishing from 'find_code_duplicity' and 'search_codebase_semantic' by locating reusable functional contracts and import statements rather than flagging verbatim duplicated code blocks or performing raw keyword search.\n"
+            "\n"
+            "Parameters:\n"
+            "- `query` (str, optional, default=''): Natural language task description, functionality needed, or function name (e.g. 'parse json safely', 'format timestamp').\n"
+            "- `code_snippet` (str, optional, default=''): Optional code snippet being written to check for duplicate helper reimplementation.\n"
+            "- `project_root` (str, optional, default='.'): Target repository root directory.\n"
+            "- `top_k` (int, optional, default=5): Maximum number of reusable helpers to recommend.\n"
+            "- `include_body` (bool, optional, default=True): Whether to include the full implementation body of the helper function.\n"
+            "\n"
+            "Behavior:\n"
+            "- Read-only: Scans workspace AST without modifying files.\n"
+            "- Idempotent: Deterministic helper discovery for identical codebase AST.\n"
+            "- 100% Offline: Local AST analysis; zero remote network calls or external embeddings sent.\n"
+            "- Auth & Rate Limits: Zero credentials, tokens, or API keys required; executes in <80ms.\n"
+            "- Error Handling: Returns clean Markdown notification if no matching helpers are found.\n"
+            "\n"
+            "Usage Guidelines:\n"
+            "- When to use: Prevent writing duplicate utility functions or locate already implemented helper functions that were pruned from context skeletons.\n"
+            "- When NOT to use: Do not use for scanning verbatim copy-pasted blocks (use 'find_code_duplicity' instead); do not use for general full-text BM25 code search (use 'search_codebase_semantic' instead).\n"
+            "\n"
+            "Returns: Markdown report detailing matching repository helpers, exact line locations, copy-pasteable import statements, docstrings, and full source bodies."
+        ),
+        annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
+    )
+    def _legacy_suggest_reusable_helpers(
+        query: Annotated[str, Field(default="", description="Natural language task description, functionality needed, or function name (default: '').")] = "",
+        code_snippet: Annotated[str, Field(default="", description="Optional code snippet being written to check for duplicate helper reimplementation.")] = "",
+        project_root: Annotated[str, Field(default=".", description="Target repository root directory (default: current directory).")] = ".",
+        top_k: Annotated[int, Field(default=5, description="Maximum number of reusable helpers to recommend (default: 5).")] = 5,
+        include_body: Annotated[bool, Field(default=True, description="Whether to include full implementation bodies of suggested helpers.")] = True
+    ) -> str:
+        """Discovers existing reusable helpers across codebase AST."""
+        abs_root = os.path.abspath(project_root)
+        from tzero_features import ReusableHelperSuggester
+        suggester = ReusableHelperSuggester(abs_root)
+        if code_snippet:
+            guard_report = suggester.check_reinvention_guard(code_snippet=code_snippet, top_k=top_k)
+            if guard_report.get("has_reinventions"):
+                return suggester.format_guard_report(guard_report, include_body=include_body)
+        results = suggester.suggest_helpers(query=query, top_k=top_k)
+        return suggester.format_helpers_report(results, query=query, include_body=include_body)
 
     # Register legacy mappings
+    _LEGACY_DISPATCH['suggest_reusable_helpers'] = _legacy_suggest_reusable_helpers
+    suggest_reusable_helpers = _legacy_suggest_reusable_helpers
+    _LEGACY_DISPATCH['find_reusable_helpers'] = _legacy_suggest_reusable_helpers
+    find_reusable_helpers = _legacy_suggest_reusable_helpers
     _LEGACY_DISPATCH['get_project_context_tree'] = _legacy_get_project_context_tree
     get_project_context_tree = _legacy_get_project_context_tree
     _LEGACY_DISPATCH['query_module_dependencies'] = _legacy_query_module_dependencies
@@ -2805,6 +2856,9 @@ def create_mcp_server():
         elif c_type == "incremental_diff":
             target = focus_file or "HEAD~1"
             return _legacy_get_incremental_diff_context(project_root=project_root, diff_ref=target)
+        elif c_type in ("helpers", "reuse", "reusable_helpers"):
+            target = focus_file or ""
+            return _legacy_suggest_reusable_helpers(query=target, project_root=project_root)
         else:
             return _legacy_get_project_context_tree(
                 project_root=project_root,
@@ -3234,7 +3288,7 @@ def create_mcp_server():
     @_canon_tool(
         name="estimate_token_cost",
         description=(
-            "Calculates exact token counts, comparative API billing costs across AI model providers (OpenAI, Claude, Gemini, DeepSeek), and cumulative financial ROI savings, distinguishing from 'build_project_context' and 'prune_code_snippet' by evaluating financial costs and token metrics rather than constructing context trees or pruning code.\n"
+            "Calculates exact token counts, comparative API billing costs across major model families, and cumulative financial ROI savings, distinguishing from 'build_project_context' and 'prune_code_snippet' by evaluating financial costs and token metrics rather than constructing context trees or pruning code.\n"
             "\n"
             "Parameters:\n"
             "- `text` (str, optional, default=''): Raw text string to count tokens and calculate cost for.\n"
@@ -3466,7 +3520,7 @@ def create_mcp_server():
             "Behavior:\n"
             "- Mutating: Generates design specification artifacts in the workspace directory.\n"
             "- Idempotent: Produces consistent design blueprints for identical prompt parameters.\n"
-            "- 100% Offline: Generates accessible design blueprints following Superdesign principles without requiring external API keys.\n"
+            "- 100% Offline: Generates accessible design blueprints following Superdesign principles without requiring remote network credentials.\n"
             "- Auth & Rate Limits: Zero authentication or cloud credentials required; completes in <100ms.\n"
             "- Error Handling: Gracefully falls back to default system tokens if custom theme is not found.\n"
             "\n"
@@ -3801,6 +3855,15 @@ def create_mcp_server():
 
         elif act in ("call_chain", "callees"):
             return _legacy_trace_symbol_call_chain(symbol_name=query or target, project_root=target if os.path.isdir(target) else ".")
+
+        elif act in ("helpers", "suggest_helpers", "reuse", "reinvention"):
+            return _legacy_suggest_reusable_helpers(
+                query=query or target,
+                project_root=target if os.path.isdir(target) else ".",
+                code_snippet=opts.get("code_snippet", ""),
+                top_k=opts.get("top_k", 5),
+                include_body=opts.get("include_body", True)
+            )
 
         # Fallback to general dispatch
         handler = _CANONICAL_DISPATCH.get(act) or _LEGACY_DISPATCH.get(act)

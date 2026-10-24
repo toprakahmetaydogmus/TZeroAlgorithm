@@ -33,8 +33,8 @@ class TestTZeroDashboard(unittest.TestCase):
         with urllib.request.urlopen(url) as resp:
             self.assertEqual(resp.status, 200)
             data = json.loads(resp.read().decode("utf-8"))
-            self.assertEqual(data["version"], "7.3.4")
-            self.assertEqual(data["tools_count"], 48)
+            self.assertEqual(data["version"], "8.0.1")
+            self.assertEqual(data["tools_count"], 49)
 
     def test_post_api_reduce(self):
         url = f"http://localhost:{self.test_port}/api/reduce"

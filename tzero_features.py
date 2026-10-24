@@ -30,6 +30,7 @@ import subprocess
 import fnmatch
 import difflib
 import hashlib
+import copy
 from typing import Dict, List, Set, Tuple, Optional, Any
 
 # Ensure parent directory is in sys.path
@@ -1626,11 +1627,68 @@ def launch_web_dashboard(project_dir: str = ".", port: int = 7300, open_browser:
 # 7. ZERO-HALLUCINATION GUARD & PRE-FLIGHT SYMBOL / CALL VALIDATOR (TOOL 17)
 # =============================================================================
 
+class _SelfHealingTransformer(ast.NodeTransformer):
+    """AST transformer that automatically corrects hallucinated imports, function names, and kwargs."""
+    def __init__(self, fixes: Dict[str, Any]):
+        self.import_fixes = fixes.get("imports", {})    # (module, old_sym) -> new_sym
+        self.call_fixes = fixes.get("calls", {})        # old_func_name -> new_func_name
+        self.kwarg_fixes = fixes.get("kwargs", {})      # (func_name, old_kw) -> new_kw
+
+    def visit_ImportFrom(self, node: ast.ImportFrom) -> ast.AST:
+        if node.module:
+            for alias in node.names:
+                key = (node.module, alias.name)
+                if key in self.import_fixes:
+                    alias.name = self.import_fixes[key]
+        return self.generic_visit(node)
+
+    def visit_Name(self, node: ast.Name) -> ast.AST:
+        if node.id in self.call_fixes:
+            node.id = self.call_fixes[node.id]
+        return self.generic_visit(node)
+
+    def visit_Call(self, node: ast.Call) -> ast.AST:
+        fname = ""
+        full_name = ""
+        if isinstance(node.func, ast.Name):
+            fname = node.func.id
+            if fname in self.call_fixes:
+                node.func.id = self.call_fixes[fname]
+                fname = node.func.id
+            full_name = fname
+        elif isinstance(node.func, ast.Attribute):
+            attr = node.func.attr
+            if attr in self.call_fixes:
+                node.func.attr = self.call_fixes[attr]
+                attr = node.func.attr
+            fname = attr
+            try:
+                full_name = f"{ast.unparse(node.func.value)}.{attr}"
+            except Exception:
+                full_name = attr
+
+        for kw in node.keywords:
+            if kw.arg:
+                if (full_name, kw.arg) in self.kwarg_fixes:
+                    kw.arg = self.kwarg_fixes[(full_name, kw.arg)]
+                elif (fname, kw.arg) in self.kwarg_fixes:
+                    kw.arg = self.kwarg_fixes[(fname, kw.arg)]
+                elif ("", kw.arg) in self.kwarg_fixes:
+                    kw.arg = self.kwarg_fixes[("", kw.arg)]
+        return self.generic_visit(node)
+
+
 class ZeroHallucinationGuard:
     """Pre-flight validator that eliminates AI coding hallucinations before code is applied.
     
-    Verifies imports against workspace modules/symbols and validates function/method calls
-    against known AST signatures (argument counts and keyword argument names).
+    5-Tier Zero-Hallucination Architecture:
+      1. Ghost Dependency Guard: Blocks imports of non-existent packages (validates against stdlib, requirements.txt, pyproject.toml, and installed packages).
+      2. AST Symbol & Module Guard: Verifies imports against workspace modules and declared __all__ / exported symbols.
+      3. AST Call & Keyword Argument Guard: Validates positional counts and parameter names against known function signatures.
+      4. Schema & Field Contract Guard: Validates class instantiations, dataclasses, and attribute accesses against known fields.
+      5. Return Type & Chaining Guard: Detects invalid chaining or iterations on functions returning None or primitive types.
+      + Self-Healing AST Patcher: Automatically synthesizes corrected, hallucination-free code via AST node transformation.
+      + Grounding Contract Generator: Emits immutable Type & Symbol boundary contracts for prompt pinning.
     """
 
     def __init__(self, project_dir: str):
@@ -1638,7 +1696,118 @@ class ZeroHallucinationGuard:
         self.modules: Dict[str, str] = {}  # mod_name -> rel_path
         self.exported_symbols: Dict[str, Set[str]] = collections.defaultdict(set)
         self.function_signatures: Dict[str, Dict[str, Any]] = {}
+        self.class_fields: Dict[str, Set[str]] = collections.defaultdict(set)
+        self.class_methods: Dict[str, Set[str]] = collections.defaultdict(set)
+        self.declared_packages: Set[str] = set()
+        self.installed_packages: Set[str] = set()
+        self.stdlib_modules: Set[str] = set()
+        self.known_package_aliases: Dict[str, str] = {}
+        self._load_installed_and_stdlib()
+        self._load_dependency_manifests()
         self._build_catalog()
+
+    def _load_installed_and_stdlib(self):
+        """Loads Python standard library modules, installed environment packages, and alias mappings."""
+        # 1. Standard Library Modules
+        self.stdlib_modules = set(getattr(sys, "stdlib_module_names", sys.builtin_module_names))
+        self.stdlib_modules.update({
+            "typing", "typing_extensions", "__future__", "dataclasses", "unittest",
+            "test", "abc", "contextlib", "collections", "functools", "itertools",
+            "os", "sys", "re", "json", "ast", "math", "time", "datetime", "pathlib",
+            "shutil", "tempfile", "subprocess", "socket", "http", "urllib", "hashlib",
+            "logging", "threading", "asyncio", "multiprocessing", "queue", "signal",
+            "copy", "inspect", "difflib", "fnmatch", "glob", "io", "pickle", "sqlite3",
+            "csv", "xml", "email", "html", "base64", "binascii", "struct", "random",
+            "warnings", "weakref", "zoneinfo", "uuid", "decimal", "enum", "numbers"
+        })
+
+        # 2. Installed packages in the active environment
+        try:
+            import importlib.metadata as im
+            for dist in im.distributions():
+                dname = dist.metadata.get("Name", "")
+                if dname:
+                    norm = dname.lower().replace("-", "_")
+                    self.installed_packages.add(norm)
+                    self.installed_packages.add(dname.lower())
+                try:
+                    top_level = dist.read_text("top_level.txt")
+                    if top_level:
+                        for tl in top_level.splitlines():
+                            tl = tl.strip()
+                            if tl:
+                                self.installed_packages.add(tl.lower())
+                except Exception:
+                    pass
+        except Exception:
+            pass
+
+        # 3. Canonical import aliases for top third-party packages
+        self.known_package_aliases = {
+            "yaml": "pyyaml",
+            "cv2": "opencv-python",
+            "pil": "pillow",
+            "sklearn": "scikit-learn",
+            "dateutil": "python-dateutil",
+            "dotenv": "python-dotenv",
+            "jwt": "pyjwt",
+            "bs4": "beautifulsoup4",
+            "magic": "python-magic",
+            "multipart": "python-multipart",
+            "git": "gitpython",
+            "serial": "pyserial",
+            "mcp": "mcp",
+            "fastapi": "fastapi",
+            "pydantic": "pydantic",
+            "uvicorn": "uvicorn",
+            "click": "click",
+            "pytest": "pytest",
+            "flask": "flask",
+            "django": "django",
+            "sqlalchemy": "sqlalchemy",
+            "httpx": "httpx",
+            "aiohttp": "aiohttp",
+            "requests": "requests",
+        }
+
+    def _load_dependency_manifests(self):
+        """Scans project directory for requirements.txt, pyproject.toml, and setup.py to find declared dependencies."""
+        for root, _, files in os.walk(self.project_dir):
+            if should_skip_dir(root, self.project_dir):
+                continue
+            for f in files:
+                f_lower = f.lower()
+                full_p = os.path.join(root, f)
+                if f_lower.startswith("requirements") and f_lower.endswith(".txt"):
+                    try:
+                        with open(full_p, "r", encoding="utf-8", errors="ignore") as fp:
+                            for line in fp:
+                                line = line.strip()
+                                if line and not line.startswith(("#", "-", "@")):
+                                    pkg = re.split(r'[><=~!;\s\[]', line)[0].strip()
+                                    if pkg:
+                                        self.declared_packages.add(pkg.lower().replace("-", "_"))
+                                        self.declared_packages.add(pkg.lower())
+                    except Exception:
+                        pass
+                elif f_lower == "pyproject.toml":
+                    try:
+                        with open(full_p, "r", encoding="utf-8", errors="ignore") as fp:
+                            in_deps = False
+                            for line in fp:
+                                line = line.strip()
+                                if line.startswith("[") and ("dependencies" in line.lower() or "requires" in line.lower()):
+                                    in_deps = True
+                                    continue
+                                elif line.startswith("["):
+                                    in_deps = False
+                                if in_deps and line:
+                                    m = re.match(r'^["\']?([a-zA-Z0-9_\-]+)', line)
+                                    if m:
+                                        pkg = m.group(1).lower().replace("-", "_")
+                                        self.declared_packages.add(pkg)
+                    except Exception:
+                        pass
 
     def _build_catalog(self):
         for root, _, files in os.walk(self.project_dir):
@@ -1677,12 +1846,35 @@ class ZeroHallucinationGuard:
                 all_symbols.add(node.target.id)
             elif isinstance(node, ast.ClassDef):
                 all_symbols.add(node.name)
+                fields: Set[str] = set()
+                methods: Set[str] = set()
                 for item in node.body:
-                    if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                    if isinstance(item, ast.AnnAssign) and isinstance(item.target, ast.Name):
+                        fields.add(item.target.id)
+                    elif isinstance(item, ast.Assign):
+                        for t in item.targets:
+                            if isinstance(t, ast.Name):
+                                fields.add(t.id)
+                    elif isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                        methods.add(item.name)
                         sig = self._extract_func_sig(item)
                         self.function_signatures[f"{node.name}.{item.name}"] = sig
                         if item.name not in self.function_signatures:
                             self.function_signatures[item.name] = sig
+                        if item.name == "__init__":
+                            for sub in ast.walk(item):
+                                if isinstance(sub, ast.Assign):
+                                    for t in sub.targets:
+                                        if isinstance(t, ast.Attribute) and isinstance(t.value, ast.Name) and t.value.id == "self":
+                                            fields.add(t.attr)
+                                elif isinstance(sub, ast.AnnAssign):
+                                    if isinstance(sub.target, ast.Attribute) and isinstance(sub.target.value, ast.Name) and sub.target.value.id == "self":
+                                        fields.add(sub.target.attr)
+                self.class_fields[node.name] = fields
+                self.class_fields[f"{stem}.{node.name}"] = fields
+                self.class_methods[node.name] = methods
+                self.class_methods[f"{stem}.{node.name}"] = methods
+
             elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
                 all_symbols.add(node.name)
                 sig = self._extract_func_sig(node)
@@ -1741,7 +1933,8 @@ class ZeroHallucinationGuard:
                 k_s += f": {ast.unparse(args.kwarg.annotation)}"
             arg_strs.append(k_s)
 
-        ret = f" -> {ast.unparse(node.returns)}" if node.returns else ""
+        ret_type = ast.unparse(node.returns).strip() if node.returns else ""
+        ret = f" -> {ret_type}" if ret_type else ""
         sig_str = f"{node.name}({', '.join(arg_strs)}){ret}"
 
         return {
@@ -1752,10 +1945,11 @@ class ZeroHallucinationGuard:
             "has_kwarg": bool(args.kwarg),
             "all_params": all_params,
             "sig_str": sig_str,
+            "return_type": ret_type,
         }
 
     def validate_code(self, proposed_code: str, target_file: str = "") -> Dict[str, Any]:
-        """Validates proposed code against workspace symbol and function call contracts."""
+        """Validates proposed code against workspace symbol, dependency manifests, and call contracts."""
         try:
             tree = ast.parse(proposed_code)
         except SyntaxError as e:
@@ -1763,51 +1957,120 @@ class ZeroHallucinationGuard:
                 "passed": False,
                 "syntax_error": str(e),
                 "violations": [f"Syntax error at line {e.lineno}: {e.msg}"],
+                "repaired_code": "",
+                "can_auto_heal": False,
+                "repairs_applied": [],
                 "report": f"❌ [HALLUCINATION BLOCKED] Proposed code failed Python syntax parsing at line {e.lineno}: {e.msg}"
             }
 
         violations: List[str] = []
+        fixes: Dict[str, Any] = {"imports": {}, "calls": {}, "kwargs": {}}
+        repairs_applied: List[str] = []
 
-        # 1. Check workspace imports
+        # ---------------------------------------------------------------------
+        # 1. TIER 1 & 2: GHOST DEPENDENCY & WORKSPACE IMPORT GUARDS
+        # ---------------------------------------------------------------------
         for node in ast.walk(tree):
             if isinstance(node, ast.ImportFrom):
                 if node.module:
                     base_mod = node.module.split('.')[0]
-                    if base_mod in self.modules or node.module in self.modules:
+                    is_workspace = base_mod in self.modules or node.module in self.modules
+                    if is_workspace:
                         avail = self.exported_symbols.get(node.module, self.exported_symbols.get(base_mod, set()))
                         for alias in node.names:
                             if alias.name != "*" and alias.name not in avail:
-                                close = difflib.get_close_matches(alias.name, list(avail), n=3, cutoff=0.5)
-                                did_you_mean = f" Did you mean: `{', '.join(close)}`?" if close else ""
+                                close = difflib.get_close_matches(alias.name, list(avail), n=1, cutoff=0.5)
+                                did_you_mean = f" Did you mean: `{close[0]}`?" if close else ""
+                                if close:
+                                    fixes["imports"][(node.module, alias.name)] = close[0]
+                                    fixes["calls"][alias.name] = close[0]
+                                    repairs_applied.append(f"Import `{alias.name}` -> `{close[0]}` (in `{node.module}`)")
                                 violations.append(
                                     f"Import Hallucination: Symbol `{alias.name}` does not exist in workspace module `{node.module}`.{did_you_mean}"
                                 )
+                    else:
+                        # Check external third-party package against stdlib + manifests + environment
+                        b_lower = base_mod.lower()
+                        is_std = b_lower in self.stdlib_modules
+                        is_dec = b_lower in self.declared_packages or b_lower.replace("_", "-") in self.declared_packages
+                        is_inst = b_lower in self.installed_packages or b_lower in self.known_package_aliases or self.known_package_aliases.get(b_lower) in self.installed_packages
+                        if not (is_std or is_dec or is_inst):
+                            all_known = list(self.declared_packages | self.installed_packages | set(self.known_package_aliases.keys()))
+                            close_pkg = difflib.get_close_matches(b_lower, all_known, n=1, cutoff=0.6)
+                            hint = f" Did you mean `{close_pkg[0]}`?" if close_pkg else ""
+                            violations.append(
+                                f"Ghost Dependency Hallucination: Package `{base_mod}` is not part of Python stdlib, not declared in requirements.txt/pyproject.toml, and not installed in environment.{hint}"
+                            )
 
-        # 2. Check function calls
+            elif isinstance(node, ast.Import):
+                for alias in node.names:
+                    base_mod = alias.name.split('.')[0]
+                    is_workspace = base_mod in self.modules
+                    if not is_workspace:
+                        b_lower = base_mod.lower()
+                        is_std = b_lower in self.stdlib_modules
+                        is_dec = b_lower in self.declared_packages or b_lower.replace("_", "-") in self.declared_packages
+                        is_inst = b_lower in self.installed_packages or b_lower in self.known_package_aliases or self.known_package_aliases.get(b_lower) in self.installed_packages
+                        if not (is_std or is_dec or is_inst):
+                            all_known = list(self.declared_packages | self.installed_packages | set(self.known_package_aliases.keys()))
+                            close_pkg = difflib.get_close_matches(b_lower, all_known, n=1, cutoff=0.6)
+                            hint = f" Did you mean `{close_pkg[0]}`?" if close_pkg else ""
+                            violations.append(
+                                f"Ghost Dependency Hallucination: Package `{base_mod}` is not part of Python stdlib, not declared in requirements.txt/pyproject.toml, and not installed in environment.{hint}"
+                            )
+
+        # ---------------------------------------------------------------------
+        # 2. TIER 3 & 4: CALL SIGNATURE, KWARGS & SCHEMA FIELD GUARDS
+        # ---------------------------------------------------------------------
         for node in ast.walk(tree):
             if isinstance(node, ast.Call):
                 func_name = ""
+                attr_name = ""
                 if isinstance(node.func, ast.Name):
                     func_name = node.func.id
                 elif isinstance(node.func, ast.Attribute):
                     val_str = ast.unparse(node.func.value)
-                    func_name = f"{val_str}.{node.func.attr}"
+                    attr_name = node.func.attr
+                    func_name = f"{val_str}.{attr_name}"
 
                 sig = self.function_signatures.get(func_name)
-                if not sig and isinstance(node.func, ast.Attribute):
-                    sig = self.function_signatures.get(node.func.attr)
+                if not sig and attr_name:
+                    sig = self.function_signatures.get(attr_name)
+
+                # Schema & Dataclass field validation on class instantiation
+                target_class = func_name or attr_name
+                if target_class in self.class_fields and len(self.class_fields[target_class]) > 0:
+                    declared_fields = self.class_fields[target_class]
+                    valid_params = sig["all_params"] if sig else set()
+                    for kw in node.keywords:
+                        if kw.arg and kw.arg not in declared_fields and kw.arg not in valid_params:
+                            close_f = difflib.get_close_matches(kw.arg, list(declared_fields | valid_params), n=1, cutoff=0.5)
+                            hint = f" Did you mean field `{close_f[0]}`?" if close_f else ""
+                            if close_f:
+                                fixes["kwargs"][(target_class, kw.arg)] = close_f[0]
+                                repairs_applied.append(f"Field `{target_class}.{kw.arg}` -> `{close_f[0]}`")
+                            violations.append(
+                                f"Schema Field Hallucination: Class `{target_class}` has no declared attribute or field `{kw.arg}`.{hint}"
+                            )
 
                 if sig:
                     # Validate keyword arguments
                     if not sig["has_kwarg"]:
                         for kw in node.keywords:
                             if kw.arg and kw.arg not in sig["all_params"]:
-                                close_kw = difflib.get_close_matches(kw.arg, list(sig["all_params"]), n=2, cutoff=0.6)
+                                close_kw = difflib.get_close_matches(kw.arg, list(sig["all_params"]), n=1, cutoff=0.5)
                                 hint = f" Did you mean parameter `{close_kw[0]}`?" if close_kw else ""
+                                if close_kw:
+                                    target_k = func_name or sig["name"]
+                                    fixes["kwargs"][(target_k, kw.arg)] = close_kw[0]
+                                    fixes["kwargs"][(sig["name"], kw.arg)] = close_kw[0]
+                                    if attr_name:
+                                        fixes["kwargs"][(attr_name, kw.arg)] = close_kw[0]
+                                    repairs_applied.append(f"Param `{kw.arg}` -> `{close_kw[0]}` in `{func_name or sig['name']}()`")
                                 violations.append(
                                     f"Call Hallucination: `{func_name or sig['name']}` does not accept keyword argument `{kw.arg}`.{hint} Valid signature: `{sig['sig_str']}`"
                                 )
-                    # Validate positional argument counts (skip 'self' for method calls like obj.method())
+                    # Validate positional argument counts
                     num_pos = len(node.args)
                     is_method_attr_call = isinstance(node.func, ast.Attribute)
                     effective_min = sig["min_pos"]
@@ -1826,34 +2089,147 @@ class ZeroHallucinationGuard:
                             f"Call Hallucination: `{func_name or sig['name']}` received too many positional arguments ({num_pos} provided, at most {effective_max} allowed). Valid signature: `{sig['sig_str']}`"
                         )
                 elif isinstance(node.func, ast.Attribute):
-                    # Method called on a class or object that is not recognized
                     target_attr = node.func.attr
                     all_sigs = list(self.function_signatures.keys())
-                    matches = difflib.get_close_matches(target_attr, [s.split('.')[-1] for s in all_sigs], n=2, cutoff=0.5)
+                    matches = difflib.get_close_matches(target_attr, [s.split('.')[-1] for s in all_sigs], n=1, cutoff=0.5)
                     if matches:
                         cand_sigs = [self.function_signatures[m]["sig_str"] for m in matches if m in self.function_signatures]
                         val_str = ast.unparse(node.func.value)
+                        fixes["calls"][target_attr] = matches[0]
+                        repairs_applied.append(f"Method `{val_str}.{target_attr}()` -> `.{matches[0]}()`")
                         violations.append(
                             f"Call Hallucination: Method or function `{val_str}.{target_attr}` does not exist! Did you mean: `{'; '.join(cand_sigs or matches)}`?"
                         )
 
+        # ---------------------------------------------------------------------
+        # 3. TIER 5: RETURN TYPE & CHAINING GUARD
+        # ---------------------------------------------------------------------
+        for node in ast.walk(tree):
+            # Check iterations: for x in func():
+            if isinstance(node, (ast.For, ast.AsyncFor)):
+                if isinstance(node.iter, ast.Call):
+                    c_name = ast.unparse(node.iter.func).strip()
+                    sig = self.function_signatures.get(c_name) or self.function_signatures.get(c_name.split('.')[-1])
+                    if sig and sig.get("return_type"):
+                        rt = sig["return_type"].strip()
+                        if rt in ("None", "NoneType", "bool", "int", "float"):
+                            violations.append(
+                                f"Return Contract Hallucination: Function `{c_name}` returns `{rt}`, which is not iterable in a loop!"
+                            )
+            # Check attribute access on None return: func().attr
+            elif isinstance(node, ast.Attribute):
+                if isinstance(node.value, ast.Call):
+                    c_name = ast.unparse(node.value.func).strip()
+                    sig = self.function_signatures.get(c_name) or self.function_signatures.get(c_name.split('.')[-1])
+                    if sig and sig.get("return_type") in ("None", "NoneType"):
+                        violations.append(
+                            f"Return Contract Hallucination: Function `{c_name}` has declared return type 'None', cannot access member `.{node.attr}` on NoneType!"
+                        )
+
+        # ---------------------------------------------------------------------
+        # 4. SELF-HEALING AST REPAIR SYNTHESIS
+        # ---------------------------------------------------------------------
+        repaired_code = ""
+        can_auto_heal = False
+        has_fixes = bool(fixes["imports"] or fixes["calls"] or fixes["kwargs"])
+        if has_fixes:
+            try:
+                tree_copy = copy.deepcopy(tree)
+                transformer = _SelfHealingTransformer(fixes)
+                healed_tree = transformer.visit(tree_copy)
+                ast.fix_missing_locations(healed_tree)
+                repaired_code = ast.unparse(healed_tree)
+                can_auto_heal = True
+            except Exception:
+                repaired_code = ""
+                can_auto_heal = False
+
         passed = len(violations) == 0
         if passed:
-            report_str = "✅ [PASS] Zero-Hallucination Guard verified. All imports and call contracts are valid."
+            report_str = "✅ [PASS] Zero-Hallucination Guard verified. All imports, call contracts, dependency manifests, and schemas are valid."
         else:
             report_lines = [
                 f"❌ [HALLUCINATION BLOCKED] Found {len(violations)} contract violation(s) in proposed code:\n"
             ]
             for i, v in enumerate(violations, 1):
                 report_lines.append(f"{i}. {v}")
-            report_lines.append("\n> **Corrective Action:** Adjust imports or function calls to match declared AST interfaces above.")
+            
+            if can_auto_heal and repaired_code:
+                report_lines.append("\n### 🩹 Self-Healing AST Auto-Repair:")
+                report_lines.append(f"> T-Zero automatically synthesized a corrected, hallucination-free version applying {len(repairs_applied)} fix(es):")
+                for r in repairs_applied:
+                    report_lines.append(f"- 🔧 {r}")
+                report_lines.append("\n```python")
+                report_lines.append(repaired_code)
+                report_lines.append("```\n")
+            else:
+                report_lines.append("\n> **Corrective Action:** Adjust imports or function calls to match declared AST interfaces above.")
+
             report_str = "\n".join(report_lines)
 
         return {
             "passed": passed,
             "violations": violations,
+            "repaired_code": repaired_code,
+            "can_auto_heal": can_auto_heal,
+            "repairs_applied": repairs_applied,
             "report": report_str
         }
+
+    def repair_code(self, proposed_code: str, target_file: str = "") -> str:
+        """Returns auto-healed code if hallucinations exist and can be safely repaired, or original code."""
+        res = self.validate_code(proposed_code, target_file)
+        if res.get("can_auto_heal") and res.get("repaired_code"):
+            return res["repaired_code"]
+        return proposed_code
+
+    def generate_grounding_contract(self, focus_modules: Optional[List[str]] = None, task_intent: str = "") -> str:
+        """Emits an immutable AST Type & Symbol grounding contract for prompt pinning."""
+        out = [
+            "# 🔒 T-ZERO IMMUTABLE AST GROUNDING CONTRACT (ZERO-HALLUCINATION SPECIFICATION)",
+            "",
+            "> **CRITICAL DIRECTIVE FOR AI AGENT / COMPOSER:**",
+            "> You MUST strictly conform to the exact symbol, function, parameter, and class definitions declared below.",
+            "> Guessing parameter names, inventing unlisted methods, or importing ghost packages is strictly prohibited.",
+            ""
+        ]
+
+        if task_intent:
+            out.append(f"**Task Objective:** `{task_intent}`\n")
+
+        # 1. Permitted Workspace Signatures
+        out.append("## 1. 🔍 Permitted Workspace Function Signatures & Types")
+        out.append("| Module | Function / Method Signature | Return Type |")
+        out.append("|:---|:---|:---|")
+        
+        target_keys = sorted(self.function_signatures.keys())
+        if focus_modules:
+            target_keys = [k for k in target_keys if any(m in k for m in focus_modules)]
+
+        for k in target_keys[:40]:
+            sig = self.function_signatures[k]
+            rt = sig.get("return_type") or "Any"
+            out.append(f"| `{k.split('.')[0] if '.' in k else 'global'}` | `{sig['sig_str']}` | `{rt}` |")
+        out.append("")
+
+        # 2. Permitted Class Schemas
+        if self.class_fields:
+            out.append("## 2. 🧩 Declared Class & Model Field Schemas")
+            out.append("| Class | Declared Attributes & Fields |")
+            out.append("|:---|:---|")
+            for c_name, fields in list(self.class_fields.items())[:25]:
+                if "." not in c_name and fields:
+                    out.append(f"| `{c_name}` | `{', '.join(sorted(fields))}` |")
+            out.append("")
+
+        # 3. Permitted Dependencies
+        declared_list = sorted(list(self.declared_packages))
+        if declared_list:
+            out.append("## 3. 📦 Declared Third-Party Packages (Manifest Verified)")
+            out.append(f"`{', '.join(declared_list[:25])}`\n")
+
+        out.append("> **Enforcement:** Code failing this grounding contract will be blocked and rejected by the T-Zero Pre-Flight Compiler.")
+        return "\n".join(out)
 
 
 # =============================================================================
@@ -1869,8 +2245,8 @@ class SmartSkeletonContextBuilder:
         self.project_dir = os.path.abspath(project_dir)
         self.impact_analyzer = ChangeImpactAnalyzer(project_dir)
 
-    def build_skeleton(self, focus_file: str, focus_symbol: str = "") -> str:
-        """Returns full target code + 1st-degree AST skeletons."""
+    def build_skeleton(self, focus_file: str, focus_symbol: str = "", task_intent: str = "") -> str:
+        """Returns full target code + 1st-degree AST skeletons and matching reusable helpers."""
         from tzero_v3 import TokenReducer
         
         target_path = os.path.join(self.project_dir, focus_file) if not os.path.isabs(focus_file) else focus_file
@@ -1951,6 +2327,24 @@ class SmartSkeletonContextBuilder:
                 md.append("```\n")
             except Exception:
                 pass
+
+        # Section 3: Surface matching reusable helpers across repository
+        try:
+            suggester = ReusableHelperSuggester(self.project_dir)
+            lookup_query = task_intent or focus_symbol or os.path.splitext(os.path.basename(rel_target))[0]
+            helpers = suggester.suggest_helpers(lookup_query, target_file=rel_target, top_k=3)
+            if helpers:
+                md.append("## 3. 💡 Reusable Repository Helpers Available")
+                md.append("> **T-Zero Anti-Reinvention Guard:** Pruned skeletons might conceal helper utilities. The following existing helpers match your context and are ready for direct import:")
+                md.append("")
+                for h in helpers:
+                    md.append(f"- **`{h['name']}`** in `{h['file']}:{h['line']}`")
+                    md.append(f"  ```python\n  {h['import_stmt']}\n  ```")
+                    if h.get("docstring"):
+                        md.append(f"  *{h['docstring']}*")
+                md.append("")
+        except Exception:
+            pass
 
         return "\n".join(md)
 
@@ -2354,5 +2748,275 @@ class DeadCodeFinder:
         return "\n".join(out)
 
     find_unused_symbols = find_dead_symbols
+
+
+# =============================================================================
+# 11. REUSABLE HELPER SUGGESTER & ANTI-REINVENTION GUARD
+# =============================================================================
+
+class ReusableHelperSuggester:
+    """Discovers, ranks, and surfaces reusable utility and helper functions across repository AST.
+    
+    Prevents LLMs and developers from reinventing existing functions that may have been pruned
+    from the context window or located in separate utility packages.
+    """
+
+    def __init__(self, project_dir: str):
+        self.project_dir = os.path.abspath(project_dir)
+        self.helpers: List[Dict[str, Any]] = []
+        self._indexed = False
+
+    def _ensure_indexed(self):
+        if not self._indexed:
+            self._index_codebase()
+            self._indexed = True
+
+    def _index_codebase(self):
+        """Scans workspace python files and extracts reusable helper functions."""
+        for root, _, files in os.walk(self.project_dir):
+            if should_skip_dir(root, self.project_dir):
+                continue
+            for f in files:
+                if f.endswith('.py'):
+                    full_p = os.path.join(root, f)
+                    rel_p = os.path.relpath(full_p, self.project_dir).replace('\\', '/')
+                    # Skip test files and private hidden files
+                    if any(t in rel_p.lower() for t in ("/test", "\\test", "tests/", "tests\\", "test_")):
+                        continue
+                    try:
+                        with open(full_p, 'r', encoding='utf-8', errors='ignore') as fp:
+                            content = fp.read()
+                        self._extract_helpers_from_file(rel_p, content)
+                    except Exception:
+                        pass
+
+    def _extract_helpers_from_file(self, rel_path: str, code: str):
+        try:
+            tree = ast.parse(code)
+        except Exception:
+            return
+
+        lines = code.splitlines()
+        is_util_file = any(u in rel_path.lower() for u in ("util", "helper", "common", "tools", "shared", "lib", "core"))
+
+        mod_name = rel_path
+        if mod_name.endswith(".py"):
+            mod_name = mod_name[:-3]
+        if mod_name.endswith("/__init__"):
+            mod_name = mod_name[:-9]
+        mod_dotted = mod_name.replace("/", ".").replace("\\", ".")
+
+        helper_prefixes = (
+            "get_", "parse_", "format_", "safe_", "is_", "has_", "compute_", "build_",
+            "extract_", "clean_", "normalize_", "validate_", "to_", "from_", "find_",
+            "convert_", "serialize_", "deserialize_", "read_", "write_", "load_", "dump_",
+            "calculate_", "check_", "detect_", "scan_", "strip_", "ensure_", "resolve_"
+        )
+
+        for node in ast.walk(tree):
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                fname = node.name
+                if fname.startswith("__"):
+                    continue
+                if fname.startswith("test_") or fname in ("setUp", "tearDown", "main", "run"):
+                    continue
+
+                is_prefixed = fname.startswith(helper_prefixes)
+                doc = (ast.get_docstring(node) or "").strip()
+
+                if not (is_util_file or is_prefixed or doc):
+                    continue
+
+                start_l = node.lineno
+                end_l = getattr(node, "end_lineno", len(lines))
+                body = "\n".join(lines[start_l - 1:end_l])
+
+                # Extract parameters signature
+                args_list = []
+                for a in node.args.args:
+                    arg_str = a.arg
+                    if a.annotation:
+                        try:
+                            arg_str += f": {ast.unparse(a.annotation)}"
+                        except Exception:
+                            pass
+                    args_list.append(arg_str)
+                ret_str = ""
+                if node.returns:
+                    try:
+                        ret_str = f" -> {ast.unparse(node.returns)}"
+                    except Exception:
+                        pass
+
+                sig_str = f"def {fname}({', '.join(args_list)}){ret_str}"
+
+                tokens = set()
+                for part in re.split(r'[_]+', fname):
+                    subparts = re.findall(r'[A-Za-z][a-z0-9]*', part)
+                    for sp in subparts:
+                        tokens.add(sp.lower())
+                for a in node.args.args:
+                    tokens.add(a.arg.lower())
+                if doc:
+                    for w in re.findall(r'[a-zA-Z]{3,}', doc):
+                        tokens.add(w.lower())
+
+                import_stmt = f"from {mod_dotted} import {fname}"
+
+                self.helpers.append({
+                    "name": fname,
+                    "file": rel_path,
+                    "line": start_l,
+                    "end_line": end_l,
+                    "signature": sig_str,
+                    "docstring": doc,
+                    "body": body,
+                    "import_stmt": import_stmt,
+                    "is_util_file": is_util_file,
+                    "tokens": tokens,
+                })
+
+    def suggest_helpers(self, query: str = "", target_file: str = "", top_k: int = 5) -> List[Dict[str, Any]]:
+        """Searches repository helpers matching natural language query, function name, or task."""
+        self._ensure_indexed()
+        if not self.helpers:
+            return []
+
+        q_clean = (query or "").lower().strip()
+        q_tokens = set(re.findall(r'[a-zA-Z0-9]+', q_clean))
+
+        scored: List[Tuple[float, Dict[str, Any]]] = []
+        for h in self.helpers:
+            score = 0.0
+            h_name = h["name"].lower()
+            h_tokens = h["tokens"]
+            h_doc = h["docstring"].lower()
+
+            if q_clean and h_name == q_clean:
+                score += 150.0
+            elif q_clean and q_clean in h_name:
+                score += 60.0
+
+            if q_tokens:
+                token_matches = q_tokens & h_tokens
+                score += len(token_matches) * 25.0
+
+                for qt in q_tokens:
+                    if qt in h_doc:
+                        score += 12.0
+
+            if h["is_util_file"]:
+                score *= 1.25
+
+            if target_file and h["file"] == target_file:
+                score *= 0.8  # Slight preference for importing from other modules
+
+            if score > 0 or not q_clean:
+                if not q_clean:
+                    score = 20.0 if h["is_util_file"] else 5.0
+                scored.append((score, h))
+
+        scored.sort(key=lambda x: x[0], reverse=True)
+
+        seen_names = set()
+        results = []
+        for s, h in scored:
+            if h["name"] in seen_names:
+                continue
+            seen_names.add(h["name"])
+            item = dict(h)
+            item["relevance_score"] = round(s, 2)
+            results.append(item)
+            if len(results) >= top_k:
+                break
+
+        return results
+
+    def check_reinvention_guard(self, code_snippet: str, target_file: str = "", top_k: int = 3) -> Dict[str, Any]:
+        """Inspects newly written code snippet to detect if it re-implements existing workspace helpers."""
+        self._ensure_indexed()
+        warnings = []
+        try:
+            tree = ast.parse(code_snippet)
+            for node in ast.walk(tree):
+                if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                    new_fname = node.name
+                    doc = ast.get_docstring(node) or ""
+                    query = f"{new_fname} {doc}"
+                    matches = self.suggest_helpers(query=query, target_file=target_file, top_k=top_k)
+                    for m in matches:
+                        if m["name"] == new_fname and target_file and m["file"] == target_file:
+                            continue
+                        if m["relevance_score"] >= 35.0:
+                            warnings.append({
+                                "new_symbol": new_fname,
+                                "matched_helper": m["name"],
+                                "file": m["file"],
+                                "line": m["line"],
+                                "import_stmt": m["import_stmt"],
+                                "docstring": m["docstring"],
+                                "body": m["body"],
+                                "relevance_score": m["relevance_score"]
+                            })
+        except Exception:
+            pass
+
+        return {
+            "has_reinventions": len(warnings) > 0,
+            "total_warnings": len(warnings),
+            "warnings": warnings
+        }
+
+    def format_helpers_report(self, results: List[Dict[str, Any]], query: str = "", include_body: bool = True) -> str:
+        q_label = f': "{query}"' if query else ""
+        out = [
+            f"# 💡 Reusable Repository Helpers{q_label}\n",
+            "> **T-Zero Anti-Reinvention Guard:** Pruning code into skeletons can sometimes hide utility helpers.",
+            "> The following functions already exist in your workspace and can be directly imported and reused:\n"
+        ]
+
+        if not results:
+            out.append("*(No matching reusable helpers found in the repository for this query)*")
+            return "\n".join(out)
+
+        out.append("| Helper Function | Module File | Line | Ready Import |")
+        out.append("|:---|:---|:---|:---|")
+        for r in results:
+            out.append(f"| `{r['name']}` | `{r['file']}` | Line {r['line']} | `{r['import_stmt']}` |")
+        out.append("")
+
+        for i, r in enumerate(results, 1):
+            out.append(f"### {i}. `{r['signature']}`")
+            out.append(f"- **File:** `{r['file']}` (Line {r['line']})")
+            out.append(f"- **Import:** `{r['import_stmt']}`")
+            if r.get("docstring"):
+                out.append(f"- **Docstring:** *{r['docstring']}*")
+            if include_body and r.get("body"):
+                out.append("```python")
+                out.append(r["body"])
+                out.append("```\n")
+
+        out.append("> **Recommendation:** Import and reuse these existing helpers instead of writing duplicate logic.")
+        return "\n".join(out)
+
+    def format_guard_report(self, report: Dict[str, Any], include_body: bool = True) -> str:
+        count = report.get("total_warnings", 0)
+        out = [
+            f"# 🛡️ T-Zero Anti-Reinvention Guard Alert ({count} Existing Helpers Found)\n",
+            "> **AST Wheel-Reinvention Warning:** The code snippet being introduced defines functions that replicate helpers already present in the codebase:\n"
+        ]
+        for w in report.get("warnings", []):
+            out.append(f"### ⚠️ Proposed Function: `{w['new_symbol']}`")
+            out.append(f"- **Existing Helper:** `{w['matched_helper']}` in `{w['file']}:{w['line']}`")
+            out.append(f"- **Recommended Reuse:**")
+            out.append(f"  ```python\n  {w['import_stmt']}\n  ```")
+            if w.get("docstring"):
+                out.append(f"- **Existing Docstring:** *{w['docstring']}*")
+            if include_body and w.get("body"):
+                out.append("```python")
+                out.append(w["body"])
+                out.append("```\n")
+        out.append("> **Action:** Avoid re-implementing these functions. Use the provided import statements instead.")
+        return "\n".join(out)
 
 

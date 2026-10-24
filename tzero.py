@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""T-Zero Context Architect v7.3.4 - Backward Compatibility & API Wrapper.
+"""T-Zero Context Architect v8.0.1 - Backward Compatibility & API Wrapper.
 
 Developer: Toprak Ahmet Aydoğmuş (Siber Akademi)
 LinkedIn: https://linkedin.com/in/toprak-ahmet-aydo%C4%9Fmu%C5%9F-60462534b/

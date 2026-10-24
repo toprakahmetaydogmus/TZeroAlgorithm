@@ -32,7 +32,7 @@ class TestAnchor5TDQS(unittest.TestCase):
                 os.environ.pop("TZERO_MCP_TOOL_MODE", None)
 
     def test_full_47_tool_suite(self):
-        """Audits the full 48 tools against TDQS 5.0 specifications."""
+        """Audits the full 49 tools against TDQS 5.0 specifications."""
         import os
         old_mode = os.environ.get("TZERO_MCP_TOOL_MODE")
         try:
@@ -40,7 +40,7 @@ class TestAnchor5TDQS(unittest.TestCase):
             server = tzero_mcp.create_mcp_server()
             manager = getattr(server, "_tool_manager", server)
             tools = manager.list_tools() if hasattr(manager, "list_tools") else []
-            self.assertEqual(len(tools), 48, f"Expected 48 registered tools in full mode, found {len(tools)}")
+            self.assertEqual(len(tools), 49, f"Expected 49 registered tools in full mode, found {len(tools)}")
             self._audit_tools(tools)
         finally:
             if old_mode is not None:

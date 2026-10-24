@@ -46,6 +46,22 @@ We built **T-Zero**, a local AST-level context optimizer and MCP server designed
 Feedback on edge-case parsing (especially complex decorators) would be greatly appreciated!
 ```
 
+#### 💬 Objection Handling & Community Responses:
+
+**Q: "The token drop on big repos is neat. Does the pruning ever hide something the model actually needed, like a helper it should've reused? And are you mostly on Cursor's own models or bringing your own key?"**
+
+**A:**
+> Great question! We built a dedicated engine for this exact problem:
+>
+> 1. **Anti-Reinvention Guard (`suggest_reusable_helpers`):**
+>    Even when method bodies are pruned, signatures, parameters, return types, and docstrings stay in context. In addition, T-Zero includes an active Helper Suggester: before generating code, it scans the repository AST for utility helpers and surfaces them (`from utils.date import parse_iso_date`) so Composer/LLM never reinvents the wheel.
+>
+> 2. **Focus-Aware Skeletonization (`get_smart_skeleton_context`):**
+>    The target file being modified retains 100% full implementation, while 1st-degree dependencies and matching reusable helpers are skeletonized with ready-to-use imports.
+>
+> 3. **Models & BYOK:**
+>    T-Zero is **100% offline and model-agnostic**. The AST pruner and BM25 indexer run locally on your CPU with zero API keys. You can use it with Cursor's built-in models (Claude 3.7 / GPT-4o) or bring your own keys (OpenAI, Anthropic, Gemini, DeepSeek, or local Ollama).
+
 ---
 
 ### B. Official Model Context Protocol (MCP) Discord (`#showcase` or `#servers`)

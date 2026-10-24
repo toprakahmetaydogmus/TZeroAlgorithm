@@ -1561,6 +1561,7 @@ const MCP_TOOLS_CATALOG = [
   { name: "find_dead_code", cat: "ast", badge: "AST", desc: "Detects unreferenced exports, unreachable branches, and unused variables.", sig: "find_dead_code(project_root: str)" },
   { name: "get_incremental_diff_context", cat: "ast", badge: "AST", desc: "Compacts Git diffs into AST-aware structural change summaries.", sig: "get_incremental_diff_context(project_root: str, base_commit: str = 'HEAD~1')" },
   { name: "find_code_duplicity", cat: "ast", badge: "AST", desc: "Scans workspace for duplicate or copy-pasted AST blocks across modules.", sig: "find_code_duplicity(project_root: str, min_lines: int = 6)" },
+  { name: "suggest_reusable_helpers", cat: "ast", badge: "AST", desc: "Discovers and surfaces reusable utility functions across repository AST to avoid duplicate code.", sig: "suggest_reusable_helpers(query: str, code_snippet: str = '')" },
 
   // Category: Memory & Graph (10)
   { name: "jarvis_compress_semantic_memory", cat: "memory", badge: "Memory", desc: "Compresses episodic agent actions into dense semantic vectors.", sig: "jarvis_compress_semantic_memory(session_id: str, memory_content: str)" },

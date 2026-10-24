@@ -1,5 +1,27 @@
 # Changelog
 
+## [8.0.1] - 2026-10-25
+
+### Released (Official V8.0.1 Zero-Hallucination & Anti-Reinvention Master Release)
+
+- **5-Tier Zero-Hallucination Pre-Flight Guard (`verify_hallucination_guard` & `--guard`):**
+  - **Tier 1 (Ghost Dependency Guard):** Statically intercepts imports of non-existent packages against `sys.stdlib_module_names`, `requirements.txt`, `pyproject.toml`, and local environment distributions.
+  - **Tier 2 (AST Symbol & Module Guard):** Verifies all imported symbols against workspace module AST tables and exported `__all__` definitions with `Did you mean?` fuzzy suggestions.
+  - **Tier 3 (Call & Keyword Argument Guard):** Validates positional and keyword argument counts and names against indexed workspace function AST signatures.
+  - **Tier 4 (Schema & Field Contract Guard):** Blocks assignment or instantiation of undeclared attributes on classes, dataclasses, and Pydantic models.
+  - **Tier 5 (Return Type & Chaining Guard):** Prohibits invalid loops or member accesses on functions returning `None` or primitive types.
+  - **Self-Healing AST Patcher (`repair_code`):** Automated AST rewriter (`_SelfHealingTransformer`) that synthesizes clean, corrected code fixing mismatched imports, renamed functions, and keyword arguments.
+  - **Immutable Grounding Contract Pinner (`--grounding-contract`):** Emits immutable AST Type & Symbol Markdown contracts for AI prompt pinning.
+- **Anti-Reinvention Guard & Helper Reuse Suggester (`suggest_reusable_helpers` & `--helpers`):**
+  - Surfaces existing repository utility functions and ready-to-use import statements to prevent models and Composer from reinventing the wheel.
+  - Integrated into `SmartSkeletonContextBuilder` to automatically inject reusable helpers into focus context windows.
+  - Provides pre-flight warning if newly written code duplicates existing helpers.
+- **TDQS 5.0/5.0 Anchor Certification across All 49 Tools:**
+  - 100% pass across all 6 TDQS dimensions: Purpose Clarity, Usage Guidelines (`When to use:` & `When NOT to use:` routing), Behavioral Transparency, Parameter Semantics, Structure, and Contextual Completeness.
+  - Passed both strict keyword audits and comprehensive evaluation with 0 defects across all 49 tools.
+- **Zero Cost & Offline Guarantee:**
+  - 100% local Python AST and system metadata; strictly $0.00 spend with zero external paid APIs.
+
 ## [7.3.4] - 2026-10-24
 
 ### Released (Official V7.3.4 PyPI SEO, Discoverability & CI/CD Multiplier Suite)

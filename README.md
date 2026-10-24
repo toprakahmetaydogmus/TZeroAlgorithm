@@ -145,7 +145,7 @@ Prevent accidental credential leaks and token bloat before code ever leaves deve
 ```yaml
 repos:
   - repo: https://github.com/toprakahmetaydogmus/TZeroAlgorithm
-    rev: v7.3.4
+    rev: v8.0.1
     hooks:
       - id: tzero-guard
       - id: tzero-audit
@@ -239,12 +239,12 @@ Or execute targeted operations on demand:
 - `"action": "heal"` — Automated AST diagnostic diagnosis & self-healing patch
 - `"action": "search"` — Local BM25 hybrid semantic search
 
-> **Tool Architecture:** By default, T-Zero exposes the **15 TDQS-certified Canonical & Omni Tools** to prevent context bloat and ensure 5/5 tool coherence. The full 48-tool suite is available on-demand via `tzero-mcp --all` or `TZERO_MCP_TOOL_MODE=all` (and all 48 tools remain dynamically callable via `call_tool()` in both modes).
+> **Tool Architecture:** By default, T-Zero exposes the **15 TDQS-certified Canonical & Omni Tools** to prevent context bloat and ensure 5/5 tool coherence. The full 49-tool suite is available on-demand via `tzero-mcp --all` or `TZERO_MCP_TOOL_MODE=all` (and all 49 tools remain dynamically callable via `call_tool()` in both modes).
 
 T-Zero tools grouped by functional category:
 
 <details>
-<summary><strong>1. Context & AST Pruning (6 tools)</strong></summary>
+<summary><strong>1. Context & AST Pruning (7 tools)</strong></summary>
 
 - `get_project_context_tree`: Multi-tier hierarchical AST context tree (T-1 to T-4).
 - `prune_code_snippet`: Strips implementation bodies from in-memory snippets or diff streams.
@@ -252,6 +252,7 @@ T-Zero tools grouped by functional category:
 - `get_smart_skeleton_context`: Focus-file implementation with 1st-degree caller/callee skeletons.
 - `get_incremental_diff_context`: Git diff context pruned with AST signatures.
 - `generate_zero_waste_prompt_context`: Token-optimized prompt preamble for coding agents.
+- `suggest_reusable_helpers`: Discovers and surfaces existing reusable helpers across AST to prevent reinventing wheels.
 </details>
 
 <details>

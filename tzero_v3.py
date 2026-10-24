@@ -468,7 +468,7 @@ def calculate_token_cost(token_count: int, provider_name: str) -> float:
 # i18n Translations
 TRANSLATIONS: Dict[str, Dict[str, str]] = {
     "en": {
-        "title": "T-Zero Developer Console & Context Architect v7.3.4",
+        "title": "T-Zero Developer Console & Context Architect v8.0.1",
         "subtitle": f"Developer: {DEV_NAME} | {DEV_URL_MAIN} | {DEV_URL_BIO}",
         "overview_tab": "🏠 Overview Dashboard",
         "setup_tab": "⚡ Setup & AI Models",
@@ -505,7 +505,7 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "audit_btn": "🛡️ SECURITY AUDIT"
     },
     "tr": {
-        "title": "T-Zero Geliştirici Konsolu & Bağlam Mimarı v7.3.4",
+        "title": "T-Zero Geliştirici Konsolu & Bağlam Mimarı v8.0.1",
         "subtitle": f"Geliştirici: {DEV_NAME} | {DEV_URL_MAIN} | {DEV_URL_BIO}",
         "overview_tab": "🏠 Genel Bakış",
         "setup_tab": "⚡ Kurulum & Model",
@@ -8287,12 +8287,15 @@ def main():
     parser.add_argument("--pipe", nargs="?", const="", default=None, metavar="FILENAME_HINT", help="Read code/diff/schema from stdin, compress tokens, and output to stdout")
     parser.add_argument("--clip", "--copy", action="store_true", help="Copy output of --pipe or command directly to system clipboard")
     parser.add_argument("--init-hooks", nargs="?", const=".", default=None, metavar="REPO_DIR", dest="init_hooks", help="Install zero-leak & token security pre-commit hook into .git/hooks")
-    parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect v7.3.4 Master Edition (engine v4.1.0)")
+    parser.add_argument("--helpers", "--suggest-helpers", metavar="QUERY", help="Discover reusable helpers/utilities across repository AST to avoid duplicate code")
+    parser.add_argument("--guard", "--verify-code", metavar="CODE_OR_FILE", help="Validate code against AST contracts to eliminate hallucinations before applying")
+    parser.add_argument("--grounding-contract", action="store_true", help="Generate immutable AST grounding contract for LLM prompt pinning")
+    parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect v8.0.1 Master Edition (engine v4.1.0)")
 
     def print_quickstart_guide():
         print("""
 ================================================================================
-⚡ SİBER AKADEMİ — T-ZERO CONTEXT ARCHITECT & MCP v7.3.4 MASTER (engine v4.1.0)
+⚡ SİBER AKADEMİ — T-ZERO CONTEXT ARCHITECT & MCP v8.0.1 MASTER (engine v4.1.0)
 ================================================================================
 🎯 %95'e Varan Token Tasarrufu & Otonom Yapay Zeka Mimari Bağlam Motoru
 
@@ -8412,6 +8415,30 @@ def main():
         searcher = LocalSemanticCodeSearch(args.dir)
         matches = searcher.search(args.search, top_k=6)
         print(searcher.format_search_results(args.search, matches))
+    elif args.helpers:
+        from tzero_features import ReusableHelperSuggester
+        suggester = ReusableHelperSuggester(args.dir)
+        matches = suggester.suggest_helpers(args.helpers, top_k=6)
+        print(suggester.format_helpers_report(matches, query=args.helpers))
+    elif args.guard:
+        from tzero_features import ZeroHallucinationGuard
+        code_input = args.guard
+        if os.path.exists(code_input) and os.path.isfile(code_input):
+            with open(code_input, "r", encoding="utf-8", errors="ignore") as f:
+                code_input = f.read()
+        elif r"\n" in code_input and "\n" not in code_input:
+            code_input = code_input.replace(r"\n", "\n").replace(r"\t", "\t")
+        guard = ZeroHallucinationGuard(args.dir)
+        res = guard.validate_code(code_input)
+        print(res["report"])
+        if not res["passed"]:
+            sys.exit(1)
+        else:
+            sys.exit(0)
+    elif args.grounding_contract:
+        from tzero_features import ZeroHallucinationGuard
+        guard = ZeroHallucinationGuard(args.dir)
+        print(guard.generate_grounding_contract())
     elif args.export_agent_rules:
         from tzero_features import AgentRulesGenerator
         created = AgentRulesGenerator.export_all(args.dir)

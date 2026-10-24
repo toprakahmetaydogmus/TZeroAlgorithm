@@ -36,7 +36,7 @@ class TestMCPServer(unittest.TestCase):
         """Verifies that all 47 specialized MCP tools and grounding prompt are properly registered."""
         tools = self.run_async(self.server.list_tools())
         tool_names = [t.name for t in tools]
-        self.assertEqual(len(tool_names), 48)
+        self.assertEqual(len(tool_names), 49)
         self.assertIn("execute_codebase_workflow", tool_names)
         expected_tools = [
             "execute_codebase_workflow",
@@ -82,6 +82,7 @@ class TestMCPServer(unittest.TestCase):
             "generate_zero_waste_prompt_context",
             "compress_stream_tokens",
             "install_git_security_guard",
+            "suggest_reusable_helpers",
             "superdesign_generate",
             "superdesign_iterate",
             "superdesign_extract_system",
@@ -213,6 +214,37 @@ class TestMCPServer(unittest.TestCase):
             self.assertIn("Code Duplicity Report", out)
             self.assertIn("mod1.py", out)
             self.assertIn("mod2.py", out)
+
+    def test_tool_suggest_reusable_helpers(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            util_f = os.path.join(temp_dir, "my_utils.py")
+            with open(util_f, "w", encoding="utf-8") as f:
+                f.write(
+                    "def format_iso_timestamp(ts: int) -> str:\n"
+                    "    \"\"\"Converts timestamp to ISO 8601 string.\"\"\"\n"
+                    "    return str(ts)\n"
+                )
+
+            res = self.run_async(self.server.call_tool(
+                "suggest_reusable_helpers",
+                {"project_root": temp_dir, "query": "timestamp format"}
+            ))
+            out = tool_result_text(res)
+            self.assertIn("Reusable Repository Helpers", out)
+            self.assertIn("format_iso_timestamp", out)
+            self.assertIn("from my_utils import format_iso_timestamp", out)
+
+            # Test reinvention guard
+            res_guard = self.run_async(self.server.call_tool(
+                "suggest_reusable_helpers",
+                {
+                    "project_root": temp_dir,
+                    "code_snippet": "def format_timestamp(ts):\n    \"\"\"Converts timestamp to string\"\"\"\n    pass\n"
+                }
+            ))
+            out_guard = tool_result_text(res_guard)
+            self.assertIn("Anti-Reinvention Guard Alert", out_guard)
+            self.assertIn("format_iso_timestamp", out_guard)
 
     def test_tool_estimate_token_cost(self):
         res = self.run_async(self.server.call_tool(
@@ -720,7 +752,7 @@ diff --git a/core.py b/core.py
             os.environ["TZERO_MCP_TOOL_MODE"] = "all"
             full_server = tzero_mcp.create_mcp_server()
             tools_all = self.run_async(full_server.list_tools())
-            self.assertEqual(len(tools_all), 48)
+            self.assertEqual(len(tools_all), 49)
             self.assertIn("execute_codebase_workflow", [t.name for t in tools_all])
         finally:
             if old_val is not None:

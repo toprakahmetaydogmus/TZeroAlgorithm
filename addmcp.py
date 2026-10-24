@@ -21,7 +21,7 @@ from pathlib import Path
 from typing import Callable, Dict, List, Optional, Tuple
 
 
-APP_VERSION = "7.3.4"
+APP_VERSION = "8.0.1"
 SERVER_NAME = "tzero"
 SERVER_FILENAME = "TZeroMCP.exe"
 
@@ -447,6 +447,7 @@ When the user enters `/tzero [subcommand]` or asks for T-Zero assistance, dispat
 | `/tzero boundaries` | Enforces T-4 architectural boundaries defined in `tzero.rules.json` to prevent architectural erosion. | Call `enforce_architecture_boundaries` MCP tool |
 | `/tzero repomap` | Generates ultra-compact AST symbol token map for chat context windows. | Call `generate_repo_map` MCP tool |
 | `/tzero duplicity` | Scans workspace for duplicate or copy-pasted code blocks (6+ lines) across modules. | Call `find_code_duplicity` MCP tool |
+| `/tzero helpers <query>` | Discovers reusable repository helpers & guards against reinventing existing functions. | Call `suggest_reusable_helpers` MCP tool |
 | `/tzero doctor` | Inspects environment, Python runtime, and dependencies. | Run `python -m tzero_deps` or CLI `--doctor` |
 
 ## Execution Guidelines
@@ -599,6 +600,10 @@ _MCP_TOOLS_SPEC = {
     "find_dead_code": (
         "Finds unused, orphaned, or unreferenced functions and classes across the codebase AST.",
         "Invoke the `find_dead_code` MCP tool."
+    ),
+    "suggest_reusable_helpers": (
+        "Discovers and surfaces existing reusable helper and utility functions across the repository AST to prevent reinventing wheels.",
+        "Invoke the `suggest_reusable_helpers` MCP tool with query or code snippet."
     ),
 }
 

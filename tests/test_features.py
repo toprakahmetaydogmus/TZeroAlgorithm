@@ -32,6 +32,8 @@ from tzero_features import (
     DeadCodeFinder,
     detect_circular_dependencies,
     ZeroHallucinationGuard,
+    ReusableHelperSuggester,
+    SmartSkeletonContextBuilder,
 )
 
 
@@ -346,6 +348,148 @@ class TestZeroHallucinationGuard(unittest.TestCase):
         self.assertFalse(res_kwarg["passed"])
         self.assertIn("b", res_kwarg["report"])
 
+    def test_ghost_dependency_detection(self):
+        guard = ZeroHallucinationGuard(self.temp_dir)
+        # Fake hallucinated package not in stdlib or requirements
+        fake_code = "import phantom_fake_sdk_cloud_999\nfrom phantom_fake_sdk_cloud_999 import Client\n"
+        res = guard.validate_code(fake_code)
+        self.assertFalse(res["passed"])
+        self.assertTrue(any("Ghost Dependency Hallucination" in v for v in res["violations"]))
+
+        # Real stdlib imports must pass
+        valid_stdlib = "import os\nimport sys\nimport json\nimport ast\n"
+        res_valid = guard.validate_code(valid_stdlib)
+        self.assertTrue(res_valid["passed"])
+
+    def test_self_healing_ast_patcher(self):
+        guard = ZeroHallucinationGuard(self.temp_dir)
+        broken_code = (
+            "from calc import Calculater\n"
+            "calc = Calculater()\n"
+            "calc.add_numbers(a=5, bx=10)\n"
+        )
+        res = guard.validate_code(broken_code)
+        self.assertFalse(res["passed"])
+        self.assertTrue(res["can_auto_heal"])
+        self.assertIn("Calculator", res["repaired_code"])
+        self.assertIn("b=10", res["repaired_code"])
+
+        # Validate repair_code method
+        healed = guard.repair_code(broken_code)
+        self.assertIn("from calc import Calculator", healed)
+        self.assertIn("b=10", healed)
+
+    def test_schema_field_contract_guard(self):
+        models_file = os.path.join(self.temp_dir, "models.py")
+        with open(models_file, "w", encoding="utf-8") as f:
+            f.write(
+                "class UserAccount:\n"
+                "    username: str\n"
+                "    email: str\n"
+                "    def __init__(self, username: str, email: str):\n"
+                "        self.username = username\n"
+                "        self.email = email\n"
+            )
+        guard = ZeroHallucinationGuard(self.temp_dir)
+        bad_instantiation = "from models import UserAccount\nu = UserAccount(username='bob', ghost_field=123)\n"
+        res = guard.validate_code(bad_instantiation)
+        self.assertFalse(res["passed"])
+        self.assertTrue(any("Schema Field Hallucination" in v for v in res["violations"]))
+
+    def test_return_type_contract_guard(self):
+        svc_file = os.path.join(self.temp_dir, "svc.py")
+        with open(svc_file, "w", encoding="utf-8") as f:
+            f.write(
+                "def emit_metric(name: str) -> None:\n"
+                "    pass\n"
+            )
+        guard = ZeroHallucinationGuard(self.temp_dir)
+        
+        # Test invalid loop over None return
+        loop_code = "import svc\nfor x in svc.emit_metric('cpu'): pass\n"
+        res_loop = guard.validate_code(loop_code)
+        self.assertFalse(res_loop["passed"])
+        self.assertTrue(any("Return Contract Hallucination" in v for v in res_loop["violations"]))
+
+        # Test invalid attribute access on None return
+        attr_code = "import svc\nval = svc.emit_metric('cpu').non_existent_prop\n"
+        res_attr = guard.validate_code(attr_code)
+        self.assertFalse(res_attr["passed"])
+        self.assertTrue(any("Return Contract Hallucination" in v for v in res_attr["violations"]))
+
+    def test_grounding_contract_generation(self):
+        guard = ZeroHallucinationGuard(self.temp_dir)
+        contract = guard.generate_grounding_contract(task_intent="Mathematical Additions")
+        self.assertIn("IMMUTABLE AST GROUNDING CONTRACT", contract)
+        self.assertIn("Calculator", contract)
+        self.assertIn("add_numbers", contract)
+        self.assertIn("Mathematical Additions", contract)
+
+
+class TestReusableHelperSuggester(unittest.TestCase):
+    def setUp(self):
+        self.temp_dir = tempfile.mkdtemp()
+        self.utils_file = os.path.join(self.temp_dir, "date_utils.py")
+        self.client_file = os.path.join(self.temp_dir, "app.py")
+
+        with open(self.utils_file, "w", encoding="utf-8") as f:
+            f.write(
+                "def parse_iso_datetime(date_str: str) -> str:\n"
+                "    \"\"\"Parses ISO 8601 formatted date string safely.\"\"\"\n"
+                "    return date_str.strip()\n\n"
+                "def format_currency_amount(amount: float, currency: str = 'USD') -> str:\n"
+                "    \"\"\"Formats a numeric amount with standard currency code.\"\"\"\n"
+                "    return f'{currency} {amount:.2f}'\n"
+            )
+
+        with open(self.client_file, "w", encoding="utf-8") as f:
+            f.write(
+                "import date_utils\n\n"
+                "def main():\n"
+                "    print(date_utils.format_currency_amount(100.0))\n"
+            )
+
+    def tearDown(self):
+        shutil.rmtree(self.temp_dir, ignore_errors=True)
+
+    def test_suggest_helpers_by_query(self):
+        suggester = ReusableHelperSuggester(self.temp_dir)
+        matches = suggester.suggest_helpers("parse date string")
+        self.assertTrue(len(matches) > 0)
+        top = matches[0]
+        self.assertEqual(top["name"], "parse_iso_datetime")
+        self.assertIn("from date_utils import parse_iso_datetime", top["import_stmt"])
+        self.assertIn("parse_iso_datetime", top["signature"])
+
+    def test_check_reinvention_guard_detects_duplicate(self):
+        suggester = ReusableHelperSuggester(self.temp_dir)
+        snippet = (
+            "def parse_date(date_str):\n"
+            "    \"\"\"Parses ISO formatted date string\"\"\"\n"
+            "    return date_str\n"
+        )
+        guard_res = suggester.check_reinvention_guard(snippet)
+        self.assertTrue(guard_res["has_reinventions"])
+        self.assertEqual(guard_res["total_warnings"], 1)
+        w = guard_res["warnings"][0]
+        self.assertEqual(w["new_symbol"], "parse_date")
+        self.assertEqual(w["matched_helper"], "parse_iso_datetime")
+
+    def test_format_helpers_report(self):
+        suggester = ReusableHelperSuggester(self.temp_dir)
+        matches = suggester.suggest_helpers("currency")
+        report = suggester.format_helpers_report(matches, query="currency")
+        self.assertIn("Reusable Repository Helpers", report)
+        self.assertIn("format_currency_amount", report)
+        self.assertIn("from date_utils import format_currency_amount", report)
+
+    def test_smart_skeleton_includes_reusable_helpers(self):
+        builder = SmartSkeletonContextBuilder(self.temp_dir)
+        context = builder.build_skeleton("app.py", task_intent="parse date string")
+        self.assertIn("Reusable Repository Helpers Available", context)
+        self.assertIn("parse_iso_datetime", context)
+
 
 if __name__ == "__main__":
     unittest.main()
+
