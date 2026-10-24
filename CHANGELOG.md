@@ -1,5 +1,19 @@
 # Changelog
 
+## [7.3.3] - 2026-10-24
+
+### Released (Official V7.3.3 Autonomous Master Omni-Tool & Universal Package Suite)
+
+- **Flagship Autonomous Omni-Tool (`execute_codebase_workflow`):**
+  - Added all-in-one autonomous codebase command executing the entire T-Zero intelligence pipeline (Zero-Leak Security Audit + System Architecture Blueprint + Token Reduction ROI + Code Quality Audit) in a single MCP call.
+  - Dynamically routes to all 48 specialized tools on-demand (`action="security"`, `"context"`, `"blueprint"`, `"impact"`, `"heal"`, `"search"`, `"prune"`, `"rules"`, `"memory"`, `"swarm"`, `"design"`).
+  - Keeps all granular MCP tools fully preserved and callable with zero feature loss.
+- **Packaging & Containerization Resilience:**
+  - Standardized `pyproject.toml` setuptools configuration with full `packages = ["tzero_jarvis"]` and all root module exports.
+  - Updated `Dockerfile` and added `Dockerfile.glama` with explicit `TZERO_MCP_TOOL_MODE=canonical` and unbuffered stdio transport.
+  - Synchronized `glama.json` with official Glama server schema (`https://glama.ai/mcp/schemas/server.json`).
+  - Added comprehensive automated unit test coverage across all 222 test suites (100% passing).
+
 ## [7.3.2] - 2026-10-24
 
 ### Released (Official V7.3.2 Server Coherence Grade A & Clean Architecture Suite)

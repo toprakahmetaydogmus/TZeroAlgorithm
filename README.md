@@ -8,7 +8,7 @@ Reduces codebase prompt tokens by up to **94.9%** while preserving complete clas
 
 [![PyPI Version](https://img.shields.io/pypi/v/tzero-mcp?color=38bdf8&style=flat-square&logo=pypi)](https://pypi.org/project/tzero-mcp/)
 [![Python Version](https://img.shields.io/badge/python-3.10%2B-blue?style=flat-square)](https://pypi.org/project/tzero-mcp/)
-[![Tests](https://img.shields.io/badge/tests-221%20passing-34d399?style=flat-square&logo=githubactions)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions)
+[![Tests](https://img.shields.io/badge/tests-222%20passing-34d399?style=flat-square&logo=githubactions)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions)
 [![Security](https://img.shields.io/badge/security-100%25%20Zero--Leak-38bdf8?style=flat-square&logo=shield)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm#security-architecture)
 [![License](https://img.shields.io/badge/license-MIT-f8fafc?style=flat-square)](LICENSE)
 
@@ -181,7 +181,30 @@ Natively integrates the [Superdesign](https://github.com/superdesigndev/superdes
 
 ## MCP Tools Reference
 
-> **Tool Architecture:** By default, T-Zero exposes the **14 TDQS-certified Canonical Tools** to prevent context bloat and ensure 5/5 tool coherence. The full 47-tool suite is available on-demand via `tzero-mcp --all` or `TZERO_MCP_TOOL_MODE=all` (and all 47 tools remain dynamically callable via `call_tool()` in both modes).
+### 🚀 Flagship Omni-Tool: `execute_codebase_workflow`
+
+Execute any codebase workflow, multi-stage audit, or specific T-Zero engine in a **single unified MCP command**:
+
+```json
+// Full autonomous pipeline: Security Audit + Architecture Blueprint + Token ROI + Code Quality
+{
+  "name": "execute_codebase_workflow",
+  "arguments": {
+    "action": "auto",
+    "target": "."
+  }
+}
+```
+
+Or execute targeted operations on demand:
+- `"action": "security"` — 100% Zero-Leak secret scan across workspace
+- `"action": "context"` — Hierarchical AST context tree generation
+- `"action": "blueprint"` — Mermaid system architecture & component topologies
+- `"action": "impact"` — Change blast radius analysis for a class or function
+- `"action": "heal"` — Automated AST diagnostic diagnosis & self-healing patch
+- `"action": "search"` — Local BM25 hybrid semantic search
+
+> **Tool Architecture:** By default, T-Zero exposes the **15 TDQS-certified Canonical & Omni Tools** to prevent context bloat and ensure 5/5 tool coherence. The full 48-tool suite is available on-demand via `tzero-mcp --all` or `TZERO_MCP_TOOL_MODE=all` (and all 48 tools remain dynamically callable via `call_tool()` in both modes).
 
 T-Zero tools grouped by functional category:
 

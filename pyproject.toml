@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tzero-mcp"
-version = "7.3.2"
+version = "7.3.3"
 description = "Enterprise Codebase Context Builder, AST Signatures Analyzer, & Token Reducer for LLMs"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -64,10 +64,30 @@ tzero-add-mcp = "addmcp:main"
 tzero-addmcp = "addmcp:main"
 
 [tool.setuptools]
-py-modules = ["main", "tzero", "tzero_features", "tzero_mcp", "tzero_v3", "tzero_deps", "addmcp", "siber_akademi_icon", "app"]
+packages = ["tzero_jarvis"]
+py-modules = [
+    "main",
+    "tzero",
+    "tzero_features",
+    "tzero_mcp",
+    "tzero_v3",
+    "tzero_deps",
+    "addmcp",
+    "siber_akademi_icon",
+    "app",
+    "tzero_guard",
+    "tzero_patch",
+    "tzero_superdesign",
+    "tzero_gateway",
+    "tzero_infra",
+    "tzero_pipe",
+    "tzero_polyglot",
+    "tzero_reachability",
+    "tzero_dashboard"
+]
 
 [tool.setuptools.package-data]
-"*" = ["*.ico"]
+"*" = ["*.ico", "*.json"]
 
 [project.urls]
 LinkedIn = "https://linkedin.com/in/toprak-ahmet-aydo%C4%9Fmu%C5%9F-60462534b/"

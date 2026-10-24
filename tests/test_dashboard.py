@@ -26,15 +26,15 @@ class TestTZeroDashboard(unittest.TestCase):
             self.assertEqual(resp.status, 200)
             body = resp.read().decode("utf-8")
             self.assertIn("T-Zero Developer Console", body)
-            self.assertIn("47 MCP TOOLS OPERATIONAL", body)
+            self.assertIn("48 MCP TOOLS OPERATIONAL", body)
 
     def test_get_api_stats(self):
         url = f"http://localhost:{self.test_port}/api/stats"
         with urllib.request.urlopen(url) as resp:
             self.assertEqual(resp.status, 200)
             data = json.loads(resp.read().decode("utf-8"))
-            self.assertEqual(data["version"], "7.3.2")
-            self.assertEqual(data["tools_count"], 47)
+            self.assertEqual(data["version"], "7.3.3")
+            self.assertEqual(data["tools_count"], 48)
 
     def test_post_api_reduce(self):
         url = f"http://localhost:{self.test_port}/api/reduce"

@@ -1,8 +1,11 @@
 include siber_akademi.ico
 include siber_akademi_icon.py
 include smithery.json
+include smithery.yaml
+include glama.json
 include install.ps1
 include install.sh
 include action.yml
 include .pre-commit-hooks.yaml
 include requirements.txt
+recursive-include tzero_jarvis *.py

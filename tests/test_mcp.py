@@ -36,8 +36,10 @@ class TestMCPServer(unittest.TestCase):
         """Verifies that all 47 specialized MCP tools and grounding prompt are properly registered."""
         tools = self.run_async(self.server.list_tools())
         tool_names = [t.name for t in tools]
-        self.assertEqual(len(tool_names), 47)
+        self.assertEqual(len(tool_names), 48)
+        self.assertIn("execute_codebase_workflow", tool_names)
         expected_tools = [
+            "execute_codebase_workflow",
             "get_project_context_tree",
             "query_module_dependencies",
             "query_architecture_boundaries",
@@ -703,26 +705,49 @@ diff --git a/core.py b/core.py
             self.assertIn("T-Zero", tool_result_text(res))
 
     def test_legacy_mode_environment_variable(self):
-        """Verifies that default registers the 14 canonical tools, and TZERO_MCP_TOOL_MODE=all registers 47 tools."""
+        """Verifies that default registers 15 canonical/auto tools, and TZERO_MCP_TOOL_MODE=all registers 48 tools."""
         # Clean env to test true default behavior
         old_val = os.environ.pop("TZERO_MCP_TOOL_MODE", None)
         try:
             default_server = tzero_mcp.create_mcp_server()
             tools_def = self.run_async(default_server.list_tools())
             tool_names = [t.name for t in tools_def]
-            self.assertEqual(len(tool_names), 14)
+            self.assertEqual(len(tool_names), 15)
+            self.assertIn("execute_codebase_workflow", tool_names)
             self.assertIn("build_project_context", tool_names)
             self.assertIn("manage_memory_store", tool_names)
 
             os.environ["TZERO_MCP_TOOL_MODE"] = "all"
             full_server = tzero_mcp.create_mcp_server()
             tools_all = self.run_async(full_server.list_tools())
-            self.assertEqual(len(tools_all), 47)
+            self.assertEqual(len(tools_all), 48)
+            self.assertIn("execute_codebase_workflow", [t.name for t in tools_all])
         finally:
             if old_val is not None:
                 os.environ["TZERO_MCP_TOOL_MODE"] = old_val
             else:
                 os.environ.pop("TZERO_MCP_TOOL_MODE", None)
+
+    def test_execute_codebase_workflow_actions(self):
+        """Verifies that the execute_codebase_workflow omni-tool routes and executes all actions cleanly."""
+        # Test 1: Action = 'auto'
+        res = self.run_async(self.server.call_tool("execute_codebase_workflow", {"action": "auto", "target": "."}))
+        text = tool_result_text(res)
+        self.assertIn("T-Zero Autonomous Codebase Intelligence Report", text)
+        self.assertIn("Zero-Leak Security Audit", text)
+        self.assertIn("System Architecture & Topology", text)
+
+        # Test 2: Action = 'security'
+        res_sec = self.run_async(self.server.call_tool("execute_codebase_workflow", {"action": "security", "target": "."}))
+        self.assertIn("Zero-Leak", tool_result_text(res_sec))
+
+        # Test 3: Action = 'blueprint'
+        res_bp = self.run_async(self.server.call_tool("execute_codebase_workflow", {"action": "blueprint", "target": "."}))
+        self.assertIn("Architecture", tool_result_text(res_bp))
+
+        # Test 4: Unknown action error handling
+        res_err = self.run_async(self.server.call_tool("execute_codebase_workflow", {"action": "invalid_unknown_action"}))
+        self.assertIn("Unknown action", tool_result_text(res_err))
 
 
 if __name__ == "__main__":
