@@ -468,7 +468,7 @@ def calculate_token_cost(token_count: int, provider_name: str) -> float:
 # i18n Translations
 TRANSLATIONS: Dict[str, Dict[str, str]] = {
     "en": {
-        "title": "T-Zero Developer Console & Context Architect v7.2.0",
+        "title": "T-Zero Developer Console & Context Architect v7.3.0",
         "subtitle": f"Developer: {DEV_NAME} | {DEV_URL_MAIN} | {DEV_URL_BIO}",
         "overview_tab": "🏠 Overview Dashboard",
         "setup_tab": "⚡ Setup & AI Models",
@@ -505,7 +505,7 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "audit_btn": "🛡️ SECURITY AUDIT"
     },
     "tr": {
-        "title": "T-Zero Geliştirici Konsolu & Bağlam Mimarı v7.2.0",
+        "title": "T-Zero Geliştirici Konsolu & Bağlam Mimarı v7.3.0",
         "subtitle": f"Geliştirici: {DEV_NAME} | {DEV_URL_MAIN} | {DEV_URL_BIO}",
         "overview_tab": "🏠 Genel Bakış",
         "setup_tab": "⚡ Kurulum & Model",
@@ -8287,12 +8287,12 @@ def main():
     parser.add_argument("--pipe", nargs="?", const="", default=None, metavar="FILENAME_HINT", help="Read code/diff/schema from stdin, compress tokens, and output to stdout")
     parser.add_argument("--clip", "--copy", action="store_true", help="Copy output of --pipe or command directly to system clipboard")
     parser.add_argument("--init-hooks", nargs="?", const=".", default=None, metavar="REPO_DIR", dest="init_hooks", help="Install zero-leak & token security pre-commit hook into .git/hooks")
-    parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect v7.2.0 Master Edition (engine v4.1.0)")
+    parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect v7.3.0 Master Edition (engine v4.1.0)")
 
     def print_quickstart_guide():
         print("""
 ================================================================================
-⚡ SİBER AKADEMİ — T-ZERO CONTEXT ARCHITECT & MCP v7.2.0 MASTER (engine v4.1.0)
+⚡ SİBER AKADEMİ — T-ZERO CONTEXT ARCHITECT & MCP v7.3.0 MASTER (engine v4.1.0)
 ================================================================================
 🎯 %95'e Varan Token Tasarrufu & Otonom Yapay Zeka Mimari Bağlam Motoru
 
