@@ -1020,7 +1020,8 @@ def run_cli() -> int:
 
         print(f"\n[T-Zero MCP Installer v{APP_VERSION}] Installing to {len(selected)} target(s)...")
         successes, failures = install_targets(selected, log_fn=lambda m: print(f"  -> {m}"))
-        print(f"[T-Zero MCP] Completed: {successes} configured, {failures} failed.\n")
+        print(f"[T-Zero MCP] Completed: {successes} configured, {failures} failed.")
+        print("⭐ Enjoying T-Zero? Please star the project on GitHub: https://github.com/toprakahmetaydogmus/TZeroAlgorithm\n")
         return 0 if failures == 0 else 1
 
     # Default action: launch GUI if display available, otherwise list targets
@@ -1036,6 +1037,7 @@ def run_cli() -> int:
         if not selected:
             selected = all_targets
         successes, failures = install_targets(selected, log_fn=lambda m: print(f"  -> {m}"))
+        print("⭐ Enjoying T-Zero? Please star the project on GitHub: https://github.com/toprakahmetaydogmus/TZeroAlgorithm\n")
         return 0 if failures == 0 else 1
 
 

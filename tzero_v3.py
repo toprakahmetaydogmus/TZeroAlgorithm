@@ -8328,6 +8328,9 @@ def main():
     $ tzero --diff
     veya:
     $ tzero --diff HEAD~1
+
+⭐ GitHub'da projeyi yıldızlayarak destek olun:
+    https://github.com/toprakahmetaydogmus/TZeroAlgorithm
 ================================================================================
 """)
 
