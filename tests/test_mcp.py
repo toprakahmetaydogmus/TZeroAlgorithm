@@ -781,7 +781,63 @@ diff --git a/core.py b/core.py
         res_err = self.run_async(self.server.call_tool("execute_codebase_workflow", {"action": "invalid_unknown_action"}))
         self.assertIn("Unknown action", tool_result_text(res_err))
 
+    def test_mcp_prompts_comprehensive(self):
+        """Verifies that all 7 MCP prompts are registered and produce correct workflow directives."""
+        prompts = self.run_async(self.server.list_prompts())
+        prompt_names = [p.name for p in prompts]
+        expected_prompts = [
+            "tzero_grounding",
+            "tzero_refactor",
+            "tzero_code_review",
+            "tzero_architecture_audit",
+            "tzero_security_audit",
+            "tzero_token_optimizer",
+            "jarvis_workspace_copilot"
+        ]
+        for ep in expected_prompts:
+            self.assertIn(ep, prompt_names, f"Expected prompt '{ep}' to be registered")
+
+        # 1. Test tzero_refactor
+        p_ref = self.run_async(self.server.get_prompt("tzero_refactor", {"symbol": "TestClass", "project_root": "."}))
+        text_ref = p_ref.messages[0].content.text
+        self.assertIn("surgical refactor of 'TestClass'", text_ref)
+        self.assertIn("analyze_change_impact", text_ref)
+        self.assertIn("verify_hallucination_guard", text_ref)
+
+        # 2. Test tzero_code_review
+        p_cr = self.run_async(self.server.get_prompt("tzero_code_review", {"git_ref": "HEAD~2", "project_root": "."}))
+        text_cr = p_cr.messages[0].content.text
+        self.assertIn("reviewing git diff against 'HEAD~2'", text_cr)
+        self.assertIn("get_incremental_diff_context", text_cr)
+        self.assertIn("verify_zero_leak_security", text_cr)
+
+        # 3. Test tzero_architecture_audit
+        p_arch = self.run_async(self.server.get_prompt("tzero_architecture_audit", {"project_root": "."}))
+        text_arch = p_arch.messages[0].content.text
+        self.assertIn("auditing system architecture", text_arch)
+        self.assertIn("enforce_architecture_rules", text_arch)
+        self.assertIn("generate_architecture_blueprint", text_arch)
+
+        # 4. Test tzero_security_audit
+        p_sec = self.run_async(self.server.get_prompt("tzero_security_audit", {"project_root": "."}))
+        text_sec = p_sec.messages[0].content.text
+        self.assertIn("100% Zero-Leak security audit", text_sec)
+        self.assertIn("verify_security_guard", text_sec)
+
+        # 5. Test tzero_token_optimizer
+        p_opt = self.run_async(self.server.get_prompt("tzero_token_optimizer", {"project_root": "."}))
+        text_opt = p_opt.messages[0].content.text
+        self.assertIn("optimizing token consumption", text_opt)
+        self.assertIn("build_project_context", text_opt)
+        self.assertIn("estimate_token_cost", text_opt)
+
+        # 6. Test jarvis_workspace_copilot
+        p_jarvis = self.run_async(self.server.get_prompt("jarvis_workspace_copilot", {"goal": "Optimize repository", "project_root": "."}))
+        text_jarvis = p_jarvis.messages[0].content.text
+        self.assertIn("CO-PILOT EXECUTION DIRECTIVES", text_jarvis)
+
 
 if __name__ == "__main__":
     unittest.main()
+
 

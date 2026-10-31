@@ -21,6 +21,7 @@ function activate(context) {
     const openMenuCmd = vscode.commands.registerCommand('tzero.openMenu', async () => {
         const selected = await vscode.window.showQuickPick([
             { label: "$(zap) 1-Click MCP Initialize", description: "Connect T-Zero MCP to Cursor, Claude, Windsurf, VS Code", cmd: "tzero.init" },
+            { label: "$(clippy) Compress Selection to Clipboard", description: "Prune selected block and copy AST signatures", cmd: "tzero.compressSelection" },
             { label: "$(file-code) Compress Current File", description: "Prune active file to AST signatures (-85% tokens)", cmd: "tzero.compressFile" },
             { label: "$(type-hierarchy) Show Project AST Skeleton", description: "Generate compact architecture outline", cmd: "tzero.showTree" },
             { label: "$(shield) Run 100% Zero-Leak Audit", description: "Scan workspace for secrets and code smells", cmd: "tzero.audit" },
@@ -102,6 +103,42 @@ function activate(context) {
         child.stdin.end();
     });
     context.subscriptions.push(compressCmd);
+
+    // Command: Compress Selection (Copy to Clipboard)
+    const compressSelCmd = vscode.commands.registerCommand('tzero.compressSelection', async () => {
+        const editor = vscode.window.activeTextEditor;
+        if (!editor) {
+            vscode.window.showWarningMessage("No active editor found.");
+            return;
+        }
+
+        const selection = editor.selection;
+        const text = editor.document.getText(selection) || editor.document.getText();
+        const filename = path.basename(editor.document.fileName);
+
+        const child = spawn('tzero', ['--pipe', filename], { shell: true });
+        let output = '';
+        let errOutput = '';
+
+        child.stdout.on('data', (data) => { output += data.toString(); });
+        child.stderr.on('data', (data) => { errOutput += data.toString(); });
+
+        child.on('close', async (code) => {
+            if (code === 0 && output.trim()) {
+                await vscode.env.clipboard.writeText(output.trim());
+                const origTokens = Math.max(1, Math.floor(text.length / 4));
+                const prunedTokens = Math.max(1, Math.floor(output.length / 4));
+                const savings = Math.max(0, ((1 - prunedTokens / origTokens) * 100)).toFixed(1);
+                vscode.window.showInformationMessage(`📋 Compressed signatures copied to clipboard! ${origTokens} -> ${prunedTokens} tokens (${savings}% saved)`);
+            } else {
+                vscode.window.showErrorMessage(`Failed to compress selection: ${errOutput || 'Unknown error'}`);
+            }
+        });
+
+        child.stdin.write(text);
+        child.stdin.end();
+    });
+    context.subscriptions.push(compressSelCmd);
 
     // Command: Show AST Skeleton Tree
     const showTreeCmd = vscode.commands.registerCommand('tzero.showTree', async () => {

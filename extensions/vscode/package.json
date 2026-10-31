@@ -63,8 +63,40 @@
         "command": "tzero.openDashboard",
         "title": "T-Zero: Launch Local Developer Dashboard",
         "category": "T-Zero"
+      },
+      {
+        "command": "tzero.compressSelection",
+        "title": "T-Zero: Compress Selection (Copy to Clipboard)",
+        "category": "T-Zero"
       }
     ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "tzero.compressSelection",
+          "when": "editorHasSelection",
+          "group": "tzero@1"
+        },
+        {
+          "command": "tzero.compressFile",
+          "group": "tzero@2"
+        },
+        {
+          "command": "tzero.audit",
+          "group": "tzero@3"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "tzero.showTree",
+          "group": "tzero@1"
+        },
+        {
+          "command": "tzero.audit",
+          "group": "tzero@2"
+        }
+      ]
+    },
     "configuration": {
       "title": "T-Zero Context Architect",
       "properties": {

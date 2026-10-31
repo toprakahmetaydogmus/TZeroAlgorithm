@@ -122,9 +122,20 @@ def get_file_imports(file_path: str) -> List[str]:
             return []
 
     deps = set()
-    if ext in (".js", ".ts", ".jsx", ".tsx", ".mjs", ".cjs"):
+    if ext in (".js", ".ts", ".jsx", ".tsx", ".mjs", ".cjs", ".vue", ".svelte"):
         for m in re.finditer(r"""(?:import\s+.*?\s+from\s+['"]|import\s*\(?['"]|require\s*\(\s*['"])([^'"]+)['"]""", content):
             deps.add(m.group(1))
+    elif ext == ".sol":
+        for m in re.finditer(r"""(?:import\s+.*?from\s+['"]|import\s+['"])([^'"]+)['"]""", content):
+            deps.add(m.group(1))
+    elif ext == ".rb":
+        for m in re.finditer(r"""(?:require|require_relative)\s+['"]([^'"]+)['"]""", content):
+            deps.add(m.group(1))
+    elif ext == ".php":
+        for m in re.finditer(r"""(?:use\s+([A-Za-z0-9_\\]+);|(?:require|require_once|include|include_once)\s*\(?['"]([^'"]+)['"]\)?;)""", content):
+            dep = m.group(1) or m.group(2)
+            if dep:
+                deps.add(dep)
     elif ext == ".go":
         in_group = False
         for line in content.splitlines():
@@ -168,7 +179,7 @@ def build_workspace_import_graph(files: List[str], base_dir: str) -> Dict[str, L
     supported_exts = {
         ".py", ".js", ".ts", ".jsx", ".tsx", ".mjs", ".cjs",
         ".go", ".rs", ".java", ".cs", ".cpp", ".c", ".h", ".hpp",
-        ".kt", ".kts", ".swift"
+        ".kt", ".kts", ".swift", ".vue", ".svelte", ".sol", ".rb", ".php"
     }
     for f in files:
         ext = os.path.splitext(f.lower())[1]
@@ -3995,6 +4006,91 @@ def create_mcp_server():
             "2. Enforce 100% Zero-Leak security: NEVER commit or log raw API keys or personal credentials.\n"
             "3. Adhere to modular separation of concerns and avoid introducing cyclic dependencies.\n"
             "4. Verify code quality using `audit_codebase_quality` before marking tasks complete."
+        )
+
+    # -------------------------------------------------------------------------
+    # PROMPT: tzero_refactor
+    # -------------------------------------------------------------------------
+    @server.prompt(
+        name="tzero_refactor",
+        description="Guides surgical symbol refactoring with blast radius calculation and zero regression."
+    )
+    def tzero_refactor(symbol: str = "", project_root: str = ".") -> str:
+        return (
+            f"You are conducting a surgical refactor of '{symbol}' in '{project_root}'.\n\n"
+            "MANDATORY REFACTORING WORKFLOW:\n"
+            f"1. Call `analyze_change_impact(target_symbol='{symbol}', project_root='{project_root}')` to evaluate blast radius (0-100 score) and downstream dependents.\n"
+            f"2. Use `get_smart_skeleton_context(focus_symbol='{symbol}', project_root='{project_root}')` to retain full focus implementation while pruning sibling noise to AST interface headers.\n"
+            "3. Before applying modifications, run `verify_hallucination_guard` to validate proposed imports and function calls against the workspace AST.\n"
+            "4. Enforce 100% Zero-Leak safety: verify no secrets or credentials enter the code."
+        )
+
+    # -------------------------------------------------------------------------
+    # PROMPT: tzero_code_review
+    # -------------------------------------------------------------------------
+    @server.prompt(
+        name="tzero_code_review",
+        description="Conducts AST-driven code review on a git diff reference with token metrics and security audit."
+    )
+    def tzero_code_review(git_ref: str = "HEAD~1", project_root: str = ".") -> str:
+        return (
+            f"You are reviewing git diff against '{git_ref}' in '{project_root}'.\n\n"
+            "MANDATORY CODE REVIEW WORKFLOW:\n"
+            f"1. Call `get_incremental_diff_context(git_ref='{git_ref}', project_root='{project_root}')` to extract affected AST symbols and downstream blast radius with 98%+ token savings.\n"
+            f"2. Run `verify_zero_leak_security(project_root='{project_root}')` to confirm zero hardcoded secrets or API keys are present in modified files.\n"
+            f"3. Run `audit_codebase_quality(project_root='{project_root}')` to detect any new code smells, cyclomatic complexity spikes, or dead code.\n"
+            "4. Summarize changes with clear risk score, architecture impact, and token ROI."
+        )
+
+    # -------------------------------------------------------------------------
+    # PROMPT: tzero_architecture_audit
+    # -------------------------------------------------------------------------
+    @server.prompt(
+        name="tzero_architecture_audit",
+        description="Conducts an in-depth AST architectural boundary and dependency audit to prevent architectural erosion."
+    )
+    def tzero_architecture_audit(project_root: str = ".") -> str:
+        return (
+            f"You are auditing system architecture and layer boundaries for '{project_root}'.\n\n"
+            "MANDATORY ARCHITECTURE AUDIT WORKFLOW:\n"
+            f"1. Call `enforce_architecture_rules(project_root='{project_root}')` to verify inward-only dependencies and identify any boundary violations.\n"
+            f"2. Call `analyze_code_dependencies(project_root='{project_root}')` to inspect module coupling, depth, and circular imports.\n"
+            f"3. Call `generate_architecture_blueprint(project_root='{project_root}')` to generate updated Mermaid component diagrams and ARCHITECTURE.md.\n"
+            "4. Recommend modular decoupling solutions with zero circular dependencies."
+        )
+
+    # -------------------------------------------------------------------------
+    # PROMPT: tzero_security_audit
+    # -------------------------------------------------------------------------
+    @server.prompt(
+        name="tzero_security_audit",
+        description="Performs a 100% Zero-Leak security audit across all workspace files for secrets, tokens, and keys."
+    )
+    def tzero_security_audit(project_root: str = ".") -> str:
+        return (
+            f"You are executing a 100% Zero-Leak security audit for '{project_root}'.\n\n"
+            "MANDATORY SECURITY AUDIT WORKFLOW:\n"
+            f"1. Call `verify_security_guard(code_content='', file_path='', project_root='{project_root}')` to scan for high-entropy secrets, API keys, and private credentials.\n"
+            f"2. Call `audit_code_quality(project_root='{project_root}')` to evaluate security smell hotspots, hardcoded endpoints, and insecure patterns.\n"
+            "3. Enforce immediate migration of any discovered keys into environment variables.\n"
+            "4. Confirm that no confidential code or credentials ever leak into external cloud endpoints."
+        )
+
+    # -------------------------------------------------------------------------
+    # PROMPT: tzero_token_optimizer
+    # -------------------------------------------------------------------------
+    @server.prompt(
+        name="tzero_token_optimizer",
+        description="Calculates context compression ratios, token savings metrics, and optimal multi-tier representation for LLM ingestion."
+    )
+    def tzero_token_optimizer(project_root: str = ".") -> str:
+        return (
+            f"You are optimizing token consumption and context windows for '{project_root}'.\n\n"
+            "MANDATORY TOKEN OPTIMIZATION WORKFLOW:\n"
+            f"1. Call `build_project_context(project_root='{project_root}', tier='T-2')` to generate an ultra-compact hierarchical AST representation (up to 95% reduction).\n"
+            f"2. Call `estimate_token_cost(token_count=100000)` to benchmark cost savings across OpenAI GPT-4o, Anthropic Claude 3.7, Google Gemini 2.5 Pro, and DeepSeek R1.\n"
+            f"3. Use `prune_code_snippet` on hot code paths to extract interface skeletons before feeding into LLM prompts.\n"
+            "4. Report raw tokens vs reduced tokens with percentage savings."
         )
 
     # -------------------------------------------------------------------------

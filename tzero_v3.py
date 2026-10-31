@@ -1119,6 +1119,18 @@ class PolyglotSignatureExtractor:
             return cls.reduce_kotlin(code, mode)
         elif ext == ".swift":
             return cls.reduce_swift(code, mode)
+        elif ext in (".rb", ".rake", ".gemspec"):
+            from tzero_polyglot import PolyglotTokenReducer
+            return PolyglotTokenReducer.reduce_ruby(code, mode)
+        elif ext in (".php", ".phtml"):
+            from tzero_polyglot import PolyglotTokenReducer
+            return PolyglotTokenReducer.reduce_php(code, mode)
+        elif ext in (".dart",):
+            from tzero_polyglot import PolyglotTokenReducer
+            return PolyglotTokenReducer.reduce_dart(code, mode)
+        elif ext in (".sol",):
+            from tzero_polyglot import PolyglotTokenReducer
+            return PolyglotTokenReducer.reduce_solidity(code, mode)
         return code
 
     @staticmethod
@@ -1582,6 +1594,15 @@ class TokenReducer:
         elif ext == ".sol":
             from tzero_polyglot import PolyglotTokenReducer
             return PolyglotTokenReducer.reduce_solidity(code, mode)
+        elif ext in (".rb", ".rake", ".gemspec"):
+            from tzero_polyglot import PolyglotTokenReducer
+            return PolyglotTokenReducer.reduce_ruby(code, mode)
+        elif ext in (".php", ".phtml"):
+            from tzero_polyglot import PolyglotTokenReducer
+            return PolyglotTokenReducer.reduce_php(code, mode)
+        elif ext in (".dart",):
+            from tzero_polyglot import PolyglotTokenReducer
+            return PolyglotTokenReducer.reduce_dart(code, mode)
             
         return TokenReducer._default_trim(code)
 
@@ -8307,6 +8328,8 @@ def main():
     $ tzero init --cursor
     $ tzero init --claude
     $ tzero init --windsurf
+    veya:
+    $ tzero-add-mcp
 
 2️⃣  Terminal Sihirbazını Başlat:
     $ tzero --cli

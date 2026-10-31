@@ -25,7 +25,12 @@ class PolyglotTokenReducer:
         "go": [".go"],
         "cpp": [".c", ".cpp", ".cc", ".cxx", ".h", ".hpp", ".hxx"],
         "java": [".java", ".cs"],
-        "solidity": [".sol"]
+        "solidity": [".sol"],
+        "ruby": [".rb", ".rake", ".gemspec"],
+        "php": [".php", ".phtml"],
+        "swift": [".swift"],
+        "kotlin": [".kt", ".kts"],
+        "dart": [".dart"]
     }
 
     @classmethod
@@ -58,6 +63,16 @@ class PolyglotTokenReducer:
             return cls.reduce_java(content, mode)
         elif lang == "solidity":
             return cls.reduce_solidity(content, mode)
+        elif lang == "ruby":
+            return cls.reduce_ruby(content, mode)
+        elif lang == "php":
+            return cls.reduce_php(content, mode)
+        elif lang == "swift":
+            return cls.reduce_swift(content, mode)
+        elif lang == "kotlin":
+            return cls.reduce_kotlin(content, mode)
+        elif lang == "dart":
+            return cls.reduce_dart(content, mode)
         return content
 
     @staticmethod
@@ -255,3 +270,101 @@ class PolyglotTokenReducer:
                 else:
                     pruned.append(line)
         return "\n".join(pruned) if pruned else content
+
+    @staticmethod
+    def reduce_ruby(content: str, mode: str = "ultra") -> str:
+        """Reduces Ruby source code to module/class declarations, requires, mixins, and method signatures."""
+        lines = content.splitlines()
+        pruned: List[str] = []
+        for line in lines:
+            stripped = line.strip()
+            if (stripped.startswith("require ") or stripped.startswith("require_relative ") or
+                stripped.startswith("module ") or stripped.startswith("class ") or
+                stripped.startswith("def ") or stripped.startswith("attr_") or
+                stripped.startswith("include ") or stripped.startswith("extend ") or
+                stripped.startswith("has_many ") or stripped.startswith("belongs_to ") or
+                stripped in ("private", "protected", "public")):
+                if stripped.startswith("def ") and not stripped.endswith("end"):
+                    pruned.append(f"{line}; ...; end")
+                else:
+                    pruned.append(line)
+        return "\n".join(pruned) if pruned else content
+
+    @staticmethod
+    def reduce_php(content: str, mode: str = "ultra") -> str:
+        """Reduces PHP source code to namespace, imports, classes, interfaces, traits, and method signatures."""
+        lines = content.splitlines()
+        pruned: List[str] = []
+        for line in lines:
+            stripped = line.strip()
+            if (stripped.startswith("<?php") or stripped.startswith("namespace ") or
+                stripped.startswith("use ") or "class " in stripped or
+                "interface " in stripped or "trait " in stripped or "enum " in stripped or
+                "function " in stripped):
+                if "{" in stripped:
+                    pruned.append(re.sub(r'\{.*$', '{ ... }', line))
+                elif "function " in stripped and not stripped.endswith(";"):
+                    pruned.append(f"{line} {{ ... }}")
+                else:
+                    pruned.append(line)
+        return "\n".join(pruned) if pruned else content
+
+    @staticmethod
+    def reduce_swift(content: str, mode: str = "ultra") -> str:
+        """Reduces Swift source code to imports, protocols, classes, structs, enums, extensions, and func signatures."""
+        lines = content.splitlines()
+        pruned: List[str] = []
+        for line in lines:
+            stripped = line.strip()
+            if (stripped.startswith("import ") or stripped.startswith("protocol ") or
+                "class " in stripped or "struct " in stripped or "enum " in stripped or
+                "extension " in stripped or "func " in stripped or stripped.startswith("init(")):
+                if "{" in stripped:
+                    pruned.append(re.sub(r'\{.*$', '{ ... }', line))
+                elif not stripped.endswith(";"):
+                    pruned.append(f"{line} {{ ... }}")
+                else:
+                    pruned.append(line)
+        return "\n".join(pruned) if pruned else content
+
+    @staticmethod
+    def reduce_kotlin(content: str, mode: str = "ultra") -> str:
+        """Reduces Kotlin source code to package, imports, classes, interfaces, objects, and function headers."""
+        lines = content.splitlines()
+        pruned: List[str] = []
+        for line in lines:
+            stripped = line.strip()
+            if (stripped.startswith("package ") or stripped.startswith("import ") or
+                "class " in stripped or "interface " in stripped or "object " in stripped or
+                stripped.startswith("fun ") or " fun " in stripped):
+                if "{" in stripped:
+                    pruned.append(re.sub(r'\{.*$', '{ ... }', line))
+                elif not stripped.endswith(";"):
+                    pruned.append(f"{line} {{ ... }}")
+                else:
+                    pruned.append(line)
+        return "\n".join(pruned) if pruned else content
+
+    @staticmethod
+    def reduce_dart(content: str, mode: str = "ultra") -> str:
+        """Reduces Dart source code to imports, exports, classes, mixins, enums, and method signatures."""
+        lines = content.splitlines()
+        pruned: List[str] = []
+        for line in lines:
+            stripped = line.strip()
+            if not stripped or stripped.startswith("//") or stripped.startswith("/*"):
+                continue
+            if stripped.startswith(("return ", "return;", "if ", "if(", "for ", "for(", "while ", "while(", "switch ", "throw ", "print(")):
+                continue
+            if (stripped.startswith("import ") or stripped.startswith("export ") or
+                stripped.startswith("part ") or "class " in stripped or
+                "mixin " in stripped or "enum " in stripped or "extension " in stripped or
+                re.match(r'^\s*(?:@\w+\s+)*(?:static\s+|async\s+)?[\w<>,]+\s+\w+\s*\(.*?\)', stripped)):
+                if "{" in stripped and not ("class " in stripped or "mixin " in stripped):
+                    pruned.append(re.sub(r'\{.*$', '{ ... }', line))
+                elif not stripped.endswith(";") and not stripped.endswith("{"):
+                    pruned.append(f"{line} {{ ... }}")
+                else:
+                    pruned.append(line)
+        return "\n".join(pruned) if pruned else content
+
