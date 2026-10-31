@@ -193,7 +193,49 @@ class CustomCard {
         self.assertIn("Widget build(BuildContext context)", res)
         self.assertNotIn("Container(child: Text", res)
 
+    def test_scala_reduction(self):
+        code = """package com.example.analytics
+
+import scala.concurrent.Future
+
+case class Metric(name: String, value: Double)
+
+object AnalyticsService {
+    def process(data: List[Metric]): Future[Unit] = {
+        heavyCompute(data)
+        Future.unit
+    }
+}
+"""
+        res = PolyglotTokenReducer.reduce_code(code, "Analytics.scala")
+        self.assertIn("package com.example.analytics", res)
+        self.assertIn("import scala.concurrent.Future", res)
+        self.assertIn("case class Metric", res)
+        self.assertIn("object AnalyticsService", res)
+        self.assertIn("def process(data: List[Metric])", res)
+        self.assertNotIn("heavyCompute(data)", res)
+
+    def test_elixir_reduction(self):
+        code = """defmodule App.Payment do
+  @moduledoc "Handles crypto payments"
+  use GenServer
+
+  @spec process(integer()) :: :ok
+  def process(amount) do
+    do_heavy_crypto(amount)
+    :ok
+  end
+end
+"""
+        res = PolyglotTokenReducer.reduce_code(code, "payment.ex")
+        self.assertIn("defmodule App.Payment do", res)
+        self.assertIn("use GenServer", res)
+        self.assertIn("@spec process(integer()) :: :ok", res)
+        self.assertIn("def process(amount)", res)
+        self.assertNotIn("do_heavy_crypto(amount)", res)
+
 
 if __name__ == "__main__":
     unittest.main()
+
 

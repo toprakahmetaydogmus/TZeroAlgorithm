@@ -30,7 +30,9 @@ class PolyglotTokenReducer:
         "php": [".php", ".phtml"],
         "swift": [".swift"],
         "kotlin": [".kt", ".kts"],
-        "dart": [".dart"]
+        "dart": [".dart"],
+        "scala": [".scala", ".sc"],
+        "elixir": [".ex", ".exs"]
     }
 
     @classmethod
@@ -73,6 +75,10 @@ class PolyglotTokenReducer:
             return cls.reduce_kotlin(content, mode)
         elif lang == "dart":
             return cls.reduce_dart(content, mode)
+        elif lang == "scala":
+            return cls.reduce_scala(content, mode)
+        elif lang == "elixir":
+            return cls.reduce_elixir(content, mode)
         return content
 
     @staticmethod
@@ -367,4 +373,50 @@ class PolyglotTokenReducer:
                 else:
                     pruned.append(line)
         return "\n".join(pruned) if pruned else content
+
+    @staticmethod
+    def reduce_scala(content: str, mode: str = "ultra") -> str:
+        """Reduces Scala source code to packages, imports, traits, objects, classes, and def headers."""
+        lines = content.splitlines()
+        pruned: List[str] = []
+        for line in lines:
+            stripped = line.strip()
+            if not stripped or stripped.startswith("//") or stripped.startswith("/*"):
+                continue
+            if (stripped.startswith("package ") or stripped.startswith("import ") or
+                "class " in stripped or "trait " in stripped or "object " in stripped or
+                "enum " in stripped or stripped.startswith("def ") or " def " in stripped):
+                if "{" in stripped and not ("class " in stripped or "trait " in stripped or "object " in stripped):
+                    pruned.append(re.sub(r'\{.*$', '{ ... }', line))
+                elif not stripped.endswith(";") and not stripped.endswith("{"):
+                    pruned.append(f"{line} {{ ... }}")
+                else:
+                    pruned.append(line)
+        return "\n".join(pruned) if pruned else content
+
+    @staticmethod
+    def reduce_elixir(content: str, mode: str = "ultra") -> str:
+        """Reduces Elixir source code to module headers, structs, specs, and function signatures."""
+        lines = content.splitlines()
+        pruned: List[str] = []
+        for line in lines:
+            stripped = line.strip()
+            if not stripped or stripped.startswith("#"):
+                continue
+            if (stripped.startswith("defmodule ") or stripped.startswith("defstruct ") or
+                stripped.startswith("alias ") or stripped.startswith("import ") or
+                stripped.startswith("require ") or stripped.startswith("use ") or
+                stripped.startswith("@type ") or stripped.startswith("@spec ") or
+                stripped.startswith("def ") or stripped.startswith("defp ") or
+                stripped.startswith("defmacro ")):
+                if stripped.startswith("defmodule "):
+                    pruned.append(line)
+                elif ", do:" in stripped:
+                    pruned.append(re.sub(r', do:.*$', ', do: ...', line))
+                elif stripped.endswith(" do"):
+                    pruned.append(re.sub(r'\s+do$', ', do: ...', line))
+                else:
+                    pruned.append(line)
+        return "\n".join(pruned) if pruned else content
+
 

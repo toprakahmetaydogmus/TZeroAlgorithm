@@ -196,6 +196,25 @@ def build_client_targets(
             home.joinpath(".gemini", "settings.json").exists()
             or which("gemini") is not None,
         ),
+        ClientTarget(
+            "zed",
+            "Zed Editor",
+            (app_data / "Zed" / "settings.json") if os.name == "nt" else (home / ".config" / "zed" / "settings.json"),
+            "context_servers",
+            any_path_exists(
+                app_data / "Zed",
+                home / ".config" / "zed",
+                local_app_data / "Programs" / "Zed" / "Zed.exe",
+            )
+            or which("zed") is not None,
+        ),
+        ClientTarget(
+            "continue",
+            "Continue (VS Code / JetBrains)",
+            home / ".continue" / "config.json",
+            "mcpServers",
+            (home / ".continue").exists() or any_path_exists(home / ".continue" / "config.json"),
+        ),
     ]
 
 

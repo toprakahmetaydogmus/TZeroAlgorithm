@@ -1131,6 +1131,12 @@ class PolyglotSignatureExtractor:
         elif ext in (".sol",):
             from tzero_polyglot import PolyglotTokenReducer
             return PolyglotTokenReducer.reduce_solidity(code, mode)
+        elif ext in (".scala", ".sc"):
+            from tzero_polyglot import PolyglotTokenReducer
+            return PolyglotTokenReducer.reduce_scala(code, mode)
+        elif ext in (".ex", ".exs"):
+            from tzero_polyglot import PolyglotTokenReducer
+            return PolyglotTokenReducer.reduce_elixir(code, mode)
         return code
 
     @staticmethod
@@ -1603,6 +1609,12 @@ class TokenReducer:
         elif ext in (".dart",):
             from tzero_polyglot import PolyglotTokenReducer
             return PolyglotTokenReducer.reduce_dart(code, mode)
+        elif ext in (".scala", ".sc"):
+            from tzero_polyglot import PolyglotTokenReducer
+            return PolyglotTokenReducer.reduce_scala(code, mode)
+        elif ext in (".ex", ".exs"):
+            from tzero_polyglot import PolyglotTokenReducer
+            return PolyglotTokenReducer.reduce_elixir(code, mode)
             
         return TokenReducer._default_trim(code)
 

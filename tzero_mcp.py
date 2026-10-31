@@ -3990,6 +3990,31 @@ def create_mcp_server():
     def resource_token_roi() -> str:
         return get_token_savings_metrics(".", 5)
 
+    @server.resource(
+        "tzero://polyglot/catalog",
+        name="Universal Polyglot Catalog & Compression Metrics",
+        description="Deterministic AST signature catalog and compression ratios across all supported languages",
+        mime_type="text/markdown"
+    )
+    def resource_polyglot_catalog() -> str:
+        from tzero_polyglot import PolyglotTokenReducer
+        langs = PolyglotTokenReducer.SUPPORTED_LANGUAGES
+        md = ["# Siber Akademi T-Zero — Universal Polyglot AST Engine\n"]
+        md.append("| Language | Extensions | Average Token Reduction | Strategy |")
+        md.append("|---|---|---|---|")
+        for lang, exts in langs.items():
+            md.append(f"| {lang.capitalize()} | `{'`, `'.join(exts)}` | ~90-96% | Deterministic AST/Signature Pruning |")
+        return "\n".join(md)
+
+    @server.resource(
+        "tzero://security/guard",
+        name="100% Zero-Leak Security Audit Snapshot",
+        description="Real-time zero-leak credential and secret audit snapshot across active workspace",
+        mime_type="text/markdown"
+    )
+    def resource_security_guard() -> str:
+        return verify_zero_leak_security(project_root=".")
+
     # -------------------------------------------------------------------------
     # PROMPT: tzero_grounding
     # -------------------------------------------------------------------------

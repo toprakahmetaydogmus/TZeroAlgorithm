@@ -398,7 +398,38 @@ class HeavyDartWidget {
         self.assertIn("class HeavyDartWidget", reduced_dart)
         self.assertNotIn("renderNode(50)", reduced_dart)
 
+        # Test Scala reduction via TokenReducer
+        long_scala = """package com.app.pipeline
+
+import scala.concurrent.Future
+
+object HeavyPipeline {
+    def execute() {
+""" + "\n".join([f"        runJob({i})" for i in range(100)]) + """
+    }
+}
+"""
+        reduced_scala, savings_scala = TokenReducer.reduce_content("HeavyPipeline.scala", long_scala)
+        self.assertGreater(savings_scala, 50.0)
+        self.assertIn("object HeavyPipeline", reduced_scala)
+        self.assertNotIn("runJob(50)", reduced_scala)
+
+        # Test Elixir reduction via TokenReducer
+        long_elixir = """defmodule HeavyElixirWorker do
+    use GenServer
+
+    def perform_all() do
+""" + "\n".join([f"        dispatch({i})" for i in range(100)]) + """
+    end
+end
+"""
+        reduced_elixir, savings_elixir = TokenReducer.reduce_content("worker.ex", long_elixir)
+        self.assertGreater(savings_elixir, 50.0)
+        self.assertIn("defmodule HeavyElixirWorker do", reduced_elixir)
+        self.assertNotIn("dispatch(50)", reduced_elixir)
+
 
 if __name__ == '__main__':
     unittest.main()
+
 

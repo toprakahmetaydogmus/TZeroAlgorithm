@@ -836,8 +836,38 @@ diff --git a/core.py b/core.py
         text_jarvis = p_jarvis.messages[0].content.text
         self.assertIn("CO-PILOT EXECUTION DIRECTIVES", text_jarvis)
 
+    def test_mcp_resources_comprehensive(self):
+        """Verifies that all 7 MCP resources are registered and return structured markdown content."""
+        resources = self.run_async(self.server.list_resources())
+        uris = [str(r.uri) for r in resources]
+        expected_uris = [
+            "tzero://architecture",
+            "tzero://boundaries",
+            "tzero://token-roi",
+            "tzero://polyglot/catalog",
+            "tzero://security/guard",
+            "tzero://jarvis/plan",
+            "tzero://jarvis/capabilities"
+        ]
+        for uri in expected_uris:
+            self.assertIn(uri, uris, f"Expected resource '{uri}' to be registered")
+
+        # 1. Test reading tzero://polyglot/catalog
+        res_cat = self.run_async(self.server.read_resource("tzero://polyglot/catalog"))
+        cat_text = res_cat[0].content
+        self.assertIn("Universal Polyglot AST Engine", cat_text)
+        self.assertIn("Python", cat_text)
+        self.assertIn("Rust", cat_text)
+        self.assertIn("Solidity", cat_text)
+
+        # 2. Test reading tzero://security/guard
+        res_sec = self.run_async(self.server.read_resource("tzero://security/guard"))
+        sec_text = res_sec[0].content
+        self.assertIn("ZERO-LEAK", sec_text)
+
 
 if __name__ == "__main__":
     unittest.main()
+
 
 
