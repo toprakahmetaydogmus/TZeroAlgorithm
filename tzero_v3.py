@@ -8324,6 +8324,12 @@ def main():
     parser.add_argument("--helpers", "--suggest-helpers", metavar="QUERY", help="Discover reusable helpers/utilities across repository AST to avoid duplicate code")
     parser.add_argument("--guard", "--verify-code", metavar="CODE_OR_FILE", help="Validate code against AST contracts to eliminate hallucinations before applying")
     parser.add_argument("--grounding-contract", action="store_true", help="Generate immutable AST grounding contract for LLM prompt pinning")
+    parser.add_argument("--patch", "--apply-patch", dest="apply_patch", metavar="DIFF_FILE_OR_STR", help="Apply patch with AST-tolerant fuzzy matching (whitespace & line drift agnostic)")
+    parser.add_argument("--target", default=None, metavar="TARGET_FILE", help="Target file for --patch (optional if patch specifies file header)")
+    parser.add_argument("--fuzzy", action="store_true", default=True, help="Enable fuzzy AST and whitespace matching for patch application (default: True)")
+    parser.add_argument("--no-fuzzy", dest="fuzzy", action="store_false", help="Disable fuzzy matching and enforce exact line matches only")
+    parser.add_argument("--dry-run-patch", action="store_true", help="Validate patch applicability without modifying files on disk")
+    parser.add_argument("--reverse-patch", action="store_true", help="Un-apply / revert patch changes")
     parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect v8.0.1 Master Edition (engine v4.1.0)")
 
     def print_quickstart_guide():
@@ -8513,6 +8519,42 @@ def main():
         print(res["markdown"])
     elif args.pr_report is not None:
         run_pr_report_cli(args.dir, args.pr_report)
+    elif args.apply_patch is not None:
+        from tzero_patch import ASTFuzzyPatcher, patch_file
+        patch_arg = args.apply_patch
+        target = args.target
+
+        patch_text = patch_arg
+        if os.path.isfile(patch_arg):
+            with open(patch_arg, "r", encoding="utf-8", errors="replace") as pf:
+                patch_text = pf.read()
+
+        if not target:
+            file_patches = ASTFuzzyPatcher.parse_patch(patch_text)
+            if file_patches and file_patches[0].target_file:
+                target = file_patches[0].target_file
+
+        if not target:
+            print("\033[31m[ERROR] No target file specified. Use --target <path/to/file.py>\033[0m")
+            sys.exit(1)
+
+        target_path = os.path.join(args.dir, target) if not os.path.isabs(target) and not os.path.exists(target) else target
+        res = patch_file(
+            target_path,
+            patch_text,
+            in_place=True,
+            fuzzy=args.fuzzy,
+            dry_run=args.dry_run_patch,
+            backup=True
+        )
+        if res.get("success"):
+            strat_list = ", ".join(res.get("strategies_used", []))
+            print(f"\033[32m[SUCCESS] Applied {res['applied_hunks']}/{res['total_hunks']} hunks to {target_path} (Tolerances: {strat_list})\033[0m")
+            if res.get("backup_created"):
+                print(f"  Backup preserved at: {res['backup_created']}")
+        else:
+            print(f"\033[31m[FAILED] Could not apply patch to {target_path}: {res.get('error', 'Hunk match failed')}\033[0m")
+            sys.exit(1)
     elif args.gui:
         launch_gui()
     elif args.scan is not None:

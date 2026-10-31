@@ -1153,7 +1153,103 @@ public:
     }
 };
 
-} // namespace TZero::Core`
+} // namespace TZero::Core`,
+
+  swift: `import Foundation
+
+public struct UserProfile: Codable {
+    public let id: UUID
+    public var username: String
+}
+
+public class SessionManager: ObservableObject {
+    @Published public var currentUser: UserProfile?
+
+    public init() {
+        self.currentUser = nil
+    }
+
+    public func login(username: String) {
+        let profile = UserProfile(id: UUID(), username: username)
+        self.currentUser = profile
+    }
+}`,
+
+  kotlin: `package com.tzero.data
+
+data class User(val id: Long, val email: String)
+
+class UserRepository(private val apiService: Any) {
+    suspend fun fetchUser(id: Long): User {
+        val raw = "user_" + id
+        return User(id, raw + "@tzero.ai")
+    }
+
+    fun clearCache() {
+        println("Cache purged")
+    }
+}`,
+
+  dart: `import 'package:flutter/material.dart';
+
+class CounterModel {
+  int count = 0;
+  void increment() {
+    count += 1;
+  }
+}
+
+class CounterView extends StatelessWidget {
+  final CounterModel model;
+  const CounterView({Key? key, required this.model}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      child: Text("Count: " + model.count.toString()),
+    );
+  }
+}`,
+
+  ruby: `module Billing
+  class InvoiceService
+    attr_reader :customer_id
+
+    def initialize(customer_id)
+      @customer_id = customer_id
+      @invoices = []
+    end
+
+    def generate_invoice(amount, currency = 'USD')
+      tax = amount * 0.18
+      total = amount + tax
+      puts "Generated invoice: #{total}"
+      total
+    end
+  end
+end`,
+
+  elixir: `defmodule TZero.VaultActor do
+  use GenServer
+
+  def start_link(initial_balance) do
+    GenServer.start_link(__MODULE__, initial_balance, name: __MODULE__)
+  end
+
+  def deposit(amount) do
+    GenServer.call(__MODULE__, {:deposit, amount})
+  end
+
+  def init(balance) do
+    {:ok, balance}
+  end
+
+  def handle_call({:deposit, amount}, _from, state) do
+    new_state = state + amount
+    {:reply, new_state, new_state}
+  end
+end`
 };
 
 function pruneCodeAST(code, lang) {
@@ -1192,10 +1288,22 @@ function pruneCodeAST(code, lang) {
           output.push(line);
         }
       }
+    } else if (lang === "ruby" || lang === "elixir") {
+      const isDef = trimmed.startsWith("def ") || trimmed.startsWith("defp ") || trimmed.startsWith("defmacro ");
+      const isModuleOrClass = trimmed.startsWith("module ") || trimmed.startsWith("class ") || trimmed.startsWith("defmodule ");
+      const isEnd = trimmed === "end";
+      const isDecl = trimmed.startsWith("attr_") || trimmed.startsWith("use ") || trimmed.startsWith("require ");
+
+      if (isModuleOrClass || isDecl || isEnd) {
+        output.push(line);
+      } else if (isDef) {
+        const sig = trimmed.endsWith(" do") ? line.replace(/ do$/, ", do: ...") : line;
+        output.push(sig.includes(", do:") ? sig : line + " # ...");
+      }
     } else {
-      // General brace-language signature extractor (TS, Rust, Go, Solidity, C++)
+      // General brace-language signature extractor (TS, Rust, Go, Solidity, C++, Swift, Kotlin, Dart, PHP)
       const isImport = trimmed.startsWith("import ") || trimmed.startsWith("from ") || trimmed.startsWith("use ") || trimmed.startsWith("package ") || trimmed.startsWith("#include") || trimmed.startsWith("// SPDX") || trimmed.startsWith("pragma");
-      const isStructOrClass = trimmed.startsWith("export class") || trimmed.startsWith("class ") || trimmed.startsWith("export interface") || trimmed.startsWith("interface ") || trimmed.startsWith("pub struct") || trimmed.startsWith("struct ") || trimmed.startsWith("pub trait") || trimmed.startsWith("trait ") || trimmed.startsWith("contract ") || trimmed.startsWith("namespace ");
+      const isStructOrClass = trimmed.startsWith("export class") || trimmed.startsWith("class ") || trimmed.startsWith("export interface") || trimmed.startsWith("interface ") || trimmed.startsWith("pub struct") || trimmed.startsWith("struct ") || trimmed.startsWith("pub trait") || trimmed.startsWith("trait ") || trimmed.startsWith("contract ") || trimmed.startsWith("namespace ") || trimmed.startsWith("public class") || trimmed.startsWith("public struct");
       const isDecoratorOrAttr = trimmed.startsWith("@") || trimmed.startsWith("#[");
       const isMethod = trimmed.includes("(") && (trimmed.includes("function") || trimmed.includes("fn ") || trimmed.includes("func ") || trimmed.includes("async ") || trimmed.includes("public") || trimmed.includes("override") || trimmed.includes("constructor") || trimmed.includes("modifier") || trimmed.includes("virtual"));
 
