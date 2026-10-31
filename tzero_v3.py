@@ -8339,6 +8339,7 @@ def main():
     parser.add_argument("--stubs", nargs="?", const=".", default=None, metavar="PATH", help="Generate PEP-484 AST type stubs (.pyi) for target file or workspace")
     parser.add_argument("--stubs-out", default=None, metavar="DIR", help="Output directory for generated type stubs (default: alongside .py files)")
     parser.add_argument("--guard-install", action="store_true", help="Install local git pre-commit zero-leak and token security hook")
+    parser.add_argument("--tui", "--monitor", "--cockpit", action="store_true", help="Launch live ANSI terminal cockpit and interactive executive dashboard")
     parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect v8.0.1 Master Edition (engine v4.1.0)")
 
     def print_quickstart_guide():
@@ -8616,6 +8617,9 @@ def main():
         else:
             print(f"\033[31m[FAILED] {res.get('message')}\033[0m")
             sys.exit(1)
+    elif getattr(args, "tui", False):
+        from tzero_tui import TZeroTerminalCockpit
+        TZeroTerminalCockpit.run_interactive(args.dir)
     elif args.gui:
         launch_gui()
     elif args.scan is not None:
