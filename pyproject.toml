@@ -83,6 +83,9 @@ tzero-mcp = "tzero_mcp:main"
 tzero-add-mcp = "addmcp:main"
 tzero-addmcp = "addmcp:main"
 tzero-guard = "tzero_guard:main"
+tzero-sync = "tzero_sync:main"
+tzero-cost = "tzero_cost:main"
+tzero-drift = "tzero_drift:main"
 
 [tool.setuptools]
 packages = ["tzero_jarvis"]
@@ -104,7 +107,11 @@ py-modules = [
     "tzero_pipe",
     "tzero_polyglot",
     "tzero_reachability",
-    "tzero_dashboard"
+    "tzero_dashboard",
+    "tzero_security",
+    "tzero_sync",
+    "tzero_cost",
+    "tzero_drift"
 ]
 
 [tool.setuptools.package-data]

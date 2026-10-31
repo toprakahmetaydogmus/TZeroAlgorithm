@@ -1,5 +1,36 @@
 # Changelog
 
+## [8.2.0] - 2026-10-31
+
+### Released (Official V8.2.0 Autonomous AI Rules Sync, ROI Cockpit & Drift Engine)
+
+- **Autonomous Multi-IDE Rules & Context Synchronizer (`tzero sync` & `sync_workspace_rules`):**
+  - Instant one-command synchronization aligning `.cursorrules`, `CLAUDE.md`, `.windsurfrules`, `.agents/rules/`, and `.git/hooks/pre-commit` with ground-truth codebase AST symbols.
+  - Automatically indexes exported public classes and reusable helper functions to prevent AI hallucination and wheel re-invention across all major IDE agents.
+- **Real-Time Token Cost & Financial ROI Cockpit (`tzero cost` & `calculate_token_cost_roi`):**
+  - Quantitative economic calculator comparing full-codebase raw context against T-Zero AST-pruned context across Anthropic Claude 3.5 Sonnet, Claude 3 Opus, OpenAI GPT-4o, Google Gemini 1.5 Pro, and DeepSeek V3.
+  - Shows exact per-query dollar costs and projected monthly developer team financial savings (based on 5,500 queries/month team benchmark).
+- **Instruction & Architecture Drift Analyzer (`tzero drift` & `analyze_instruction_drift`):**
+  - Automated drift scoring engine (0-100 score & percentage adherence) measuring rule decay and "Lost in the Middle" attention degradation in multi-turn sessions.
+  - Detects bare exceptions, unmasked credentials, and oversized monolith functions exceeding modularity limits.
+- **One-Click Clipboard AST Context Pruner (`tzero clip <file>`):**
+  - Instantly prunes any source file to compact AST signatures and copies it directly to the system clipboard for zero-token prompt injection.
+- **Seamless CLI Subcommand Ergonomics:**
+  - Dashless CLI subcommands supported natively (`tzero sync`, `tzero cost`, `tzero drift`, `tzero clip`, `tzero audit`, `tzero doctor`).
+- **MCP Expansion to 52 Tools:**
+  - Registered `sync_workspace_rules`, `calculate_token_cost_roi`, and `analyze_instruction_drift` across stdio MCP server with full `execute_codebase_workflow` routing.
+
+## [8.1.0] - 2026-10-31
+
+### Released (Official V8.1.0 Unified Zero-Leak & Shannon Entropy Security Engine)
+
+- **Unified 100% Zero-Leak Security & Shannon Entropy Engine (`tzero_security.py`):**
+  - **Shannon Entropy Mathematical Detection:** Dynamically detects high-entropy ($H \ge 4.2$) cryptographic secrets, raw base64 tokens, and custom private credentials that escape standard regex filters.
+  - **20+ Cloud & AI Provider Signatures:** Added high-precision signatures for Anthropic Claude (`sk-ant-`), Google Gemini/Cloud (`AIza...`), GitHub Fine-Grained PATs (`github_pat_`), Slack Tokens (`xoxb/xoxp`), HuggingFace (`hf_`), Stripe Live Keys (`sk_live_`), PEM Private Key blocks, JWTs, and database URIs with credentials (`postgres://`, `mongodb+srv://`).
+  - **AST Constant Node Redaction (`sanitize_ast`):** Automatically replaces sensitive string literals in-flight with `[ZERO_LEAK_MASKED_...]` tokens before code is ingested into LLM prompts.
+  - **Centralized Security Layer:** Integrated unified engine across `tzero_guard.py` (pre-commit hook), `tzero_mcp.py` (`verify_zero_leak_security`), and `app.py` (`SecurityQualityAuditor`) eliminating code duplication.
+  - **16 New Automated Security Unit Tests (`tests/test_security_engine.py`):** 100% pass rate testing entropy calculations, provider signatures, AST mutations, and false positive placeholder filtering.
+
 ## [8.0.1] - 2026-10-25
 
 ### Released (Official V8.0.1 Zero-Hallucination & Anti-Reinvention Master Release)

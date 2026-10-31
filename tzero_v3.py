@@ -8319,7 +8319,10 @@ def main():
     parser.add_argument("--gui", "-g", action="store_true", help="Launch the GUI Dashboard")
     parser.add_argument("--doctor", action="store_true", help="Check Python, dependencies, tkinter, git and keyring (installs missing packages)")
     parser.add_argument("--pipe", nargs="?", const="", default=None, metavar="FILENAME_HINT", help="Read code/diff/schema from stdin, compress tokens, and output to stdout")
-    parser.add_argument("--clip", "--copy", action="store_true", help="Copy output of --pipe or command directly to system clipboard")
+    parser.add_argument("--clip", "--copy", nargs="?", const="", default=None, metavar="FILE", help="Prune file AST signatures and copy directly to system clipboard")
+    parser.add_argument("--sync", nargs="?", const=".", default=None, metavar="DIR", help="Synchronize active codebase rules across Cursor, Claude Code, Windsurf & Git hooks")
+    parser.add_argument("--cost", nargs="?", const=".", default=None, metavar="DIR", help="Calculate real-time token cost and ROI financial cockpit")
+    parser.add_argument("--drift", nargs="?", const=".", default=None, metavar="DIR", help="Analyze quantitative instruction adherence and architectural rule drift")
     parser.add_argument("--init-hooks", nargs="?", const=".", default=None, metavar="REPO_DIR", dest="init_hooks", help="Install zero-leak & token security pre-commit hook into .git/hooks")
     parser.add_argument("--helpers", "--suggest-helpers", metavar="QUERY", help="Discover reusable helpers/utilities across repository AST to avoid duplicate code")
     parser.add_argument("--guard", "--verify-code", metavar="CODE_OR_FILE", help="Validate code against AST contracts to eliminate hallucinations before applying")
@@ -8394,6 +8397,41 @@ def main():
         import addmcp
         sys.exit(addmcp.run_init(sys.argv[2:]))
 
+    # Seamless subcommand normalization (e.g. `tzero audit` -> `tzero --audit`)
+    if len(sys.argv) > 1 and not sys.argv[1].startswith("-"):
+        sub = sys.argv[1].lower()
+        sub_map = {
+            "audit": "--audit",
+            "scan": "--scan",
+            "pack": "--pack",
+            "gui": "--gui",
+            "doctor": "--doctor",
+            "tui": "--tui",
+            "cockpit": "--tui",
+            "monitor": "--tui",
+            "diff": "--diff",
+            "pr": "--diff",
+            "mcp": "--mcp",
+            "helpers": "--helpers",
+            "patch": "--patch",
+            "stubs": "--stubs",
+            "ci": "--ci",
+            "web": "--web",
+            "dashboard": "--web",
+            "info": "--info",
+            "quickstart": "--info",
+            "savings": "--savings",
+            "rules": "--export-agent-rules",
+            "arch": "--export-arch",
+            "repomap": "--export-repomap",
+            "sync": "--sync",
+            "cost": "--cost",
+            "drift": "--drift",
+            "clip": "--clip",
+        }
+        if sub in sub_map:
+            sys.argv[1] = sub_map[sub]
+
     if len(sys.argv) == 1:
         if TK_AVAILABLE and (os.name == "nt" or os.environ.get("DISPLAY") or os.environ.get("WAYLAND_DISPLAY")):
             try:
@@ -8432,7 +8470,50 @@ def main():
         tzero_mcp.main()
     elif args.pipe is not None:
         from tzero_pipe import PipeCompressor
-        PipeCompressor.run_cli_pipe(filename_hint=args.pipe, copy_to_clipboard=getattr(args, "clip", False))
+        PipeCompressor.run_cli_pipe(filename_hint=args.pipe, copy_to_clipboard=bool(getattr(args, "clip", False)))
+        sys.exit(0)
+    elif args.clip is not None:
+        from tzero_pipe import PipeCompressor
+        clip_target = args.clip if args.clip and args.clip != "" else args.dir
+        if os.path.isfile(clip_target):
+            with open(clip_target, "r", encoding="utf-8", errors="replace") as cf:
+                content = cf.read()
+            reduced = PipeCompressor.compress_stream(content, filename_hint=clip_target, tier="T-3")
+            PipeCompressor._copy_clipboard(reduced)
+            raw_t = count_tokens_precise(content)
+            pruned_t = count_tokens_precise(reduced)
+            sav = round((1.0 - pruned_t / max(1, raw_t)) * 100, 1)
+            print(f"\033[32m[SUCCESS] Pruned {clip_target} ({pruned_t:,} tokens vs {raw_t:,} raw tokens, -{sav}%) copied to clipboard!\033[0m")
+            sys.exit(0)
+        elif clip_target and os.path.isdir(clip_target):
+            print(f"\033[33m[NOTICE] Target '{clip_target}' is a directory. Please specify a file: tzero clip <file.py>\033[0m")
+            sys.exit(1)
+        else:
+            print(f"\033[31m[ERROR] File not found: {clip_target}\033[0m")
+            sys.exit(1)
+    elif args.sync is not None:
+        from tzero_sync import WorkspaceSyncManager
+        target = args.sync or args.dir
+        res = WorkspaceSyncManager.sync(target)
+        WorkspaceSyncManager.render_cli(res)
+        sys.exit(0)
+    elif args.cost is not None:
+        from tzero_cost import TokenCostCalculator
+        target = args.cost or args.dir
+        rep = TokenCostCalculator.calculate_cost(target)
+        if getattr(args, "format", "text") == "json":
+            print(TokenCostCalculator.to_json(rep))
+        else:
+            TokenCostCalculator.render_cli(rep)
+        sys.exit(0)
+    elif args.drift is not None:
+        from tzero_drift import DriftAnalyzer
+        target = args.drift or args.dir
+        rep = DriftAnalyzer.analyze_workspace(target)
+        if getattr(args, "format", "text") == "json":
+            print(DriftAnalyzer.to_json(rep))
+        else:
+            DriftAnalyzer.render_cli(rep)
         sys.exit(0)
     elif args.init_hooks is not None:
         from tzero_guard import GitSecurityGuard

@@ -36,7 +36,7 @@ class TestMCPServer(unittest.TestCase):
         """Verifies that all 47 specialized MCP tools and grounding prompt are properly registered."""
         tools = self.run_async(self.server.list_tools())
         tool_names = [t.name for t in tools]
-        self.assertEqual(len(tool_names), 49)
+        self.assertEqual(len(tool_names), 52)
         self.assertIn("execute_codebase_workflow", tool_names)
         expected_tools = [
             "execute_codebase_workflow",
@@ -88,6 +88,9 @@ class TestMCPServer(unittest.TestCase):
             "superdesign_extract_system",
             "superdesign_list",
             "superdesign_gallery",
+            "sync_workspace_rules",
+            "calculate_token_cost_roi",
+            "analyze_instruction_drift",
         ]
         for exp in expected_tools:
             self.assertIn(exp, tool_names)
@@ -752,7 +755,7 @@ diff --git a/core.py b/core.py
             os.environ["TZERO_MCP_TOOL_MODE"] = "all"
             full_server = tzero_mcp.create_mcp_server()
             tools_all = self.run_async(full_server.list_tools())
-            self.assertEqual(len(tools_all), 49)
+            self.assertEqual(len(tools_all), 52)
             self.assertIn("execute_codebase_workflow", [t.name for t in tools_all])
         finally:
             if old_val is not None:
@@ -777,9 +780,40 @@ diff --git a/core.py b/core.py
         res_bp = self.run_async(self.server.call_tool("execute_codebase_workflow", {"action": "blueprint", "target": "."}))
         self.assertIn("Architecture", tool_result_text(res_bp))
 
-        # Test 4: Unknown action error handling
+        # Test 4: Action = 'sync'
+        res_sync = self.run_async(self.server.call_tool("execute_codebase_workflow", {"action": "sync", "target": "."}))
+        self.assertIn("T-Zero Autonomous Rules Synchronization", tool_result_text(res_sync))
+
+        # Test 5: Action = 'roi'
+        res_roi = self.run_async(self.server.call_tool("execute_codebase_workflow", {"action": "roi", "target": "."}))
+        self.assertIn("Token Cost & ROI Cockpit", tool_result_text(res_roi))
+
+        # Test 6: Action = 'drift'
+        res_drift = self.run_async(self.server.call_tool("execute_codebase_workflow", {"action": "drift", "target": "."}))
+        self.assertIn("Instruction & Architecture Drift Analysis", tool_result_text(res_drift))
+
+        # Test 7: Unknown action error handling
         res_err = self.run_async(self.server.call_tool("execute_codebase_workflow", {"action": "invalid_unknown_action"}))
         self.assertIn("Unknown action", tool_result_text(res_err))
+
+    def test_tool_sync_cost_drift(self):
+        """Verifies individual execution of sync_workspace_rules, calculate_token_cost_roi, and analyze_instruction_drift."""
+        # Test sync_workspace_rules
+        res_sync = self.run_async(self.server.call_tool("sync_workspace_rules", {"workspace_dir": "."}))
+        sync_txt = tool_result_text(res_sync)
+        self.assertIn("Autonomous Rules Synchronization", sync_txt)
+        self.assertIn("AST Symbols Indexed", sync_txt)
+
+        # Test calculate_token_cost_roi
+        res_cost = self.run_async(self.server.call_tool("calculate_token_cost_roi", {"workspace_dir": "."}))
+        cost_txt = tool_result_text(res_cost)
+        self.assertIn("Token Cost & ROI Cockpit", cost_txt)
+        self.assertIn("Claude 3.5 Sonnet", cost_txt)
+
+        # Test analyze_instruction_drift
+        res_drift = self.run_async(self.server.call_tool("analyze_instruction_drift", {"workspace_dir": "."}))
+        drift_txt = tool_result_text(res_drift)
+        self.assertIn("Instruction & Architecture Drift Analysis", drift_txt)
 
     def test_mcp_prompts_comprehensive(self):
         """Verifies that all 7 MCP prompts are registered and produce correct workflow directives."""

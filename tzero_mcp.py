@@ -193,24 +193,16 @@ def build_workspace_import_graph(files: List[str], base_dir: str) -> Dict[str, L
 
 def scan_text_for_secrets(text: str) -> List[Dict[str, Any]]:
     """Scans raw text for hardcoded API keys, private keys, and secrets across any language."""
-    secret_patterns = [
-        (re.compile(r"""(?i)(?:api_key|apikey|secret|password|auth_token)\s*=\s*['\"][A-Za-z0-9_\-\.]{12,}['\"]"""), "Hardcoded API Key / Secret"),
-        (re.compile(r"""sk-[a-zA-Z0-9_\-]{20,}"""), "OpenAI API Key Pattern"),
-        (re.compile(r"""nvapi-[a-zA-Z0-9_\-]{30,}"""), "NVIDIA API Key Pattern"),
-        (re.compile(r"""AIza[0-9A-Za-z-_]{35}"""), "Google Gemini / Cloud Key"),
-        (re.compile(r"""sk-ant-[a-zA-Z0-9_\-]{30,}"""), "Anthropic Claude Key Pattern"),
-        (re.compile(r"""ghp_[a-zA-Z0-9]{36}"""), "GitHub Personal Access Token"),
-    ]
+    from tzero_security import ZeroLeakEngine
     findings = []
-    lines = text.splitlines()
-    for lineno, line in enumerate(lines, 1):
-        for pat, desc in secret_patterns:
-            if pat.search(line):
-                findings.append({
-                    "line": lineno,
-                    "desc": desc,
-                    "preview": line.strip()[:60]
-                })
+    for f in ZeroLeakEngine.scan_text(text, check_entropy=True):
+        findings.append({
+            "line": f.line_no,
+            "desc": f"{f.provider}: {f.description}",
+            "preview": f.preview,
+            "entropy": f.entropy,
+            "severity": f.severity
+        })
     return findings
 
 
@@ -3704,6 +3696,140 @@ def create_mcp_server():
         res = tzero_superdesign.superdesign_gallery(workspace_path=workspace_path)
         return json.dumps(res, indent=2, ensure_ascii=False)
 
+    @_maybe_tool(
+        name="sync_workspace_rules",
+        description=(
+            "Synchronizes multi-IDE AI rules (.cursorrules, CLAUDE.md, .windsurfrules, .agents/rules/) and pre-commit security hooks, distinguishing from 'export_agent_rules' and 'install_git_security_guard' by coordinating cross-environment alignment with active codebase AST signatures in one shot rather than updating isolated rules files.\n"
+            "\n"
+            "Parameters:\n"
+            "- `workspace_dir` (str, optional, default='.'): Target repository root directory to scan and synchronize.\n"
+            "\n"
+            "Behavior:\n"
+            "- Mutating: Creates and updates IDE rules files and git pre-commit security hook.\n"
+            "- Idempotent: Subsequent runs produce identical rule directives given unchanged AST symbols.\n"
+            "- 100% Offline: Performs local AST indexing without external network calls.\n"
+            "- Auth & Rate Limits: Zero external credentials or API keys required; completes in <50ms.\n"
+            "- Error Handling: Skips unparseable modules gracefully while indexing valid symbols.\n"
+            "\n"
+            "Usage Guidelines:\n"
+            "- When to use: Use when syncing fresh codebase AST symbols into Cursor, Claude Code, Windsurf, and Git hooks.\n"
+            "- When NOT to use: Do not use if you only want to generate static rules without installing Git hooks (use 'export_agent_rules' instead).\n"
+            "\n"
+            "Returns: Formatted Markdown summary of synchronized files and indexed AST symbols."
+        ),
+        annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
+    )
+    def sync_workspace_rules(
+        workspace_dir: Annotated[str, Field(default=".", description="Target repository root directory (default: current directory).")] = "."
+    ) -> str:
+        """Synchronizes active codebase AST topologies and rules across Cursor, Claude, Windsurf, and Git hooks."""
+        from tzero_sync import WorkspaceSyncManager
+        res = WorkspaceSyncManager.sync(workspace_dir)
+        files_str = "\n".join(f"- `{f}`" for f in res.synced_files)
+        return (
+            f"# ⚡ T-Zero Autonomous Rules Synchronization\n\n"
+            f"- **Workspace:** `{res.workspace_dir}`\n"
+            f"- **Modules Scanned:** {res.modules_scanned}\n"
+            f"- **AST Symbols Indexed:** {res.symbols_indexed}\n"
+            f"- **Zero-Leak Security:** {res.zero_leak_status}\n\n"
+            f"### Synchronized Directives:\n{files_str}\n\n"
+            f"**Status:** {res.summary_message}"
+        )
+
+    @_maybe_tool(
+        name="calculate_token_cost_roi",
+        description=(
+            "Calculates exact per-query token footprints and financial ROI savings across major LLM providers (Claude 3.5 Sonnet, Claude 3 Opus, GPT-4o, Gemini 1.5 Pro, DeepSeek V3), distinguishing from 'estimate_token_cost' and 'get_token_savings_metrics' by providing multi-model financial dollar savings and monthly team ROI projections rather than raw token counts.\n"
+            "\n"
+            "Parameters:\n"
+            "- `workspace_dir` (str, optional, default='.'): Target repository root directory.\n"
+            "\n"
+            "Behavior:\n"
+            "- Read-only: Performs static token calculation without modifying files on disk.\n"
+            "- Idempotent: Deterministic token counts and price calculations.\n"
+            "- 100% Offline: Computes token volumes locally without sending code to cloud endpoints.\n"
+            "- Auth & Rate Limits: Zero external credentials or API keys required; calculates in <20ms.\n"
+            "- Error Handling: Safely falls back to default benchmarks if directory is empty.\n"
+            "\n"
+            "Usage Guidelines:\n"
+            "- When to use: Use when estimating multi-model LLM financial savings, dollar ROI per query, and team budget optimization.\n"
+            "- When NOT to use: Do not use for measuring raw token counts of standalone string snippets without financial pricing (use 'estimate_token_cost' instead).\n"
+            "\n"
+            "Returns: Formatted Markdown table comparing token volume and dollar savings across major LLM models."
+        ),
+        annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
+    )
+    def calculate_token_cost_roi(
+        workspace_dir: Annotated[str, Field(default=".", description="Target repository root directory (default: current directory).")] = "."
+    ) -> str:
+        """Calculates token reduction and quantitative financial ROI across LLM providers."""
+        from tzero_cost import TokenCostCalculator
+        rep = TokenCostCalculator.calculate_cost(workspace_dir)
+        lines = [
+            f"# 💰 T-Zero Real-Time Token Cost & ROI Cockpit",
+            f"",
+            f"- **Workspace:** `{rep.workspace_dir}` ({rep.total_files} active files)",
+            f"- **Raw Context:** {rep.raw_tokens:,} tokens / query",
+            f"- **T-Zero Pruned:** {rep.tzero_pruned_tokens:,} tokens / query",
+            f"- **Net Reduction:** -{rep.tokens_saved:,} tokens (-{rep.reduction_pct}%)",
+            f"",
+            f"| LLM Model | Raw / Query | T-Zero | Saved % | Monthly Team ROI |",
+            f"| :--- | :--- | :--- | :--- | :--- |"
+        ]
+        for c in rep.comparisons:
+            lines.append(f"| {c.model_name} | ${c.raw_cost_per_query:.3f} | ${c.tzero_cost_per_query:.3f} | -{c.savings_pct}% | +${c.monthly_team_savings:,.2f}/mo |")
+        lines.append("")
+        lines.append("> Based on standard team benchmark: 5 developers x 50 AI queries/day (5,500 queries/mo).")
+        return "\n".join(lines)
+
+    @_maybe_tool(
+        name="analyze_instruction_drift",
+        description=(
+            "Quantifies how closely LLM code generations and workspace modifications adhere to initial prompt rules, negative constraints, and modularity limits, distinguishing from 'audit_code_quality' and 'enforce_architecture_boundaries' by calculating a quantitative 0-100 adherence score reflecting attention SNR degradation.\n"
+            "\n"
+            "Parameters:\n"
+            "- `workspace_dir` (str, optional, default='.'): Target repository root directory.\n"
+            "\n"
+            "Behavior:\n"
+            "- Read-only: Performs static AST inspection without modifying files on disk.\n"
+            "- Idempotent: Deterministic scoring and findings for identical codebase state.\n"
+            "- 100% Offline: Operates entirely on local AST without sending code to cloud APIs.\n"
+            "- Auth & Rate Limits: Zero external credentials or API keys required; completes in <100ms.\n"
+            "- Error Handling: Gracefully skips unparseable files without aborting workspace audit.\n"
+            "\n"
+            "Usage Guidelines:\n"
+            "- When to use: Use when measuring instruction decay, context window SNR degradation, and rule drift across long coding sessions.\n"
+            "- When NOT to use: Do not use for generic linting or formatting (use 'audit_code_quality' instead); do not use for hard CI boundary enforcement (use 'enforce_architecture_boundaries' instead).\n"
+            "\n"
+            "Returns: Formatted Markdown report detailing drift score, adherence rating, and identified violation points."
+        ),
+        annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
+    )
+    def analyze_instruction_drift(
+        workspace_dir: Annotated[str, Field(default=".", description="Target repository root directory (default: current directory).")] = "."
+    ) -> str:
+        """Measures instruction drift and architectural rule decay across the codebase."""
+        from tzero_drift import DriftAnalyzer
+        rep = DriftAnalyzer.analyze_workspace(workspace_dir)
+        lines = [
+            f"# 🎯 T-Zero Instruction & Architecture Drift Analysis",
+            f"",
+            f"- **Workspace:** `{rep.workspace_dir}` ({rep.files_audited} modules audited)",
+            f"- **Prompt Instruction Adherence:** {rep.adherence_pct}%",
+            f"- **Cumulative Drift Score:** {rep.drift_score} / 100",
+            f"- **Attention Attention SNR:** {rep.snr_rating}",
+            f""
+        ]
+        if not rep.findings:
+            lines.append("🌟 **Flawless Adherence:** Zero rule drift, zero secret leaks, zero boundary violations.")
+        else:
+            lines.append(f"### Identified Drift Points ({len(rep.findings)} total):")
+            for f in rep.findings[:15]:
+                lines.append(f"- `{f.file_path}:{f.line_no}` [{f.category}]: {f.message}")
+            if len(rep.findings) > 15:
+                lines.append(f"- *... and {len(rep.findings) - 15} more findings.*")
+        return "\n".join(lines)
+
     # -------------------------------------------------------------------------
     # MASTER AUTONOMOUS OMNI-TOOL: execute_codebase_workflow
     # Executes all codebase intelligence, analysis, and self-healing in one command
@@ -3876,6 +4002,15 @@ def create_mcp_server():
                 include_body=opts.get("include_body", True)
             )
 
+        elif act in ("sync", "rules_sync", "sync_rules"):
+            return sync_workspace_rules(workspace_dir=target if os.path.isdir(target) else ".")
+
+        elif act in ("roi", "cost_roi", "financial_cost"):
+            return calculate_token_cost_roi(workspace_dir=target if os.path.isdir(target) else ".")
+
+        elif act in ("drift", "drift_analysis", "instruction_drift", "attention_drift"):
+            return analyze_instruction_drift(workspace_dir=target if os.path.isdir(target) else ".")
+
         # Fallback to general dispatch
         handler = _CANONICAL_DISPATCH.get(act) or _LEGACY_DISPATCH.get(act)
         if handler:
@@ -3897,7 +4032,7 @@ def create_mcp_server():
             f"❌ Unknown action '{act}'.\n"
             f"Supported actions: 'auto', 'context', 'audit', 'security', 'blueprint', 'dependencies', "
             f"'impact', 'search', 'prune', 'rules', 'enforce', 'cost', 'memory', 'swarm', 'heal', 'design', "
-            f"'patch', 'pagerank', 'dead_code', 'duplicity', 'call_chain'."
+            f"'patch', 'pagerank', 'dead_code', 'duplicity', 'call_chain', 'sync', 'roi', 'drift'."
         )
 
     # Register canonical mappings
@@ -3922,6 +4057,12 @@ def create_mcp_server():
     _CANONICAL_DISPATCH['superdesign_extract_system'] = superdesign_extract_system
     _CANONICAL_DISPATCH['superdesign_list'] = superdesign_list
     _CANONICAL_DISPATCH['superdesign_gallery'] = superdesign_gallery
+    _CANONICAL_DISPATCH['sync_workspace_rules'] = sync_workspace_rules
+    _CANONICAL_DISPATCH['calculate_token_cost_roi'] = calculate_token_cost_roi
+    _CANONICAL_DISPATCH['analyze_instruction_drift'] = analyze_instruction_drift
+    _LEGACY_DISPATCH['sync_workspace_rules'] = sync_workspace_rules
+    _LEGACY_DISPATCH['calculate_token_cost_roi'] = calculate_token_cost_roi
+    _LEGACY_DISPATCH['analyze_instruction_drift'] = analyze_instruction_drift
 
 
     # -------------------------------------------------------------------------

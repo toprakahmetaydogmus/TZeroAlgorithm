@@ -922,18 +922,8 @@ class ASTContextArchitect:
     @classmethod
     def sanitize_secrets(cls, text: str) -> str:
         """T-001 Zero-Leak Security Sanitizer. Detects and replaces hardcoded secrets."""
-        patterns = [
-            (r'sk-[a-zA-Z0-9_\-]{20,}', '[ZERO_LEAK_MASKED_OPENAI_KEY]'),
-            (r'AKIA[0-9A-Z]{16}', '[ZERO_LEAK_MASKED_AWS_KEY]'),
-            (r'postgres://[^:]+:[^@]+@[^/]+/[a-zA-Z0-9_\-]+', '[ZERO_LEAK_MASKED_DB_URL]'),
-            (r'Bearer\s+[a-zA-Z0-9_\.\-]{20,}', 'Bearer [ZERO_LEAK_MASKED_JWT]'),
-            (r'eyJ[a-zA-Z0-9_\-]+\.eyJ[a-zA-Z0-9_\-]+\.[a-zA-Z0-9_\-]+', '[ZERO_LEAK_MASKED_JWT]'),
-            (r'(?i)(api[_-]?key|secret|password|token)\s*=\s*["\'][^"\']+["\']', r'\1 = "[ZERO_LEAK_MASKED_VALUE]"'),
-        ]
-        sanitized = text
-        for pat, repl in patterns:
-            sanitized = re.sub(pat, repl, sanitized)
-        return sanitized
+        from tzero_security import ZeroLeakEngine
+        return ZeroLeakEngine.sanitize_text(text)
 
 
 # ==================================================================================================
@@ -958,26 +948,17 @@ class SecurityQualityAuditor:
         lines = code_str.splitlines()
 
         # 1. T-001 Zero-Leak Checks
-        secret_patterns = [
-            (r'sk-[a-zA-Z0-9_\-]{20,}', "OpenAI API Token Leak", "Hardcoded OpenAI API key detected in source code."),
-            (r'AKIA[0-9A-Z]{16}', "AWS Access Key ID Leak", "AWS production identity token detected."),
-            (r'postgres://.*:.*@', "Plaintext Database Credentials", "Direct database connection string with embedded password."),
-            (r'eyJ[a-zA-Z0-9_\-]+\.eyJ[a-zA-Z0-9_\-]+\.', "Embedded JWT Token", "JWT secret token embedded in source."),
-            (r'(?i)(password|secret_key|private_key)\s*=\s*["\'][^"\']{6,}["\']', "Hardcoded Secret String", "High-entropy credential assigned to variable."),
-        ]
-
-        for idx, line in enumerate(lines, 1):
-            for pat, title, desc in secret_patterns:
-                if re.search(pat, line):
-                    findings.append(AuditFinding(
-                        tier="T-001 Zero-Leak",
-                        rule_id="SEC-001",
-                        severity="CRITICAL",
-                        line_no=idx,
-                        title=title,
-                        detail=desc,
-                        recommendation="Store secret in environment variable or KMS vault (os.environ.get)."
-                    ))
+        from tzero_security import ZeroLeakEngine
+        for finding in ZeroLeakEngine.scan_text(code_str, check_entropy=True):
+            findings.append(AuditFinding(
+                tier="T-001 Zero-Leak",
+                rule_id=finding.rule_id,
+                severity=finding.severity,
+                line_no=finding.line_no,
+                title=f"{finding.provider} Secret Exposure",
+                detail=finding.description,
+                recommendation="Store secret in environment variable or KMS vault (os.environ.get)."
+            ))
 
         # 2. AST Static Quality & Code Smell Checks (T-003, T-004)
         try:
