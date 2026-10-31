@@ -96,12 +96,57 @@ class PolyglotTokenReducer:
         """Reduces JavaScript/TypeScript source to imports, interfaces, types, and function signatures."""
         lines = content.splitlines()
         pruned: List[str] = []
+        in_multiline_import = False
+        in_interface_or_type = False
+        in_block_comment = False
+
         for line in lines:
             stripped = line.strip()
+            if not stripped:
+                continue
+
+            # Multi-line comment tracking
+            if in_block_comment:
+                if "*/" in stripped:
+                    in_block_comment = False
+                continue
+            if stripped.startswith("/*") and not stripped.endswith("*/"):
+                in_block_comment = True
+                continue
+            if stripped.startswith("//"):
+                continue
+
+            # Multi-line imports
+            if in_multiline_import:
+                pruned.append(line)
+                if "}" in stripped or ";" in stripped:
+                    in_multiline_import = False
+                continue
+
+            if stripped.startswith("import ") and "{" in stripped and "}" not in stripped:
+                in_multiline_import = True
+                pruned.append(line)
+                continue
+
+            # Interfaces and Type declarations (keep interface definitions and fields)
+            if re.match(r"^(export\s+)?(interface|type)\s+[A-Za-z0-9_]+", stripped):
+                pruned.append(line)
+                if "{" in stripped and "}" not in stripped:
+                    in_interface_or_type = True
+                continue
+
+            if in_interface_or_type:
+                pruned.append(line)
+                if "}" in stripped:
+                    in_interface_or_type = False
+                continue
+
+            # Function declarations, arrow functions, classes
             if (stripped.startswith("import ") or stripped.startswith("export ") or
-                stripped.startswith("interface ") or stripped.startswith("type ") or
                 stripped.startswith("class ") or stripped.startswith("function ") or
-                stripped.startswith("async function ") or stripped.startswith("const ") and "=>" in stripped):
+                stripped.startswith("async function ") or
+                (stripped.startswith("const ") and "=>" in stripped) or
+                (stripped.startswith("let ") and "=>" in stripped)):
                 if "{" in stripped and "}" not in stripped:
                     pruned.append(re.sub(r'\{.*$', '{ ... }', line))
                 elif stripped.endswith("{"):

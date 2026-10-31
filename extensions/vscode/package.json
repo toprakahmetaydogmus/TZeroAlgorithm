@@ -1,0 +1,84 @@
+{
+  "name": "tzero-vscode",
+  "displayName": "T-Zero Context Architect & MCP",
+  "description": "Cut AI token costs by up to 95% with local AST pruning, Zero-Leak security audit, and 1-click MCP initialization for Cursor, Windsurf, and VS Code Copilot.",
+  "version": "8.0.1",
+  "publisher": "siber-akademi",
+  "author": {
+    "name": "Toprak Ahmet Aydoğmuş (Siber Akademi)",
+    "url": "https://github.com/toprakahmetaydogmus/TZeroAlgorithm"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/toprakahmetaydogmus/TZeroAlgorithm",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git"
+  },
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "AI",
+    "Programming Languages",
+    "Formatters",
+    "Other"
+  ],
+  "keywords": [
+    "mcp",
+    "cursor",
+    "token-reduction",
+    "ast-pruning",
+    "context-window",
+    "copilot",
+    "claude",
+    "windsurf"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./src/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "tzero.init",
+        "title": "T-Zero: Initialize MCP in Workspace",
+        "category": "T-Zero"
+      },
+      {
+        "command": "tzero.compressFile",
+        "title": "T-Zero: Compress Current File (AST Prune)",
+        "category": "T-Zero"
+      },
+      {
+        "command": "tzero.showTree",
+        "title": "T-Zero: Show AST Context Tree",
+        "category": "T-Zero"
+      },
+      {
+        "command": "tzero.audit",
+        "title": "T-Zero: Run 100% Zero-Leak Security & AST Audit",
+        "category": "T-Zero"
+      },
+      {
+        "command": "tzero.openDashboard",
+        "title": "T-Zero: Launch Local Developer Dashboard",
+        "category": "T-Zero"
+      }
+    ],
+    "configuration": {
+      "title": "T-Zero Context Architect",
+      "properties": {
+        "tzero.executablePath": {
+          "type": "string",
+          "default": "tzero",
+          "description": "Path to the tzero executable or command."
+        },
+        "tzero.autoInitOnOpen": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically initialize T-Zero MCP config if missing in workspace."
+        }
+      }
+    }
+  }
+}

@@ -1046,6 +1046,108 @@ def run_cli() -> int:
         return 0 if failures == 0 else 1
 
 
+def run_init(argv: Optional[List[str]] = None) -> int:
+    """1-Click T-Zero initialization for modern AI IDEs.
+    
+    Usage:
+        tzero init               # Auto-detects and installs to all installed IDEs
+        tzero init --cursor      # Installs directly to Cursor (.cursor/mcp.json)
+        tzero init --claude      # Installs to Claude Desktop & Claude Code
+        tzero init --windsurf    # Installs to Windsurf
+        tzero init --vscode      # Installs to VS Code / Copilot
+        tzero init --all         # Installs to all supported IDEs
+        tzero init --list        # Lists detected status of all supported IDEs
+    """
+    _attach_windows_console()
+    if argv is None:
+        argv = sys.argv[2:] if (len(sys.argv) > 1 and sys.argv[1].lower() == "init") else []
+
+    all_targets = build_client_targets()
+    target_map = {t.key.lower(): t for t in all_targets}
+
+    # Aliases
+    aliases = {
+        "cursor": ["cursor"],
+        "claude": ["claude-desktop", "claude-code"],
+        "claude-desktop": ["claude-desktop"],
+        "claude-code": ["claude-code"],
+        "windsurf": ["windsurf"],
+        "vscode": ["vscode"],
+        "copilot": ["vscode"],
+        "cline": ["cline"],
+        "roo": ["roo-code"],
+        "roo-code": ["roo-code"],
+        "antigravity": ["antigravity"],
+        "gemini": ["gemini-cli"],
+        "gemini-cli": ["gemini-cli"],
+    }
+
+    # Print banner
+    print("""
+\033[1;36m================================================================================
+⚡ SİBER AKADEMİ — T-ZERO 1-CLICK MCP INITIALIZATION (v8.0.1)
+================================================================================\033[0m
+\033[32m🎯 Zero-Config AST Codebase Context & 100% Zero-Leak Security Guard\033[0m
+""")
+
+    # Parse arguments
+    flags = [a.lower().lstrip("-") for a in argv]
+    if "list" in flags or "l" in flags or "--list" in argv:
+        print("\033[1;33m📋 Supported & Detected IDE Environments:\033[0m\n")
+        for t in all_targets:
+            state = "\033[32m✓ DETECTED\033[0m" if t.detected else "\033[90mnot found \033[0m"
+            print(f"  [{state}] {t.name:<25} : key='{t.key}' ({t.config_path})")
+        print("\n\033[36m💡 Run: 'tzero init' to install to all detected IDEs automatically.\033[0m\n")
+        return 0
+
+    selected_keys = set()
+    install_all_mode = "all" in flags or "-a" in argv or "--all" in argv or not flags
+
+    if install_all_mode:
+        detected_targets = [t for t in all_targets if t.detected]
+        if detected_targets:
+            selected_targets = detected_targets
+            print(f"\033[34m[AUTO-DETECT]\033[0m Found {len(selected_targets)} active IDE environment(s):")
+            for t in selected_targets:
+                print(f"  • {t.name}")
+        else:
+            print("\033[33m[INFO]\033[0m No active IDEs currently detected; configuring default targets (Cursor, Claude, VS Code, Windsurf)...")
+            selected_targets = [t for t in all_targets if t.key in ("cursor", "claude-desktop", "vscode", "windsurf")]
+    else:
+        for f in flags:
+            if f in aliases:
+                selected_keys.update(aliases[f])
+            elif f in target_map:
+                selected_keys.add(f)
+        selected_targets = [t for t in all_targets if t.key in selected_keys]
+
+    if not selected_targets:
+        print(f"\033[31m[ERROR]\033[0m No matching IDE target found for: {argv}")
+        print("Available targets: cursor, claude, windsurf, vscode, cline, roo, antigravity, gemini, all")
+        return 1
+
+    print(f"\n\033[35m[INSTALLING]\033[0m Configuring {len(selected_targets)} target(s)...")
+    successes, failures = install_targets(
+        selected_targets,
+        log_fn=lambda m: print(f"  \033[32m✓\033[0m {m}")
+    )
+
+    print(f"\n\033[1;32m🎉 [SUCCESS] T-Zero MCP Server successfully registered in {successes} client(s)!\033[0m")
+    if failures:
+        print(f"\033[33m⚠️  {failures} client(s) could not be updated.\033[0m")
+
+    print("""
+\033[1;37m🚀 HOW TO USE IN YOUR IDE (CURSOR, CLAUDE, WINDSURF):
+1. Restart your IDE or Reload Window.
+2. In Composer / Chat, prompt your agent:\033[0m
+   \033[36m"Use T-Zero to get the project skeleton and analyze the blast radius."\033[0m
+   \033[36m"Use tzero reduce_tokens to prune noise and audit zero-leak security."\033[0m
+
+\033[90m⭐ Star T-Zero on GitHub: https://github.com/toprakahmetaydogmus/TZeroAlgorithm\033[0m
+""")
+    return 0 if failures == 0 else 1
+
+
 def main() -> None:
     sys.exit(run_cli())
 

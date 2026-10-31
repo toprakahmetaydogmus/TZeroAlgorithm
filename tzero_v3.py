@@ -8280,6 +8280,7 @@ def main():
     parser.add_argument("--format", choices=["text", "json", "sarif"], default="text", help="Output format for audit/scan reports (default: text)")
     parser.add_argument("--pr-report", nargs="?", const="HEAD~1", default=None, metavar="REF", help="Generate GitHub PR summary report with Blast Radius and Security tables")
     parser.add_argument("--mcp", action="store_true", help="Start Model Context Protocol (MCP) stdio server for Cursor/Claude/Antigravity")
+    parser.add_argument("--init", nargs="?", const="auto", default=None, metavar="CLIENT", help="1-Click MCP initialization for Cursor, Claude, Windsurf, VS Code, etc. (e.g. --init cursor, --init all)")
     parser.add_argument("--add-mcp", action="store_true", help="Install T-Zero MCP server into Cursor, Claude Desktop, Antigravity, VS Code, etc.")
     parser.add_argument("--info", "--quickstart", action="store_true", help="Show quickstart guide and simplest installation/usage steps")
     parser.add_argument("--gui", "-g", action="store_true", help="Launch the GUI Dashboard")
@@ -8301,10 +8302,11 @@ def main():
 
 🚀 EN BASİT KULLANIM ADIMLARI (QUICKSTART):
 
-1️⃣  Tüm IDE'lere Otomatik Bağla (Cursor, Claude, Antigravity, VS Code, Cline):
-    $ tzero-add-mcp
-    veya:
-    $ tzero --add-mcp
+1️⃣  1-Click IDE Entegrasyonu (Cursor, Claude, Windsurf, VS Code, Cline):
+    $ tzero init
+    $ tzero init --cursor
+    $ tzero init --claude
+    $ tzero init --windsurf
 
 2️⃣  Terminal Sihirbazını Başlat:
     $ tzero --cli
@@ -8337,6 +8339,10 @@ def main():
 ================================================================================
 """)
 
+    if len(sys.argv) > 1 and sys.argv[1].lower() == "init":
+        import addmcp
+        sys.exit(addmcp.run_init(sys.argv[2:]))
+
     if len(sys.argv) == 1:
         if TK_AVAILABLE and (os.name == "nt" or os.environ.get("DISPLAY") or os.environ.get("WAYLAND_DISPLAY")):
             try:
@@ -8354,7 +8360,6 @@ def main():
         print_quickstart_guide()
         return
 
-
     args = parser.parse_args()
     if getattr(args, "info", False):
         print_quickstart_guide()
@@ -8364,6 +8369,10 @@ def main():
             print("[ERROR] tzero_deps.py is missing; reinstall T-Zero to use --doctor.")
             sys.exit(1)
         sys.exit(tzero_deps.run_doctor())
+    elif args.init is not None:
+        import addmcp
+        target_arg = [] if args.init == "auto" else [args.init]
+        sys.exit(addmcp.run_init(target_arg))
     elif args.add_mcp:
         import addmcp
         sys.exit(addmcp.run_cli())
