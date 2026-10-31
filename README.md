@@ -302,6 +302,13 @@ Eliminates AI coding hallucinations before changes touch files. Statically inter
 ### 7. Anti-Reinvention Engine
 Automatically surfaces reusable existing utility helpers across the repository AST (`suggest_reusable_helpers` / `--helpers`), injecting ready-to-use imports into focus skeletons so AI models never duplicate code already written in your project.
 
+### 8. AST-Tolerant Fuzzy Patcher & Autonomous Context Engineering Suite
+- **AST-Tolerant Fuzzy Patcher (`--patch`):** Resiliently resolves LLM patch failures caused by line-number drift, 2-space vs. 4-space indentation mismatches, comment variations, and function boundary ambiguity through a 5-tier fuzzy matching algorithm.
+- **Dynamic Token Budget Packer (`--pack [BUDGET]`):** Solves the context window knapsack packing problem, allocating multi-tier AST representations (T-1 Raw to T-4 Signatures) to fit an exact token ceiling (8k, 16k, 32k, 64k, 128k) with relevance focus.
+- **AST Type Stub & Interface (.pyi) Generator (`--stubs`):** Generates PEP-484 compliant typed interfaces from AST, extracting decorators, method signatures, docstrings, and inferred default types with up to **95% token savings**.
+- **$0 Offline Conventional Commit & Changelog Synthesizer (`--commit-msg`, `--changelog`):** Evaluates staged AST git diffs 100% locally to synthesize Conventional Commit messages and formatted release notes with zero cloud LLM API costs.
+- **Turnkey CI/CD Security & Pipeline Generator (`--ci`, `--guard-install`):** Generates production GitHub Actions workflows, GitLab CI definitions, and pre-commit security gates to block secret leaks and token bloat before code is committed.
+
 ---
 
 ## MCP Tools Reference

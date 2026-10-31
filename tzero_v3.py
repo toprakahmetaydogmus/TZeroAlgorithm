@@ -8330,6 +8330,15 @@ def main():
     parser.add_argument("--no-fuzzy", dest="fuzzy", action="store_false", help="Disable fuzzy matching and enforce exact line matches only")
     parser.add_argument("--dry-run-patch", action="store_true", help="Validate patch applicability without modifying files on disk")
     parser.add_argument("--reverse-patch", action="store_true", help="Un-apply / revert patch changes")
+    parser.add_argument("--pack", nargs="?", const=16000, type=int, default=None, metavar="BUDGET", help="Pack codebase into an exact token budget (default: 16000 tokens)")
+    parser.add_argument("--focus", default="", metavar="TARGET", help="Focus file or semantic search query for context budget packing")
+    parser.add_argument("--pack-out", default=None, metavar="FILE", help="Output file for packed context bundle (default: stdout)")
+    parser.add_argument("--commit-msg", action="store_true", help="Generate Conventional Commit message from local AST git diff ($0 local engine)")
+    parser.add_argument("--changelog", nargs="?", const="v8.2.0", default=None, metavar="VERSION", help="Generate release CHANGELOG markdown from git history")
+    parser.add_argument("--ci", choices=["github", "gitlab", "pre-commit", "all"], default=None, help="Install turnkey CI/CD security and verification workflow")
+    parser.add_argument("--stubs", nargs="?", const=".", default=None, metavar="PATH", help="Generate PEP-484 AST type stubs (.pyi) for target file or workspace")
+    parser.add_argument("--stubs-out", default=None, metavar="DIR", help="Output directory for generated type stubs (default: alongside .py files)")
+    parser.add_argument("--guard-install", action="store_true", help="Install local git pre-commit zero-leak and token security hook")
     parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect v8.0.1 Master Edition (engine v4.1.0)")
 
     def print_quickstart_guide():
@@ -8554,6 +8563,58 @@ def main():
                 print(f"  Backup preserved at: {res['backup_created']}")
         else:
             print(f"\033[31m[FAILED] Could not apply patch to {target_path}: {res.get('error', 'Hunk match failed')}\033[0m")
+            sys.exit(1)
+    elif args.pack is not None:
+        from tzero_packer import pack_workspace
+        budget = args.pack
+        focus = getattr(args, "focus", "")
+        out_f = getattr(args, "pack_out", None)
+        res = pack_workspace(workspace_dir=args.dir, budget_tokens=budget, focus=focus, out_file=out_f)
+        if out_f:
+            print(f"\033[32m[SUCCESS] Packed context bundle ({res.total_tokens:,} tokens, {res.utilization_pct}% capacity) saved to: {out_f}\033[0m")
+        else:
+            print(res.bundle_text)
+    elif args.commit_msg:
+        from tzero_commit import LocalSemanticCommitSynthesizer
+        msg = LocalSemanticCommitSynthesizer.generate_commit_message(repo_dir=args.dir, staged=True)
+        print(msg)
+    elif args.changelog is not None:
+        from tzero_commit import LocalSemanticCommitSynthesizer
+        entry = LocalSemanticCommitSynthesizer.generate_changelog_entry(version=args.changelog, repo_dir=args.dir)
+        print(entry)
+    elif args.ci is not None:
+        from tzero_ci import CIPipelineGenerator
+        target = args.ci
+        installed = []
+        if target in ("github", "all"):
+            _, p = CIPipelineGenerator.install_github_workflow(args.dir)
+            installed.append(p)
+        if target in ("gitlab", "all"):
+            _, p = CIPipelineGenerator.install_gitlab_ci(args.dir)
+            installed.append(p)
+        if target in ("pre-commit", "all"):
+            _, p = CIPipelineGenerator.install_pre_commit(args.dir)
+            installed.append(p)
+        print("\033[32m[SUCCESS] Turnkey CI/CD pipelines installed:\033[0m")
+        for p in installed:
+            print(f"  - {os.path.relpath(p, args.dir)}")
+    elif args.stubs is not None:
+        from tzero_stubs import TypeStubGenerator
+        target = args.stubs
+        out_dir = getattr(args, "stubs_out", None)
+        if os.path.isfile(target):
+            _, raw_t, stub_t, sav = TypeStubGenerator.generate_stub_file(target, dst_path=out_dir)
+            print(f"\033[32m[SUCCESS] Generated type stub for {target} ({stub_t:,} tokens vs {raw_t:,} raw tokens - {sav:.1f}% reduction)\033[0m")
+        else:
+            res = TypeStubGenerator.generate_workspace_stubs(workspace_dir=target, output_dir=out_dir)
+            print(f"\033[32m[SUCCESS] Generated {res['total_files']} type stubs in {res['output_dir']} (~{res['stub_tokens']:,} tokens vs {res['raw_tokens']:,} raw tokens - {res['overall_savings_pct']}% reduction)\033[0m")
+    elif getattr(args, "guard_install", False):
+        from tzero_guard import GitSecurityGuard
+        res = GitSecurityGuard.install_hook(args.dir)
+        if res.get("success"):
+            print(f"\033[32m[SUCCESS] {res.get('message', 'Pre-commit zero-leak guard installed.')}\033[0m")
+        else:
+            print(f"\033[31m[FAILED] {res.get('message')}\033[0m")
             sys.exit(1)
     elif args.gui:
         launch_gui()

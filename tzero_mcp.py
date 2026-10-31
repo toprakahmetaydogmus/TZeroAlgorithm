@@ -4144,8 +4144,35 @@ def create_mcp_server():
         orch = JarvisOrchestrator(workspace_root=".")
         return orch.present_capabilities()
 
+    @server.resource(
+        "tzero://workspace/packed-context",
+        name="T-Zero Packed Workspace Context",
+        description="Greedy knapsack packed workspace context optimized for 32k token window",
+        mime_type="text/markdown"
+    )
+    def resource_workspace_packed_context() -> str:
+        try:
+            from tzero_packer import pack_workspace
+            bundle = pack_workspace(workspace_dir=".", budget_tokens=32000)
+            return bundle.bundle_text
+        except Exception as e:
+            return f"Error generating packed context: {e}"
+
+    @server.resource(
+        "tzero://workspace/changelog",
+        name="T-Zero Local Workspace Changelog",
+        description="Synthesized offline release notes and changelog from workspace AST git history",
+        mime_type="text/markdown"
+    )
+    def resource_workspace_changelog() -> str:
+        try:
+            from tzero_commit import LocalSemanticCommitSynthesizer
+            return LocalSemanticCommitSynthesizer.generate_changelog_entry(version="Latest", repo_dir=".")
+        except Exception as e:
+            return f"Error generating changelog: {e}"
+
     # -------------------------------------------------------------------------
-    # PROMPT: jarvis_workspace_copilot
+    # PROMPTS
     # -------------------------------------------------------------------------
     @server.prompt(
         name="jarvis_workspace_copilot",
@@ -4164,6 +4191,41 @@ def create_mcp_server():
             "2. Execute Phase 1 first using AST reduction tools (`get_project_context_tree`).\n"
             "3. Enforce 100% Zero-Leak security at all times."
         )
+
+    @server.prompt(
+        name="tzero_pack_budget",
+        description="Packs workspace context into an exact token budget (e.g. 8k, 16k, 32k, 64k, 128k) using multi-tier AST optimization."
+    )
+    def prompt_tzero_pack_budget(budget_tokens: str = "32000", focus_targets: str = "") -> str:
+        try:
+            from tzero_packer import pack_workspace
+            bt = int(budget_tokens) if budget_tokens.isdigit() else 32000
+            res = pack_workspace(workspace_dir=".", budget_tokens=bt, focus=focus_targets)
+            return (
+                f"T-ZERO OPTIMIZED WORKSPACE CONTEXT BUNDLE ({res.total_tokens:,}/{res.target_budget:,} tokens - {res.token_savings_pct:.1f}% reduction):\n\n"
+                f"{res.bundle_text}"
+            )
+        except Exception as e:
+            return f"Error generating packed context: {e}"
+
+    @server.prompt(
+        name="tzero_commit_synthesizer",
+        description="Analyzes local git changes and synthesizes a 100% offline Conventional Commit message and changelog."
+    )
+    def prompt_tzero_commit_synthesizer(target_scope: str = "") -> str:
+        try:
+            from tzero_commit import LocalSemanticCommitSynthesizer
+            msg = LocalSemanticCommitSynthesizer.generate_commit_message(repo_dir=".", staged=True)
+            diff_text = LocalSemanticCommitSynthesizer.get_git_diff(repo_dir=".", staged=True)
+            sem = LocalSemanticCommitSynthesizer.analyze_diff(diff_text)
+            return (
+                "T-ZERO OFFLINE CONVENTIONAL COMMIT SYNTHESIS:\n\n"
+                f"Proposed Commit Message:\n```\n{msg}\n```\n\n"
+                f"Type: {sem.commit_type} | Scope: {sem.scope} | Files: {len(sem.modified_files)}\n"
+                f"Symbols affected: {', '.join(sem.symbols_modified) if sem.symbols_modified else 'none'}\n"
+            )
+        except Exception as e:
+            return f"Error synthesizing commit: {e}"
 
     return server
 
