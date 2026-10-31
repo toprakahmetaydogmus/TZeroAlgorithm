@@ -6,16 +6,22 @@
 **High-performance AST context pruner & MCP server for AI coding assistants.**  
 Reduces codebase prompt tokens by up to **94.9%** while preserving complete class contracts, typed signatures, and cross-file dependencies.
 
+[![tzero-mcp MCP server – quality and maintenance score on Glama](https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm/badges/score.svg)](https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm)
 [![PyPI Version](https://img.shields.io/pypi/v/tzero-mcp?color=38bdf8&style=flat-square&logo=pypi)](https://pypi.org/project/tzero-mcp/)
 [![PyPI Downloads](https://img.shields.io/pypi/dm/tzero-mcp?color=818cf8&style=flat-square&logo=pypi)](https://pypi.org/project/tzero-mcp/)
 [![Python Version](https://img.shields.io/badge/python-3.11%2B-blue?style=flat-square)](https://pypi.org/project/tzero-mcp/)
-[![TDQS Score](https://img.shields.io/badge/TDQS-Grade%20A%20(5.0%2F5.0)-34d399?style=flat-square&logo=checkmarx)](https://glama.ai/mcp/servers)
-[![Tests](https://img.shields.io/badge/tests-232%20passing-34d399?style=flat-square&logo=githubactions)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions)
+[![Tests](https://img.shields.io/badge/tests-235%20passing-34d399?style=flat-square&logo=githubactions)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions)
 [![Security](https://img.shields.io/badge/security-100%25%20Zero--Leak-38bdf8?style=flat-square&logo=shield)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm#security-architecture)
 [![Hallucination](https://img.shields.io/badge/hallucinations-0%25%20(5--Tier%20Guard)-10b981?style=flat-square&logo=probot)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm#core-capabilities)
 [![License](https://img.shields.io/badge/license-MIT-f8fafc?style=flat-square)](LICENSE)
 
 <br>
+
+<p align="center">
+  <a href="https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm">
+    <img src="https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm/badges/card.svg" alt="tzero-mcp MCP server on Glama" width="460">
+  </a>
+</p>
 
 <p align="center">
   <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm/raw/main/assets/brag.mp4">
@@ -87,14 +93,24 @@ The AI assistant retains full access to class names, typed parameters, docstring
 
 ## Quickstart
 
-### 1. ⚡ One-Click Auto-Install (Zero Configuration)
+### 1. ⚡ One-Click 1-Second Setup (`tzero init`)
 
-Automatically detect and configure Cursor, Claude Desktop, Antigravity IDE, Windsurf, Cline, and VS Code in 5 seconds with zero manual JSON editing:
+Automatically detect and configure Cursor, Claude Desktop, Antigravity IDE, Windsurf, Cline, Roo Code, and VS Code in 1 second with zero manual JSON editing:
 
 ```bash
-uvx tzero-mcp --add-mcp
-# or using pipx
-pipx run tzero-mcp --add-mcp
+# 1-Click install into all detected IDEs:
+tzero init
+
+# Or target a specific client directly:
+tzero init --cursor
+tzero init --claude
+tzero init --windsurf
+tzero init --vscode
+
+# Without installing, run instantly via uvx:
+uvx tzero-mcp --init
+# or
+pipx run tzero-mcp --init
 ```
 
 ### 2. Instant Run via uvx or pipx (Zero Installation)
@@ -112,7 +128,14 @@ pipx run tzero-mcp
 pip install tzero-mcp
 ```
 
-### 4. Manual Configuration for Cursor / Claude Desktop / Antigravity / Windsurf
+### 4. 🧩 VS Code & Cursor Extension
+
+You can also use T-Zero directly from your editor status bar and command palette:
+- Load the bundled extension from [`extensions/vscode`](extensions/vscode/)
+- Commands: `T-Zero: Initialize MCP in Workspace`, `T-Zero: Compress Current File`, `T-Zero: Run 100% Zero-Leak Audit`
+- Real-time status bar token ROI meter: `$(zap) T-Zero: 94.9% Saved`
+
+### 5. Manual Configuration for Cursor / Claude Desktop / Antigravity / Windsurf
 
 Add the following to your `claude_desktop_config.json` or Cursor Settings (`Features` &rarr; `MCP`):
 
@@ -139,20 +162,20 @@ Add the following to your `claude_desktop_config.json` or Cursor Settings (`Feat
 }
 ```
 
-### 5. Claude Code CLI Integration
+### 6. Claude Code CLI Integration
 
 ```bash
 claude mcp add --scope user tzero uvx tzero-mcp
 ```
 
-### 6. Launch Local Web Dashboard
+### 7. Launch Local Web Dashboard
 
 ```bash
 tzero --dashboard
 ```
 Opens the local browser dashboard on `http://localhost:8421` featuring interactive dependency graphs and the live AST pruner sandbox.
 
-### 7. 🛡️ Pre-Commit Hook (Auto Zero-Leak & Token Guard)
+### 8. 🛡️ Pre-Commit Hook (Auto Zero-Leak & Token Guard)
 
 Prevent accidental credential leaks and token bloat before code ever leaves developer machines. Add to your `.pre-commit-config.yaml`:
 
@@ -165,7 +188,7 @@ repos:
       - id: tzero-audit
 ```
 
-### 8. ⚡ GitHub Actions CI/CD Integration
+### 9. ⚡ GitHub Actions CI/CD Integration
 
 Automatically audit repositories for zero hardcoded secrets and generate token optimization summaries on every commit and PR:
 
@@ -185,7 +208,7 @@ jobs:
           audit-level: 'strict'
 ```
 
-### 9. 🏅 Badge of Honor: Show Your Repo is Context-Optimized
+### 10. 🏅 Badge of Honor: Show Your Repo is Context-Optimized
 
 If your repository, library, or framework is optimized for AI coding assistants using T-Zero, embed our official badge in your `README.md`. This signals to developers and AI coding agents that your repository can be ingested with 90%+ less token overhead:
 
