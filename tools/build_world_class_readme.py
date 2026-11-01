@@ -479,7 +479,7 @@ tzero --swarm "Analyze refactoring opportunities"
 ---
 
 <a id="reproducible-benchmarks"></a>
-## 📊 Reproducible Multi-Model Benchmarks (V9.8.0)
+## 📊 Reproducible Multi-Model Benchmarks (V9.9.0)
 
 <p align="center">
   <img src="assets/tzero_terminal_benchmark.svg" alt="T-Zero macOS Terminal Benchmark HUD" width="100%" style="max-width: 900px; border-radius: 12px;">

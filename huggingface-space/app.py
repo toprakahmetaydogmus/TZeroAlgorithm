@@ -2,7 +2,7 @@
 """
 T-Zero Enterprise AST Context Architect & Token Reducer (Hugging Face Spaces App)
 Developer: Toprak Ahmet Aydoğmuş (Siber Akademi)
-Version: 9.8.0
+Version: 9.9.0
 License: MIT
 """
 
@@ -262,7 +262,7 @@ with gr.Blocks(title="T-Zero Context Architect & AgentOS", theme=gr.themes.Soft(
     
     [![GitHub](https://img.shields.io/badge/GitHub-TZeroAlgorithm-0f172a?style=flat&logo=github)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)
     [![PyPI](https://img.shields.io/pypi/v/tzero-mcp?color=38bdf8)](https://pypi.org/project/tzero-mcp/)
-    [![Version](https://img.shields.io/badge/version-9.8.0-10b981)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)
+    [![Version](https://img.shields.io/badge/version-9.9.0-10b981)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)
     """)
 
     with gr.Tabs():
@@ -390,7 +390,7 @@ with gr.Blocks(title="T-Zero Context Architect & AgentOS", theme=gr.themes.Soft(
 
     gr.Markdown("""
     ---
-    **T-Zero V9.8.0** • Developed with pride by **Toprak Ahmet Aydoğmuş (Siber Akademi)**  
+    **T-Zero V9.9.0** • Developed with pride by **Toprak Ahmet Aydoğmuş (Siber Akademi)**  
     [GitHub Repository](https://github.com/toprakahmetaydogmus/TZeroAlgorithm) • [PyPI Package](https://pypi.org/project/tzero-mcp/) • [Glama MCP Registry](https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm)
     """)
 

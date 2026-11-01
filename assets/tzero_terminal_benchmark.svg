@@ -49,7 +49,7 @@
   <circle cx="86" cy="39" r="6.5" fill="#10b981"/>
 
   <!-- Title Center -->
-  <text x="460" y="44" text-anchor="middle" fill="#94a3b8" font-size="12.5" class="mono" font-weight="600">toprak@macbook-pro: ~/TZeroAlgorithm — tzero benchmark (v9.8.0)</text>
+  <text x="460" y="44" text-anchor="middle" fill="#94a3b8" font-size="12.5" class="mono" font-weight="600">toprak@macbook-pro: ~/TZeroAlgorithm — tzero benchmark (v9.9.0)</text>
 
   <!-- Terminal Body Content -->
   <g class="mono" font-size="13.5">
@@ -61,7 +61,7 @@
 
     <!-- Line 2 & 3: Banner (Step 1) -->
     <g class="anim-1">
-      <text x="45" y="118" fill="url(#cyan-glow)" font-weight="700">⚡ SİBER AKADEMİ — T-ZERO AUTONOMOUS BENCHMARK ENGINE v9.8.0</text>
+      <text x="45" y="118" fill="url(#cyan-glow)" font-weight="700">⚡ SİBER AKADEMİ — T-ZERO AUTONOMOUS BENCHMARK ENGINE v9.9.0</text>
       <text x="45" y="138" fill="#64748b">Analyzing 281 active files • 51,541 lines of code • Polyglot AST Engine</text>
     </g>
 
@@ -141,7 +141,7 @@
     <g class="anim-5">
       <text x="45" y="482" fill="#10b981" font-weight="700">🚀 Enterprise ROI:</text>
       <text x="185" y="482" fill="#f8fafc">Saving an estimated <tspan fill="#10b981" font-weight="700">$10,654.18 / month</tspan> per 10-developer team</text>
-      <text x="780" y="482" fill="#64748b" font-size="11">T-Zero V9.8.0</text>
+      <text x="780" y="482" fill="#64748b" font-size="11">T-Zero V9.9.0</text>
     </g>
   </g>
 </svg>
