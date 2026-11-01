@@ -90,6 +90,10 @@ class TokenBudgetPacker:
         workspace_dir = os.path.abspath(workspace_dir)
 
         for root, dirs, files in os.walk(workspace_dir):
+            if len(entries) >= max_files:
+                dirs[:] = []
+                break
+
             if should_skip_dir(root, workspace_dir):
                 dirs[:] = []
                 continue
@@ -99,6 +103,7 @@ class TokenBudgetPacker:
 
             for fname in files:
                 if len(entries) >= max_files:
+                    dirs[:] = []
                     break
                 lang = PolyglotTokenReducer.detect_language(fname)
                 if not lang:

@@ -77,7 +77,7 @@ test = [
 ]
 
 [project.scripts]
-tzero = "main:main"
+tzero = "tzero_v3:main"
 tzero-gui = "tzero_v3:launch_gui"
 tzero-mcp = "tzero_mcp:main"
 tzero-add-mcp = "addmcp:main"
