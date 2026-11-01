@@ -51,8 +51,8 @@ diff --git a/tzero_patch.py b/tzero_patch.py
         self.assertIn("apply_fuzzy_patch", msg)
 
     def test_generate_changelog_entry(self):
-        entry = LocalSemanticCommitSynthesizer.generate_changelog_entry(version="v8.2.0")
-        self.assertIn("## [v8.2.0]", entry)
+        entry = LocalSemanticCommitSynthesizer.generate_changelog_entry(version="v9.8.0")
+        self.assertIn("## [v9.8.0]", entry)
 
     def test_install_ci_templates(self):
         with tempfile.TemporaryDirectory() as td:

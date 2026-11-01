@@ -256,6 +256,40 @@ class JarvisOrchestrator:
         """Jarvis'in çalışma alanındaki yetenek kataloğunu sunar."""
         return self.workspace_orchestrator.format_capabilities_catalog()
 
+    def run_autonomous_benchmark(self, target_budget: int = 64000) -> Dict[str, Any]:
+        """
+        Otonom olarak çok modelli (Claude, GPT-4o, Gemini, DeepSeek) token tasarruf ve
+        finansal ROI benchmarkını çalıştırır, bağlam sıkıştırma bütçesini otomatik optimize eder.
+        """
+        try:
+            from tzero_benchmark import TZeroBenchmarkEngine, JarvisBenchmarkOptimizer
+            rep = TZeroBenchmarkEngine.run_benchmark(self.workspace_root)
+            tuning = JarvisBenchmarkOptimizer.auto_tune_context(self.workspace_root, target_budget)
+            svg_path = TZeroBenchmarkEngine.generate_animated_svg(rep)
+            return {
+                "success": True,
+                "version": rep.version,
+                "workspace": rep.workspace_dir,
+                "raw_tokens": rep.raw_tokens,
+                "tzero_tokens": rep.tzero_tokens,
+                "reduction_pct": rep.reduction_pct,
+                "speedup_ratio": rep.speedup_ratio,
+                "tuning": tuning,
+                "svg_recording": svg_path,
+                "models": [
+                    {
+                        "name": m.name,
+                        "raw_cost": m.raw_cost_per_query,
+                        "tzero_cost": m.tzero_cost_per_query,
+                        "monthly_savings": m.monthly_team_savings
+                    } for m in rep.models
+                ]
+            }
+        except Exception as e:
+            logger.error(f"Jarvis Benchmark hatası: {e}")
+            return {"success": False, "error": str(e)}
+
+
 
 AutonomousGoalOrchestrator = JarvisOrchestrator
 

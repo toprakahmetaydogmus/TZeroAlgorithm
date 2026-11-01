@@ -8,13 +8,18 @@
 3. Anti-Reinvention: Always reuse existing helper functions before writing new utilities.
 4. AST Compression: When ingesting code, prioritize interface signatures and contracts over raw method bodies.
 
-# Key Workspace Classes (185 total)
+# Key Workspace Classes (190 total)
 - ClientTarget (addmcp.py)
 - AddMCPApp (addmcp.py)
 - ASTContextArchitect (app.py)
 - AuditFinding (app.py)
 - SecurityQualityAuditor (app.py)
 - ROIEstimator (app.py)
+- TierMetric (tzero_benchmark.py)
+- ModelBenchmarkItem (tzero_benchmark.py)
+- BenchmarkReport (tzero_benchmark.py)
+- TZeroBenchmarkEngine (tzero_benchmark.py)
+- JarvisBenchmarkOptimizer (tzero_benchmark.py)
 - CIPipelineGenerator (tzero_ci.py)
 - DiffSemantics (tzero_commit.py)
 - LocalSemanticCommitSynthesizer (tzero_commit.py)
@@ -24,13 +29,8 @@
 - DashboardRequestHandler (tzero_dashboard.py)
 - Dependency (tzero_deps.py)
 - DriftFinding (tzero_drift.py)
-- DriftReport (tzero_drift.py)
-- DriftAnalyzer (tzero_drift.py)
-- ChangeImpactAnalyzer (tzero_features.py)
-- ArchitectureRuleEngine (tzero_features.py)
-- AgentRulesGenerator (tzero_features.py)
 
-# Key Exported Helpers (107 total)
+# Key Exported Helpers (106 total)
 - build_client_targets() (addmcp.py)
 - server_entry() (addmcp.py)
 - merge_server_config() (addmcp.py)
@@ -53,9 +53,9 @@
 - get_icon_file_path() (siber_akademi_icon.py)
 - get_logo_photo_image() (siber_akademi_icon.py)
 - apply_window_icon() (siber_akademi_icon.py)
+- main() (tzero_benchmark.py)
 - main() (tzero_cost.py)
 - start_dashboard_server() (tzero_dashboard.py)
-- main() (tzero_dashboard.py)
 
 # Verification Command
 Run verification before completing any task:

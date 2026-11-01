@@ -1,0 +1,147 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 540" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a0f1d"/>
+      <stop offset="100%" stop-color="#030712"/>
+    </linearGradient>
+    <linearGradient id="cyan-glow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00f2fe"/>
+      <stop offset="100%" stop-color="#4facfe"/>
+    </linearGradient>
+    <linearGradient id="green-glow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="115%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#000000" flood-opacity="0.75"/>
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#00f2fe" flood-opacity="0.15"/>
+    </filter>
+    <style>
+      @keyframes blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+      @keyframes step1 { 0% { opacity: 0; } 6% { opacity: 1; } 100% { opacity: 1; } }
+      @keyframes step2 { 0%, 14% { opacity: 0; } 20% { opacity: 1; } 100% { opacity: 1; } }
+      @keyframes step3 { 0%, 28% { opacity: 0; } 35% { opacity: 1; } 100% { opacity: 1; } }
+      @keyframes step4 { 0%, 45% { opacity: 0; } 52% { opacity: 1; } 100% { opacity: 1; } }
+      @keyframes step5 { 0%, 65% { opacity: 0; } 72% { opacity: 1; } 100% { opacity: 1; } }
+      @keyframes barGrow { 0% { width: 0; } 100% { width: 260px; } }
+      
+      .cursor { animation: blink 1s infinite; }
+      .anim-1 { animation: step1 14s infinite; }
+      .anim-2 { animation: step2 14s infinite; }
+      .anim-3 { animation: step3 14s infinite; }
+      .anim-4 { animation: step4 14s infinite; }
+      .anim-5 { animation: step5 14s infinite; }
+      
+      .mono { font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Menlo, Monaco, Consolas, monospace; }
+    </style>
+  </defs>
+
+  <!-- Window Frame with Drop Shadow -->
+  <rect x="20" y="20" width="880" height="500" rx="14" fill="url(#bg-grad)" stroke="#1e293b" stroke-width="1.5" filter="url(#shadow)"/>
+
+  <!-- macOS Window Title Bar -->
+  <rect x="20" y="20" width="880" height="38" rx="14" fill="#0f172a"/>
+  <rect x="20" y="44" width="880" height="14" fill="#0f172a"/>
+  
+  <!-- Traffic Light Buttons -->
+  <circle cx="44" cy="39" r="6.5" fill="#ef4444"/>
+  <circle cx="65" cy="39" r="6.5" fill="#f59e0b"/>
+  <circle cx="86" cy="39" r="6.5" fill="#10b981"/>
+
+  <!-- Title Center -->
+  <text x="460" y="44" text-anchor="middle" fill="#94a3b8" font-size="12.5" class="mono" font-weight="600">toprak@macbook-pro: ~/TZeroAlgorithm — tzero benchmark (v9.8.0)</text>
+
+  <!-- Terminal Body Content -->
+  <g class="mono" font-size="13.5">
+    <!-- Line 1: Command Prompt -->
+    <text x="45" y="88" fill="#94a3b8">$</text>
+    <text x="62" y="88" fill="#f8fafc" font-weight="600">tzero benchmark</text>
+    <text x="195" y="88" fill="#38bdf8">--repo . --models claude-3.5-sonnet,gpt-4o,gemini-1.5-pro,deepseek-v3</text>
+    <rect x="735" y="74" width="8" height="16" fill="#38bdf8" class="cursor"/>
+
+    <!-- Line 2 & 3: Banner (Step 1) -->
+    <g class="anim-1">
+      <text x="45" y="118" fill="url(#cyan-glow)" font-weight="700">⚡ SİBER AKADEMİ — T-ZERO AUTONOMOUS BENCHMARK ENGINE v9.8.0</text>
+      <text x="45" y="138" fill="#64748b">Analyzing 281 active files • 51,541 lines of code • Polyglot AST Engine</text>
+    </g>
+
+    <!-- Scanning & AST Reduction Metrics (Step 2) -->
+    <g class="anim-2">
+      <!-- Raw Box -->
+      <rect x="45" y="160" width="265" height="66" rx="8" fill="#1e1b2e" stroke="#ef4444" stroke-width="1.2"/>
+      <text x="60" y="184" fill="#fca5a5" font-size="11.5" font-weight="600">RAW CODEBASE CONTEXT</text>
+      <text x="60" y="210" fill="#ef4444" font-size="20" font-weight="700">1,168,014 <tspan font-size="12" fill="#94a3b8">tokens</tspan></text>
+
+      <!-- Arrow -->
+      <text x="325" y="200" fill="#38bdf8" font-size="22" font-weight="700">→</text>
+
+      <!-- T-Zero Compressed Box -->
+      <rect x="360" y="160" width="265" height="66" rx="8" fill="#062822" stroke="#10b981" stroke-width="1.2"/>
+      <text x="375" y="184" fill="#6ee7b7" font-size="11.5" font-weight="600">T-ZERO AST SKELETON (TIER-2)</text>
+      <text x="375" y="210" fill="#10b981" font-size="20" font-weight="700">64,240 <tspan font-size="12" fill="#94a3b8">tokens</tspan></text>
+
+      <!-- Reduction Badge -->
+      <rect x="645" y="160" width="230" height="66" rx="8" fill="#082f49" stroke="#0284c7" stroke-width="1.2"/>
+      <text x="660" y="184" fill="#7dd3fc" font-size="11.5" font-weight="600">NET TOKEN REDUCTION</text>
+      <text x="660" y="210" fill="#38bdf8" font-size="20" font-weight="700">-94.5% <tspan font-size="12" fill="#10b981">(-1,103,774)</tspan></text>
+    </g>
+
+    <!-- Model Table (Step 3) -->
+    <g class="anim-3">
+      <!-- Table Header -->
+      <rect x="45" y="244" width="830" height="26" fill="#1e293b" rx="4"/>
+      <text x="60" y="262" fill="#94a3b8" font-size="11" font-weight="700">FRONTIER MODEL</text>
+      <text x="320" y="262" fill="#94a3b8" font-size="11" font-weight="700">RAW / QUERY</text>
+      <text x="460" y="262" fill="#94a3b8" font-size="11" font-weight="700">T-ZERO / QUERY</text>
+      <text x="610" y="262" fill="#94a3b8" font-size="11" font-weight="700">SAVED %</text>
+      <text x="730" y="262" fill="#94a3b8" font-size="11" font-weight="700">10-DEV ROI / MO</text>
+
+      <!-- Model 1: Claude 3.5 Sonnet -->
+      <text x="60" y="292" fill="#f8fafc" font-weight="600">Anthropic Claude 3.5 Sonnet</text>
+      <text x="320" y="292" fill="#ef4444">$3.504</text>
+      <text x="460" y="292" fill="#10b981" font-weight="600">$0.193</text>
+      <text x="610" y="292" fill="#38bdf8" font-weight="700">-94.5%</text>
+      <text x="730" y="292" fill="#10b981" font-weight="700">+$18,212.27</text>
+
+      <!-- Model 2: OpenAI GPT-4o -->
+      <text x="60" y="318" fill="#f8fafc" font-weight="600">OpenAI GPT-4o</text>
+      <text x="320" y="318" fill="#ef4444">$2.920</text>
+      <text x="460" y="318" fill="#10b981" font-weight="600">$0.161</text>
+      <text x="610" y="318" fill="#38bdf8" font-weight="700">-94.5%</text>
+      <text x="730" y="318" fill="#10b981" font-weight="700">+$15,176.89</text>
+
+      <!-- Model 3: Google Gemini 1.5 Pro -->
+      <text x="60" y="344" fill="#f8fafc" font-weight="600">Google Gemini 1.5 Pro</text>
+      <text x="320" y="344" fill="#ef4444">$1.460</text>
+      <text x="460" y="344" fill="#10b981" font-weight="600">$0.080</text>
+      <text x="610" y="344" fill="#38bdf8" font-weight="700">-94.5%</text>
+      <text x="730" y="344" fill="#10b981" font-weight="700">+$7,588.45</text>
+
+      <!-- Model 4: DeepSeek V3 -->
+      <text x="60" y="370" fill="#f8fafc" font-weight="600">DeepSeek V3 / R1</text>
+      <text x="320" y="370" fill="#ef4444">$0.315</text>
+      <text x="460" y="370" fill="#10b981" font-weight="600">$0.017</text>
+      <text x="610" y="370" fill="#38bdf8" font-weight="700">-94.5%</text>
+      <text x="730" y="370" fill="#10b981" font-weight="700">+$1,639.10</text>
+    </g>
+
+    <!-- Security & Quality Badges (Step 4) -->
+    <g class="anim-4">
+      <rect x="45" y="394" width="830" height="50" rx="8" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+      <text x="65" y="424" fill="#10b981" font-size="13" font-weight="700">✓ 100% Zero-Leak Guard</text>
+      <text x="250" y="424" fill="#94a3b8" font-size="12">(0 secrets exposed)</text>
+
+      <text x="400" y="424" fill="#38bdf8" font-size="13" font-weight="700">✓ 0.0% Hallucinations</text>
+      <text x="575" y="424" fill="#94a3b8" font-size="12">(Reality-Lock AST Grounded)</text>
+
+      <text x="760" y="424" fill="#fbbf24" font-size="13" font-weight="700">⚡ 171.8x Faster</text>
+    </g>
+
+    <!-- Bottom Footer (Step 5) -->
+    <g class="anim-5">
+      <text x="45" y="482" fill="#10b981" font-weight="700">🚀 Enterprise ROI:</text>
+      <text x="185" y="482" fill="#f8fafc">Saving an estimated <tspan fill="#10b981" font-weight="700">$10,654.18 / month</tspan> per 10-developer team</text>
+      <text x="780" y="482" fill="#64748b" font-size="11">T-Zero V9.8.0</text>
+    </g>
+  </g>
+</svg>

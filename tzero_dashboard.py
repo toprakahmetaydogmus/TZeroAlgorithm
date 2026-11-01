@@ -456,7 +456,7 @@ HTML_PAGE = """<!DOCTYPE html>
       <div class="brand-logo">T0</div>
       <div>
         <div class="brand-title">T-Zero Developer Console</div>
-        <div class="brand-sub">Enterprise AST Context Architect &bull; v8.0.1</div>
+        <div class="brand-sub">Enterprise AST Context Architect &bull; v9.8.0</div>
       </div>
     </div>
     <div class="header-actions">
@@ -751,7 +751,7 @@ impl SwarmCluster {
   </main>
 
   <footer>
-    T-Zero Context Architect v8.0.1 &bull; Developer: Toprak Ahmet Aydoğmuş &bull; Siber Akademi
+    T-Zero Context Architect v9.8.0 &bull; Developer: Toprak Ahmet Aydoğmuş &bull; Siber Akademi
   </footer>
 
   <script>
@@ -1336,7 +1336,7 @@ class DashboardRequestHandler(http.server.BaseHTTPRequestHandler):
             self.send_header("Content-Type", "application/json")
             self.end_headers()
             stats = {
-                "version": "8.0.1",
+                "version": "9.8.0",
                 "tools_count": 49,
                 "token_savings": "94.9%",
                 "security": "100% Zero-Leak Guard",

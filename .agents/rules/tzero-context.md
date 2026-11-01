@@ -25,15 +25,15 @@ tzero sync
   * `AuditFinding (app.py)`
   * `SecurityQualityAuditor (app.py)`
   * `ROIEstimator (app.py)`
+  * `TierMetric (tzero_benchmark.py)`
+  * `ModelBenchmarkItem (tzero_benchmark.py)`
+  * `BenchmarkReport (tzero_benchmark.py)`
+  * `TZeroBenchmarkEngine (tzero_benchmark.py)`
+  * `JarvisBenchmarkOptimizer (tzero_benchmark.py)`
   * `CIPipelineGenerator (tzero_ci.py)`
   * `DiffSemantics (tzero_commit.py)`
   * `LocalSemanticCommitSynthesizer (tzero_commit.py)`
   * `ModelCostComparison (tzero_cost.py)`
-  * `CostReport (tzero_cost.py)`
-  * `TokenCostCalculator (tzero_cost.py)`
-  * `DashboardRequestHandler (tzero_dashboard.py)`
-  * `Dependency (tzero_deps.py)`
-  * `DriftFinding (tzero_drift.py)`
 - **Primary Public Functions:**
   * `build_client_targets() (addmcp.py)`
   * `server_entry() (addmcp.py)`

@@ -468,7 +468,7 @@ def calculate_token_cost(token_count: int, provider_name: str) -> float:
 # i18n Translations
 TRANSLATIONS: Dict[str, Dict[str, str]] = {
     "en": {
-        "title": "T-Zero Developer Console & Context Architect v8.0.1",
+        "title": "T-Zero Developer Console & Context Architect v9.8.0",
         "subtitle": f"Developer: {DEV_NAME} | {DEV_URL_MAIN} | {DEV_URL_BIO}",
         "overview_tab": "🏠 Overview Dashboard",
         "setup_tab": "⚡ Setup & AI Models",
@@ -505,7 +505,7 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "audit_btn": "🛡️ SECURITY AUDIT"
     },
     "tr": {
-        "title": "T-Zero Geliştirici Konsolu & Bağlam Mimarı v8.0.1",
+        "title": "T-Zero Geliştirici Konsolu & Bağlam Mimarı v9.8.0",
         "subtitle": f"Geliştirici: {DEV_NAME} | {DEV_URL_MAIN} | {DEV_URL_BIO}",
         "overview_tab": "🏠 Genel Bakış",
         "setup_tab": "⚡ Kurulum & Model",
@@ -8337,7 +8337,7 @@ def main():
     parser.add_argument("--focus", default="", metavar="TARGET", help="Focus file or semantic search query for context budget packing")
     parser.add_argument("--pack-out", default=None, metavar="FILE", help="Output file for packed context bundle (default: stdout)")
     parser.add_argument("--commit-msg", action="store_true", help="Generate Conventional Commit message from local AST git diff ($0 local engine)")
-    parser.add_argument("--changelog", nargs="?", const="v8.2.0", default=None, metavar="VERSION", help="Generate release CHANGELOG markdown from git history")
+    parser.add_argument("--changelog", nargs="?", const="v9.8.0", default=None, metavar="VERSION", help="Generate release CHANGELOG markdown from git history")
     parser.add_argument("--ci", choices=["github", "gitlab", "pre-commit", "all"], default=None, help="Install turnkey CI/CD security and verification workflow")
     parser.add_argument("--stubs", nargs="?", const=".", default=None, metavar="PATH", help="Generate PEP-484 AST type stubs (.pyi) for target file or workspace")
     parser.add_argument("--stubs-out", default=None, metavar="DIR", help="Output directory for generated type stubs (default: alongside .py files)")
@@ -8350,7 +8350,9 @@ def main():
     parser.add_argument("--pillar", type=int, choices=range(1, 8), default=None, help="Filter --matrix by Pillar number (1 to 7)")
     parser.add_argument("--hallucination-check", "--hc", metavar="FILE_OR_CODE", dest="hallucination_check", help="Run pre-flight AST reality-lock to verify imports and method calls")
     parser.add_argument("--tutorial", "--guide", action="store_true", help="Launch interactive step-by-step master tutorial for T-Zero Neural Cortex & IDE setups")
-    parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect v8.0.1 Master Edition (engine v4.1.0)")
+    parser.add_argument("--benchmark", nargs="?", const=".", default=None, metavar="PATH", help="Run multi-model token reduction, latency & ROI benchmark (Claude, GPT-4o, Gemini, DeepSeek)")
+    parser.add_argument("--benchmark-svg", action="store_true", help="Generate animated macOS terminal SVG recording of benchmark for README")
+    parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect v9.8.0 Master Edition (engine v4.1.0)")
 
 
     def print_master_tutorial():
@@ -8451,7 +8453,7 @@ Generate tailored subagent manifests (.tzero/agents/ + SKILL.md) in 1 second:
     def print_quickstart_guide():
         print("""
 ================================================================================
-⚡ SİBER AKADEMİ — T-ZERO CONTEXT ARCHITECT & MCP v8.0.1 MASTER (engine v4.1.0)
+⚡ SİBER AKADEMİ — T-ZERO CONTEXT ARCHITECT & MCP v9.8.0 MASTER (engine v4.1.0)
 ================================================================================
 🎯 %95'e Varan Token Tasarrufu & Otonom Yapay Zeka Mimari Bağlam Motoru
 
@@ -8538,6 +8540,8 @@ Generate tailored subagent manifests (.tzero/agents/ + SKILL.md) in 1 second:
             "matrix": "--matrix",
             "tutorial": "--tutorial",
             "guide": "--tutorial",
+            "benchmark": "--benchmark",
+            "bench": "--benchmark",
         }
         if sub in sub_map:
             sys.argv[1] = sub_map[sub]
@@ -8882,6 +8886,17 @@ Generate tailored subagent manifests (.tzero/agents/ + SKILL.md) in 1 second:
         else:
             print(f"\033[31m[FAILED] {res.get('message')}\033[0m")
             sys.exit(1)
+    elif getattr(args, "benchmark", None) is not None or getattr(args, "benchmark_svg", False):
+        from tzero_benchmark import TZeroBenchmarkEngine
+        target = args.benchmark if (args.benchmark and args.benchmark != ".") else args.dir
+        rep = TZeroBenchmarkEngine.run_benchmark(target)
+        if getattr(args, "benchmark_svg", False):
+            out_p = TZeroBenchmarkEngine.generate_animated_svg(rep)
+            print(f"\033[32m[SUCCESS] Generated vector-animated macOS terminal SVG recording: {out_p}\033[0m")
+        else:
+            TZeroBenchmarkEngine.render_cli(rep)
+            out_p = TZeroBenchmarkEngine.generate_animated_svg(rep)
+            print(f"\033[32m[SUCCESS] Vector-animated macOS terminal recording saved to: {out_p}\033[0m")
     elif getattr(args, "tui", False):
         from tzero_tui import TZeroTerminalCockpit
         TZeroTerminalCockpit.run_interactive(args.dir)
