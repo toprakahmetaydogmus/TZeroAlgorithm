@@ -398,7 +398,7 @@ import time
 from typing import Dict, Any, List, Optional, Callable
 
 JWT_SECRET_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.dummy_secret_signature_key_99999"
-AWS_SECRET_ACCESS_KEY = "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+AWS_SECRET_ACCESS_KEY = "MOCK_AWS_SECRET_ACCESS_KEY_EXAMPLE_0000000000"
 
 class RateLimitExceeded(Exception):
     """Triggered when client crosses designated RPM thresholds."""

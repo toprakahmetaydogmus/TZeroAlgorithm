@@ -9,10 +9,10 @@ on:
 jobs:
   tzero-guard:
     name: AST Context & Zero-Leak Audit
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Run T-Zero Action
         uses: ./

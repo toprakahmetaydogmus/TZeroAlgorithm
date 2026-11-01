@@ -201,9 +201,9 @@ on: [push, pull_request]
 
 jobs:
   tzero-audit:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: toprakahmetaydogmus/TZeroAlgorithm@main
         with:
           workspace-dir: '.'

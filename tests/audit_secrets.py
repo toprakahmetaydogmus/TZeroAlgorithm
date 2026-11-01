@@ -22,17 +22,18 @@ FALSE_POSITIVES = [
     "invalid passphrase or corrupted backup",
     "sha256",
     "tzero_seed_",
+    "mock",
+    "placeholder",
+    "example",
 ]
 
-root_dirs = [
-    r"C:\Users\topra_n3vq63d\.gemini\antigravity-ide\scratch\TZeroAlgorithm",
-    r"C:\Users\topra_n3vq63d\.gemini\antigravity-ide\scratch\jarvis-system",
-]
+repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+root_dirs = [repo_root]
 
 found = []
 for rdir in root_dirs:
     for root, dirs, files in os.walk(rdir):
-        if any(d in root for d in [".git", "__pycache__", ".pytest_cache", "target", "dist", "build", ".venv", "venv", ".egg-info"]):
+        if any(d in root for d in [".git", "__pycache__", ".pytest_cache", "target", "dist", "build", ".venv", "venv", ".egg-info", "node_modules", "tests"]):
             continue
         for f in files:
             if f.endswith((".py", ".rs", ".json", ".toml", ".bat", ".md", ".txt", ".html", ".js", ".css")):

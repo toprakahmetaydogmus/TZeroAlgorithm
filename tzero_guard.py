@@ -148,17 +148,31 @@ exit /b 0
         abs_repo = os.path.abspath(repo_dir)
         files_map: Dict[str, str] = {}
         skip_dirs = {".git", "__pycache__", ".pytest_cache", "target", "dist", "build", ".venv", "venv", ".egg-info", "node_modules"}
+        skip_files = {
+            "package-lock.json", "yarn.lock", "pnpm-lock.yaml", "Cargo.lock",
+            "poetry.lock", "composer.lock", "Gemfile.lock", "Pipfile.lock"
+        }
         code_exts = {".py", ".rs", ".js", ".ts", ".jsx", ".tsx", ".go", ".java", ".json", ".toml", ".yaml", ".yml", ".env"}
 
         for root, dirs, files in os.walk(abs_repo):
             dirs[:] = [d for d in dirs if d not in skip_dirs]
             for f in files:
+                if f in skip_files or f.endswith((".lock", ".min.js", ".min.css", ".map")):
+                    continue
                 _, ext = os.path.splitext(f)
                 if ext.lower() in code_exts or f.startswith(".env"):
                     fpath = os.path.join(root, f)
                     rel_path = os.path.relpath(fpath, abs_repo).replace("\\", "/")
                     if "test" in rel_path.lower():
                         continue
+                    if f.startswith(".env") and f != ".env.example":
+                        # Skip local gitignored environment files
+                        try:
+                            check = subprocess.run(["git", "-C", abs_repo, "check-ignore", fpath], capture_output=True)
+                            if check.returncode == 0:
+                                continue
+                        except Exception:
+                            pass
                     try:
                         with open(fpath, "r", encoding="utf-8", errors="replace") as fp:
                             files_map[rel_path] = fp.read()

@@ -53,8 +53,9 @@ COMMON_ENTROPY_WHITELIST = {
 
 PLACEHOLDER_SUBSTRINGS = (
     "YOUR_API_KEY", "YOUR-API-KEY", "YOUR_SECRET", "YOUR_TOKEN",
-    "ENTER_YOUR", "PLACEHOLDER", "CHANGEME", "INSERT_HERE",
-    "000000000000", "EXAMPLE_KEY", "MOCK_KEY_PLACEHOLDER", "MOCK", "DEMO"
+    "YOUR-", "YOUR_", "ENTER_YOUR", "PLACEHOLDER", "CHANGEME", "INSERT_HERE",
+    "000000000000", "EXAMPLE_KEY", "EXAMPLEKEY", "EXAMPLE_SECRET",
+    "MOCK_KEY_PLACEHOLDER", "MOCK", "DEMO"
 )
 
 
@@ -292,6 +293,11 @@ class ZeroLeakEngine:
                 for tok in candidate_tokens:
                     # Filter out URLs, file paths, and common non-secrets
                     if any(prefix in tok for prefix in ("http:", "https:", "/", "\\", "@", ".com", ".org", ".net")):
+                        continue
+                    # Ignore SRI cryptographic package hashes and data URIs (e.g. package-lock.json integrity hashes)
+                    if tok.startswith(("sha512-", "sha384-", "sha256-", "md5-", "urn:", "data:")):
+                        continue
+                    if any(kw in line.lower() for kw in ('"integrity"', '"resolved"', '"hash"', 'sha512-', 'sha256-')):
                         continue
                     if cls.is_placeholder(tok) or tok.lower() in COMMON_ENTROPY_WHITELIST:
                         continue
