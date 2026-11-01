@@ -14,37 +14,21 @@ Your objective is to execute all coding, debugging, refactoring, and orchestrati
 - **Active Frameworks:** `None / Core`
 - **Build & Packaging:** `poetry/uv/flit, pip`
 - **Architectural Style:** `Autonomous CLI / Tool Architecture`
-- **Estimated Code Volume:** `282 files` (~`51748 lines of code`)
-- **T-Zero Context Budget:** `1124835 virtual tokens` (vs `9373629` raw tokens, **88.0% context reduction**)
+- **Estimated Code Volume:** `284 files` (~`51936 lines of code`)
+- **T-Zero Context Budget:** `1124571 virtual tokens` (vs `9371428` raw tokens, **88.0% context reduction**)
 
-## 3. Operational Protocols & 5 Verification Gates
-Before marking any assignment, feature, or bugfix as complete, you MUST execute the following verification pipeline in sequence:
+## 3. Operational Protocols & Verification Gates
+Before marking any assignment, feature, or bugfix as complete, you MUST execute the following verification pipeline:
 
-1. **Gate 1: AST Structural Syntax Check**
-   ```bash
-   python -m py_compile <modified_files>
-   ```
-2. **Gate 2: Shannon Entropy Secret Scan (Filter Threshold: $H \ge 4.75$)**
-   - *Rationale:* English prose and standard source code identifiers have an average Shannon entropy of $H \approx 3.0 - 3.8$. High-entropy cryptographic secrets, JWTs, and API keys (base64/hex) measure $H \ge 4.75$. Setting the threshold at $H = 4.75$ catches real secrets while avoiding false positives on variable names.
-   ```bash
-   python tests/audit_secrets.py
-   ```
-3. **Gate 3: Pre-Flight Reality-Lock Static Guard**
-   - Statically validates that 100% of imported symbols, method names, and parameter counts exist in the workspace AST.
-   ```bash
-   python tzero_v3.py --hallucination-check <file_or_code>
-   ```
-4. **Gate 4: Bounded Blast Radius Check (Safety Threshold: Score $< 40$)**
-   - *Rationale:* Blast radius is scored 0-100 based on directed call-graph DAG centrality ($R = \min(100, \sum \text{dependent}_i \times \text{weight}_i)$). A score $< 40$ guarantees edits are isolated to leaf or edge modules without risking cascading regressions across foundational abstractions.
-   ```bash
-   python tzero_v3.py --impact <symbol_name>
-   ```
-5. **Gate 5: Comprehensive Automated Test Suite**
-   ```bash
-   python -m unittest discover -s tests -p "test_*.py"
-   ```
+```bash
+# 1. Run Workspace Static Quality & Lint Check
+flake8 .
 
-If any gate fails, activate the **T-Zero Self-Healing Execution Protocol**: diagnose the traceback, identify the exact failing AST node, apply surgical patches, and re-run until 100% green.
+# 2. Run Comprehensive Automated Test Suite
+python -m unittest discover -s tests -p "test_*.py"
+```
+
+If tests fail, activate the **T-Zero Self-Healing Execution Protocol**: diagnose the traceback, identify the exact failing AST node, apply surgical patches, and re-run until 100% green.
 
 ## 4. Architectural Boundaries & Structural Contracts
 ```mermaid
