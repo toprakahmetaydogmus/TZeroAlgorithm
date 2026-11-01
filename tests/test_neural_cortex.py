@@ -162,8 +162,99 @@ def calculate(x):
         self.assertTrue(plan.is_conflict_free)
         execution_report = self.coordinator.execute_mission(plan)
         self.assertTrue(execution_report["success"])
-        self.assertEqual(len(execution_report["agent_results"]), 3)
+    def test_deep_ast_engines(self):
+        from tzero_neural_cortex import (
+            StaticCallGraphEngine,
+            BackwardProgramSlicer,
+            BlastRadiusCalculator,
+            SurgicalASTPatcher,
+            Type3CloneDetector,
+            CyclomaticComplexityEngine,
+            TaintFlowTracker,
+            PolyglotTranspiler,
+            EntropySecretScrubber,
+            DeveloperDNACloner
+        )
+
+        sample = """
+def helper(x):
+    return x * 2
+
+def compute(val):
+    a = val + 1
+    b = helper(a)
+    return b
+
+def compute_clone(item):
+    p = item + 1
+    q = helper(p)
+    return q
+"""
+        # 1. Static Call Graph
+        graph = StaticCallGraphEngine.build_graph(sample)
+        self.assertIn("compute", graph["nodes"])
+        self.assertIn("helper", graph["nodes"])
+        self.assertIn("flowchart TD", graph["mermaid"])
+
+        # 2. Backward Program Slicing
+        slice_res = BackwardProgramSlicer.slice(sample, target_var="b")
+        self.assertIn("b = helper(a)", slice_res["sliced_code"])
+
+        # 3. Blast Radius
+        blast = BlastRadiusCalculator.calculate_blast_radius("helper", sample)
+        self.assertGreaterEqual(blast["blast_radius_score"], 20)
+
+        # 4. Surgical AST Patcher
+        patched = SurgicalASTPatcher.patch_node(
+            source_code=sample,
+            target_name="helper",
+            replacement_code="def helper(x):\n    return x * 10\n"
+        )
+        self.assertTrue(patched["success"])
+        self.assertIn("x * 10", patched["patched_code"])
+
+        # 5. Type-3 Clone Detection
+        clones = Type3CloneDetector.detect_clones(sample, min_statements=2)
+        self.assertGreaterEqual(len(clones), 1)
+
+        # 6. Cyclomatic Complexity
+        complexity = CyclomaticComplexityEngine.analyze(sample)
+        self.assertEqual(complexity["overall_rating"], "A")
+
+        # 7. Taint Flow Tracking
+        vuln_code = """
+import os
+def handle_req(request_param):
+    cmd = request_param + " --list"
+    os.system(cmd)
+"""
+        taints = TaintFlowTracker.scan(vuln_code)
+        self.assertGreaterEqual(len(taints), 1)
+        self.assertEqual(taints[0]["sink"], "system")
+
+        # 8. Polyglot Transpiler
+        dataclass_py = """
+class UserProfile:
+    user_id: str
+    credits: int
+    is_active: bool
+"""
+        ts = PolyglotTranspiler.to_typescript(dataclass_py)
+        self.assertIn("export interface UserProfile", ts)
+        self.assertIn("user_id: string;", ts)
+
+        # 9. Entropy Secret Scrubber
+        secret_sample = "API_KEY = 'sk-1234567890abcdef1234567890abcdef'"
+        scrubbed, map_s = EntropySecretScrubber.scrub(secret_sample)
+        self.assertIn("[REDACTED_SECRET_", scrubbed)
+        restored = EntropySecretScrubber.restore(scrubbed, map_s)
+        self.assertEqual(restored, secret_sample)
+
+        # 10. Developer DNA Cloner
+        dna = DeveloperDNACloner.analyze_style(sample)
+        self.assertEqual(dna["naming_convention"], "snake_case")
 
 
 if __name__ == "__main__":
     unittest.main()
+

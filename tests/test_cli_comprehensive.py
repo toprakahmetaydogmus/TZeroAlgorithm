@@ -177,7 +177,15 @@ class TestComprehensiveCLI(unittest.TestCase):
         res_fail = self._run_cli(["--hallucination-check", "import math; x = math.non_existent_fake_method()"])
         self.assertEqual(res_fail.returncode, 1)
         self.assertIn("HALLUCINATION DETECTED", res_fail.stdout)
+ 
+    def test_cli_tutorial(self):
+        res = self._run_cli(["--tutorial"])
+        self.assertEqual(res.returncode, 0)
+        self.assertIn("T-ZERO MASTER TUTORIAL", res.stdout)
+        self.assertIn("MODULE 1: THE TOKEN CRISIS", res.stdout)
+        self.assertIn("MODULE 3: THE 105 ENTERPRISE CAPABILITY MATRIX", res.stdout)
 
 
 if __name__ == "__main__":
     unittest.main()
+

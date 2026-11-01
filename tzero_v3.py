@@ -8349,7 +8349,104 @@ def main():
     parser.add_argument("--matrix", action="store_true", help="Display full 105 T-Zero Enterprise AI Capability Matrix")
     parser.add_argument("--pillar", type=int, choices=range(1, 8), default=None, help="Filter --matrix by Pillar number (1 to 7)")
     parser.add_argument("--hallucination-check", "--hc", metavar="FILE_OR_CODE", dest="hallucination_check", help="Run pre-flight AST reality-lock to verify imports and method calls")
+    parser.add_argument("--tutorial", "--guide", action="store_true", help="Launch interactive step-by-step master tutorial for T-Zero Neural Cortex & IDE setups")
     parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect v8.0.1 Master Edition (engine v4.1.0)")
+
+
+    def print_master_tutorial():
+        print("""\033[36m================================================================================
+🧠 T-ZERO MASTER TUTORIAL: THE WORLD'S #1 AST CONTEXT ARCHITECT & AGENT-OS
+================================================================================\033[0m
+🎯 OVERVIEW:
+T-Zero is the world's most advanced context engineering engine and autonomous
+multi-agent operating system. It cuts up to 95% of LLM prompt tokens while preserving
+100% of typed signatures, interface contracts, and dependency topologies.
+
+\033[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📚 MODULE 1: THE TOKEN CRISIS & AST SKELETONIZATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m
+Problem: When AI assistants read full codebases, 85-95% of prompt tokens are wasted
+on routine loop bodies, intermediate math, and internal variable reassignments.
+Solution: T-Zero extracts compact AST signatures (Class contracts, typed params,
+docstrings) and collapses implementation bodies ({...}) to save tokens.
+
+Try it now:
+  $ tzero --scan .
+  $ tzero --tree . --out skeleton_tree.txt
+  $ tzero --pack 16000 --focus auth.py
+
+\033[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📚 MODULE 2: UNIVERSAL 1-CLICK IDE SETUP (1 SECOND)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m
+T-Zero connects natively to any AI code editor via the Model Context Protocol (MCP):
+  • Cursor:          $ tzero init --cursor
+  • Claude Desktop:  $ tzero init --claude
+  • Antigravity IDE: $ tzero init --antigravity
+  • Windsurf:        $ tzero init --windsurf
+  • Cline:           $ tzero init --cline
+  • All at once:     $ tzero init
+
+\033[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📚 MODULE 3: THE 105 ENTERPRISE CAPABILITY MATRIX (7 PILLARS)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m
+T-Zero provides 105 modular capabilities divided into 7 grand pillars:
+  1. Pillar I:   Compiler, AST & Program Analysis (CAP-001 to CAP-015)
+  2. Pillar II:  Matryoshka Context & Token Economy (CAP-016 to CAP-030)
+  3. Pillar III: Shadow Workspace & Simulation (CAP-031 to CAP-045)
+  4. Pillar IV:  Runtime & Deep Telemetry (CAP-046 to CAP-060)
+  5. Pillar V:   Zero-Latency Orchestration & Meta-Tools (CAP-061 to CAP-075)
+  6. Pillar VI:  Cognitive Memory & Enterprise Knowledge Graph (CAP-076 to CAP-090)
+  7. Pillar VII: Hardware Bridge, Security & Core Performance (CAP-091 to CAP-105)
+
+Inspect by pillar:
+  $ tzero --matrix
+  $ tzero --matrix --pillar 1
+  $ tzero --matrix --pillar 7
+
+\033[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📚 MODULE 4: THE 12 AUTONOMOUS FLEET SUBAGENTS & SWARM MISSIONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m
+T-Zero contains 12 built-in autonomous fleet subagents:
+  🛡️  SecuritySentinelAgent     - 100% Zero-Leak OS Keyring & Entropy Scrubber
+  ⚡  ASTArchitectAgent         - AST Skeletonization & 95% Token Pruning
+  🧹  DeadCodePurgerAgent        - Orphan Symbol & Unreachable Branch Purging
+  🧪  TestSynthesizerAgent       - Property-Based Mutation Unit Tests
+  🌐  PolyglotTranspilerAgent    - Cross-Language Boundary & FFI Resolution
+  🔍  BugHunterAgent             - AST Causal Trace & Stack Dump Autopsy
+  ⏱️  PerformanceProfilerAgent   - Live CPU Flamegraphs & Complexity Profiler
+  📝  DocstringGeneratorAgent    - AST Type Inlining & PEP-257 Synchronization
+  📦  DependencyAuditorAgent     - Lockfile Drift & Conflict Simulator
+  🛠️  RefactorModernizerAgent    - Surgical AST Patching & Clone Deduplication
+  ⚖️  HallucinationValidatorAgent- Pre-Flight Reality-Lock AST Validation
+  🚀  DevOpsReleaseAgent         - Zero-Roundtrip DAG Execution & CI/CD Guard
+
+Execute a multi-agent swarm mission across workspace:
+  $ tzero --swarm "Full Workspace AST & Security Audit"
+
+\033[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📚 MODULE 5: PRE-FLIGHT REALITY-LOCK (HALLUCINATION ANNIHILATOR)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m
+Eliminate hallucinated method calls and phantom imports before code is executed:
+  $ tzero --hallucination-check "import math; x = math.sqrt(25)"
+  $ tzero --hallucination-check path/to/ai_generated_patch.py
+
+\033[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📚 MODULE 6: AGENTFORGE CUSTOM SUBAGENT PERSONA SYNTHESIZER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m
+Generate tailored subagent manifests (.tzero/agents/ + SKILL.md) in 1 second:
+  $ tzero --forge SecurityAuditor "Audit API routes for zero-leak compliance"
+  $ tzero --forge DbOptimizer "Optimize SQL queries and N+1 call sites"
+
+\033[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📚 MODULE 7: INTERACTIVE COCKPITS, TUI & 3D NEURAL WEB STUDIO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m
+  • ANSI Terminal Cockpit:  $ tzero --tui
+  • Desktop GUI Studio:      $ tzero-gui (or $ tzero --gui)
+  • 3D Synaptic Web Lab:     $ python benchmark-site/serve.py (Opens on http://localhost:8080)
+
+⭐ Star T-Zero on GitHub: https://github.com/toprakahmetaydogmus/TZeroAlgorithm
+================================================================================
+""")
 
     def print_quickstart_guide():
         print("""
@@ -8439,6 +8536,8 @@ def main():
             "swarm": "--swarm",
             "forge": "--forge",
             "matrix": "--matrix",
+            "tutorial": "--tutorial",
+            "guide": "--tutorial",
         }
         if sub in sub_map:
             sys.argv[1] = sub_map[sub]
@@ -8525,6 +8624,9 @@ def main():
             print(DriftAnalyzer.to_json(rep))
         else:
             DriftAnalyzer.render_cli(rep)
+        sys.exit(0)
+    elif getattr(args, "tutorial", False) or getattr(args, "guide", False):
+        print_master_tutorial()
         sys.exit(0)
     elif getattr(args, "neural", False):
         from tzero_neural_cortex import CapabilityRegistry, TZeroAgentFleet
