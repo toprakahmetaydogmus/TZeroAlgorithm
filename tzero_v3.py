@@ -8911,7 +8911,7 @@ Generate tailored subagent manifests (.tzero/agents/ + SKILL.md) in 1 second:
         print("\033[36m" + "=" * 80)
         print("🤗 SİBER AKADEMİ — T-ZERO HUGGING FACE SPACE & GRADIO COCKPIT (v9.9.0)")
         print("=" * 80 + "\033[0m")
-        print("🌐 Official Live Space : https://huggingface.co/spaces/toprakahmetaydogmus/TZeroContextArchitect")
+        print("🌐 Official Live Space : https://huggingface.co/spaces/toprakke4/tzero-token-reducer")
         print(f"📁 Local Application   : {app_path}")
         print("\n🚀 Launching local Gradio Web Cockpit on http://localhost:7860 ...")
         if os.path.exists(app_path):

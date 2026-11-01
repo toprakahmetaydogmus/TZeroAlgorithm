@@ -6,7 +6,7 @@
 ### *Next-Generation Context Engineering, 105 Enterprise Capabilities, 12 Autonomous Fleet Subagents, 0% Hallucinations & 95% Token Reduction for AI Coding Assistants.*
 
 [![Glama MCP Badge](https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm/badges/score.svg)](https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm)
-[![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces%20Live%20Demo-ffd21e?style=flat-square&logo=huggingface)](https://huggingface.co/spaces/toprakahmetaydogmus/TZeroContextArchitect)
+[![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces%20Live%20Demo-ffd21e?style=flat-square&logo=huggingface)](https://huggingface.co/spaces/toprakke4/tzero-token-reducer)
 [![PyPI Version](https://img.shields.io/pypi/v/tzero-mcp?color=38bdf8&style=flat-square&logo=pypi)](https://pypi.org/project/tzero-mcp/)
 [![PyPI Downloads](https://img.shields.io/pypi/dm/tzero-mcp?color=818cf8&style=flat-square&logo=pypi)](https://pypi.org/project/tzero-mcp/)
 [![Python Version](https://img.shields.io/badge/python-3.11%2B-blue?style=flat-square)](https://pypi.org/project/tzero-mcp/)
@@ -197,7 +197,7 @@ claude mcp add --scope user tzero uvx tzero-mcp
 Experience T-Zero directly in your browser without installing anything locally via our official Gradio 5 application:
 
 <p align="center">
-  <a href="https://huggingface.co/spaces/toprakahmetaydogmus/TZeroContextArchitect">
+  <a href="https://huggingface.co/spaces/toprakke4/tzero-token-reducer">
     <img src="https://img.shields.io/badge/%F0%9F%A4%97%20Open%20in%20Hugging%20Face-Spaces-ffd21e?style=for-the-badge&logo=huggingface&logoColor=black" alt="Open in Hugging Face Spaces" height="40">
   </a>
 </p>
@@ -216,8 +216,8 @@ The workspace includes a turnkey `huggingface-space/` directory ready to push to
 ```bash
 # 1. Create a new Space on huggingface.co (SDK: Gradio)
 # 2. Clone your Space repository:
-git clone https://huggingface.co/spaces/YOUR_USERNAME/TZeroContextArchitect
-cd TZeroContextArchitect
+git clone https://huggingface.co/spaces/toprakke4/tzero-token-reducer
+cd tzero-token-reducer
 
 # 3. Copy T-Zero Hugging Face files:
 cp -r /path/to/TZeroAlgorithm/huggingface-space/* .
