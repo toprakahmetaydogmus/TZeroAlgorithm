@@ -78,14 +78,14 @@ It solves the **Context Token Crisis**: when AI coding models ingest entire code
 
 ### 🥊 Context Architecture Comparison Matrix
 
-| Dimension | Raw Prompt Ingestion | Vector DB / Embedding RAG | Repomix (Raw Concatenation) | T-Zero Deterministic AST Engine |
-| :--- | :---: | :---: | :---: | :---: |
-| **Token Consumption** | 100% (Massive waste) | 40-70% (Fragmented chunks) | 100% (Dumps raw files) | **5-10% (Up to 94.6% reduction)** |
-| **Architectural Completeness** | High (Exhausts context window) | Very Low (Missing caller context) | High (Massive context bloat) | **100% (Full AST inheritance & signatures preserved)** |
-| **Hallucination Prevention** | None (Prone to phantom APIs) | None (Blind to call graphs) | None | **Pre-Flight Reality-Lock (Static AST Verification)** |
-| **Inference Cost** | $3.00 - $15.00+ / turn | Cloud Vector DB + Embedding fees | $3.00 - $15.00+ / turn | **$0.00 (100% Local, Offline AST Pruning)** |
-| **Time-to-First-Token (TTFT)**| 5,000ms - 15,000ms | 1,500ms - 3,500ms | 5,000ms - 15,000ms | **100ms - 200ms (Immediate)** |
-| **Credential Safety** | High risk of plaintext leak | Cloud transmission risk | High risk of dumping .env | **Shannon-Entropy Key Scrubber (H ≥ 4.75)** |
+| Dimension | Raw Prompt Ingestion | Vector DB / Embedding RAG | Repomix (Raw Concat) | Aider (Repo-Map) | T-Zero Deterministic AST Engine |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **Token Reduction** | 0% (Massive waste) | 40-70% (Fragmented) | 0% (Dumps raw files) | 70-85% (Symbol list only) | **Up to 94.6% (AST Skeleton)** |
+| **Context Strategy** | Full files | Naive text chunks | Flattened text dump | Top symbol signatures | **Smart Skeleton (Focus full + 1st-deg types)** |
+| **Hallucination Guard**| None (Blind) | None (Lost caller context)| None | None | **Pre-Flight Reality-Lock (Static AST)** |
+| **Protocol Support** | Manual copy/paste | Custom proprietary API | CLI file export | CLI only | **Universal MCP (Cursor, Claude, Antigravity)** |
+| **Inference Cost** | $3.00 - $15.00+ / turn | Cloud Vector DB fees | $3.00 - $15.00+ / turn | Model dependent | **$0.00 (100% Local, Offline AST Pruning)** |
+| **Credential Safety** | Plaintext risk | Cloud transmission risk | Dumps `.env` files | None | **Shannon-Entropy Key Scrubber (H ≥ 4.75)** |
 
 ---
 
