@@ -8343,6 +8343,12 @@ def main():
     parser.add_argument("--stubs-out", default=None, metavar="DIR", help="Output directory for generated type stubs (default: alongside .py files)")
     parser.add_argument("--guard-install", action="store_true", help="Install local git pre-commit zero-leak and token security hook")
     parser.add_argument("--tui", "--monitor", "--cockpit", action="store_true", help="Launch live ANSI terminal cockpit and interactive executive dashboard")
+    parser.add_argument("--neural", "--cortex", action="store_true", help="Launch T-Zero Neural Cortex & Autonomous Multi-Agent OS")
+    parser.add_argument("--swarm", nargs="?", const=".", default=None, metavar="MISSION", help="Run 12-agent autonomous neural swarm evaluation on workspace")
+    parser.add_argument("--forge", nargs=2, metavar=("ROLE", "TASK"), help="Synthesize domain-specific subagent persona (e.g. --forge SecurityAuditor 'Audit API routes')")
+    parser.add_argument("--matrix", action="store_true", help="Display full 105 T-Zero Enterprise AI Capability Matrix")
+    parser.add_argument("--pillar", type=int, choices=range(1, 8), default=None, help="Filter --matrix by Pillar number (1 to 7)")
+    parser.add_argument("--hallucination-check", "--hc", metavar="FILE_OR_CODE", dest="hallucination_check", help="Run pre-flight AST reality-lock to verify imports and method calls")
     parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect v8.0.1 Master Edition (engine v4.1.0)")
 
     def print_quickstart_guide():
@@ -8428,6 +8434,11 @@ def main():
             "cost": "--cost",
             "drift": "--drift",
             "clip": "--clip",
+            "neural": "--neural",
+            "cortex": "--neural",
+            "swarm": "--swarm",
+            "forge": "--forge",
+            "matrix": "--matrix",
         }
         if sub in sub_map:
             sys.argv[1] = sub_map[sub]
@@ -8515,6 +8526,77 @@ def main():
         else:
             DriftAnalyzer.render_cli(rep)
         sys.exit(0)
+    elif getattr(args, "neural", False):
+        from tzero_neural_cortex import CapabilityRegistry, TZeroAgentFleet
+        reg = CapabilityRegistry()
+        fleet = TZeroAgentFleet()
+        print("\033[36m================================================================================")
+        print("🧠 T-ZERO NEURAL CORTEX & AGENT-OS v9.0.0 (100+ CAPABILITIES & 12 FLEET AGENTS)")
+        print("================================================================================\033[0m")
+        print(f"✅ Active Capabilities: {len(reg.list_all())} modular capabilities registered")
+        print(f"🤖 Autonomous Fleet:    {len(fleet.list_agents())} specialized subagents ready")
+        print("🌐 Neural Web Studio:   Run 'python benchmark-site/serve.py' for 3D Neural Canvas (port 8080)")
+        sys.exit(0)
+    elif getattr(args, "matrix", False):
+        from tzero_neural_cortex import CapabilityRegistry
+        reg = CapabilityRegistry()
+        p_filter = getattr(args, "pillar", None)
+        all_caps = reg.search(pillar_num=p_filter) if p_filter else reg.list_all()
+        header = "⚡ T-ZERO 105 ENTERPRISE AI CAPABILITY MATRIX"
+        if p_filter:
+            header += f" (Pillar {p_filter} - {len(all_caps)} Capabilities)"
+        else:
+            header += f" ({len(all_caps)} Total across 7 Pillars)"
+        print(f"\n\033[36m{header}\033[0m\n")
+        current_cat = None
+        for cap in all_caps:
+            if cap.category.value != current_cat:
+                current_cat = cap.category.value
+                print(f"\n\033[33m=== {current_cat} ===\033[0m")
+            print(f"  \033[32m[{cap.id}]\033[0m \033[1m{cap.name}\033[0m ({cap.tier}) - {cap.description}")
+        sys.exit(0)
+    elif getattr(args, "swarm", None) is not None:
+        from tzero_neural_cortex import NeuralSwarmCoordinator
+        coordinator = NeuralSwarmCoordinator()
+        mission_text = args.swarm if args.swarm != "." else "Full Workspace AST & Security Audit"
+        plan = coordinator.create_mission_plan(
+            mission_title=mission_text,
+            tasks=[{"agent": a["name"], "scope": [args.dir]} for a in coordinator.fleet.list_agents()]
+        )
+        report = coordinator.execute_mission(plan)
+        print(f"\n\033[36m🐝 T-ZERO NEURAL SWARM MISSION: {mission_text}\033[0m")
+        print(f"Conflict-Free Isolation: {'✅ Active' if report['conflict_free'] else '⚠️ Overlapping'}")
+        print("================================================================================")
+        for res in report["agent_results"]:
+            status_color = "\033[32m" if res.get("verdict") == "APPROVED" else "\033[33m"
+            print(f"  {status_color}[{res.get('verdict')}]\033[0m \033[1m{res.get('agent_name')}\033[0m: {res.get('findings', [''])[0]}")
+        sys.exit(0)
+    elif getattr(args, "forge", None) is not None:
+        from tzero_neural_cortex import AgentForge
+        role, task = args.forge
+        forge = AgentForge()
+        res = forge.synthesize_subagent(role=role, task=task, workspace_dir=args.dir)
+        print(f"\033[32m[SUCCESS] Synthesized Autonomous Subagent '{res['role']}' for task: '{res['task']}'\033[0m")
+        print(f"  - Config: {res['generated_files']['agent.json']}")
+        print(f"  - Skill:  {res['generated_files']['SKILL.md']}")
+        sys.exit(0)
+    elif getattr(args, "hallucination_check", None) is not None:
+        from tzero_neural_cortex import HallucinationGuard
+        target = args.hallucination_check
+        code_str = target
+        if os.path.isfile(target):
+            with open(target, "r", encoding="utf-8", errors="replace") as f:
+                code_str = f.read()
+        guard = HallucinationGuard()
+        res = guard.validate_code(code_str)
+        if res.is_clean:
+            print(f"\033[32m[REALITY-LOCK PASS] No hallucinated methods or phantom imports detected ({res.scanned_calls} calls, {res.scanned_imports} imports).\033[0m")
+            sys.exit(0)
+        else:
+            print(f"\033[31m[HALLUCINATION DETECTED] Found {len(res.hallucinations)} hallucinated symbols:\033[0m")
+            for h in res.hallucinations:
+                print(f"  - Line {h.line_number}: {h.diagnosis}")
+            sys.exit(1)
     elif args.init_hooks is not None:
         from tzero_guard import GitSecurityGuard
         res = GitSecurityGuard.install_hook(args.init_hooks)

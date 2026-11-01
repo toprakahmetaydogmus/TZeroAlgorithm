@@ -156,6 +156,28 @@ class TestComprehensiveCLI(unittest.TestCase):
         self.assertEqual(res.returncode, 0)
         self.assertIn("T-Zero Autonomous PR Architecture & Security Report", res.stdout)
 
+    def test_cli_neural_cortex(self):
+        res = self._run_cli(["--neural"])
+        self.assertEqual(res.returncode, 0)
+        self.assertIn("T-ZERO NEURAL CORTEX & AGENT-OS", res.stdout)
+        self.assertIn("105 modular capabilities registered", res.stdout)
+        self.assertIn("12 specialized subagents ready", res.stdout)
+
+    def test_cli_matrix(self):
+        res = self._run_cli(["--matrix"])
+        self.assertEqual(res.returncode, 0)
+        self.assertIn("105 ENTERPRISE AI CAPABILITY MATRIX", res.stdout)
+        self.assertIn("CAP-001", res.stdout)
+
+    def test_cli_hallucination_check(self):
+        res_pass = self._run_cli(["--hallucination-check", "import math; x = math.sqrt(25)"])
+        self.assertEqual(res_pass.returncode, 0)
+        self.assertIn("REALITY-LOCK PASS", res_pass.stdout)
+
+        res_fail = self._run_cli(["--hallucination-check", "import math; x = math.non_existent_fake_method()"])
+        self.assertEqual(res_fail.returncode, 1)
+        self.assertIn("HALLUCINATION DETECTED", res_fail.stdout)
+
 
 if __name__ == "__main__":
     unittest.main()

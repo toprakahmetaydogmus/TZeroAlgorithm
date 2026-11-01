@@ -8,7 +8,7 @@
 3. Anti-Reinvention: Always reuse existing helper functions before writing new utilities.
 4. AST Compression: When ingesting code, prioritize interface signatures and contracts over raw method bodies.
 
-# Key Workspace Classes (148 total)
+# Key Workspace Classes (174 total)
 - ClientTarget (addmcp.py)
 - AddMCPApp (addmcp.py)
 - ASTContextArchitect (app.py)
@@ -30,7 +30,7 @@
 - ArchitectureRuleEngine (tzero_features.py)
 - AgentRulesGenerator (tzero_features.py)
 
-# Key Exported Helpers (103 total)
+# Key Exported Helpers (104 total)
 - build_client_targets() (addmcp.py)
 - server_entry() (addmcp.py)
 - merge_server_config() (addmcp.py)

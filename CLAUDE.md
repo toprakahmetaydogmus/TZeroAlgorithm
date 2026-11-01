@@ -17,7 +17,7 @@ tzero sync
 ```
 
 ## Ground-Truth Architecture Symbols
-- **Active Modules:** 53 core files
+- **Active Modules:** 55 core files
 - **Primary Classes:**
   * `ClientTarget (addmcp.py)`
   * `AddMCPApp (addmcp.py)`
