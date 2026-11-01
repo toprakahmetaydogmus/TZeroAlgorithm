@@ -1,0 +1,44 @@
+name: Bug Report
+description: Create a report to help us improve T-Zero
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for filing a bug report! Please provide as much detail as possible.
+  - type: input
+    id: version
+    attributes:
+      label: T-Zero Version
+      description: Run `tzero --version`
+      placeholder: e.g. 9.9.0
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating System
+      options:
+        - Windows 11 / 10
+        - macOS (Apple Silicon)
+        - macOS (Intel)
+        - Ubuntu / Linux
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what the bug is.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: Steps or CLI command to reproduce the behavior.
+      placeholder: |
+        1. Run 'tzero --tree <dir>'
+        2. Encounter exception...
+    validations:
+      required: true

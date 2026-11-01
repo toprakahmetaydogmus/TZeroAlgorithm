@@ -76,10 +76,10 @@ Her tema 11 renk değişkeni tanımlar: `bg_start`, `card_bg`, `card_border`, `c
 - macOS: Keychain
 - Linux: Secret Service (GNOME Keyring / KDE Wallet)
 
-### XOR Şifreli Yedekleme
-- `KeyringSecretsBackupManager` sınıfı master anahtar ile XOR şifreleme yapar
-- Yedek dosya `.dat` uzantılı binary olarak kaydedilir
-- Geri yükleme aynı master anahtar ile yapılır
+### Şifreli Kasa Yedekleme (Keyring & PBKDF2)
+- Ana sırlar işletim sistemi kasasında (Keyring: Credential Manager, Keychain, Secret Service) saklanır.
+- Çevrimdışı dışa aktarma yedekleri `PBKDF2HMAC` ile türetilmiş anahtarla şifrelenir.
+- Geriye dönük uyumluluk için eski formatlar (legacy XOR fallback) desteklenir ancak üretim için önerilmez.
 
 ### Dosya İzinleri
 - POSIX sistemlerde yapılandırma dosyaları `0o600` iznine sahiptir

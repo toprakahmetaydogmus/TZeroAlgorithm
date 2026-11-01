@@ -1,79 +1,71 @@
-# Contributing to T-Zero Context Architect
+# Contributing to T-Zero
 
-Thank you for your interest in contributing to **T-Zero**! We welcome contributions from developers worldwide to help make context optimization, AST pruning, and autonomous agent orchestration faster, more private, and accessible to everyone.
-
----
-
-## 🚀 Getting Started
-
-### 1. Prerequisites
-- **Python 3.10+** (Python 3.11 or 3.12 recommended)
-- `git`
-- Optional: `uv` for ultra-fast environment bootstrapping
-
-### 2. Fork & Clone
-```bash
-git clone https://github.com/<your-username>/TZeroAlgorithm.git
-cd TZeroAlgorithm
-```
-
-### 3. Install Dependencies
-```bash
-# Using standard pip
-pip install -e ".[dev]"
-
-# Or using uv
-uv sync
-```
+Thank you for your interest in contributing to **T-Zero**! We welcome community contributions, bug reports, and performance optimizations from engineers worldwide.
 
 ---
 
-## 🧪 Testing Guidelines
+## 🛠 Local Development Setup
 
-Before opening a pull request, ensure all tests pass locally:
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git
+   cd TZeroAlgorithm
+   ```
 
-```bash
-# Run full unit and integration test suite
-python -m unittest discover -s tests -v
+2. **Create a virtual environment:**
+   ```bash
+   python -m venv .venv
+   # Windows:
+   .venv\Scripts\activate
+   # Linux/macOS:
+   source .venv/bin/activate
+   ```
 
-# Smoke-test CLI tools
-python tzero_v3.py --version
-python tzero_v3.py --savings
-python tzero_v3.py --scan .
-python tzero_v3.py --audit .
-```
-
-All pull requests automatically run across a matrix of:
-- **Ubuntu Latest & Windows Latest**
-- **Python 3.11, 3.12, and 3.13**
-
----
-
-## 🌐 Adding New Language Support
-
-To add signature reduction for a new programming language (e.g. Zig, Lua, Elixir):
-1. Open `tzero_polyglot.py`.
-2. Add language file extension mappings to `SUPPORTED_LANGUAGES`.
-3. Implement `reduce_<language>(content: str, mode: str) -> str`.
-4. Add unit tests in `tests/test_polyglot_engine.py`.
-5. Run the test suite: `python -m unittest tests/test_polyglot_engine.py`.
+3. **Install dependencies and editable package:**
+   ```bash
+   pip install -e ".[test,build]"
+   ```
 
 ---
 
-## 🔒 100% Zero-Leak & Zero-Cost Policy
+## 🧪 Verification Pipeline Before Submitting a PR
 
-T-Zero enforces strict security standards:
-- **Never hardcode secrets, API keys, or personal tokens.**
-- All code transformations and AST reductions must execute **100% offline** without unexpected cloud API charges ($0.00 cost forever).
-- Every PR is automatically scanned by our Zero-Leak security auditor.
+Before opening a pull request, ensure all verification gates pass locally:
+
+1. **Syntax Check:**
+   ```bash
+   python -m py_compile $(git diff --name-only HEAD | grep '\.py$')
+   ```
+
+2. **Run Zero-Leak Secret Audit:**
+   ```bash
+   python tests/audit_secrets.py
+   # Must return: Total secret audit findings: 0
+   ```
+
+3. **Run Unit Tests:**
+   ```bash
+   python -m unittest discover tests -v
+   ```
+
+4. **Run Empirical Task Benchmark:**
+   ```bash
+   python tzero_task_benchmark.py
+   ```
 
 ---
 
-## 📜 Pull Request Process
+## 📐 Code Style & Architecture Guidelines
 
-1. Create a feature branch: `git checkout -b feature/my-new-feature`
-2. Commit with conventional commit messages: `feat: ...`, `fix: ...`, `docs: ...`
-3. Push to your fork and submit a Pull Request to `toprakahmetaydogmus/TZeroAlgorithm` (`main` branch).
-4. Ensure all CI/CD matrix checks are green.
+- **Determinism First:** All AST parsing, BM25 searching, and token reduction must run 100% locally with zero external network telemetry.
+- **Inward Dependencies:** Core modules (`tzero_packer`, `tzero_guard`) must not depend on outer presentation layers (`tzero_tui`, `tzero_gui`).
+- **No Plaintext Secrets:** Never commit API keys, connection URIs, or high-entropy tokens.
+- **Air-Gapped Compliance:** Respect `TZERO_NO_AUTO_INSTALL=1` across all scripts.
 
-Thank you for helping empower developers and AI coding agents everywhere!
+---
+
+## 💬 Community & Discussions
+
+- **GitHub Issues:** [Bug Reports & Feature Requests](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/issues)
+- **Hugging Face Space:** [Interactive Web Demo](https://huggingface.co/spaces/toprakke4/tzero-token-reducer)
+- **Maintainer:** Toprak Ahmet Aydoğmuş (`siberakademi@org.tr`)

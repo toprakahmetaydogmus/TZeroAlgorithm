@@ -8352,6 +8352,7 @@ def main():
     parser.add_argument("--tutorial", "--guide", action="store_true", help="Launch interactive step-by-step master tutorial for T-Zero Neural Cortex & IDE setups")
     parser.add_argument("--benchmark", nargs="?", const=".", default=None, metavar="PATH", help="Run multi-model token reduction, latency & ROI benchmark (Claude, GPT-4o, Gemini, DeepSeek)")
     parser.add_argument("--benchmark-svg", action="store_true", help="Generate animated macOS terminal SVG recording of benchmark for README")
+    parser.add_argument("--task-benchmark", action="store_true", help="Run empirical task-completion & BPE tokenizer benchmark (tiktoken)")
     parser.add_argument("--huggingface", "--hf", action="store_true", help="Launch local Hugging Face Space Gradio app or display deployment guide")
     parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect v9.9.0 Master Edition (engine v4.1.0)")
 
@@ -8546,6 +8547,8 @@ Generate tailored subagent manifests (.tzero/agents/ + SKILL.md) in 1 second:
             "guide": "--tutorial",
             "benchmark": "--benchmark",
             "bench": "--benchmark",
+            "task-benchmark": "--task-benchmark",
+            "task-bench": "--task-benchmark",
             "hf": "--huggingface",
             "huggingface": "--huggingface",
             "space": "--huggingface",
@@ -8904,6 +8907,10 @@ Generate tailored subagent manifests (.tzero/agents/ + SKILL.md) in 1 second:
             TZeroBenchmarkEngine.render_cli(rep)
             out_p = TZeroBenchmarkEngine.generate_animated_svg(rep)
             print(f"\033[32m[SUCCESS] Vector-animated macOS terminal recording saved to: {out_p}\033[0m")
+    elif getattr(args, "task_benchmark", False):
+        from tzero_task_benchmark import TaskCompletionBenchmark
+        rep = TaskCompletionBenchmark.evaluate_all()
+        print(TaskCompletionBenchmark.format_terminal_summary(rep))
     elif getattr(args, "huggingface", False):
         app_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "huggingface-space", "app.py")
         if not os.path.exists(app_path):
