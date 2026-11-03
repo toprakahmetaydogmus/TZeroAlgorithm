@@ -247,6 +247,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="get_project_context_tree",
+        title="Build Hierarchical Multi-Tier AST Context Tree",
         description=(
             "Scans the target codebase to build an enterprise-grade multi-tier AST context tree (T-1 to T-4), distinguishing from 'generate_repo_map' and 'get_smart_skeleton_context' by generating hierarchical architectural outlines and symbol tables rather than flat symbol indexes or isolated file skeletons.\n"
             "\n"
@@ -362,6 +363,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="query_module_dependencies",
+        title="Query Module Import and Dependency Graph",
         description=(
             "Analyzes import and export dependency graphs across polyglot codebase modules, distinguishing from 'trace_symbol_call_chain' and 'enforce_architecture_boundaries' by mapping package-level inbound and outbound module relationships rather than function-level call stacks or rule violations.\n"
             "\n"
@@ -468,6 +470,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="query_architecture_boundaries",
+        title="Query Active Architecture Rules and Boundaries",
         description=(
             "Retrieves active T-4 architectural tier boundary definitions and operational constraints, distinguishing from 'enforce_architecture_boundaries' and 'generate_architecture_blueprint' by inspecting existing rules rather than executing compliance audits or generating diagrams.\n"
             "\n"
@@ -521,6 +524,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="generate_architecture_blueprint",
+        title="Generate Architecture Blueprint and Topology Diagrams",
         description=(
             "Generates a system architecture specification with live Mermaid topology diagrams, distinguishing from 'query_architecture_boundaries' and 'get_project_context_tree' by producing graphical structural blueprints rather than raw rule definitions or token-reduced source code.\n"
             "\n"
@@ -594,6 +598,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="generate_repo_map",
+        title="Generate Ultra-Compact AST Symbol Repo Map",
         description=(
             "Generates an ultra-compact single-file AST symbol map of classes, methods, and functions, distinguishing from 'get_project_context_tree' and 'get_smart_skeleton_context' by producing an ultra-dense symbol index rather than hierarchical code trees or implementation skeletons.\n"
             "\n"
@@ -652,6 +657,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="audit_codebase_quality",
+        title="Audit Codebase Quality and Static Code Smells",
         description=(
             "Audits workspace code for static code smells, cyclomatic complexity spikes, and hardcoded secret leaks, distinguishing from 'enforce_architecture_boundaries' and 'verify_hallucination_guard' by scanning for code cleanliness and secret exposure rather than layer boundaries or phantom imports.\n"
             "\n"
@@ -782,6 +788,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="find_code_duplicity",
+        title="Detect Duplicate and Copy-Pasted Code Blocks",
         description=(
             "Detects duplicate or copy-pasted code blocks across codebase modules, distinguishing from 'audit_codebase_quality' and 'find_dead_code' by identifying duplicated logic chunks rather than static code smells or unreferenced functions.\n"
             "\n"
@@ -858,6 +865,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="estimate_token_cost",
+        title="Estimate LLM Token Cost and Financial Savings",
         description=(
             "Calculates comparative dollar costs across major commercial LLM providers for given source text or repository, distinguishing from 'get_token_savings_metrics' by forecasting per-query API expenses rather than team-wide monthly ROI savings.\n"
             "\n"
@@ -937,6 +945,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="analyze_change_impact",
+        title="Calculate Symbol Modification Blast Radius",
         description=(
             "Analyzes the blast radius and downstream dependents before modifying a symbol or file, distinguishing from 'query_module_dependencies' and 'trace_symbol_call_chain' by scoring change severity (0-100) and risk tier rather than listing raw imports or single call stacks.\n"
             "\n"
@@ -974,6 +983,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="enforce_architecture_boundaries",
+        title="Enforce Architectural Boundary Rules on AST",
         description=(
             "Enforces architectural layer boundaries and detects unauthorized cross-layer imports, distinguishing from 'query_architecture_boundaries' and 'audit_codebase_quality' by validating import contracts against 'tzero.rules.json' and emitting CI violation errors rather than querying rules or scanning code smells.\n"
             "\n"
@@ -1013,6 +1023,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="search_codebase_semantic",
+        title="Local Hybrid BM25 Semantic Code Search",
         description=(
             "Performs fast local hybrid semantic search across repository files, distinguishing from 'jarvis_hybrid_search' and 'jarvis_query_knowledge_graph' by indexing file contents on-the-fly using BM25 and AST symbol tokens rather than persistent vector databases or knowledge graphs.\n"
             "\n"
@@ -1052,6 +1063,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="export_agent_rules",
+        title="Export Cursor and Cline Agent Rule Configurations",
         description=(
             "Generates and writes standardized AI agent rule specifications into workspace root, distinguishing from 'query_architecture_boundaries' and 'install_git_security_guard' by writing editor-ready governance files (.cursorrules, AGENT.md, .clinerules) rather than querying rules in memory or installing git hooks.\n"
             "\n"
@@ -1127,6 +1139,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="get_token_savings_metrics",
+        title="Calculate Token Reduction Metrics and ROI",
         description=(
             "Computes quantitative token reduction metrics and monthly team financial ROI savings, distinguishing from 'estimate_token_cost' by calculating aggregate cumulative dollar and token savings across team engineering workflows rather than single-query price estimates.\n"
             "\n"
@@ -1174,6 +1187,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="get_incremental_diff_context",
+        title="Extract Incremental PR Diff Context",
         description=(
             "Calculates hyper-compact git diff context for pull requests and commits, distinguishing from 'generate_smart_micro_patch' and 'get_project_context_tree' by extracting changed files with surrounding AST context from git revisions rather than compressing raw diff strings or whole repos.\n"
             "\n"
@@ -1211,6 +1225,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="prune_code_snippet",
+        title="Prune In-Memory Code Snippet to AST Signatures",
         description=(
             "Compresses arbitrary in-memory source code or text by stripping function bodies while preserving AST signatures, distinguishing from 'compress_stream_tokens' and 'get_project_context_tree' by performing structural language-aware AST pruning on raw strings rather than byte-level stream packing or file scanning.\n"
             "\n"
@@ -1269,6 +1284,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="verify_zero_leak_security",
+        title="Scan Secrets and Validate Zero Leak Security",
         description=(
             "Scans codebase or memory snippets for hardcoded API keys, private tokens, and credentials with 100% Zero-Leak safety, distinguishing from 'audit_codebase_quality' and 'verify_hallucination_guard' by focusing exclusively on secret exposure rather than code complexity or hallucinated APIs.\n"
             "\n"
@@ -1347,6 +1363,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="verify_hallucination_guard",
+        title="Validate Imports and Call Signatures Against AST",
         description=(
             "Verifies proposed AI code changes against workspace AST symbol tables to eliminate hallucinations before files are modified, distinguishing from 'verify_zero_leak_security' and 'audit_codebase_quality' by detecting non-existent methods, phantom imports, and signature mismatches rather than secrets or code smells.\n"
             "\n"
@@ -1393,6 +1410,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="get_smart_skeleton_context",
+        title="Extract Focus Implementation with Surrounding AST Skeletons",
         description=(
             "Generates focus-aware dynamic skeleton context showing full implementation of a target file alongside pruned 1st-degree caller/callee skeletons, distinguishing from 'get_project_context_tree' and 'generate_repo_map' by isolating a single focus file with immediate dependencies rather than scanning the entire repository.\n"
             "\n"
@@ -1438,6 +1456,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="rank_repository_pagerank",
+        title="Rank Module Architectural Centrality with PageRank",
         description=(
             "Calculates PageRank importance scores across workspace modules to identify architectural backbone files, distinguishing from 'query_module_dependencies' and 'trace_symbol_call_chain' by assigning global centrality weights to files based on incoming reference graphs rather than listing individual imports.\n"
             "\n"
@@ -1481,6 +1500,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="trace_symbol_call_chain",
+        title="Trace Deep Symbol Execution Call Chains",
         description=(
             "Traces recursive execution call paths across codebase ASTs in upward or downward directions, distinguishing from 'query_module_dependencies' and 'analyze_change_impact' by following function-level invocation call chains rather than file-level imports or risk scores.\n"
             "\n"
@@ -1527,6 +1547,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="find_dead_code",
+        title="Identify Unused and Orphaned Code Symbols",
         description=(
             "Identifies unused, orphaned, or unreferenced functions, classes, and private methods across codebase files, distinguishing from 'find_code_duplicity' and 'audit_codebase_quality' by finding uncalled symbols rather than duplicate code blocks or static code smells.\n"
             "\n"
@@ -1567,6 +1588,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="jarvis_compress_semantic_memory",
+        title="Compress Semantic Memory into Triplet Codes",
         description=(
             "Compresses natural language text or system logs into dense T-Zero virtual memory tokens using Vector Quantization, distinguishing from 'jarvis_decompress_semantic_memory' and 'prune_code_snippet' by encoding prose into persistent vector tokens rather than decoding or pruning AST code.\n"
             "\n"
@@ -1620,6 +1642,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="jarvis_decompress_semantic_memory",
+        title="Decompress Semantic Memory from Triplet Codes",
         description=(
             "Resolves and decompresses a T-Zero virtual memory token back into its original text representation, distinguishing from 'jarvis_compress_semantic_memory' and 'jarvis_query_knowledge_graph' by reconstructing exact stored memories from token identifiers rather than encoding or graph search.\n"
             "\n"
@@ -1670,6 +1693,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="jarvis_orchestrate_goal",
+        title="Decompose and Orchestrate Autonomous Coding Goals",
         description=(
             "Orchestrates autonomous workspace engineering goals across multi-agent swarms with self-healing verification, distinguishing from 'jarvis_self_healing_execute' and 'jarvis_swarm_orchestrate' by executing complete phased engineering refactors and rule governance rather than single commands or consensus votes.\n"
             "\n"
@@ -1748,6 +1772,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="jarvis_zero_key_query",
+        title="Query Offline Models via Zero Key Neural Gateway",
         description=(
             "Dispatches inference prompts to free zero-API-key intelligence providers (local Ollama or free cloud endpoints), distinguishing from 'search_codebase_semantic' and 'get_project_context_tree' by generating natural language completions rather than static codebase context.\n"
             "\n"
@@ -1796,6 +1821,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="jarvis_query_knowledge_graph",
+        title="Query Knowledge Graph Entities and Relationships",
         description=(
             "Searches the T-Zero Jarvis semantic knowledge graph and VQ memory by entity, predicate, or context, distinguishing from 'jarvis_causal_chain_query' and 'search_codebase_semantic' by querying structured semantic memory triples rather than 4D temporal causal chains or raw text files.\n"
             "\n"
@@ -1856,6 +1882,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="jarvis_compress_document",
+        title="Compress Markdown and Text Documents Semantically",
         description=(
             "Compresses large multi-paragraph technical documents into hierarchical semantic outlines, distinguishing from 'jarvis_latent_press_compress' and 'prune_code_snippet' by preserving document structure and section keynotes rather than mathematical latent vectors or AST code syntax.\n"
             "\n"
@@ -1909,6 +1936,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="jarvis_export_memory_store",
+        title="Export Semantic Memory Store to JSON",
         description=(
             "Exports or imports the T-Zero Jarvis persistent VQ codebook memory and knowledge graph to or from disk, distinguishing from 'jarvis_consolidate_memory' and 'jarvis_export_graph_visualization' by serializing raw memory states for backup rather than consolidating memories or generating HTML visualizers.\n"
             "\n"
@@ -1958,6 +1986,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="jarvis_causal_chain_query",
+        title="Query Causal Reasoning and Root Cause Chains",
         description=(
             "Queries the 4D Causal and Temporal Knowledge Graph for root cause analysis of changes and incidents, distinguishing from 'analyze_change_impact' and 'jarvis_query_knowledge_graph' by analyzing chronological causal chains and temporal links rather than static blast radius or entity triples.\n"
             "\n"
@@ -2009,6 +2038,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="jarvis_self_healing_execute",
+        title="Diagnose Test Failures and Apply AST Self-Healing Patches",
         description=(
             "Executes commands in a guarded environment with automated error analysis and self-healing retry loops, distinguishing from 'jarvis_orchestrate_goal' and 'jarvis_bft_swarm_consensus' by focusing specifically on command execution recovery rather than full workspace orchestration or swarm consensus.\n"
             "\n"
@@ -2058,6 +2088,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="jarvis_consolidate_memory",
+        title="Consolidate and Deduplicate Episodic Memory",
         description=(
             "Performs brain-like hippocampal memory consolidation to merge redundant vector clusters into representative centroids, distinguishing from 'jarvis_compress_semantic_memory' and 'jarvis_export_memory_store' by organizing existing memory stores rather than encoding new text or backing up to disk.\n"
             "\n"
@@ -2100,6 +2131,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="jarvis_hybrid_search",
+        title="Execute Hybrid Lexical and Semantic Memory Search",
         description=(
             "Performs high-speed hybrid search combining BM25 lexical ranking and latent codebook similarity, distinguishing from 'search_codebase_semantic' and 'jarvis_query_knowledge_graph' by querying both persistent VQ memory and workspace files with reciprocal rank fusion rather than pure text or entity triples.\n"
             "\n"
@@ -2162,6 +2194,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="jarvis_swarm_orchestrate",
+        title="Coordinate Multi-Agent Swarm Task Execution",
         description=(
             "Coordinates a 5-agent autonomous swarm (Security, Architect, QA, Coder, Executive) to execute engineering missions, distinguishing from 'jarvis_orchestrate_goal' and 'jarvis_bft_swarm_consensus' by delegating specialized sub-tasks across roles rather than executing sequentially or running voting rounds.\n"
             "\n"
@@ -2216,6 +2249,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="jarvis_export_graph_visualization",
+        title="Export Interactive Graph Visualization HTML",
         description=(
             "Generates an offline, interactive cyberpunk HTML graph visualizer for knowledge and causal memory networks, distinguishing from 'jarvis_export_memory_store' and 'generate_architecture_blueprint' by producing an interactive browser canvas for memory graphs rather than JSON backups or Mermaid architecture diagrams.\n"
             "\n"
@@ -2270,6 +2304,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="jarvis_minhash_similarity",
+        title="Compute MinHash Jaccard Text Similarity",
         description=(
             "Calculates sub-microsecond Jaccard similarity between two text snippets using MinHash Locality-Sensitive Hashing, distinguishing from 'find_code_duplicity' and 'jarvis_latent_press_compress' by computing probabilistic set similarity on raw strings rather than AST block duplicity or vector prefill compression.\n"
             "\n"
@@ -2349,6 +2384,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="jarvis_bft_swarm_consensus",
+        title="Execute Byzantine Fault Tolerant Swarm Consensus",
         description=(
             "Executes 3-phase Practical Byzantine Fault-Tolerant consensus across autonomous swarm agents, distinguishing from 'jarvis_swarm_orchestrate' and 'jarvis_orchestrate_goal' by running formal cryptographic voting (pre-prepare, prepare, commit) rather than delegating tasks or managing work plans.\n"
             "\n"
@@ -2400,6 +2436,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="jarvis_latent_press_compress",
+        title="Ultra-High Density Neural Memory Compression",
         description=(
             "Compresses long text contexts before model prefill using Latent-Press deduplication and token pruning, distinguishing from 'jarvis_compress_semantic_memory' and 'prune_code_snippet' by pruning near-duplicate sentence clusters for LLM prefill rather than generating memory tokens or parsing AST code.\n"
             "\n"
@@ -2450,6 +2487,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="prune_schema_definition",
+        title="Prune OpenAPI and JSON Schemas to Essential Signatures",
         description=(
             "Compresses SQL DDL schemas, Kubernetes YAML manifests, Dockerfiles, and OpenAPI specs by stripping comments and non-essential attributes, distinguishing from 'prune_code_snippet' and 'get_project_context_tree' by using declarative schema grammar rules rather than programming language AST parsers.\n"
             "\n"
@@ -2497,6 +2535,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="generate_smart_micro_patch",
+        title="Generate Compact Contextual Unified Diff Patches",
         description=(
             "Compresses unified git diffs into ultra-dense semantic micro-patches while preserving change context, distinguishing from 'get_incremental_diff_context' and 'compress_stream_tokens' by parsing raw diff patch text directly without requiring a live git repository.\n"
             "\n"
@@ -2532,6 +2571,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="generate_zero_waste_prompt_context",
+        title="Assemble Token-Minimized LLM Agent Prompts",
         description=(
             "Extracts cross-module AST call graphs from workspace entrypoints to assemble minimal zero-waste prompt context, distinguishing from 'get_project_context_tree' and 'get_smart_skeleton_context' by tracing execution reachability from specific main entrypoints rather than scanning all files.\n"
             "\n"
@@ -2579,6 +2619,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="compress_stream_tokens",
+        title="Compress Streaming Token Buffers On the Fly",
         description=(
             "Compresses arbitrary streaming code chunks, unified diffs, or logs using byte-level token compression, distinguishing from 'prune_code_snippet' and 'jarvis_latent_press_compress' by processing continuous byte streams on-the-fly without requiring complete AST grammar structures.\n"
             "\n"
@@ -2626,6 +2667,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="install_git_security_guard",
+        title="Install Automated Git Pre-Commit Security Guard",
         description=(
             "Installs the automated T-Zero Git Pre-Commit Security Guard hook in the local repository, distinguishing from 'verify_zero_leak_security' and 'export_agent_rules' by installing executable git hooks into '.git/hooks' rather than running one-time scans or writing editor rules.\n"
             "\n"
@@ -2669,6 +2711,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="suggest_reusable_helpers",
+        title="Discover Existing Reusable Helper Functions",
         description=(
             "Discovers and surfaces existing reusable helper and utility functions across the repository AST, distinguishing from 'find_code_duplicity' and 'search_codebase_semantic' by locating reusable functional contracts and import statements rather than flagging verbatim duplicated code blocks or performing raw keyword search.\n"
             "\n"
@@ -2813,6 +2856,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_canon_tool(
         name="build_project_context",
+        title="Build Hierarchical AST Codebase Context Tree",
         description=(
             "Scans the target repository file system and constructs a token-optimized AST context payload for LLM prompts across multiple hierarchy tiers (T-1 to T-4), distinguishing from 'prune_code_snippet' and 'search_codebase' by constructing multi-tier repository architecture trees rather than pruning individual in-memory snippets or executing keyword searches.\n"
             "\n"
@@ -2875,6 +2919,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_canon_tool(
         name="prune_code_snippet",
+        title="Prune In-Memory Code Snippet to AST Signatures",
         description=(
             "Prunes implementation bodies from in-memory code snippets, API schemas, or unified diff streams while preserving AST interfaces, type annotations, and function signatures, distinguishing from 'build_project_context' and 'audit_code_quality' by stripping function bodies in memory rather than scanning repository file trees or auditing code quality.\n"
             "\n"
@@ -2914,6 +2959,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_canon_tool(
         name="manage_architecture_rules",
+        title="Manage Architectural Boundary and Layer Rules",
         description=(
             "Manages the complete lifecycle of architectural boundary definitions, tier rules (T-1 to T-4), and layer constraints configured in tzero.rules.json, distinguishing from 'enforce_architecture_rules' and 'generate_architecture_blueprint' by adding, updating, resetting, or deleting boundary definitions on disk rather than validating files or drawing diagrams.\n"
             "\n"
@@ -3012,6 +3058,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_canon_tool(
         name="enforce_architecture_rules",
+        title="Enforce Workspace Architectural Layer Rules",
         description=(
             "Enforces architectural boundary rules and layer isolation constraints defined in tzero.rules.json across the repository AST, distinguishing from 'manage_architecture_rules' and 'analyze_code_dependencies' by validating import graph compliance against defined architectural layers rather than editing rule definitions or tracing raw calls.\n"
             "\n"
@@ -3049,6 +3096,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_canon_tool(
         name="generate_architecture_blueprint",
+        title="Generate System Architecture Blueprint Document",
         description=(
             "Generates a complete system architectural specification (ARCHITECTURE.md) with auto-generated Mermaid component topology diagrams, layer boundaries, and module hierarchies, distinguishing from 'enforce_architecture_rules' and 'analyze_code_dependencies' by producing comprehensive system architecture documentation rather than verifying boundary rules or tracing call chains.\n"
             "\n"
@@ -3085,6 +3133,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_canon_tool(
         name="analyze_code_dependencies",
+        title="Analyze Codebase Module Dependency Graph",
         description=(
             "Analyzes module imports, symbol call chains, graph centrality (PageRank), and unreferenced dead code across polyglot source files, distinguishing from 'analyze_change_impact' and 'enforce_architecture_rules' by performing global dependency structure and dead-code analysis rather than calculating change blast radius or verifying layer boundaries.\n"
             "\n"
@@ -3132,6 +3181,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_canon_tool(
         name="analyze_change_impact",
+        title="Analyze Symbol Modification Blast Radius",
         description=(
             "Calculates change blast radius score (0-100) and identifies downstream dependents before modifying or deleting a target function, class, or module, distinguishing from 'analyze_code_dependencies' and 'audit_code_quality' by calculating targeted refactoring risk scores rather than mapping overall import graphs or profiling code complexity.\n"
             "\n"
@@ -3171,6 +3221,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_canon_tool(
         name="search_codebase",
+        title="Search Codebase via Local Hybrid Lexical Index",
         description=(
             "Executes private local hybrid search combining BM25 keyword matching and TF-IDF semantic scoring across repository functions, classes, and docstrings, distinguishing from 'query_memory_store' and 'build_project_context' by indexing source code identifiers and docstrings rather than querying agent episodic memory or generating context trees.\n"
             "\n"
@@ -3207,6 +3258,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_canon_tool(
         name="audit_code_quality",
+        title="Audit Codebase Quality and Static Code Smells",
         description=(
             "Performs AST static code smell analysis, cyclomatic complexity profiling, duplicate code block detection, and AI coding hallucination validation, distinguishing from 'verify_security_guard' and 'analyze_code_dependencies' by scanning code maintainability and complexity rather than checking for credential leaks or analyzing module dependencies.\n"
             "\n"
@@ -3250,6 +3302,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_canon_tool(
         name="verify_security_guard",
+        title="Verify Zero Leak Shannon Entropy Secrets Guard",
         description=(
             "Scans workspace files and code buffers for hardcoded secrets and API keys, or installs the automated git pre-commit zero-leak security guard, distinguishing from 'audit_code_quality' and 'enforce_architecture_rules' by identifying high-entropy credentials and git hooks rather than checking code complexity or enforcing layer rules.\n"
             "\n"
@@ -3290,6 +3343,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_canon_tool(
         name="estimate_token_cost",
+        title="Estimate Multi Model Token Cost and Financial ROI",
         description=(
             "Calculates exact token counts, comparative API billing costs across major model families, and cumulative financial ROI savings, distinguishing from 'build_project_context' and 'prune_code_snippet' by evaluating financial costs and token metrics rather than constructing context trees or pruning code.\n"
             "\n"
@@ -3330,6 +3384,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_canon_tool(
         name="query_memory_store",
+        title="Query Persistent Agent Memory Triplet Store",
         description=(
             "Queries semantic triples, causal reasoning graphs, and MinHash entity clusters from the local agent memory store, distinguishing from 'manage_memory_store' and 'search_codebase' by retrieving episodic reasoning relations rather than modifying memory records or searching repository code.\n"
             "\n"
@@ -3372,6 +3427,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_canon_tool(
         name="manage_memory_store",
+        title="Manage Persistent Agent Memory Triplet Store",
         description=(
             "Manages the complete lifecycle of persistent agent semantic memory stores, including compression, consolidation, export, listing, reset, and deletion, distinguishing from 'query_memory_store' and 'prune_code_snippet' by storing, compressing, and purging episodic memories rather than querying relations or pruning source code.\n"
             "\n"
@@ -3466,6 +3522,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_canon_tool(
         name="orchestrate_agent_swarm",
+        title="Orchestrate Autonomous Multi Agent Swarm Execution",
         description=(
             "Coordinates autonomous multi-agent task execution, goal decomposition, Byzantine fault-tolerant (PBFT) consensus voting, and self-healing error recovery, distinguishing from 'manage_memory_store' and 'audit_code_quality' by dispatching autonomous multi-agent workflows rather than managing memory stores or auditing code quality.\n"
             "\n"
@@ -3510,6 +3567,7 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="superdesign_generate",
+        title="Generate High-Fidelity Design Specifications",
         description=(
             "Generates structured design specifications, system prompt templates, file patterns, and design tokens for the AI agent to execute, distinguishing from 'superdesign_iterate' and 'superdesign_list' by producing initial design blueprints rather than refining existing files or listing assets.\n"
             "\n"
@@ -3555,6 +3613,7 @@ def create_mcp_server():
 
     @_maybe_tool(
         name="superdesign_iterate",
+        title="Iterate and Refine Existing UI Design Layouts",
         description=(
             "Generates structured iteration instructions to improve, refine, or polish existing design files, distinguishing from 'superdesign_generate' and 'superdesign_gallery' by modifying existing HTML/SVG assets based on visual feedback rather than creating new designs or building galleries.\n"
             "\n"
@@ -3597,6 +3656,7 @@ def create_mcp_server():
 
     @_maybe_tool(
         name="superdesign_extract_system",
+        title="Extract Design System Tokens from Existing Files",
         description=(
             "Extracts or initializes structured design tokens (colors, typography, spacing, components) into a reusable design system JSON file, distinguishing from 'superdesign_generate' and 'superdesign_list' by saving design token libraries rather than creating layouts or listing designs.\n"
             "\n"
@@ -3636,6 +3696,7 @@ def create_mcp_server():
 
     @_maybe_tool(
         name="superdesign_list",
+        title="List Available Design Blueprints and Artifacts",
         description=(
             "Discovers and enumerates all Superdesign creations, components, and iterations in the workspace, distinguishing from 'superdesign_gallery' and 'superdesign_generate' by returning structured catalog lists rather than compiling HTML preview galleries or generating new designs.\n"
             "\n"
@@ -3667,6 +3728,7 @@ def create_mcp_server():
 
     @_maybe_tool(
         name="superdesign_gallery",
+        title="Generate Interactive Multi-Device Design Gallery",
         description=(
             "Generates an interactive responsive HTML gallery to visually browse and preview all Superdesign workspace assets, distinguishing from 'superdesign_list' and 'jarvis_export_graph_visualization' by assembling a visual UI design showcase rather than returning raw JSON file lists or memory graph visualizers.\n"
             "\n"
@@ -3698,6 +3760,7 @@ def create_mcp_server():
 
     @_maybe_tool(
         name="sync_workspace_rules",
+        title="Synchronize Multi-Agent Rule Files Across IDEs",
         description=(
             "Synchronizes multi-IDE AI rules (.cursorrules, CLAUDE.md, .windsurfrules, .agents/rules/) and pre-commit security hooks, distinguishing from 'export_agent_rules' and 'install_git_security_guard' by coordinating cross-environment alignment with active codebase AST signatures in one shot rather than updating isolated rules files.\n"
             "\n"
@@ -3738,6 +3801,7 @@ def create_mcp_server():
 
     @_maybe_tool(
         name="calculate_token_cost_roi",
+        title="Calculate Comprehensive Team Token ROI and Savings",
         description=(
             "Calculates exact per-query token footprints and financial ROI savings across major LLM providers (Claude 3.5 Sonnet, Claude 3 Opus, GPT-4o, Gemini 1.5 Pro, DeepSeek V3), distinguishing from 'estimate_token_cost' and 'get_token_savings_metrics' by providing multi-model financial dollar savings and monthly team ROI projections rather than raw token counts.\n"
             "\n"
@@ -3784,6 +3848,7 @@ def create_mcp_server():
 
     @_maybe_tool(
         name="analyze_instruction_drift",
+        title="Detect Agent Rule and Instruction Drift",
         description=(
             "Quantifies how closely LLM code generations and workspace modifications adhere to initial prompt rules, negative constraints, and modularity limits, distinguishing from 'audit_code_quality' and 'enforce_architecture_boundaries' by calculating a quantitative 0-100 adherence score reflecting attention SNR degradation.\n"
             "\n"
@@ -3836,8 +3901,9 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @server.tool(
         name="execute_codebase_workflow",
+        title="Execute Composite Multi Step Codebase Workflow",
         description=(
-            "Autonomous all-in-one T-Zero master tool that executes any codebase workflow in a single command, distinguishing from individual specialized tools by autonomously orchestrating multi-step analysis, context generation, security scans, dependency mapping, and self-healing in an integrated pipeline.\n"
+            "Executes autonomous composite codebase analysis, context generation, and security pipelines in a single command, distinguishing from 'build_project_context', 'audit_code_quality', and 'verify_security_guard' by orchestrating end-to-end multi-step intelligence workflows rather than running isolated single-purpose context builds, quality audits, or secret scans.\n"
             "\n"
             "Parameters:\n"
             "- `action` (str, optional, default='auto'): Workflow operation: 'auto' (runs comprehensive all-in-one audit & context pipeline), 'context' (builds AST context tree), 'audit' (code quality & smells), 'security' (Zero-Leak secret scan), 'blueprint' (Mermaid system architecture), 'dependencies' (import & module topology), 'impact' (blast radius of modified symbols), 'search' (hybrid BM25 semantic code search), 'prune' (in-memory AST snippet pruning), 'heal' (AST self-healing diagnosis & patching), 'memory' (query/manage memory store), 'swarm' (multi-agent consensus & task dispatch), or 'design' (UI/UX design blueprint).\n"
@@ -3854,7 +3920,7 @@ def create_mcp_server():
             "\n"
             "Usage Guidelines:\n"
             "- When to use: Use whenever you want an instant complete overview of a codebase, or want to perform any T-Zero operation through a single unified entrypoint without choosing between individual tools.\n"
-            "- When NOT to use: Do not use if you specifically need an isolated low-level API call without any contextual wrapper.\n"
+            "- When NOT to use: Do not use when an isolated single-purpose operation is sufficient, such as generating an AST context tree (use 'build_project_context' instead), auditing code smells (use 'audit_code_quality' instead), scanning secrets (use 'verify_security_guard' instead), or pruning an in-memory snippet (use 'prune_code_snippet' instead).\n"
             "\n"
             "Returns: Comprehensive Markdown report tailored to the requested action or full autonomous pipeline."
         ),

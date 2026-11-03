@@ -21,6 +21,13 @@ def comprehensive_tdqs_audit():
         params_dict = getattr(tool, "parameters", {})
         props = params_dict.get("properties", {}) if isinstance(params_dict, dict) else {}
         
+        # 0. Title & Schema Signals
+        title = getattr(tool, "title", None)
+        if not title:
+            issues.append(f"[{name}] Missing title (titleIsMeaningful check)")
+        elif title == name or len(title) <= len(name):
+            issues.append(f"[{name}] Title not meaningful or shorter than name")
+
         # 1. Purpose Clarity
         first_line = desc.split("\n")[0].strip()
         if not first_line:

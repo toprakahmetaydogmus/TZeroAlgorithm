@@ -30,7 +30,7 @@
 - Dependency (tzero_deps.py)
 - DriftFinding (tzero_drift.py)
 
-# Key Exported Helpers (114 total)
+# Key Exported Helpers (116 total)
 - build_client_targets() (addmcp.py)
 - server_entry() (addmcp.py)
 - merge_server_config() (addmcp.py)

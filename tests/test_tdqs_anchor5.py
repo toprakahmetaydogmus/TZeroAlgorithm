@@ -64,6 +64,20 @@ class TestAnchor5TDQS(unittest.TestCase):
             params_dict = getattr(t, "parameters", {})
             props = params_dict.get("properties", {}) if isinstance(params_dict, dict) else {}
 
+            # 0. TDQS Stage 1: Title & Output Schema Signals
+            title = getattr(t, "title", None)
+            if not title:
+                failures.append(f"{name}: Tool title is None (violates titleIsMeaningful signal).")
+            elif title == name:
+                failures.append(f"{name}: Tool title is identical to tool name (violates titleIsMeaningful signal).")
+            elif len(title) <= len(name):
+                failures.append(f"{name}: Tool title is not longer than name (violates titleIsMeaningful signal).")
+
+            # Output Schema Signal
+            out_schema = getattr(t, "output_schema", None)
+            if out_schema is None:
+                failures.append(f"{name}: output_schema is None (violates hasOutputSchema signal).")
+
             # 1. Purpose Clarity (25%)
             first_sent = desc.split("\n")[0].strip()
             if not first_sent:
