@@ -8,6 +8,7 @@ __pycache__/
 # PyInstaller / Build artifacts
 build/
 dist/
+*.vsix
 *.spec
 *.egg-info/
 

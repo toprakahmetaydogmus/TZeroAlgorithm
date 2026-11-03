@@ -112,7 +112,7 @@ This gives the LLM complete visibility into how to call surrounding modules with
 
 ```text
 ==============================================================================
-  T-ZERO TASK-COMPLETION & BPE TOKENIZER BENCHMARK REPORT (v9.9.0)
+  T-ZERO TASK-COMPLETION & BPE TOKENIZER BENCHMARK REPORT (v10.0.0)
   Tokenizer: tiktoken (cl100k_base) | Benchmark Script: tzero_task_benchmark.py
 ==============================================================================
 Task ID    | Scope                                 | Raw BPE | T-Zero | Token Savings | Contract Integrity | Task Success

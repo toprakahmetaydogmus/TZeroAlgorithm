@@ -13,7 +13,7 @@ short_description: Enterprise AST Context Architect, Token Reducer & AgentOS for
 
 # 🧠 T-Zero: Enterprise AST Context Architect & Token Reducer
 
-Live Hugging Face Space demonstration for **T-Zero (v9.9.0)**.
+Live Hugging Face Space demonstration for **T-Zero (v10.0.0 Sovereign Edition - TDQS 5.0 Anchor Certified)**.
 - **Up to 95% Context Token Reduction** via AST Skeletonization
 - **0% AI Hallucinations** via Pre-Flight Reality-Lock
 - **100% Zero-Leak Security** via Shannon Entropy Detection

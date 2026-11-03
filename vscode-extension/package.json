@@ -2,7 +2,7 @@
   "name": "tzero-context-architect",
   "displayName": "T-Zero Context Architect & MCP",
   "description": "Enterprise AST Codebase Context Engine & 37-Tool Autonomous MCP Server. Cuts LLM tokens by up to 95% with 0 API leaks.",
-  "version": "6.0.0",
+  "version": "10.0.0",
   "publisher": "toprakahmetaydogmus",
   "engines": {
     "vscode": "^1.80.0"

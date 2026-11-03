@@ -37,7 +37,7 @@ class BillingManager:
     def test_run_benchmark(self):
         rep = TZeroBenchmarkEngine.run_benchmark(self.test_dir)
         self.assertIsInstance(rep, BenchmarkReport)
-        self.assertEqual(rep.version, "9.9.0")
+        self.assertEqual(rep.version, "10.0.0")
         self.assertGreater(rep.raw_tokens, 0)
         self.assertGreater(rep.tzero_tokens, 0)
         self.assertGreater(rep.reduction_pct, 50.0)
@@ -69,7 +69,7 @@ class BillingManager:
         orch = JarvisOrchestrator(workspace_root=self.test_dir)
         res = orch.run_autonomous_benchmark(target_budget=32000)
         self.assertTrue(res.get("success"))
-        self.assertEqual(res.get("version"), "9.9.0")
+        self.assertEqual(res.get("version"), "10.0.0")
         self.assertIn("tuning", res)
 
 

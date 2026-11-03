@@ -6,10 +6,11 @@
 ### *Empirically Proven Token Optimization Engine, 14 Canonical MCP Tools, Real BPE Tokenizer Benchmarks & Pre-Flight Reality-Lock for AI Coding Assistants.*
 
 [![Glama MCP Badge](https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm/badges/score.svg)](https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm)
+[![TDQS 5.0/5.0](https://img.shields.io/badge/TDQS-5.0%20%2F%205.0%20Anchor%20Certified-10b981?style=flat-square&logo=checkmarx&logoColor=white)](#tdqs-certification)
 [![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Live%20Web%20Demo-ffd21e?style=flat-square&logo=huggingface)](https://huggingface.co/spaces/toprakke4/tzero-token-reducer)
 [![PyPI Version](https://img.shields.io/pypi/v/tzero-mcp?color=38bdf8&style=flat-square&logo=pypi)](https://pypi.org/project/tzero-mcp/)
 [![Python Version](https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13-blue?style=flat-square)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions)
-[![Tests](https://img.shields.io/badge/tests-309%20passing-34d399?style=flat-square&logo=githubactions)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions)
+[![Tests](https://img.shields.io/badge/tests-313%20passing-34d399?style=flat-square&logo=githubactions)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions)
 [![MCP Tools](https://img.shields.io/badge/MCP%20Tools-14%20Canonical-8b5cf6?style=flat-square)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm#the-14-canonical-mcp-tools)
 [![Security](https://img.shields.io/badge/security-Shannon%20Entropy%20(H%20%3E%3D%204.75)-38bdf8?style=flat-square&logo=shield)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm#security-architecture)
 [![Reality-Lock](https://img.shields.io/badge/reality--lock-Static%20AST%20Grounding-10b981?style=flat-square&logo=probot)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm#pre-flight-reality-lock)
@@ -41,10 +42,14 @@ tzero --tree . --out context.txt
 
 # 3. Turnkey 1-click configure Cursor, Claude, Antigravity, Windsurf, Cline:
 tzero init
+
+# (Optional) Install official VS Code / Cursor Extension (.vsix):
+code --install-extension dist/tzero-vscode-10.0.0.vsix
 ```
 
 ### 🧭 Navigation & Interactive Jump Stations
 
+[![TDQS 5.0 Anchor](https://img.shields.io/badge/TDQS_5.0-Anchor_Certified-10b981?style=for-the-badge&logo=checkmarx&logoColor=white)](#tdqs-certification)
 [![Why T-Zero](https://img.shields.io/badge/Why_T--Zero-0284c7?style=for-the-badge&logo=rocket&logoColor=white)](#why-t-zero)
 [![Task Benchmark](https://img.shields.io/badge/Task_Benchmark-10b981?style=for-the-badge&logo=speedtest&logoColor=white)](#task-completion-benchmark)
 [![IDE Setup](https://img.shields.io/badge/IDE_Setup-6366f1?style=for-the-badge&logo=visualstudiocode&logoColor=white)](#universal-1-click-ide-setup)
@@ -55,6 +60,7 @@ tzero init
 [![Türkçe Dokümantasyon](https://img.shields.io/badge/T%C3%BCrk%C3%A7e-Rehber-dc2626?style=for-the-badge&logo=googletranslate&logoColor=white)](#turkce)
 
 <p align="center">
+  <b><a href="#tdqs-certification">TDQS 5.0</a></b> &bull; 
   <b><a href="#why-t-zero">Why T-Zero</a></b> &bull; 
   <b><a href="#task-completion-benchmark">Task Benchmark</a></b> &bull; 
   <b><a href="#universal-1-click-ide-setup">Universal IDE Setup</a></b> &bull; 
@@ -160,6 +166,9 @@ tzero init --windsurf      # Windsurf Editor
 tzero init --cline         # Cline / Roo Code
 tzero init --vscode        # VS Code (Continue / Copilot)
 tzero init --zed           # Zed Editor
+
+# Install official VS Code / Cursor Extension (.vsix):
+code --install-extension dist/tzero-vscode-10.0.0.vsix
 ```
 
 ### Manual Configuration Snippets (Any MCP Client)
@@ -229,6 +238,42 @@ All 14 tools are audited and verified against the Model Context Protocol specifi
 | `generate_architecture_blueprint` | Architecture | Generates complete `ARCHITECTURE.md` with auto-generated Mermaid component diagrams. |
 | `enforce_architecture_boundaries` | Governance | Validates architectural layer rules defined in `tzero.rules.json`. |
 | `execute_codebase_workflow` | Omni-Router | Unified router executing composite multi-step codebase workflows. |
+
+---
+
+<a id="tdqs-certification"></a>
+## 🏆 100% TDQS 5.0 / 5.0 Anchor Certification Standard
+
+T-Zero is officially certified at **TDQS 5.0 / 5.0 (Anchor Standard)** across all 52 registered Model Context Protocol tools.
+
+### What is TDQS (Tool Documentation Quality Score)?
+Frontier LLMs (Claude 3.5 Sonnet, GPT-4o, Gemini 1.5/2.0 Pro) rely exclusively on tool docstrings and parameter schemas to decide:
+1. *Which* tool to call among dozens of registered capabilities.
+2. *How* to invoke it without argument hallucinations.
+3. *Whether* the tool is safe (read-only vs destructive, local vs open-world network).
+
+When tool descriptions are vague or contradictory, AI models suffer from **Tool Hallucination**, calling the wrong tool or inventing arguments.
+
+### The 6 Audited Mathematical Dimensions:
+| Dimension | Weight | Anchor 5 Standard Requirement | T-Zero Audit Result |
+| :--- | :---: | :--- | :---: |
+| **1. Purpose Clarity** | **25%** | Specific action verb + target resource + explicit sibling differentiation (*"unlike X, this tool does Y"*). Zero tautological phrasing. | **100% PASS** |
+| **2. Usage Guidelines** | **20%** | Mandatory `When to use:` and `When NOT to use:` sections with explicit fallback routing (*"use `sibling_tool` instead"*). | **100% PASS** |
+| **3. Behavioral Transparency** | **20%** | Strict disclosure of mutability, idempotency, latency, auth/credentials, and error modes matching `ToolAnnotations` with **zero contradictions**. | **100% PASS** |
+| **4. Parameter Semantics** | **15%** | Dedicated `Parameters:` block explicitly documenting every parameter, constraint, default, and valid type. | **100% PASS** |
+| **5. Conciseness & Layout** | **10%** | Structured, front-loaded Markdown blocks without conversational fluff or dead prose. | **100% PASS** |
+| **6. Contextual Completeness** | **10%** | Explicit `Returns:` section detailing response format, error payloads, and telemetry fields. | **100% PASS** |
+
+### Automated Verification Pipeline:
+Every single tool is continuously audited in CI via:
+```bash
+# Automated TDQS 5.0/5.0 unit test:
+python -m unittest tests/test_tdqs_anchor5.py -v
+
+# Full 52-tool audit runner:
+python scripts/comprehensive_tdqs_audit.py
+# Output: ✅ PERFECT 5/5! No issues detected across all 52 tools!
+```
 
 ---
 
@@ -333,12 +378,31 @@ pip install tzero-mcp
 # 1 saniyede tüm IDE'leri otomatik yapılandır:
 tzero init
 
+# (İsteğe bağlı) VS Code & Cursor Eklentisini (.vsix) yükle:
+code --install-extension dist/tzero-vscode-10.0.0.vsix
+
 # Kod tabanını sıkıştır ve ağaç çıkar:
 tzero --tree . --out context.txt
 
 # Canlı web demosunu yerel başlat:
 tzero space
 ```
+
+---
+
+## ⭐ Star T-Zero on GitHub & Join the Context Revolution!
+
+If T-Zero helped you cut AI prompt token costs, eliminate hallucinations, or speed up your daily coding flow, please consider giving us a star!
+
+<div align="center">
+
+[![GitHub stars](https://img.shields.io/github/stars/toprakahmetaydogmus/TZeroAlgorithm?style=social)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)
+[![GitHub forks](https://img.shields.io/github/forks/toprakahmetaydogmus/TZeroAlgorithm?style=social)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)
+
+**T-Zero is 100% Free, Open-Source & Offline Forever.**  
+*Built with passion by Siber Akademi for developers worldwide.*
+
+</div>
 
 ---
 

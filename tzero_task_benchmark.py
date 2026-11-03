@@ -54,7 +54,7 @@ class TaskEvaluationResult:
 
 @dataclass
 class TaskBenchmarkReport:
-    version: str = "9.9.0"
+    version: str = "10.0.0"
     tokenizer: str = "tiktoken (cl100k_base)" if TIKTOKEN_AVAILABLE else "character-ratio fallback"
     total_tasks: int = 0
     passed_tasks: int = 0
@@ -342,7 +342,7 @@ def analyze_symbol_impact(symbol_path: str, table: SymbolTable, dag: CallGraphDA
         """Formats ANSI-styled benchmark summary table."""
         lines = []
         lines.append("=" * 78)
-        lines.append("  T-ZERO TASK-COMPLETION & BPE TOKENIZER BENCHMARK REPORT (v9.9.0)")
+        lines.append("  T-ZERO TASK-COMPLETION & BPE TOKENIZER BENCHMARK REPORT (v10.0.0)")
         lines.append(f"  Tokenizer: {report.tokenizer} | Tasks Evaluated: {report.total_tasks}")
         lines.append("=" * 78)
         lines.append(f"{'Task ID':<10} | {'Raw BPE':<8} | {'T-Zero':<8} | {'Saved %':<8} | {'Contract %':<10} | {'Status'}")
