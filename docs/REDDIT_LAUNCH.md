@@ -5,13 +5,14 @@ Target subreddits:
 2. `r/programming` (5.8M+ developers)
 3. `r/ChatGPTCoding` (280k+ AI coders)
 4. `r/cursor` (Cursor IDE power users)
+5. `r/vscode` (Visual Studio Code developers)
 
 ---
 
-### Reddit Post 1: r/LocalLLaMA & r/ChatGPTCoding
+### Reddit Post 1: r/LocalLLaMA, r/cursor & r/ChatGPTCoding
 
 **Post Title:**
-`I got tired of LLMs choking on boilerplate, so I built an open-source AST context compressor (-94.6% tokens, 52-tool MCP, $0 cost)`
+`I got tired of LLMs choking on boilerplate, so I built an open-source AST context compressor (-94.6% tokens, TDQS 5.0 Grade A MCP, $0 cost)`
 
 **Post Body:**
 ```markdown
@@ -19,7 +20,7 @@ Hey everyone!
 
 When using Claude 3.5 Sonnet, GPT-4o, or local LLMs on large codebases, feeding entire files dumps thousands of lines of internal helper loops, routine math, and private variables into the prompt. It wastes context window, causes attention decay, and drains your wallet.
 
-I built **T-Zero** (https://github.com/toprakahmetaydogmus/TZeroAlgorithm) — an open-source deterministic AST context compressor and Model Context Protocol (MCP) server for Cursor, Claude Code, Antigravity, and Windsurf.
+I built **T-Zero** (https://github.com/toprakahmetaydogmus/TZeroAlgorithm) — an open-source deterministic AST context compressor and Model Context Protocol (MCP) server for Cursor, VS Code, Claude Code, Antigravity, and Windsurf.
 
 ### How it works:
 Instead of dumping raw text or relying on flaky embedding chunks, T-Zero uses an Abstract Syntax Tree (AST) engine:
@@ -35,12 +36,13 @@ Instead of dumping raw text or relying on flaky embedding chunks, T-Zero uses an
 ### Additional Features:
 - **Pre-Flight Reality-Lock:** Catches non-existent function calls before code execution.
 - **Shannon Entropy Secret Scrubber ($H \ge 4.75$):** Locally redacts API keys and private tokens.
-- **100% TDQS 5.0/5.0 Anchor Certified:** Zero ambiguity across all 52 registered MCP tools.
-- **Official VS Code / Cursor Extension (.vsix):** 1-click install.
+- **100% TDQS 5.0/5.0 Grade A Certified:** Highest tool definition standard across all MCP tools.
+- **Official VS Code / Cursor Extension (.vsix):** 1-click install (`code --install-extension tzero-vscode-10.1.0.vsix`).
 - **$0.00 Forever:** Zero external paid APIs, 100% local Python AST.
 
+🌐 **Live Web Hub & Downloads:** https://tzero-indol.vercel.app  
 🔗 **GitHub:** https://github.com/toprakahmetaydogmus/TZeroAlgorithm  
-🤗 **Live Browser Demo (Hugging Face Spaces):** https://huggingface.co/spaces/toprakke4/tzero-token-reducer
+🤗 **Interactive Space:** https://huggingface.co/spaces/toprakke4/tzero-token-reducer  
 
 Would love to hear your thoughts and feedback!
 ```
