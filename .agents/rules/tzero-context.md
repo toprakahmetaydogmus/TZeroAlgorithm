@@ -17,7 +17,7 @@ tzero sync
 ```
 
 ## Ground-Truth Architecture Symbols
-- **Active Modules:** 63 core files
+- **Active Modules:** 64 core files
 - **Primary Classes:**
   * `ClientTarget (addmcp.py)`
   * `AddMCPApp (addmcp.py)`
@@ -30,10 +30,10 @@ tzero sync
   * `BenchmarkReport (tzero_benchmark.py)`
   * `TZeroBenchmarkEngine (tzero_benchmark.py)`
   * `JarvisBenchmarkOptimizer (tzero_benchmark.py)`
+  * `ModelField (tzero_bridge.py)`
+  * `TranspiledModel (tzero_bridge.py)`
+  * `PolyglotTypeBridge (tzero_bridge.py)`
   * `CIPipelineGenerator (tzero_ci.py)`
-  * `DiffSemantics (tzero_commit.py)`
-  * `LocalSemanticCommitSynthesizer (tzero_commit.py)`
-  * `ModelCostComparison (tzero_cost.py)`
 - **Primary Public Functions:**
   * `build_client_targets() (addmcp.py)`
   * `server_entry() (addmcp.py)`

@@ -111,7 +111,11 @@ py-modules = [
     "tzero_security",
     "tzero_sync",
     "tzero_cost",
-    "tzero_drift"
+    "tzero_drift",
+    "tzero_snapshot",
+    "tzero_fix",
+    "tzero_bridge",
+    "tzero_replay"
 ]
 
 [tool.setuptools.package-data]

@@ -8354,6 +8354,11 @@ def main():
     parser.add_argument("--benchmark-svg", action="store_true", help="Generate animated macOS terminal SVG recording of benchmark for README")
     parser.add_argument("--task-benchmark", action="store_true", help="Run empirical task-completion & BPE tokenizer benchmark (tiktoken)")
     parser.add_argument("--huggingface", "--hf", action="store_true", help="Launch local Hugging Face Space Gradio app or display deployment guide")
+    parser.add_argument("--snapshot", nargs="?", const=".", default=None, metavar="DIR", help="Pre-compute sub-8ms AST context snapshot cache (.tzero/snapshot.json)")
+    parser.add_argument("--fix", metavar="FILE_OR_CODE", default=None, help="Self-healing AST auto-corrector for hallucinated AI methods and phantom imports")
+    parser.add_argument("--bridge", metavar="FILE", default=None, help="Polyglot type & schema transpiler: convert Python models to TS, Rust, or Go")
+    parser.add_argument("--bridge-lang", choices=["ts", "rust", "go", "all"], default="ts", help="Target language for --bridge (default: ts)")
+    parser.add_argument("--replay", nargs="?", const=15, type=int, default=None, metavar="COMMITS", help="Historical git token and financial ROI replay (default: 15 commits)")
     parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect v10.1.0 Master Edition (engine v4.1.0)")
 
 
@@ -8552,6 +8557,10 @@ Generate tailored subagent manifests (.tzero/agents/ + SKILL.md) in 1 second:
             "hf": "--huggingface",
             "huggingface": "--huggingface",
             "space": "--huggingface",
+            "snapshot": "--snapshot",
+            "fix": "--fix",
+            "bridge": "--bridge",
+            "replay": "--replay",
         }
         if sub in sub_map:
             sys.argv[1] = sub_map[sub]
@@ -8638,6 +8647,37 @@ Generate tailored subagent manifests (.tzero/agents/ + SKILL.md) in 1 second:
             print(DriftAnalyzer.to_json(rep))
         else:
             DriftAnalyzer.render_cli(rep)
+        sys.exit(0)
+    elif getattr(args, "snapshot", None) is not None:
+        from tzero_snapshot import SnapshotEngine
+        target = args.snapshot or args.dir
+        snap, was_cached = SnapshotEngine.get_or_create(target)
+        if getattr(args, "format", "text") == "json":
+            print(json.dumps(SnapshotEngine.to_dict(snap), indent=2))
+        else:
+            SnapshotEngine.render_cli(snap, was_cached)
+        sys.exit(0)
+    elif getattr(args, "fix", None) is not None:
+        from tzero_fix import ASTHallucinationAutoCorrector
+        target = args.fix
+        if os.path.exists(target):
+            rep = ASTHallucinationAutoCorrector.heal_file(target, workspace_dir=args.dir, apply_write=True)
+            ASTHallucinationAutoCorrector.render_cli(rep, target_hint=target)
+        else:
+            rep = ASTHallucinationAutoCorrector.heal_code(target, workspace_dir=args.dir)
+            ASTHallucinationAutoCorrector.render_cli(rep, target_hint="inline_code")
+        sys.exit(0)
+    elif getattr(args, "bridge", None) is not None:
+        from tzero_bridge import PolyglotTypeBridge
+        target = args.bridge
+        blang = getattr(args, "bridge_lang", "ts")
+        PolyglotTypeBridge.render_cli(target, blang)
+        sys.exit(0)
+    elif getattr(args, "replay", None) is not None:
+        from tzero_replay import HistoricalTokenReplay
+        max_c = args.replay if isinstance(args.replay, int) else 15
+        rep = HistoricalTokenReplay.replay_history(args.dir, max_commits=max_c)
+        HistoricalTokenReplay.render_cli(rep)
         sys.exit(0)
     elif getattr(args, "tutorial", False) or getattr(args, "guide", False):
         print_master_tutorial()
