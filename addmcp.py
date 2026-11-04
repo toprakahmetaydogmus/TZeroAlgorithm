@@ -22,7 +22,7 @@ from pathlib import Path
 from typing import Callable, Dict, List, Optional, Tuple
 
 
-APP_VERSION = "10.1.0"
+APP_VERSION = "10.2.0"
 SERVER_NAME = "tzero"
 SERVER_FILENAME = "TZeroMCP.exe"
 
