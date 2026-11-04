@@ -2,7 +2,7 @@
 """
 T-Zero Enterprise AST Context Architect & Token Reducer (Hugging Face Spaces App)
 Developer: Toprak Ahmet Aydoğmuş (Siber Akademi)
-Version: 10.0.0
+Version: 10.1.0
 License: MIT
 """
 
