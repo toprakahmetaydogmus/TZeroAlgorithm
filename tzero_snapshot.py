@@ -255,3 +255,4 @@ class SnapshotEngine:
         print(f"⏱️ Load / Build Time:   \033[33m{res.generation_time_ms:.2f} ms\033[0m")
         print(f"💾 Snapshot Location:   .tzero/{cls.SNAPSHOT_FILENAME}")
         print("=" * 70)
+

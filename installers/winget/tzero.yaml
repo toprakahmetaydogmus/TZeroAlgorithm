@@ -1,0 +1,14 @@
+PackageIdentifier: SiberAkademi.TZero
+PackageVersion: 10.3.0
+PackageName: T-Zero Context Architect
+Publisher: Siber Akademi
+Author: Toprak Ahmet Aydogmus
+License: MIT
+ShortDescription: Enterprise-Grade AST Codebase Context Architect, Token Reducer & Autonomous PC-Fixer
+PackageUrl: https://tzero-indol.vercel.app
+Installers:
+  - Architecture: x64
+    InstallerType: portable
+    InstallerUrl: https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/download/v10.3.0/tzero_mcp-10.3.0-py3-none-any.whl
+ManifestType: singleton
+ManifestVersion: 1.6.0

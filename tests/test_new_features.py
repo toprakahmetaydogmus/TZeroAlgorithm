@@ -136,6 +136,36 @@ val = calculate_token_savings(100, 20)
         self.assertGreater(rep.total_raw_tokens, 0)
         self.assertGreaterEqual(rep.savings_claude_sonnet, 0.0)
 
+    # 5. PCFixerDoctor Tests
+    def test_pc_fixer_doctor(self):
+        from tzero_pc_fixer import PCFixerDoctor
+        diag = PCFixerDoctor.diagnose(self.test_dir)
+        self.assertGreaterEqual(diag.health_score_pct, 90)
+        self.assertEqual(diag.syntax_errors, 0)
+
+        # Introduce syntax flaw
+        flaw_file = os.path.join(self.test_dir, "flaw.py")
+        with open(flaw_file, "w", encoding="utf-8") as f:
+            f.write("def broken_func()\n    pass\n")
+        diag_flaw = PCFixerDoctor.diagnose(self.test_dir)
+        self.assertEqual(diag_flaw.syntax_errors, 1)
+
+        heal_res = PCFixerDoctor.auto_heal(self.test_dir, dry_run=False)
+        self.assertGreaterEqual(heal_res.issues_healed, 1)
+        diag_fixed = PCFixerDoctor.diagnose(self.test_dir)
+        self.assertEqual(diag_fixed.syntax_errors, 0)
+
+    # 6. ArchitecturalPassportGenerator Tests
+    def test_architectural_passport(self):
+        from tzero_explain import ArchitecturalPassportGenerator, ModulePassport
+        passport = ArchitecturalPassportGenerator.explain_file(self.sample_py)
+        self.assertIsInstance(passport, ModulePassport)
+        self.assertEqual(passport.module_name, "sample_models")
+        self.assertIn("class UserProfile", passport.markdown_passport)
+        self.assertIn("class AccountService", passport.markdown_passport)
+        self.assertGreater(passport.raw_tokens, 0)
+
 
 if __name__ == "__main__":
     unittest.main()
+

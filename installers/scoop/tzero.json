@@ -1,0 +1,23 @@
+{
+  "version": "10.3.0",
+  "description": "Enterprise-Grade AST Codebase Context Architect, Token Reducer & PC-Fixer Doctor",
+  "homepage": "https://tzero-indol.vercel.app",
+  "license": "MIT",
+  "architecture": {
+    "64bit": {
+      "url": "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/download/v10.3.0/tzero_mcp-10.3.0-py3-none-any.whl",
+      "bin": "tzero.exe"
+    }
+  },
+  "suggest": {
+    "python": "python"
+  },
+  "checkver": "github",
+  "autoupdate": {
+    "architecture": {
+      "64bit": {
+        "url": "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/download/v$version/tzero_mcp-$version-py3-none-any.whl"
+      }
+    }
+  }
+}

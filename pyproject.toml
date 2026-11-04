@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tzero-mcp"
-version = "10.2.0"
+version = "10.3.0"
 description = "Enterprise Codebase Context Builder, AST Signatures Analyzer, & Token Reducer for LLMs"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -86,6 +86,8 @@ tzero-guard = "tzero_guard:main"
 tzero-sync = "tzero_sync:main"
 tzero-cost = "tzero_cost:main"
 tzero-drift = "tzero_drift:main"
+tzero-fixer = "tzero_v3:main"
+tzero-explain = "tzero_v3:main"
 
 [tool.setuptools]
 packages = ["tzero_jarvis"]
@@ -115,7 +117,9 @@ py-modules = [
     "tzero_snapshot",
     "tzero_fix",
     "tzero_bridge",
-    "tzero_replay"
+    "tzero_replay",
+    "tzero_pc_fixer",
+    "tzero_explain"
 ]
 
 [tool.setuptools.package-data]

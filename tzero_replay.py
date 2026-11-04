@@ -138,3 +138,4 @@ class HistoricalTokenReplay:
         for p in rep.points[:10]:
             print(f"{p.commit_hash:<10} {p.date_str:<12} {p.author[:14]:<16} {p.raw_tokens:<10,} {p.pruned_tokens:<10,} \033[32m-{p.saved_pct}%\033[0m")
         print("=" * 80)
+

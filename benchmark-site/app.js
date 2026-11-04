@@ -1701,7 +1701,12 @@ const MCP_TOOLS_CATALOG = [
   { name: "jarvis_bft_swarm_consensus", cat: "swarm", badge: "Swarm", desc: "Runs Byzantine Fault Tolerant voting across 5 subagents to guarantee safety.", sig: "jarvis_bft_swarm_consensus(proposal: dict, quorum_ratio: float = 0.67)" },
   { name: "search_codebase_semantic", cat: "swarm", badge: "Swarm", desc: "Performs 100% private local BM25 hybrid semantic code search without cloud APIs.", sig: "search_codebase_semantic(query: str, project_root: str)" },
   { name: "jarvis_hybrid_search", cat: "swarm", badge: "Swarm", desc: "Combines lexical keyword matching with AST symbol ranking for hybrid search.", sig: "jarvis_hybrid_search(query: str, top_k: int = 10)" },
-  { name: "jarvis_minhash_similarity", cat: "swarm", badge: "Swarm", desc: "Sub-millisecond MinHash Jaccard similarity indexing across repositories.", sig: "jarvis_minhash_similarity(text_a: str, text_b: str)" }
+  { name: "jarvis_minhash_similarity", cat: "swarm", badge: "Swarm", desc: "Sub-millisecond MinHash Jaccard similarity indexing across repositories.", sig: "jarvis_minhash_similarity(text_a: str, text_b: str)" },
+  { name: "diagnose_and_heal_system", cat: "ast", badge: "Doctor 5.0", desc: "Autonomous self-healing PC & codebase doctor: repairs syntax errors, missing standard imports, broken venv paths, and stale caches.", sig: "diagnose_and_heal_system(workspace_dir: str = '.', auto_repair: bool = True)" },
+  { name: "generate_architectural_passport", cat: "ast", badge: "Passport 5.0", desc: "Generates ultra-dense, prompt-ready AST architectural passports for LLMs with up to 95% token savings.", sig: "generate_architectural_passport(file_path: str)" },
+  { name: "build_ast_snapshot", cat: "ast", badge: "Snapshot 5.0", desc: "Pre-computes and caches high-speed AST symbols and dependency graphs into .tzero/snapshot.json for sub-8ms retrieval.", sig: "build_ast_snapshot(workspace_dir: str = '.', force_refresh: bool = False)" },
+  { name: "heal_hallucinated_code", cat: "security", badge: "Heal 5.0", desc: "Statically inspects candidate code against verified workspace AST symbols and auto-heals phantom methods and imports.", sig: "heal_hallucinated_code(code_or_file: str, workspace_dir: str = '.')" },
+  { name: "transpile_model_bridge", cat: "ast", badge: "Bridge 5.0", desc: "Transpiles Python @dataclass and Pydantic models into TypeScript interfaces, Rust structs, or Go structs via AST.", sig: "transpile_model_bridge(file_path: str, target_lang: str = 'ts')" }
 ];
 
 function initMCPTools() {

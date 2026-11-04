@@ -225,3 +225,4 @@ class ASTHallucinationAutoCorrector:
         else:
             print("\033[32m✅ Flawless Code: 0 hallucinated symbols detected! AST matches workspace.\033[0m")
         print("=" * 70)
+

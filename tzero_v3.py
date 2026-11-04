@@ -8359,7 +8359,9 @@ def main():
     parser.add_argument("--bridge", metavar="FILE", default=None, help="Polyglot type & schema transpiler: convert Python models to TS, Rust, or Go")
     parser.add_argument("--bridge-lang", choices=["ts", "rust", "go", "all"], default="ts", help="Target language for --bridge (default: ts)")
     parser.add_argument("--replay", nargs="?", const=15, type=int, default=None, metavar="COMMITS", help="Historical git token and financial ROI replay (default: 15 commits)")
-    parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect v10.2.0 Master Edition (engine v4.1.0)")
+    parser.add_argument("--pc-fixer", "--fixer", nargs="?", const=".", default=None, metavar="DIR", help="Autonomous self-healing PC & codebase doctor (heal syntax, imports, venv, caches)")
+    parser.add_argument("--explain", metavar="FILE", default=None, help="Generate high-density AST architectural passport for file or LLM prompt")
+    parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect v10.3.0 Master Edition (engine v4.1.0)")
 
 
     def print_master_tutorial():
@@ -8561,6 +8563,9 @@ Generate tailored subagent manifests (.tzero/agents/ + SKILL.md) in 1 second:
             "fix": "--fix",
             "bridge": "--bridge",
             "replay": "--replay",
+            "pc-fixer": "--pc-fixer",
+            "fixer": "--pc-fixer",
+            "explain": "--explain",
         }
         if sub in sub_map:
             sys.argv[1] = sub_map[sub]
@@ -8678,6 +8683,28 @@ Generate tailored subagent manifests (.tzero/agents/ + SKILL.md) in 1 second:
         max_c = args.replay if isinstance(args.replay, int) else 15
         rep = HistoricalTokenReplay.replay_history(args.dir, max_commits=max_c)
         HistoricalTokenReplay.render_cli(rep)
+        sys.exit(0)
+    elif getattr(args, "pc_fixer", None) is not None:
+        from tzero_pc_fixer import PCFixerDoctor
+        from dataclasses import asdict
+        target = args.pc_fixer or args.dir
+        res_heal = PCFixerDoctor.auto_heal(target, dry_run=getattr(args, "dry_run", False))
+        diag = PCFixerDoctor.diagnose(target)
+        if getattr(args, "format", "text") == "json":
+            print(json.dumps(asdict(res_heal), indent=2))
+        else:
+            PCFixerDoctor.render_cli(diag, res_heal)
+        sys.exit(0)
+    elif getattr(args, "explain", None) is not None:
+        from tzero_explain import ArchitecturalPassportGenerator
+        from dataclasses import asdict
+        target = args.explain
+        passport = ArchitecturalPassportGenerator.explain_file(target)
+        if getattr(args, "format", "text") == "json":
+            print(json.dumps(asdict(passport), indent=2))
+        else:
+            ArchitecturalPassportGenerator.render_cli(passport)
+        sys.exit(0)
         sys.exit(0)
     elif getattr(args, "tutorial", False) or getattr(args, "guide", False):
         print_master_tutorial()
