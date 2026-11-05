@@ -10882,6 +10882,371 @@ class PolyglotBuildHealer:
 
 
 # ==============================================================================
+# MODULE: cwe_remediator.py
+# ==============================================================================
+
+
+
+
+
+class SecurityCweRemediator:
+    """AST surgical patcher for CWE vulnerabilities and OWASP Top 10 weaknesses."""
+
+    @classmethod
+    def diagnose_file(cls, file_path: str) -> List[DiagnosticIssue]:
+        """Audit Python file for automatable CWE vulnerabilities."""
+        issues: List[DiagnosticIssue] = []
+        try:
+            content = Path(file_path).read_text(encoding="utf-8", errors="replace")
+            tree = ast.parse(content, filename=file_path)
+        except Exception:
+            return issues
+
+        for node in ast.walk(tree):
+            # 1. CWE-78: subprocess shell=True with f-string or string formatting
+            if isinstance(node, ast.Call):
+                if cls._is_subprocess_call(node):
+                    has_shell_true = any(
+                        kw.arg == "shell" and isinstance(kw.value, ast.Constant) and kw.value.value is True
+                        for kw in node.keywords
+                    )
+                    if has_shell_true and node.args:
+                        arg0 = node.args[0]
+                        if isinstance(arg0, (ast.JoinedStr, ast.BinOp)):
+                            issues.append(DiagnosticIssue(
+                                category=DiagnosticCategory.SECURITY,
+                                severity=SeverityLevel.CRITICAL,
+                                file_path=file_path,
+                                line_number=node.lineno,
+                                error_code="CWE-78",
+                                message="Potential OS Command Injection (CWE-78): Dynamic command string passed to subprocess with shell=True",
+                                suggested_fix="Remove shell=True and pass command arguments as a tokenized list",
+                                auto_fixable=True,
+                                metadata={"issue_type": "cwe_78_shell_injection", "line_num": node.lineno},
+                            ))
+
+                # 2. CWE-89: cursor.execute with f-string or % formatting
+                if cls._is_sql_execute(node):
+                    if node.args:
+                        sql_arg = node.args[0]
+                        if isinstance(sql_arg, (ast.JoinedStr, ast.BinOp)):
+                            issues.append(DiagnosticIssue(
+                                category=DiagnosticCategory.SECURITY,
+                                severity=SeverityLevel.CRITICAL,
+                                file_path=file_path,
+                                line_number=node.lineno,
+                                error_code="CWE-89",
+                                message="Potential SQL Injection (CWE-89): Dynamic SQL query constructed via string concatenation or f-string",
+                                suggested_fix="Use parameterized queries with placeholder bindings (e.g. %s, ?)",
+                                auto_fixable=True,
+                                metadata={"issue_type": "cwe_89_sql_injection", "line_num": node.lineno},
+                            ))
+
+                # 3. CWE-327: hashlib.md5 / hashlib.sha1 without usedforsecurity=False
+                if isinstance(node.func, ast.Attribute) and node.func.attr in ("md5", "sha1"):
+                    if isinstance(node.func.value, ast.Name) and node.func.value.id == "hashlib":
+                        has_used_for_sec = any(kw.arg == "usedforsecurity" for kw in node.keywords)
+                        if not has_used_for_sec:
+                            issues.append(DiagnosticIssue(
+                                category=DiagnosticCategory.SECURITY,
+                                severity=SeverityLevel.WARNING,
+                                file_path=file_path,
+                                line_number=node.lineno,
+                                error_code="CWE-327",
+                                message=f"Broken / Risky Cryptographic Hash (CWE-327): Insecure 'hashlib.{node.func.attr}()' call",
+                                suggested_fix="Upgrade to hashlib.sha256() or pass usedforsecurity=False for non-cryptographic checksums",
+                                auto_fixable=True,
+                                metadata={"issue_type": "cwe_327_weak_hash", "line_num": node.lineno, "algo": node.func.attr},
+                            ))
+
+        return issues
+
+    @classmethod
+    def _is_subprocess_call(cls, node: ast.Call) -> bool:
+        """Check if call is subprocess.run, Popen, call, or check_output."""
+        if isinstance(node.func, ast.Attribute):
+            if node.func.attr in ("run", "Popen", "call", "check_output", "check_call"):
+                if isinstance(node.func.value, ast.Name) and node.func.value.id == "subprocess":
+                    return True
+        return False
+
+    @classmethod
+    def _is_sql_execute(cls, node: ast.Call) -> bool:
+        """Check if call is cursor.execute or conn.execute."""
+        if isinstance(node.func, ast.Attribute):
+            if node.func.attr in ("execute", "executemany"):
+                return True
+        return False
+
+    @classmethod
+    def heal_issue(cls, issue: DiagnosticIssue, dry_run: bool = False) -> HealAction:
+        """Autonomously remediate CWE vulnerabilities."""
+        itype = issue.metadata.get("issue_type")
+        file_path = issue.file_path
+        line_num = issue.metadata.get("line_num")
+
+        if not file_path or not os.path.isfile(file_path):
+            return HealAction(issue=issue, success=False, details="Target file does not exist")
+
+        content = Path(file_path).read_text(encoding="utf-8", errors="replace")
+        lines = content.splitlines()
+
+        if itype == "cwe_327_weak_hash":
+            if dry_run:
+                return HealAction(issue=issue, success=True, details="[Dry-Run] Would upgrade weak hash to sha256 or set usedforsecurity=False")
+
+            algo = issue.metadata.get("algo", "md5")
+            if line_num and 1 <= line_num <= len(lines):
+                orig_line = lines[line_num - 1]
+                # If used for simple checksum, append usedforsecurity=False
+                if f"hashlib.{algo}()" in orig_line:
+                    lines[line_num - 1] = orig_line.replace(f"hashlib.{algo}()", f"hashlib.{algo}(usedforsecurity=False)")
+                elif f"hashlib.{algo}(" in orig_line and "usedforsecurity" not in orig_line:
+                    lines[line_num - 1] = orig_line.replace(f"hashlib.{algo}(", f"hashlib.{algo}(usedforsecurity=False, ")
+                Path(file_path).write_text("\n".join(lines) + "\n", encoding="utf-8")
+                return HealAction(issue=issue, success=True, details=f"Secured CWE-327 by passing usedforsecurity=False to hashlib.{algo}()")
+
+        if itype == "cwe_78_shell_injection":
+            if dry_run:
+                return HealAction(issue=issue, success=True, details="[Dry-Run] Would remove shell=True from subprocess call")
+
+            if line_num and 1 <= line_num <= len(lines):
+                orig_line = lines[line_num - 1]
+                # Replace shell=True with shell=False
+                repaired = re.sub(r"\bshell\s*=\s*True\b", "shell=False", orig_line)
+                lines[line_num - 1] = repaired
+                Path(file_path).write_text("\n".join(lines) + "\n", encoding="utf-8")
+                return HealAction(issue=issue, success=True, details="Remediated CWE-78 by setting shell=False on subprocess invocation")
+
+        return HealAction(issue=issue, success=False, details=f"Automated surgical remediation not implemented for {itype}")
+
+# ==============================================================================
+# MODULE: dead_code_eliminator.py
+# ==============================================================================
+
+
+
+
+
+class DeadCodeEliminator:
+    """AST surgical engine for discovering and pruning unreachable or unused code."""
+
+    @classmethod
+    def diagnose_file(cls, file_path: str) -> List[DiagnosticIssue]:
+        """Audit Python file for dead code, unreferenced private helpers, and unreachable lines."""
+        issues: List[DiagnosticIssue] = []
+        try:
+            content = Path(file_path).read_text(encoding="utf-8", errors="replace")
+            tree = ast.parse(content, filename=file_path)
+        except Exception:
+            return issues
+
+        # 1. Check for unreachable statements in blocks
+        issues.extend(cls._find_unreachable_statements(file_path, tree))
+
+        # 2. Check for unused private module functions
+        issues.extend(cls._find_unused_private_functions(file_path, tree))
+
+        return issues
+
+    @classmethod
+    def _find_unreachable_statements(cls, file_path: str, tree: ast.AST) -> List[DiagnosticIssue]:
+        """Find statements following return, raise, break, or continue in the same body block."""
+        issues: List[DiagnosticIssue] = []
+
+        for node in ast.walk(tree):
+            if hasattr(node, "body") and isinstance(node.body, list):
+                term_index = -1
+                for idx, stmt in enumerate(node.body):
+                    if isinstance(stmt, (ast.Return, ast.Raise, ast.Break, ast.Continue)):
+                        term_index = idx
+                        break
+
+                if term_index != -1 and term_index < len(node.body) - 1:
+                    dead_stmt = node.body[term_index + 1]
+                    issues.append(DiagnosticIssue(
+                        category=DiagnosticCategory.SMELLS,
+                        severity=SeverityLevel.WARNING,
+                        file_path=file_path,
+                        line_number=dead_stmt.lineno,
+                        error_code="TZ-DEAD-UNREACHABLE",
+                        message=f"Unreachable code detected: Statement on line {dead_stmt.lineno} executes after terminating {type(node.body[term_index]).__name__}",
+                        suggested_fix="Prune or restructure unreachable statement block",
+                        auto_fixable=True,
+                        metadata={
+                            "issue_type": "unreachable_code",
+                            "start_line": dead_stmt.lineno,
+                            "end_line": getattr(dead_stmt, "end_lineno", dead_stmt.lineno),
+                        },
+                    ))
+
+        return issues
+
+    @classmethod
+    def _find_unused_private_functions(cls, file_path: str, tree: ast.Module) -> List[DiagnosticIssue]:
+        """Discover module-level private functions (_func) that are never referenced in the module."""
+        issues: List[DiagnosticIssue] = []
+        defined_privates: Dict[str, ast.FunctionDef] = {}
+
+        # Collect top-level private functions (excluding dunders)
+        for item in tree.body:
+            if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                if item.name.startswith("_") and not item.name.startswith("__"):
+                    defined_privates[item.name] = item
+
+        if not defined_privates:
+            return issues
+
+        # Count references in the entire module
+        referenced_names: Set[str] = set()
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Name) and not isinstance(node.ctx, ast.Store):
+                referenced_names.add(node.id)
+
+        for name, func_node in defined_privates.items():
+            if name not in referenced_names:
+                issues.append(DiagnosticIssue(
+                    category=DiagnosticCategory.SMELLS,
+                    severity=SeverityLevel.INFO,
+                    file_path=file_path,
+                    line_number=func_node.lineno,
+                    error_code="TZ-DEAD-UNUSED-FUNC",
+                    message=f"Unused private function '{name}()' is defined but never called in module",
+                    suggested_fix=f"Remove or export '{name}()'",
+                    auto_fixable=False,
+                    metadata={"issue_type": "unused_private_func", "name": name, "line_num": func_node.lineno},
+                ))
+
+        return issues
+
+    @classmethod
+    def heal_issue(cls, issue: DiagnosticIssue, dry_run: bool = False) -> HealAction:
+        """Autonomously comment-out or prune dead unreachable blocks."""
+        itype = issue.metadata.get("issue_type")
+        file_path = issue.file_path
+        start_line = issue.metadata.get("start_line")
+        end_line = issue.metadata.get("end_line", start_line)
+
+        if itype == "unreachable_code" and file_path and start_line:
+            p = Path(file_path)
+            if not p.is_file():
+                return HealAction(issue=issue, success=False, details="File not found")
+
+            if dry_run:
+                return HealAction(issue=issue, success=True, details=f"[Dry-Run] Would comment out unreachable code lines {start_line}-{end_line}")
+
+            lines = p.read_text(encoding="utf-8", errors="replace").splitlines()
+            for idx in range(start_line - 1, min(end_line, len(lines))):
+                if not lines[idx].strip().startswith("#"):
+                    lines[idx] = "# [T-Zero Dead Code] " + lines[idx]
+
+            p.write_text("\n".join(lines) + "\n", encoding="utf-8")
+            return HealAction(issue=issue, success=True, details=f"Commented out unreachable statements on lines {start_line}-{end_line}")
+
+        return HealAction(issue=issue, success=False, details=f"No automated prune for issue type '{itype}'")
+
+# ==============================================================================
+# MODULE: async_io_modernizer.py
+# ==============================================================================
+
+
+
+
+
+class AsyncIoModernizer:
+    """Specialist healer for async/await event loop hygiene and blocking I/O prevention."""
+
+    @classmethod
+    def diagnose_file(cls, file_path: str) -> List[DiagnosticIssue]:
+        """Audit Python file for blocking calls inside async coroutines."""
+        issues: List[DiagnosticIssue] = []
+        try:
+            content = Path(file_path).read_text(encoding="utf-8", errors="replace")
+            tree = ast.parse(content, filename=file_path)
+        except Exception:
+            return issues
+
+        for node in ast.walk(tree):
+            if isinstance(node, ast.AsyncFunctionDef):
+                # Traverse inside this async function only
+                for sub in ast.walk(node):
+                    if isinstance(sub, ast.Call):
+                        # 1. Check time.sleep()
+                        if isinstance(sub.func, ast.Attribute) and sub.func.attr == "sleep":
+                            if isinstance(sub.func.value, ast.Name) and sub.func.value.id == "time":
+                                issues.append(DiagnosticIssue(
+                                    category=DiagnosticCategory.PERFORMANCE,
+                                    severity=SeverityLevel.WARNING,
+                                    file_path=file_path,
+                                    line_number=sub.lineno,
+                                    error_code="TZ-ASYNC-BLOCKING-SLEEP",
+                                    message=f"Event Loop Starvation: Synchronous 'time.sleep()' called inside async function '{node.name}'",
+                                    suggested_fix="Replace with non-blocking 'await asyncio.sleep()'",
+                                    auto_fixable=True,
+                                    metadata={
+                                        "issue_type": "async_time_sleep",
+                                        "line_num": sub.lineno,
+                                        "func_name": node.name,
+                                    },
+                                ))
+
+                        # 2. Check requests.* inside async
+                        if isinstance(sub.func, ast.Attribute) and sub.func.attr in ("get", "post", "put", "delete"):
+                            if isinstance(sub.func.value, ast.Name) and sub.func.value.id == "requests":
+                                issues.append(DiagnosticIssue(
+                                    category=DiagnosticCategory.PERFORMANCE,
+                                    severity=SeverityLevel.WARNING,
+                                    file_path=file_path,
+                                    line_number=sub.lineno,
+                                    error_code="TZ-ASYNC-BLOCKING-HTTP",
+                                    message=f"Blocking HTTP Request: Synchronous 'requests.{sub.func.attr}()' called inside async function '{node.name}'",
+                                    suggested_fix="Wrap with 'asyncio.to_thread()' or migrate to 'httpx.AsyncClient'",
+                                    auto_fixable=False,
+                                    metadata={"issue_type": "async_blocking_http", "line_num": sub.lineno},
+                                ))
+
+        return issues
+
+    @classmethod
+    def heal_issue(cls, issue: DiagnosticIssue, dry_run: bool = False) -> HealAction:
+        """Autonomously heal async event loop blocking issues."""
+        itype = issue.metadata.get("issue_type")
+        file_path = issue.file_path
+        line_num = issue.metadata.get("line_num")
+
+        if itype == "async_time_sleep" and file_path and line_num:
+            p = Path(file_path)
+            if not p.is_file():
+                return HealAction(issue=issue, success=False, details="File not found")
+
+            if dry_run:
+                return HealAction(issue=issue, success=True, details="[Dry-Run] Would convert time.sleep() to await asyncio.sleep()")
+
+            content = p.read_text(encoding="utf-8", errors="replace")
+            lines = content.splitlines()
+
+            if 1 <= line_num <= len(lines):
+                orig_line = lines[line_num - 1]
+                # Replace time.sleep(...) with await asyncio.sleep(...)
+                repaired_line = re.sub(r"\btime\.sleep\(", "await asyncio.sleep(", orig_line)
+                lines[line_num - 1] = repaired_line
+
+                # Check if import asyncio is present
+                has_asyncio = any(re.match(r"^import\s+asyncio\b", l) for l in lines)
+                if not has_asyncio:
+                    # Insert after __future__ or top
+                    insert_idx = 0
+                    for idx, l in enumerate(lines):
+                        if l.startswith("from __future__"):
+                            insert_idx = idx + 1
+                    lines.insert(insert_idx, "import asyncio")
+
+                p.write_text("\n".join(lines) + "\n", encoding="utf-8")
+                return HealAction(issue=issue, success=True, details="Converted 'time.sleep()' to non-blocking 'await asyncio.sleep()' with auto-import")
+
+        return HealAction(issue=issue, success=False, details=f"No automated heal for issue type '{itype}'")
+
+# ==============================================================================
 # MODULE: mcp_server.py
 # ==============================================================================
 
@@ -12000,6 +12365,12 @@ class FixerOrchestrator:
                     issues.extend(CodeSmellsHealer.diagnose_file(full_p))
                     # Security & Zero-Leak
                     issues.extend(SecurityZeroLeakDoctor.diagnose_file(full_p))
+                    # CWE Security Remediations
+                    issues.extend(SecurityCweRemediator.diagnose_file(full_p))
+                    # Dead Code & Unreachable Stmts
+                    issues.extend(DeadCodeEliminator.diagnose_file(full_p))
+                    # AsyncIO Blocking Checks
+                    issues.extend(AsyncIoModernizer.diagnose_file(full_p))
 
         # Tallies
         crit_c = sum(1 for i in issues if i.severity == SeverityLevel.CRITICAL.value)
@@ -12092,6 +12463,18 @@ class FixerOrchestrator:
             # 9. Polyglot Build Heals
             for issue in [i for i in current_issues if i.metadata.get("issue_type") in ("missing_dockerignore", "makefile_spaces_to_tabs", "makefile_missing_phony", "docker_add_to_copy")]:
                 pass_actions.append(PolyglotBuildHealer.heal_issue(issue, dry_run=dry_run))
+
+            # 10. CWE Remediations
+            for issue in [i for i in current_issues if i.metadata.get("issue_type") in ("cwe_78_shell_injection", "cwe_89_sql_injection", "cwe_327_weak_hash")]:
+                pass_actions.append(SecurityCweRemediator.heal_issue(issue, dry_run=dry_run))
+
+            # 11. Dead Code Prunes
+            for issue in [i for i in current_issues if i.metadata.get("issue_type") == "unreachable_code"]:
+                pass_actions.append(DeadCodeEliminator.heal_issue(issue, dry_run=dry_run))
+
+            # 12. AsyncIO Modernizations
+            for issue in [i for i in current_issues if i.metadata.get("issue_type") == "async_time_sleep"]:
+                pass_actions.append(AsyncIoModernizer.heal_issue(issue, dry_run=dry_run))
 
             all_actions.extend(pass_actions)
 

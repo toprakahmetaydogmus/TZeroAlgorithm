@@ -41,6 +41,9 @@ from tzero_fixer.hardware_and_disk_doctor import HardwareAndDiskSurgeon
 from tzero_fixer.packaging_abi_surgeon import PackagingAbiSurgeon
 from tzero_fixer.git_advanced_surgeon import GitAdvancedSurgeon
 from tzero_fixer.polyglot_build_healer import PolyglotBuildHealer
+from tzero_fixer.cwe_remediator import SecurityCweRemediator
+from tzero_fixer.dead_code_eliminator import DeadCodeEliminator
+from tzero_fixer.async_io_modernizer import AsyncIoModernizer
 from tzero_fixer.mcp_server import PCFixerMcpServer
 
 
@@ -282,6 +285,49 @@ class TestPCFixerMasterEdition(unittest.TestCase):
         self.assertIn("pc_fixer_check_system", tool_names)
 
 
+
+    def test_cwe_remediator(self):
+        """Verifies CWE-78 and CWE-327 detection and autonomous remediation."""
+        with tempfile.TemporaryDirectory() as td:
+            f = Path(td) / "sec.py"
+            f.write_text("import subprocess, hashlib\nhashlib.md5()\nsubprocess.run(f'ls {x}', shell=True)\n", encoding="utf-8")
+            issues = SecurityCweRemediator.diagnose_file(str(f))
+            self.assertGreaterEqual(len(issues), 2)
+
+            for i in issues:
+                SecurityCweRemediator.heal_issue(i, dry_run=False)
+
+            new_code = f.read_text(encoding="utf-8")
+            self.assertIn("usedforsecurity=False", new_code)
+            self.assertIn("shell=False", new_code)
+
+    def test_dead_code_eliminator(self):
+        """Verifies unreachable code detection after return."""
+        with tempfile.TemporaryDirectory() as td:
+            f = Path(td) / "dead.py"
+            f.write_text("def compute():\n    return 42\n    print('dead')\n", encoding="utf-8")
+            issues = DeadCodeEliminator.diagnose_file(str(f))
+            self.assertTrue(any(i.error_code == "TZ-DEAD-UNREACHABLE" for i in issues))
+
+            for i in issues:
+                DeadCodeEliminator.heal_issue(i, dry_run=False)
+
+            self.assertIn("# [T-Zero Dead Code]", f.read_text(encoding="utf-8"))
+
+    def test_async_io_modernizer(self):
+        """Verifies conversion of blocking time.sleep to await asyncio.sleep in async def."""
+        with tempfile.TemporaryDirectory() as td:
+            f = Path(td) / "async_service.py"
+            f.write_text("import time\nasync def process():\n    time.sleep(1)\n", encoding="utf-8")
+            issues = AsyncIoModernizer.diagnose_file(str(f))
+            self.assertTrue(any(i.error_code == "TZ-ASYNC-BLOCKING-SLEEP" for i in issues))
+
+            for i in issues:
+                AsyncIoModernizer.heal_issue(i, dry_run=False)
+
+            new_code = f.read_text(encoding="utf-8")
+            self.assertIn("await asyncio.sleep(1)", new_code)
+            self.assertIn("import asyncio", new_code)
 
 if __name__ == "__main__":
     unittest.main()
