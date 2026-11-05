@@ -22,8 +22,23 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple
 
 # ==================================================================================================
-# PURE PYTHON AST ENGINE (High Performance CPU - Sub-5ms Execution)
-# Zero cloud dependencies, zero socket leaks, 100% offline local processing.
+# ==================================================================================================
+# ZERO-GPU COMPATIBILITY LAYER (Required by Hugging Face ZeroGPU Spaces)
+# ==================================================================================================
+try:
+    import spaces  # type: ignore
+    HAS_SPACES = True
+except ImportError:
+    HAS_SPACES = False
+
+    class spaces:  # type: ignore
+        @staticmethod
+        def GPU(func=None, duration=60):
+            def decorator(f):
+                return f
+            return decorator(func) if func else decorator
+
+
 import gradio as gr
 
 # ==================================================================================================
@@ -970,6 +985,12 @@ MCP_TOOLS_CATALOG = [
 # ==================================================================================================
 # GRADIO CONTROLLERS & INTERACTION LOGIC
 # ==================================================================================================
+@spaces.GPU(duration=15)
+def zero_gpu_anchor_check(x: str = "") -> str:
+    """Hugging Face ZeroGPU environment health anchor."""
+    return x
+
+@spaces.GPU
 def process_code_compression(
     code_text: str,
     tier_choice: str,
