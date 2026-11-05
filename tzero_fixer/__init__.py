@@ -30,7 +30,7 @@ from .polyglot_build_healer import PolyglotBuildHealer
 from .mcp_server import PCFixerMcpServer
 from .orchestrator import FixerOrchestrator
 
-__version__ = "10.4.0"
+__version__ = "10.5.0"
 __all__ = [
     "SeverityLevel",
     "DiagnosticCategory",

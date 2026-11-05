@@ -15,7 +15,7 @@ Features:
 - Unified ANSI terminal rendering and JSON / SARIF v2.1.0 report generation.
 
 Author: Toprak Ahmet Aydogmus (Siber Akademi)
-Version: 10.4.0
+Version: 10.5.0
 """
 
 import json
@@ -291,7 +291,7 @@ class FixerOrchestrator:
     def render_cli(cls, diag: DiagnosticReport, heal: Optional[HealReport] = None):
         """Render high-contrast, beautiful ANSI terminal cockpit report."""
         print("=" * 80)
-        print("\033[1;36m🩺 T-ZERO MASTER PC-FIXER & ENVIRONMENT AUTONOMOUS DOCTOR v10.4.0\033[0m")
+        print("\033[1;36m🩺 T-ZERO MASTER PC-FIXER & ENVIRONMENT AUTONOMOUS DOCTOR v10.5.0\033[0m")
         print("=" * 80)
         print(f"Target Directory: \033[33m{diag.target_dir}\033[0m")
         print(f"Host OS:          \033[32m{diag.environment.os_release}\033[0m (Arch: {diag.environment.python_architecture})")

@@ -2,7 +2,7 @@
 """
 T-Zero PC-Fixer & Codebase Doctor (Master Single-File Edition)
 ============================================================
-Version: 10.4.0 Master Edition | Zero-Leak Certified | 100% Free & Local
+Version: 10.5.0 Master Edition | Zero-Leak Certified | 100% Free & Local
 Architectural Specification: Monolithic Self-Healing Operating System & Codebase Doctor
 
 Components Integrated:
@@ -396,7 +396,7 @@ class DiagnosticReport:
                 "tool": {
                     "driver": {
                         "name": "T-Zero PC-Fixer Doctor",
-                        "version": "10.4.0",
+                        "version": "10.5.0",
                         "informationUri": "https://tzero-indol.vercel.app"
                     }
                 },
@@ -10292,6 +10292,7 @@ dependencies = []
 
         return HealAction(issue=issue, success=False, details=f"No automated surgical repair for issue type '{itype}'")
 
+
 # ==============================================================================
 # MODULE: git_advanced_surgeon.py
 # ==============================================================================
@@ -10539,6 +10540,7 @@ class GitAdvancedSurgeon:
                 return HealAction(issue=issue, success=False, details=f"Submodule sync failed: {e}")
 
         return HealAction(issue=issue, success=False, details=f"No automated repair for issue type '{itype}'")
+
 
 # ==============================================================================
 # MODULE: polyglot_build_healer.py
@@ -10878,6 +10880,7 @@ class PolyglotBuildHealer:
 
         return HealAction(issue=issue, success=False, details=f"No automated repair for issue type '{itype}'")
 
+
 # ==============================================================================
 # MODULE: mcp_server.py
 # ==============================================================================
@@ -10891,7 +10894,7 @@ class PCFixerMcpServer:
     """Production-grade MCP stdio server for PC-Fixer & Codebase Doctor."""
 
     SERVER_NAME = "tzero-pc-fixer-mcp"
-    SERVER_VERSION = "10.4.0"
+    SERVER_VERSION = "10.5.0"
 
     TOOLS = [
         {
@@ -12121,7 +12124,7 @@ class FixerOrchestrator:
     def render_cli(cls, diag: DiagnosticReport, heal: Optional[HealReport] = None):
         """Render high-contrast, beautiful ANSI terminal cockpit report."""
         print("=" * 80)
-        print("\033[1;36m🩺 T-ZERO MASTER PC-FIXER & ENVIRONMENT AUTONOMOUS DOCTOR v10.4.0\033[0m")
+        print("\033[1;36m🩺 T-ZERO MASTER PC-FIXER & ENVIRONMENT AUTONOMOUS DOCTOR v10.5.0\033[0m")
         print("=" * 80)
         print(f"Target Directory: \033[33m{diag.target_dir}\033[0m")
         print(f"Host OS:          \033[32m{diag.environment.os_release}\033[0m (Arch: {diag.environment.python_architecture})")
@@ -12199,7 +12202,7 @@ def main():
     parser.add_argument("--generate-ci", action="store_true", help="Generate GitHub Actions quality gate workflow")
     parser.add_argument("--verify-e2e", action="store_true", help="Run end-to-end synthetic stress verification")
     parser.add_argument("--benchmark", action="store_true", help="Run synthetic self-healing benchmarks")
-    parser.add_argument("--version", action="version", version="%(prog)s 10.4.0 (Master Zero-Leak Edition)")
+    parser.add_argument("--version", action="version", version="%(prog)s 10.5.0 (Master Zero-Leak Edition)")
 
     args = parser.parse_args()
 

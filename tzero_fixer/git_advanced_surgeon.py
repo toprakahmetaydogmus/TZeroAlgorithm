@@ -15,7 +15,7 @@ Key Capabilities:
   - Large binary file commit warning (>50MB) to prevent repo bloat
 
 Author: Siber Akademi T-Zero R&D Team
-Version: 10.4.0 | 100% Free & Local Offline | Zero-Leak Certified
+Version: 10.5.0 | 100% Free & Local Offline | Zero-Leak Certified
 """
 
 from __future__ import annotations

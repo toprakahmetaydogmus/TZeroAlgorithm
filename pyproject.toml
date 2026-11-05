@@ -4,11 +4,12 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tzero-mcp"
-version = "10.4.0"
+version = "10.5.0"
 description = "Enterprise Codebase Context Builder, AST Signatures Analyzer, & Token Reducer for LLMs"
 readme = "README.md"
 requires-python = ">=3.11"
-license = { text = "MIT" }
+license = "MIT"
+license-files = ["LICENSE"]
 authors = [
     { name = "Toprak Ahmet Aydoğmuş", email = "siberakademi@org.tr" }
 ]
@@ -47,7 +48,6 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Environment :: Console",
     "Intended Audience :: Developers",

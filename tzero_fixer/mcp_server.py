@@ -42,7 +42,7 @@ class PCFixerMcpServer:
     """Production-grade MCP stdio server for PC-Fixer & Codebase Doctor."""
 
     SERVER_NAME = "tzero-pc-fixer-mcp"
-    SERVER_VERSION = "10.4.0"
+    SERVER_VERSION = "10.5.0"
 
     TOOLS = [
         {

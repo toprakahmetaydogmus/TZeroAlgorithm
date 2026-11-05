@@ -13,7 +13,7 @@ Key Capabilities:
   - Rust Cargo.toml & Go go.mod basic syntax integrity checkers
 
 Author: Siber Akademi T-Zero R&D Team
-Version: 10.4.0 | 100% Free & Local Offline | Zero-Leak Certified
+Version: 10.5.0 | 100% Free & Local Offline | Zero-Leak Certified
 """
 
 from __future__ import annotations
