@@ -12,3 +12,4 @@ Installers:
     InstallerUrl: https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/download/v10.3.0/tzero_mcp-10.3.0-py3-none-any.whl
 ManifestType: singleton
 ManifestVersion: 1.6.0
+

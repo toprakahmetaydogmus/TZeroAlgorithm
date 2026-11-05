@@ -64,3 +64,4 @@ Install T-Zero natively across platforms:
 - **Canonical Suite:** 20 Tools (100% Passing TDQS 5.0 Rubric).
 - **Full Specialized Suite:** 57 Tools.
 - Zero rate limits, zero telemetry, 100% local execution.
+

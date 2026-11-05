@@ -18,3 +18,4 @@ class Tzero < Formula
     system "#{bin}/tzero", "pc-fixer", "--dry-run"
   end
 end
+
