@@ -30,6 +30,8 @@ from typing import Any, Dict, List, Optional, Set, Tuple
 
 from .ast_syntax_healer import ASTSyntaxHealer
 from .code_smells_healer import CodeSmellsHealer
+from .git_advanced_surgeon import GitAdvancedSurgeon
+from .hardware_and_disk_doctor import HardwareAndDiskSurgeon
 from .import_graph_healer import ImportGraphHealer
 from .models import (
     DiagnosticCategory,
@@ -42,6 +44,8 @@ from .models import (
     SeverityLevel,
 )
 from .os_doctor import OSDoctor
+from .packaging_abi_surgeon import PackagingAbiSurgeon
+from .polyglot_build_healer import PolyglotBuildHealer
 from .security_zero_leak import SecurityZeroLeakDoctor
 from .venv_doctor import VenvDoctor
 
@@ -140,6 +144,15 @@ class FixerOrchestrator:
         # 3. Import Graph & Cycles
         issues.extend(ImportGraphHealer.diagnose_workspace(workspace_dir))
 
+        # 4. Packaging, PEP 517 & ABI
+        issues.extend(PackagingAbiSurgeon.diagnose_workspace(workspace_dir))
+
+        # 5. Git VCS Integrity & Locks
+        issues.extend(GitAdvancedSurgeon.diagnose_workspace(workspace_dir))
+
+        # 6. Polyglot Build & Infrastructure
+        issues.extend(PolyglotBuildHealer.diagnose_workspace(workspace_dir))
+
         # 4. File-by-file AST, Smells, Security
         scanned_files = 0
         for root_dir, dirs, files in os.walk(str(root)):
@@ -234,6 +247,18 @@ class FixerOrchestrator:
 
             # 6. Security Heals
             pass_actions.extend(SecurityZeroLeakDoctor.execute_security_heals(current_issues, workspace_dir, dry_run=dry_run))
+
+            # 7. Packaging Heals
+            for issue in [i for i in current_issues if i.metadata.get("issue_type") in ("missing_build_system", "broken_pyvenv_home", "stale_egg_info", "legacy_setup_py")]:
+                pass_actions.append(PackagingAbiSurgeon.heal_issue(issue, dry_run=dry_run))
+
+            # 8. Git VCS Heals
+            for issue in [i for i in current_issues if i.metadata.get("issue_type") in ("stale_git_lock", "missing_gitattributes")]:
+                pass_actions.append(GitAdvancedSurgeon.heal_issue(issue, dry_run=dry_run))
+
+            # 9. Polyglot Build Heals
+            for issue in [i for i in current_issues if i.metadata.get("issue_type") in ("missing_dockerignore", "makefile_spaces_to_tabs", "makefile_missing_phony", "docker_add_to_copy")]:
+                pass_actions.append(PolyglotBuildHealer.heal_issue(issue, dry_run=dry_run))
 
             all_actions.extend(pass_actions)
 

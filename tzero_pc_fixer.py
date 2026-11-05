@@ -127,6 +127,8 @@ class DiagnosticCategory(enum.Enum):
     POLYGLOT = "polyglot"          # Node, Rust, Go, Git, Docker system diagnostics
     TYPE_HINTS = "type_hints"      # PEP-484 / 585 / 604 type annotation modernizations
     PERFORMANCE = "performance"    # Quadratic string concatenations, memory leaks
+    WORKSPACE = "workspace"        # Workspace layout, git, VCS, locks, editorconfig
+    DEPENDENCY = "dependency"      # PEP 517 build, virtualenv packages, ABI drift
 
 
 # Backward & forward compatibility alias bindings
@@ -253,7 +255,7 @@ class DiagnosticIssue:
 @dataclass
 class HealAction:
     """Record of a surgical repair action executed on disk or in memory."""
-    category: str                       # Value of DiagnosticCategory
+    category: str = "workspace"         # Value of DiagnosticCategory
     file_path: Optional[str] = None     # Target file modified
     description: str = ""               # Summary of action
     success: bool = True                # Did the patch succeed?
@@ -262,6 +264,45 @@ class HealAction:
     backup_path: Optional[str] = None   # Path to original file snapshot in rollback buffer
     duration_ms: float = 0.0            # Execution latency in milliseconds
     metadata: Dict[str, Any] = field(default_factory=dict)
+
+    def __init__(
+        self,
+        category: Optional[Any] = None,
+        file_path: Optional[str] = None,
+        description: str = "",
+        success: bool = True,
+        diff: Optional[str] = None,
+        action_type: str = "patch",
+        backup_path: Optional[str] = None,
+        duration_ms: float = 0.0,
+        metadata: Optional[Dict[str, Any]] = None,
+        # Tolerant alias kwargs:
+        issue: Optional[Any] = None,
+        details: Optional[str] = None,
+        **extra: Any,
+    ):
+        if issue is not None:
+            cat_val = getattr(issue, "category", "workspace")
+            self.category = cat_val.value if hasattr(cat_val, "value") else str(cat_val)
+            self.file_path = getattr(issue, "file_path", file_path)
+        else:
+            cat_val = category or "workspace"
+            self.category = cat_val.value if hasattr(cat_val, "value") else str(cat_val)
+            self.file_path = file_path
+
+        self.description = details if details is not None else description
+        self.success = success
+        self.diff = diff
+        self.action_type = action_type
+        self.backup_path = backup_path
+        self.duration_ms = duration_ms
+        self.metadata = metadata or {}
+        if extra:
+            self.metadata.update(extra)
+
+    @property
+    def details(self) -> str:
+        return self.description
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -5533,6 +5574,7 @@ class PerformanceProfilerHealer:
 
         return actions
 
+
 # ==============================================================================
 # MODULE: linters_and_static_analyzer.py
 # ==============================================================================
@@ -7298,6 +7340,7 @@ class ShellScriptDoctor:
 
         return issues
 
+
 # ==============================================================================
 # MODULE: polyglot_doctor.py
 # ==============================================================================
@@ -7775,6 +7818,7 @@ class ASTDuplicityRefactorer:
                 )
 
         return duplicate_groups, issues
+
 
 # ==============================================================================
 # MODULE: benchmarks_and_diagnostics.py
@@ -8900,6 +8944,7 @@ class SyntheticWorkspaceGenerator:
                 except Exception:
                     pass
 
+
 # ==============================================================================
 # MODULE: dependency_vulnerability_auditor.py
 # ==============================================================================
@@ -9181,6 +9226,7 @@ class DependencyVulnerabilityAuditor:
                 )
 
         return actions
+
 
 # ==============================================================================
 # MODULE: polyglot_schema_validator.py
@@ -9658,6 +9704,1596 @@ class SmartPatchRecommender:
         # Second application should be rejected or produce no additional changes
         ok2, final, _ = cls.apply_patch_in_memory(intermediate, patch)
         return not ok2 or final == intermediate
+
+# ==============================================================================
+# MODULE: hardware_and_disk_doctor.py
+# ==============================================================================
+
+
+
+
+
+@dataclass
+class PortConflictInfo:
+    port: int
+    process_id: Optional[int]
+    process_name: Optional[str]
+    command_line: Optional[str]
+    protocol: str = "TCP"
+
+
+@dataclass
+class DiskPartitionHealth:
+    mount_point: str
+    total_gb: float
+    free_gb: float
+    used_pct: float
+    is_critical: bool
+
+
+class HardwareAndDiskSurgeon:
+    """Diagnostic and surgical engine for hardware, storage partitions, and developer ports."""
+
+    COMMON_DEV_PORTS = [3000, 3001, 5000, 5173, 8000, 8080, 8425, 8888, 9000, 5432, 27017, 6379]
+
+    @classmethod
+    def check_dev_port_status(cls, ports: Optional[List[int]] = None) -> List[PortConflictInfo]:
+        """Scan common development ports for active listeners and identifying processes."""
+        ports_to_check = ports or cls.COMMON_DEV_PORTS
+        conflicts: List[PortConflictInfo] = []
+
+        for p in ports_to_check:
+            # Quick socket check
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.settimeout(0.15)
+                is_open = (s.connect_ex(("127.0.0.1", p)) == 0)
+
+            if is_open:
+                pid, name, cmd = cls._identify_process_on_port(p)
+                conflicts.append(PortConflictInfo(
+                    port=p,
+                    process_id=pid,
+                    process_name=name,
+                    command_line=cmd,
+                ))
+
+        return conflicts
+
+    @classmethod
+    def _identify_process_on_port(cls, port: int) -> Tuple[Optional[int], Optional[str], Optional[str]]:
+        """Identify the PID and process name bound to a specific local TCP port."""
+        sys_plat = SystemPlatform.current()
+        pid: Optional[int] = None
+        p_name: Optional[str] = None
+        cmd: Optional[str] = None
+
+        if sys_plat == SystemPlatform.WINDOWS:
+            try:
+                proc = subprocess.run(
+                    f'netstat -ano -p tcp | findstr ":{port} "',
+                    shell=True,
+                    capture_output=True,
+                    text=True,
+                    timeout=2.0
+                )
+                for line in proc.stdout.splitlines():
+                    parts = line.strip().split()
+                    if len(parts) >= 5 and "LISTENING" in parts:
+                        pid = int(parts[-1])
+                        break
+
+                if pid:
+                    task = subprocess.run(
+                        f'tasklist /FI "PID eq {pid}" /FO CSV /NH',
+                        shell=True,
+                        capture_output=True,
+                        text=True,
+                        timeout=2.0
+                    )
+                    out = task.stdout.strip()
+                    if out and not "INFO: No tasks" in out:
+                        p_name = out.split(",")[0].replace('"', '')
+            except Exception:
+                pass
+        else:
+            try:
+                proc = subprocess.run(
+                    f"lsof -ti:{port}",
+                    shell=True,
+                    capture_output=True,
+                    text=True,
+                    timeout=2.0
+                )
+                lines = proc.stdout.strip().splitlines()
+                if lines:
+                    pid = int(lines[0])
+                    p_name_proc = subprocess.run(
+                        f"ps -p {pid} -o comm=",
+                        shell=True,
+                        capture_output=True,
+                        text=True,
+                        timeout=1.0
+                    )
+                    p_name = p_name_proc.stdout.strip()
+            except Exception:
+                pass
+
+        return pid, p_name, cmd
+
+    @classmethod
+    def diagnose_port_conflicts(cls) -> Tuple[List[DiagnosticIssue], List[HealAction]]:
+        """Detect development port collisions blocking application startup."""
+        issues: List[DiagnosticIssue] = []
+        actions: List[HealAction] = []
+        active_ports = cls.check_dev_port_status()
+
+        for c in active_ports:
+            proc_desc = f"process '{c.process_name}' (PID: {c.process_id})" if c.process_id else "unknown process"
+            issues.append(
+                DiagnosticIssue(
+                    category=DiagnosticCategory.ENVIRONMENT.value,
+                    severity=SeverityLevel.WARNING.value,
+                    file_path=None,
+                    line=c.port,
+                    column=None,
+                    error_code="TZ-PORT-COLLISION",
+                    message=f"Port {c.port} is already bound by {proc_desc}",
+                    suggested_fix=f"Terminate zombie process (PID {c.process_id}) or select alternate port",
+                    auto_fixable=bool(c.process_id and c.process_id > 4),
+                    metadata={"port": c.port, "pid": c.process_id, "process_name": c.process_name}
+                )
+            )
+
+        return issues, actions
+
+    @classmethod
+    def kill_process_on_port(cls, port: int, dry_run: bool = False) -> HealAction:
+        """Safely terminate a rogue process occupying a required development port."""
+        pid, name, _ = cls._identify_process_on_port(port)
+        if not pid or pid <= 4:
+            return HealAction(
+                category=DiagnosticCategory.ENVIRONMENT.value,
+                action_type="kill_port_process",
+                file_path=None,
+                description=f"Cannot kill process on port {port}: PID {pid} is invalid or system-critical",
+                success=False,
+            )
+
+        if dry_run:
+            return HealAction(
+                category=DiagnosticCategory.ENVIRONMENT.value,
+                action_type="kill_port_process",
+                file_path=None,
+                description=f"[DRY-RUN] Would terminate process '{name}' (PID: {pid}) on port {port}",
+                success=True,
+            )
+
+        sys_plat = SystemPlatform.current()
+        cmd = f"taskkill /PID {pid} /F" if sys_plat == SystemPlatform.WINDOWS else f"kill -9 {pid}"
+
+        try:
+            res = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=3.0)
+            ok = (res.returncode == 0)
+            return HealAction(
+                category=DiagnosticCategory.ENVIRONMENT.value,
+                action_type="kill_port_process",
+                file_path=None,
+                description=f"Terminated process '{name}' (PID: {pid}) to free port {port}" if ok else f"Failed to kill PID {pid}: {res.stderr.strip()}",
+                success=ok,
+            )
+        except Exception as e:
+            return HealAction(
+                category=DiagnosticCategory.ENVIRONMENT.value,
+                action_type="kill_port_process",
+                file_path=None,
+                description=f"Exception terminating PID {pid} on port {port}: {e}",
+                success=False,
+            )
+
+    @classmethod
+    def check_disk_partitions_health(cls) -> List[DiskPartitionHealth]:
+        """Inspect all available storage volumes for low disk space conditions."""
+        partitions: List[DiskPartitionHealth] = []
+        sys_plat = SystemPlatform.current()
+
+        if sys_plat == SystemPlatform.WINDOWS:
+            import string
+            drives = [f"{d}:\\" for d in string.ascii_uppercase if os.path.exists(f"{d}:\\")]
+            for d in drives:
+                try:
+                    total, used, free = shutil.disk_usage(d)
+                    total_gb = round(total / (1024 ** 3), 2)
+                    free_gb = round(free / (1024 ** 3), 2)
+                    used_pct = round(((total - free) / total) * 100, 1)
+                    is_crit = (free_gb < 5.0 or used_pct > 95.0)
+                    partitions.append(DiskPartitionHealth(
+                        mount_point=d,
+                        total_gb=total_gb,
+                        free_gb=free_gb,
+                        used_pct=used_pct,
+                        is_critical=is_crit
+                    ))
+                except Exception:
+                    continue
+        else:
+            try:
+                total, used, free = shutil.disk_usage("/")
+                total_gb = round(total / (1024 ** 3), 2)
+                free_gb = round(free / (1024 ** 3), 2)
+                used_pct = round(((total - free) / total) * 100, 1)
+                is_crit = (free_gb < 3.0 or used_pct > 95.0)
+                partitions.append(DiskPartitionHealth(
+                    mount_point="/",
+                    total_gb=total_gb,
+                    free_gb=free_gb,
+                    used_pct=used_pct,
+                    is_critical=is_crit
+                ))
+            except Exception:
+                pass
+
+        return partitions
+
+    check_disk_space = check_disk_partitions_health
+
+    @classmethod
+    def terminate_process(cls, pid: int) -> bool:
+        """Terminate process by PID across platforms."""
+        if not pid or pid <= 4:
+            return False
+        sys_plat = SystemPlatform.current()
+        cmd = f"taskkill /PID {pid} /F" if sys_plat == SystemPlatform.WINDOWS else f"kill -9 {pid}"
+        try:
+            res = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=3.0)
+            return res.returncode == 0
+        except Exception:
+            return False
+
+    @classmethod
+    def diagnose_disk_and_memory(cls) -> List[DiagnosticIssue]:
+        """Audit storage and RAM boundaries across host machine."""
+        issues: List[DiagnosticIssue] = []
+        partitions = cls.check_disk_partitions_health()
+
+        for p in partitions:
+            if p.is_critical:
+                issues.append(
+                    DiagnosticIssue(
+                        category=DiagnosticCategory.ENVIRONMENT.value,
+                        severity=SeverityLevel.CRITICAL.value,
+                        file_path=p.mount_point,
+                        line=None,
+                        column=None,
+                        error_code="TZ-DISK-SPACE-CRITICAL",
+                        message=f"Drive {p.mount_point} has only {p.free_gb:.1f} GB free ({p.used_pct}% utilized)",
+                        suggested_fix="Clear temp caches, docker buildx layers, or orphaned node_modules",
+                        auto_fixable=False,
+                        metadata={"mount": p.mount_point, "free_gb": p.free_gb, "used_pct": p.used_pct}
+                    )
+                )
+
+        # Check WSL2 .vhdx growth if on Windows
+        if SystemPlatform.current() == SystemPlatform.WINDOWS:
+            wsl_vhdx = Path(os.environ.get("LOCALAPPDATA", "")) / "Packages"
+            if wsl_vhdx.is_dir():
+                for vhdx in wsl_vhdx.glob("**/*.vhdx"):
+                    try:
+                        sz_gb = round(os.path.getsize(vhdx) / (1024 ** 3), 2)
+                        if sz_gb > 30.0:
+                            issues.append(
+                                DiagnosticIssue(
+                                    category=DiagnosticCategory.ENVIRONMENT.value,
+                                    severity=SeverityLevel.WARNING.value,
+                                    file_path=str(vhdx),
+                                    line=None,
+                                    column=None,
+                                    error_code="TZ-WSL-VHDX-BLOAT",
+                                    message=f"WSL2 virtual disk has expanded to {sz_gb:.1f} GB",
+                                    suggested_fix="Run 'wsl --shutdown' then diskpart compact vdisk to reclaim gigabytes of host space",
+                                    auto_fixable=False,
+                                    metadata={"vhdx_path": str(vhdx), "size_gb": sz_gb}
+                                )
+                            )
+                    except Exception:
+                        continue
+
+        return issues
+
+# ==============================================================================
+# MODULE: packaging_abi_surgeon.py
+# ==============================================================================
+
+
+
+
+
+@dataclass
+class DistInfoMetadata:
+    package_name: str
+    version: str
+    directory_path: str
+    is_duplicate: bool = False
+
+
+@dataclass
+class AbiBinaryIssue:
+    binary_path: str
+    expected_abi: str
+    detected_abi: str
+    module_name: str
+
+
+class PackagingAbiSurgeon:
+    """Specialist engine for Python packaging standards, build systems, and binary ABI alignment."""
+
+    STANDARD_BUILD_BACKENDS = {
+        "setuptools": {
+            "requires": ["setuptools>=61.0", "wheel"],
+            "build-backend": "setuptools.build_meta",
+        },
+        "flit": {
+            "requires": ["flit_core>=3.4"],
+            "build-backend": "flit_core.buildapi",
+        },
+        "poetry": {
+            "requires": ["poetry-core>=1.0.0"],
+            "build-backend": "poetry.core.masonry.api",
+        },
+        "hatchling": {
+            "requires": ["hatchling"],
+            "build-backend": "hatchling.build",
+        },
+    }
+
+    @classmethod
+    def diagnose_workspace(cls, workspace_path: str) -> List[DiagnosticIssue]:
+        """Diagnose packaging and ABI issues across the workspace root and virtual environments."""
+        issues: List[DiagnosticIssue] = []
+        root = Path(workspace_path).resolve()
+
+        # 1. pyproject.toml validation
+        pyproject_file = root / "pyproject.toml"
+        if pyproject_file.is_file():
+            issues.extend(cls._audit_pyproject(pyproject_file))
+        elif (root / "setup.py").is_file():
+            issues.append(DiagnosticIssue(
+                category=DiagnosticCategory.DEPENDENCY,
+                severity=SeverityLevel.WARNING,
+                description="Legacy 'setup.py' found without modern 'pyproject.toml' (PEP 517/621 build isolation missing)",
+                file_path=str(root / "setup.py"),
+                suggested_fix="Generate standardized pyproject.toml with modern setuptools build backend",
+                metadata={"issue_type": "legacy_setup_py"},
+            ))
+
+        # 2. Virtual environment pyvenv.cfg audit
+        venv_dirs = [d for d in root.iterdir() if d.is_dir() and (d / "pyvenv.cfg").is_file()]
+        for venv in venv_dirs:
+            cfg_issues = cls._audit_pyvenv_cfg(venv / "pyvenv.cfg")
+            issues.extend(cfg_issues)
+
+            # 3. Duplicate .dist-info detection in site-packages
+            site_packages_dirs = cls._locate_site_packages(venv)
+            for sp in site_packages_dirs:
+                issues.extend(cls._audit_site_packages(sp))
+
+        # 4. Stale .egg-info directories
+        for egg_dir in root.glob("*.egg-info"):
+            if egg_dir.is_dir():
+                issues.append(DiagnosticIssue(
+                    category=DiagnosticCategory.WORKSPACE,
+                    severity=SeverityLevel.INFO,
+                    description=f"Stale development egg-info directory detected: {egg_dir.name}",
+                    file_path=str(egg_dir),
+                    suggested_fix="Remove legacy .egg-info to avoid shadowing installed packages",
+                    metadata={"issue_type": "stale_egg_info"},
+                ))
+
+        return issues
+
+    @classmethod
+    def _audit_pyproject(cls, pyproject_path: Path) -> List[DiagnosticIssue]:
+        """Audit pyproject.toml for missing build-system, invalid backends, or broken syntax."""
+        issues: List[DiagnosticIssue] = []
+        try:
+            content = pyproject_path.read_text(encoding="utf-8", errors="replace")
+        except Exception as e:
+            issues.append(DiagnosticIssue(
+                category=DiagnosticCategory.WORKSPACE,
+                severity=SeverityLevel.ERROR,
+                description=f"Cannot read pyproject.toml: {e}",
+                file_path=str(pyproject_path),
+            ))
+            return issues
+
+        # Check for [build-system] table
+        if "[build-system]" not in content:
+            issues.append(DiagnosticIssue(
+                category=DiagnosticCategory.DEPENDENCY,
+                severity=SeverityLevel.WARNING,
+                description="pyproject.toml is missing mandatory [build-system] table (PEP 517 non-compliant)",
+                file_path=str(pyproject_path),
+                suggested_fix="Inject standard setuptools build-system configuration",
+                metadata={"issue_type": "missing_build_system"},
+            ))
+        else:
+            if "build-backend" not in content:
+                issues.append(DiagnosticIssue(
+                    category=DiagnosticCategory.DEPENDENCY,
+                    severity=SeverityLevel.WARNING,
+                    description="[build-system] defined in pyproject.toml but 'build-backend' key is missing",
+                    file_path=str(pyproject_path),
+                    suggested_fix="Specify build-backend = 'setuptools.build_meta'",
+                    metadata={"issue_type": "missing_build_backend"},
+                ))
+
+        # Check for project name
+        if "[project]" in content and not re.search(r'name\s*=\s*["\']', content):
+            issues.append(DiagnosticIssue(
+                category=DiagnosticCategory.DEPENDENCY,
+                severity=SeverityLevel.ERROR,
+                description="[project] table defined in pyproject.toml but 'name' field is missing (PEP 621 non-compliant)",
+                file_path=str(pyproject_path),
+                suggested_fix="Add name = '<package-name>' to [project] table",
+                metadata={"issue_type": "missing_project_name"},
+            ))
+
+        return issues
+
+    @classmethod
+    def _audit_pyvenv_cfg(cls, cfg_path: Path) -> List[DiagnosticIssue]:
+        """Audit pyvenv.cfg for broken home directory pointers."""
+        issues: List[DiagnosticIssue] = []
+        try:
+            lines = cfg_path.read_text(encoding="utf-8", errors="replace").splitlines()
+        except Exception:
+            return issues
+
+        home_dir: Optional[Path] = None
+        version_str: Optional[str] = None
+
+        for line in lines:
+            line = line.strip()
+            if line.startswith("home ="):
+                home_path_str = line.split("=", 1)[1].strip()
+                home_dir = Path(home_path_str)
+            elif line.startswith("version ="):
+                version_str = line.split("=", 1)[1].strip()
+
+        if home_dir and not home_dir.is_dir():
+            issues.append(DiagnosticIssue(
+                category=DiagnosticCategory.ENVIRONMENT,
+                severity=SeverityLevel.ERROR,
+                description=f"pyvenv.cfg points to non-existent base Python home directory: '{home_dir}'",
+                file_path=str(cfg_path),
+                suggested_fix=f"Realign 'home' to active Python interpreter: '{Path(sys.executable).parent}'",
+                metadata={"issue_type": "broken_pyvenv_home", "target_home": str(Path(sys.executable).parent)},
+            ))
+
+        return issues
+
+    @classmethod
+    def _locate_site_packages(cls, venv_dir: Path) -> List[Path]:
+        """Locate site-packages directories inside a virtual environment across platforms."""
+        found: List[Path] = []
+        # Windows: Lib/site-packages
+        win_sp = venv_dir / "Lib" / "site-packages"
+        if win_sp.is_dir():
+            found.append(win_sp)
+
+        # Linux/macOS: lib/pythonX.Y/site-packages
+        lib_dir = venv_dir / "lib"
+        if lib_dir.is_dir():
+            for child in lib_dir.iterdir():
+                if child.is_dir() and child.name.startswith("python"):
+                    sub_sp = child / "site-packages"
+                    if sub_sp.is_dir():
+                        found.append(sub_sp)
+
+        return found
+
+    @classmethod
+    def _audit_site_packages(cls, sp_dir: Path) -> List[DiagnosticIssue]:
+        """Check for duplicate .dist-info versions and leftover installation locks."""
+        issues: List[DiagnosticIssue] = []
+        dist_infos: Dict[str, List[Path]] = {}
+
+        for item in sp_dir.iterdir():
+            if item.is_dir() and item.name.endswith(".dist-info"):
+                m = re.match(r"^([A-Za-z0-9_.\-]+)-([0-9A-Za-z.+]+)\.dist-info$", item.name)
+                if m:
+                    pkg_name = m.group(1).lower().replace("-", "_")
+                    dist_infos.setdefault(pkg_name, []).append(item)
+
+        for pkg, paths in dist_infos.items():
+            if len(paths) > 1:
+                path_names = [p.name for p in paths]
+                issues.append(DiagnosticIssue(
+                    category=DiagnosticCategory.DEPENDENCY,
+                    severity=SeverityLevel.WARNING,
+                    description=f"Duplicate conflicting metadata found for package '{pkg}': {', '.join(path_names)}",
+                    file_path=str(sp_dir),
+                    suggested_fix=f"Remove obsolete versions of '{pkg}' from site-packages",
+                    metadata={
+                        "issue_type": "duplicate_dist_info",
+                        "package": pkg,
+                        "candidates": [str(p) for p in paths],
+                    },
+                ))
+
+        return issues
+
+    @classmethod
+    def heal_issue(cls, issue: DiagnosticIssue, dry_run: bool = False) -> HealAction:
+        """Autonomously heal packaging and virtual environment ABI issues."""
+        itype = issue.metadata.get("issue_type")
+        file_path = issue.file_path
+
+        if itype == "missing_build_system" and file_path:
+            p = Path(file_path)
+            if not p.is_file():
+                return HealAction(issue=issue, success=False, details="pyproject.toml does not exist")
+            if dry_run:
+                return HealAction(issue=issue, success=True, details="[Dry-Run] Would inject PEP 517 [build-system] into pyproject.toml")
+
+            build_system_snippet = (
+                "\n[build-system]\n"
+                'requires = ["setuptools>=61.0", "wheel"]\n'
+                'build-backend = "setuptools.build_meta"\n'
+            )
+            content = p.read_text(encoding="utf-8", errors="replace")
+            p.write_text(content + build_system_snippet, encoding="utf-8")
+            return HealAction(issue=issue, success=True, details="Injected standard PEP 517 [build-system] into pyproject.toml")
+
+        if itype == "broken_pyvenv_home" and file_path:
+            p = Path(file_path)
+            target_home = issue.metadata.get("target_home", str(Path(sys.executable).parent))
+            if dry_run:
+                return HealAction(issue=issue, success=True, details=f"[Dry-Run] Would realign home in pyvenv.cfg to {target_home}")
+
+            lines = p.read_text(encoding="utf-8", errors="replace").splitlines()
+            new_lines = []
+            for line in lines:
+                if line.strip().startswith("home ="):
+                    new_lines.append(f"home = {target_home}")
+                else:
+                    new_lines.append(line)
+            p.write_text("\n".join(new_lines) + "\n", encoding="utf-8")
+            return HealAction(issue=issue, success=True, details=f"Realigned pyvenv.cfg base home directory to '{target_home}'")
+
+        if itype == "stale_egg_info" and file_path:
+            p = Path(file_path)
+            if dry_run:
+                return HealAction(issue=issue, success=True, details=f"[Dry-Run] Would delete stale egg-info: {p}")
+            if p.is_dir():
+                shutil.rmtree(p, ignore_errors=True)
+            return HealAction(issue=issue, success=True, details=f"Removed obsolete egg-info directory: {p.name}")
+
+        if itype == "legacy_setup_py" and file_path:
+            p = Path(file_path)
+            pyproj = p.parent / "pyproject.toml"
+            if dry_run:
+                return HealAction(issue=issue, success=True, details=f"[Dry-Run] Would generate modern pyproject.toml alongside setup.py")
+            if not pyproj.is_file():
+                pkg_name = p.parent.name.lower().replace("-", "_")
+                pyproj_content = f'''[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "{pkg_name}"
+version = "0.1.0"
+description = "Modernized package managed by T-Zero Doctor"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = []
+'''
+                pyproj.write_text(pyproj_content, encoding="utf-8")
+                return HealAction(issue=issue, success=True, details=f"Generated modern PEP 517/621 pyproject.toml for '{pkg_name}'")
+
+        return HealAction(issue=issue, success=False, details=f"No automated surgical repair for issue type '{itype}'")
+
+# ==============================================================================
+# MODULE: git_advanced_surgeon.py
+# ==============================================================================
+
+
+
+
+
+@dataclass
+class GitLockInfo:
+    lock_path: str
+    age_seconds: float
+    is_stale: bool
+
+
+@dataclass
+class GitRebaseState:
+    in_rebase: bool
+    in_merge: bool
+    in_cherry_pick: bool
+    head_hash: Optional[str] = None
+
+
+class GitAdvancedSurgeon:
+    """Diagnostic and surgical engine for Git repositories and VCS integrity."""
+
+    STALE_LOCK_THRESHOLD_SECONDS = 300.0  # 5 minutes
+
+    @classmethod
+    def diagnose_workspace(cls, workspace_path: str) -> List[DiagnosticIssue]:
+        """Diagnose all Git VCS issues in the workspace."""
+        issues: List[DiagnosticIssue] = []
+        root = Path(workspace_path).resolve()
+        git_dir = root / ".git"
+
+        if not git_dir.is_dir():
+            # Check if this should be a git repo
+            if (root / ".gitignore").is_file() or (root / "pyproject.toml").is_file():
+                issues.append(DiagnosticIssue(
+                    category=DiagnosticCategory.WORKSPACE,
+                    severity=SeverityLevel.INFO,
+                    description="Workspace contains project files but is not initialized as a Git repository",
+                    file_path=str(root),
+                    suggested_fix="Initialize repository with 'git init'",
+                    metadata={"issue_type": "git_not_initialized"},
+                ))
+            return issues
+
+        # 1. Stale locks (.git/index.lock, .git/HEAD.lock, refs locks)
+        locks = cls._find_git_locks(git_dir)
+        for lock in locks:
+            if lock.is_stale:
+                issues.append(DiagnosticIssue(
+                    category=DiagnosticCategory.WORKSPACE,
+                    severity=SeverityLevel.ERROR,
+                    description=f"Stale Git lock file detected ({int(lock.age_seconds)}s old): '{Path(lock.lock_path).name}' blocking git operations",
+                    file_path=lock.lock_path,
+                    suggested_fix="Safely remove orphaned lock file to unblock git",
+                    metadata={"issue_type": "stale_git_lock", "lock_path": lock.lock_path},
+                ))
+
+        # 2. Stalled rebase / merge / cherry-pick
+        rebase_state = cls._check_rebase_state(git_dir)
+        if rebase_state.in_rebase:
+            issues.append(DiagnosticIssue(
+                category=DiagnosticCategory.WORKSPACE,
+                severity=SeverityLevel.WARNING,
+                description="Git repository is stuck in an active or stalled rebase state (.git/rebase-merge or rebase-apply)",
+                file_path=str(git_dir),
+                suggested_fix="Abort stalled rebase with 'git rebase --abort' or complete with '--continue'",
+                metadata={"issue_type": "stalled_rebase"},
+            ))
+        if rebase_state.in_merge:
+            issues.append(DiagnosticIssue(
+                category=DiagnosticCategory.WORKSPACE,
+                severity=SeverityLevel.WARNING,
+                description="Git repository has an unresolved merge in progress (.git/MERGE_HEAD)",
+                file_path=str(git_dir),
+                suggested_fix="Abort unresolved merge with 'git merge --abort'",
+                metadata={"issue_type": "unresolved_merge"},
+            ))
+
+        # 3. Submodule synchronization
+        gitmodules_file = root / ".gitmodules"
+        if gitmodules_file.is_file():
+            submodule_issues = cls._audit_submodules(root)
+            issues.extend(submodule_issues)
+
+        # 4. .gitattributes cross-platform line ending check
+        gitattributes_file = root / ".gitattributes"
+        if not gitattributes_file.is_file():
+            issues.append(DiagnosticIssue(
+                category=DiagnosticCategory.WORKSPACE,
+                severity=SeverityLevel.INFO,
+                description="Missing '.gitattributes' configuration for standardized cross-platform line endings (CRLF vs LF)",
+                file_path=str(gitattributes_file),
+                suggested_fix="Generate standardized .gitattributes file with auto-normalization",
+                metadata={"issue_type": "missing_gitattributes"},
+            ))
+
+        # 5. Detached HEAD check
+        if cls._is_detached_head(root):
+            issues.append(DiagnosticIssue(
+                category=DiagnosticCategory.WORKSPACE,
+                severity=SeverityLevel.WARNING,
+                description="Repository is in a 'detached HEAD' state (commits may become orphaned if not branched)",
+                file_path=str(git_dir),
+                suggested_fix="Create a safety rescue branch from current commit: 'git branch rescue-detached-head'",
+                metadata={"issue_type": "detached_head"},
+            ))
+
+        return issues
+
+    @classmethod
+    def _find_git_locks(cls, git_dir: Path) -> List[GitLockInfo]:
+        """Find any lock files in .git directory and compute their age."""
+        locks: List[GitLockInfo] = []
+        now = time.time()
+
+        for lock_file in git_dir.glob("**/*.lock"):
+            try:
+                mtime = lock_file.stat().st_mtime
+                age = now - mtime
+                is_stale = age > cls.STALE_LOCK_THRESHOLD_SECONDS
+                locks.append(GitLockInfo(
+                    lock_path=str(lock_file),
+                    age_seconds=age,
+                    is_stale=is_stale,
+                ))
+            except Exception:
+                pass
+
+        return locks
+
+    @classmethod
+    def _check_rebase_state(cls, git_dir: Path) -> GitRebaseState:
+        """Check if Git is currently in rebase, merge, or cherry-pick states."""
+        in_rebase = (git_dir / "rebase-merge").is_dir() or (git_dir / "rebase-apply").is_dir()
+        in_merge = (git_dir / "MERGE_HEAD").is_file()
+        in_cherry = (git_dir / "CHERRY_PICK_HEAD").is_file()
+        return GitRebaseState(
+            in_rebase=in_rebase,
+            in_merge=in_merge,
+            in_cherry_pick=in_cherry,
+        )
+
+    @classmethod
+    def _is_detached_head(cls, repo_root: Path) -> bool:
+        """Determine if HEAD is currently detached."""
+        head_file = repo_root / ".git" / "HEAD"
+        if head_file.is_file():
+            try:
+                content = head_file.read_text(encoding="utf-8", errors="replace").strip()
+                return not content.startswith("ref:")
+            except Exception:
+                pass
+        return False
+
+    @classmethod
+    def _audit_submodules(cls, repo_root: Path) -> List[DiagnosticIssue]:
+        """Audit submodules listed in .gitmodules."""
+        issues: List[DiagnosticIssue] = []
+        gitmodules_path = repo_root / ".gitmodules"
+        try:
+            content = gitmodules_path.read_text(encoding="utf-8", errors="replace")
+            # Parse path = ...
+            paths = re.findall(r"path\s*=\s*(.+)", content)
+            for sub_rel_path in paths:
+                sub_rel_path = sub_rel_path.strip()
+                sub_dir = repo_root / sub_rel_path
+                if not sub_dir.is_dir() or not any(sub_dir.iterdir()):
+                    issues.append(DiagnosticIssue(
+                        category=DiagnosticCategory.WORKSPACE,
+                        severity=SeverityLevel.WARNING,
+                        description=f"Submodule '{sub_rel_path}' is uninitialized or empty directory",
+                        file_path=str(sub_dir),
+                        suggested_fix="Run 'git submodule update --init --recursive'",
+                        metadata={"issue_type": "uninitialized_submodule", "submodule_path": sub_rel_path},
+                    ))
+        except Exception:
+            pass
+        return issues
+
+    @classmethod
+    def heal_issue(cls, issue: DiagnosticIssue, dry_run: bool = False) -> HealAction:
+        """Autonomously heal Git repository issues."""
+        itype = issue.metadata.get("issue_type")
+        file_path = issue.file_path
+
+        if itype == "stale_git_lock" and file_path:
+            p = Path(file_path)
+            if dry_run:
+                return HealAction(issue=issue, success=True, details=f"[Dry-Run] Would delete stale git lock: {p.name}")
+            if p.is_file():
+                try:
+                    p.unlink()
+                    return HealAction(issue=issue, success=True, details=f"Removed stale Git lock file: {p.name}")
+                except Exception as e:
+                    return HealAction(issue=issue, success=False, details=f"Failed to remove lock: {e}")
+
+        if itype == "missing_gitattributes" and file_path:
+            p = Path(file_path)
+            if dry_run:
+                return HealAction(issue=issue, success=True, details="[Dry-Run] Would create standardized .gitattributes")
+
+            gitattrs = (
+                "# Auto normalize text files to LF on checkout\n"
+                "* text=auto eol=lf\n\n"
+                "# Python and config files\n"
+                "*.py text eol=lf\n"
+                "*.json text eol=lf\n"
+                "*.yaml text eol=lf\n"
+                "*.yml text eol=lf\n"
+                "*.toml text eol=lf\n"
+                "*.md text eol=lf\n\n"
+                "# Binary files\n"
+                "*.pyd binary\n"
+                "*.so binary\n"
+                "*.dll binary\n"
+                "*.exe binary\n"
+                "*.whl binary\n"
+            )
+            p.write_text(gitattrs, encoding="utf-8")
+            return HealAction(issue=issue, success=True, details="Generated standardized .gitattributes with universal LF normalization")
+
+        if itype == "detached_head":
+            root = Path(file_path).parent if file_path and file_path.endswith(".git") else Path(".")
+            branch_name = f"rescue-detached-head-{int(time.time())}"
+            if dry_run:
+                return HealAction(issue=issue, success=True, details=f"[Dry-Run] Would create safety rescue branch '{branch_name}'")
+            try:
+                subprocess.run(["git", "branch", branch_name], cwd=str(root), check=True, capture_output=True)
+                return HealAction(issue=issue, success=True, details=f"Created safety rescue branch '{branch_name}' from detached HEAD")
+            except Exception as e:
+                return HealAction(issue=issue, success=False, details=f"Failed to create rescue branch: {e}")
+
+        if itype == "uninitialized_submodule":
+            root = Path(file_path).parent
+            if dry_run:
+                return HealAction(issue=issue, success=True, details="[Dry-Run] Would run git submodule update --init --recursive")
+            try:
+                subprocess.run(["git", "submodule", "update", "--init", "--recursive"], cwd=str(root), check=True, capture_output=True)
+                return HealAction(issue=issue, success=True, details="Synchronized and initialized Git submodules")
+            except Exception as e:
+                return HealAction(issue=issue, success=False, details=f"Submodule sync failed: {e}")
+
+        return HealAction(issue=issue, success=False, details=f"No automated repair for issue type '{itype}'")
+
+# ==============================================================================
+# MODULE: polyglot_build_healer.py
+# ==============================================================================
+
+
+
+
+
+class PolyglotBuildHealer:
+    """Surgeon for polyglot build scripts, container files, and infrastructure recipes."""
+
+    @classmethod
+    def diagnose_workspace(cls, workspace_path: str) -> List[DiagnosticIssue]:
+        """Audit build and container files across the workspace."""
+        issues: List[DiagnosticIssue] = []
+        root = Path(workspace_path).resolve()
+
+        # 1. Dockerfile check
+        for dockerfile in root.glob("**/Dockerfile*"):
+            if dockerfile.is_file() and not cls._is_ignored(dockerfile):
+                issues.extend(cls._audit_dockerfile(dockerfile, root))
+
+        # 2. Makefile check
+        for makefile in root.glob("**/Makefile*"):
+            if makefile.is_file() and not cls._is_ignored(makefile):
+                issues.extend(cls._audit_makefile(makefile))
+
+        # 3. Nginx / Caddy conf check
+        for conf in root.glob("**/*.conf"):
+            if conf.is_file() and not cls._is_ignored(conf):
+                issues.extend(cls._audit_webserver_conf(conf))
+
+        # 4. Cargo.toml check
+        for cargo in root.glob("**/Cargo.toml"):
+            if cargo.is_file() and not cls._is_ignored(cargo):
+                issues.extend(cls._audit_cargo_toml(cargo))
+
+        # 5. go.mod check
+        for gopkg in root.glob("**/go.mod"):
+            if gopkg.is_file() and not cls._is_ignored(gopkg):
+                issues.extend(cls._audit_go_mod(gopkg))
+
+        return issues
+
+    @classmethod
+    def _is_ignored(cls, p: Path) -> bool:
+        """Check if path is inside ignored VCS, venv, or build folders."""
+        parts = p.parts
+        ignored_names = {".git", ".venv", "venv", "node_modules", "dist", "build", ".tox", "__pycache__"}
+        return any(part in ignored_names for part in parts)
+
+    @classmethod
+    def _audit_dockerfile(cls, dockerfile: Path, root: Path) -> List[DiagnosticIssue]:
+        """Audit Dockerfile for best practices and check for .dockerignore."""
+        issues: List[DiagnosticIssue] = []
+        try:
+            content = dockerfile.read_text(encoding="utf-8", errors="replace")
+            lines = content.splitlines()
+        except Exception:
+            return issues
+
+        # Check for missing .dockerignore in directory
+        dockerignore = dockerfile.parent / ".dockerignore"
+        if not dockerignore.is_file():
+            issues.append(DiagnosticIssue(
+                category=DiagnosticCategory.WORKSPACE,
+                severity=SeverityLevel.WARNING,
+                description=f"Dockerfile in '{dockerfile.parent.name}' lacks a '.dockerignore' file (unnecessary files like .git or .venv will bloat context)",
+                file_path=str(dockerfile),
+                suggested_fix="Generate optimized .dockerignore to exclude git, venv, cache, and build artifacts",
+                metadata={"issue_type": "missing_dockerignore", "target_dir": str(dockerfile.parent)},
+            ))
+
+        for idx, line in enumerate(lines, start=1):
+            stripped = line.strip()
+
+            # FROM :latest warning
+            if stripped.startswith("FROM ") and ":latest" in stripped:
+                issues.append(DiagnosticIssue(
+                    category=DiagnosticCategory.WORKSPACE,
+                    severity=SeverityLevel.INFO,
+                    description=f"Dockerfile uses unpinned ':latest' base image: '{stripped}'",
+                    file_path=str(dockerfile),
+                    line_number=idx,
+                    suggested_fix="Pin base image to specific digest or version tag for deterministic builds",
+                    metadata={"issue_type": "unpinned_docker_image"},
+                ))
+
+            # ADD instead of COPY
+            if stripped.startswith("ADD ") and not ("://" in stripped or stripped.endswith(".tar.gz") or stripped.endswith(".tgz")):
+                issues.append(DiagnosticIssue(
+                    category=DiagnosticCategory.WORKSPACE,
+                    severity=SeverityLevel.INFO,
+                    description=f"Using 'ADD' instead of 'COPY' for simple local file copy: '{stripped}'",
+                    file_path=str(dockerfile),
+                    line_number=idx,
+                    suggested_fix="Replace 'ADD' with 'COPY' for local files as per Dockerfile best practices",
+                    metadata={"issue_type": "docker_add_to_copy", "line_num": idx},
+                ))
+
+            # apt-get install without cleanup
+            if "apt-get install" in stripped and "rm -rf /var/lib/apt/lists" not in stripped and not stripped.endswith("\\"):
+                issues.append(DiagnosticIssue(
+                    category=DiagnosticCategory.WORKSPACE,
+                    severity=SeverityLevel.WARNING,
+                    description=f"apt-get install without cache cleanup in same RUN layer: '{stripped}'",
+                    file_path=str(dockerfile),
+                    line_number=idx,
+                    suggested_fix="Append '&& rm -rf /var/lib/apt/lists/*' to reduce container image footprint",
+                    metadata={"issue_type": "docker_apt_cleanup"},
+                ))
+
+        return issues
+
+    @classmethod
+    def _audit_makefile(cls, makefile: Path) -> List[DiagnosticIssue]:
+        """Audit Makefile for space vs tab indentation and missing .PHONY declarations."""
+        issues: List[DiagnosticIssue] = []
+        try:
+            content = makefile.read_text(encoding="utf-8", errors="replace")
+            lines = content.splitlines()
+        except Exception:
+            return issues
+
+        in_rule = False
+        space_indented_lines: List[int] = []
+        targets: List[str] = []
+
+        for idx, line in enumerate(lines, start=1):
+            if not line.strip() or line.strip().startswith("#"):
+                continue
+
+            # Detect target rule
+            target_match = re.match(r"^([a-zA-Z0-9_\-\.]+)\s*:\s*(.*)$", line)
+            if target_match:
+                in_rule = True
+                tgt = target_match.group(1)
+                if not tgt.startswith("."):
+                    targets.append(tgt)
+                continue
+
+            # Recipe lines must start with TAB, not spaces
+            if in_rule:
+                if line.startswith("    ") or (line.startswith(" ") and not line.startswith("\t")):
+                    space_indented_lines.append(idx)
+
+        if space_indented_lines:
+            issues.append(DiagnosticIssue(
+                category=DiagnosticCategory.SYNTAX,
+                severity=SeverityLevel.ERROR,
+                description=f"Makefile contains {len(space_indented_lines)} recipe line(s) indented with spaces instead of tabs (causes '*** missing separator' error)",
+                file_path=str(makefile),
+                line_number=space_indented_lines[0],
+                suggested_fix="Convert leading spaces on recipe lines to real tab (\\t) characters",
+                metadata={"issue_type": "makefile_spaces_to_tabs", "lines": space_indented_lines},
+            ))
+
+        if targets and ".PHONY:" not in content:
+            issues.append(DiagnosticIssue(
+                category=DiagnosticCategory.WORKSPACE,
+                severity=SeverityLevel.INFO,
+                description="Makefile declares targets without '.PHONY' directive (can conflict with files named after targets)",
+                file_path=str(makefile),
+                suggested_fix=f"Declare targets as .PHONY: {', '.join(targets[:5])}",
+                metadata={"issue_type": "makefile_missing_phony", "targets": targets},
+            ))
+
+        return issues
+
+    @classmethod
+    def _audit_webserver_conf(cls, conf_file: Path) -> List[DiagnosticIssue]:
+        """Audit Nginx / reverse proxy config files for missing semicolons."""
+        issues: List[DiagnosticIssue] = []
+        try:
+            content = conf_file.read_text(encoding="utf-8", errors="replace")
+            lines = content.splitlines()
+        except Exception:
+            return issues
+
+        # Only audit if it looks like an nginx/caddy configuration
+        if "server {" not in content and "http {" not in content and "location " not in content:
+            return issues
+
+        for idx, line in enumerate(lines, start=1):
+            stripped = line.strip()
+            if not stripped or stripped.startswith("#") or stripped.endswith("{") or stripped.endswith("}"):
+                continue
+            if not stripped.endswith(";"):
+                issues.append(DiagnosticIssue(
+                    category=DiagnosticCategory.SYNTAX,
+                    severity=SeverityLevel.ERROR,
+                    description=f"Missing terminating semicolon in Nginx directive: '{stripped}'",
+                    file_path=str(conf_file),
+                    line_number=idx,
+                    suggested_fix="Append ';' to directive line",
+                    metadata={"issue_type": "nginx_missing_semicolon", "line_num": idx},
+                ))
+
+        return issues
+
+    @classmethod
+    def _audit_cargo_toml(cls, cargo_file: Path) -> List[DiagnosticIssue]:
+        """Audit Rust Cargo.toml for basic sections."""
+        issues: List[DiagnosticIssue] = []
+        try:
+            content = cargo_file.read_text(encoding="utf-8", errors="replace")
+        except Exception:
+            return issues
+
+        if "[package]" not in content and "[workspace]" not in content:
+            issues.append(DiagnosticIssue(
+                category=DiagnosticCategory.DEPENDENCY,
+                severity=SeverityLevel.ERROR,
+                description="Cargo.toml is missing mandatory '[package]' or '[workspace]' header",
+                file_path=str(cargo_file),
+                suggested_fix="Add '[package]' table with name, version, and edition = '2021'",
+                metadata={"issue_type": "cargo_missing_package"},
+            ))
+
+        return issues
+
+    @classmethod
+    def _audit_go_mod(cls, go_mod_file: Path) -> List[DiagnosticIssue]:
+        """Audit Go go.mod for module declaration."""
+        issues: List[DiagnosticIssue] = []
+        try:
+            content = go_mod_file.read_text(encoding="utf-8", errors="replace")
+        except Exception:
+            return issues
+
+        if not re.search(r"^module\s+\S+", content, re.MULTILINE):
+            issues.append(DiagnosticIssue(
+                category=DiagnosticCategory.DEPENDENCY,
+                severity=SeverityLevel.ERROR,
+                description="go.mod is missing mandatory 'module <path>' declaration",
+                file_path=str(go_mod_file),
+                suggested_fix="Declare module path on first line of go.mod",
+                metadata={"issue_type": "go_missing_module"},
+            ))
+
+        return issues
+
+    @classmethod
+    def heal_issue(cls, issue: DiagnosticIssue, dry_run: bool = False) -> HealAction:
+        """Autonomously heal polyglot build and container issues."""
+        itype = issue.metadata.get("issue_type")
+        file_path = issue.file_path
+
+        if itype == "missing_dockerignore":
+            target_dir = Path(issue.metadata.get("target_dir", "."))
+            dignore = target_dir / ".dockerignore"
+            if dry_run:
+                return HealAction(issue=issue, success=True, details=f"[Dry-Run] Would create .dockerignore in {target_dir}")
+
+            ignore_content = (
+                "# T-Zero Autonomous Dockerignore\n"
+                ".git\n"
+                ".gitignore\n"
+                ".venv\n"
+                "venv/\n"
+                "env/\n"
+                "node_modules/\n"
+                "__pycache__/\n"
+                "*.pyc\n"
+                "*.pyo\n"
+                "dist/\n"
+                "build/\n"
+                "*.egg-info/\n"
+                ".DS_Store\n"
+                "Thumbs.db\n"
+                ".env\n"
+                ".env.local\n"
+                "coverage/\n"
+                ".pytest_cache/\n"
+            )
+            dignore.write_text(ignore_content, encoding="utf-8")
+            return HealAction(issue=issue, success=True, details=f"Generated high-performance .dockerignore in '{target_dir.name}'")
+
+        if itype == "makefile_spaces_to_tabs" and file_path:
+            p = Path(file_path)
+            if dry_run:
+                return HealAction(issue=issue, success=True, details="[Dry-Run] Would convert recipe spaces to tabs in Makefile")
+
+            lines = p.read_text(encoding="utf-8", errors="replace").splitlines()
+            new_lines = []
+            converted = 0
+            in_rule = False
+
+            for line in lines:
+                if not line.strip() or line.strip().startswith("#"):
+                    new_lines.append(line)
+                    continue
+
+                if re.match(r"^[a-zA-Z0-9_\-\.]+\s*:\s*.*$", line):
+                    in_rule = True
+                    new_lines.append(line)
+                    continue
+
+                if in_rule:
+                    if line.startswith("    "):
+                        new_lines.append("\t" + line[4:])
+                        converted += 1
+                        continue
+                    elif line.startswith("  "):
+                        new_lines.append("\t" + line.lstrip(" "))
+                        converted += 1
+                        continue
+
+                new_lines.append(line)
+
+            p.write_text("\n".join(new_lines) + "\n", encoding="utf-8")
+            return HealAction(issue=issue, success=True, details=f"Converted {converted} recipe lines from spaces to real tabs in Makefile")
+
+        if itype == "makefile_missing_phony" and file_path:
+            p = Path(file_path)
+            targets = issue.metadata.get("targets", [])
+            if dry_run:
+                return HealAction(issue=issue, success=True, details=f"[Dry-Run] Would prepend .PHONY: {' '.join(targets)} to Makefile")
+
+            content = p.read_text(encoding="utf-8", errors="replace")
+            phony_line = f".PHONY: {' '.join(targets)}\n\n"
+            p.write_text(phony_line + content, encoding="utf-8")
+            return HealAction(issue=issue, success=True, details=f"Injected .PHONY target declarations into Makefile")
+
+        if itype == "docker_add_to_copy" and file_path:
+            p = Path(file_path)
+            line_num = issue.metadata.get("line_num")
+            if dry_run:
+                return HealAction(issue=issue, success=True, details=f"[Dry-Run] Would replace ADD with COPY on line {line_num}")
+
+            lines = p.read_text(encoding="utf-8", errors="replace").splitlines()
+            if line_num and 1 <= line_num <= len(lines):
+                lines[line_num - 1] = re.sub(r"^ADD\s+", "COPY ", lines[line_num - 1])
+                p.write_text("\n".join(lines) + "\n", encoding="utf-8")
+                return HealAction(issue=issue, success=True, details=f"Replaced 'ADD' with 'COPY' on line {line_num} of Dockerfile")
+
+        return HealAction(issue=issue, success=False, details=f"No automated repair for issue type '{itype}'")
+
+# ==============================================================================
+# MODULE: mcp_server.py
+# ==============================================================================
+
+
+import traceback
+
+
+
+class PCFixerMcpServer:
+    """Production-grade MCP stdio server for PC-Fixer & Codebase Doctor."""
+
+    SERVER_NAME = "tzero-pc-fixer-mcp"
+    SERVER_VERSION = "10.4.0"
+
+    TOOLS = [
+        {
+            "name": "pc_fixer_diagnose",
+            "description": (
+                "Run deep multi-tier diagnostics across workspace code, operating system environment, "
+                "virtual environments, Git repository locks, PEP 517 build configs, AST syntax, and CWE vulnerabilities."
+            ),
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "path": {
+                        "type": "string",
+                        "description": "Workspace root directory to diagnose (default: current directory)",
+                        "default": ".",
+                    },
+                    "categories": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": "Optional list of categories to filter (e.g. ['syntax', 'environment', 'security', 'workspace'])",
+                    },
+                },
+            },
+        },
+        {
+            "name": "pc_fixer_auto_heal",
+            "description": (
+                "Autonomously heal detected codebase and environment defects with automatic backup "
+                "and atomic rollback manifest. Safe with dry-run verification mode."
+            ),
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "path": {
+                        "type": "string",
+                        "description": "Workspace root directory to heal (default: current directory)",
+                        "default": ".",
+                    },
+                    "dry_run": {
+                        "type": "boolean",
+                        "description": "When true, simulates repairs without modifying files on disk",
+                        "default": False,
+                    },
+                    "category": {
+                        "type": "string",
+                        "description": "Optional specific category to heal (e.g. 'syntax', 'security', 'workspace')",
+                    },
+                },
+            },
+        },
+        {
+            "name": "pc_fixer_rollback",
+            "description": (
+                "Roll back a previously executed healing transaction using its unique transaction ID, "
+                "restoring modified files to their exact pre-fix state."
+            ),
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "path": {
+                        "type": "string",
+                        "description": "Workspace root directory containing the transaction backup",
+                        "default": ".",
+                    },
+                    "transaction_id": {
+                        "type": "string",
+                        "description": "The transaction ID returned by pc_fixer_auto_heal (e.g. 'tx_12345_abcdef')",
+                    },
+                },
+                "required": ["transaction_id"],
+            },
+        },
+        {
+            "name": "pc_fixer_check_system",
+            "description": (
+                "Check physical hardware health, disk partitions space, WSL2 vhdx growth, "
+                "high-memory consumer processes, and active developer port conflicts (3000, 5000, 8000, etc.)."
+            ),
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "ports": {
+                        "type": "array",
+                        "items": {"type": "integer"},
+                        "description": "Optional list of TCP port numbers to check for conflicts (e.g. [3000, 5000, 8000, 8080])",
+                    },
+                },
+            },
+        },
+        {
+            "name": "pc_fixer_cwe_audit",
+            "description": (
+                "Execute local AST static security vulnerability scan against OWASP Top 10 and CWE catalog "
+                "(CWE-78 Command Injection, CWE-89 SQL Injection, CWE-22 Path Traversal, CWE-798 Hardcoded Secrets)."
+            ),
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "path": {
+                        "type": "string",
+                        "description": "Workspace root directory to audit",
+                        "default": ".",
+                    },
+                },
+            },
+        },
+        {
+            "name": "pc_fixer_kill_port_process",
+            "description": (
+                "Find and terminate the process locking a specific developer port (e.g. 3000, 5000, 8000, 8080) "
+                "to unblock dev servers without rebooting."
+            ),
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "port": {
+                        "type": "integer",
+                        "description": "TCP port number to unblock (e.g. 3000, 5000, 8000)",
+                    },
+                },
+                "required": ["port"],
+            },
+        },
+        {
+            "name": "pc_fixer_clean_git_locks",
+            "description": (
+                "Find and remove stale Git lock files (.git/index.lock, .git/HEAD.lock, refs locks) "
+                "that block git operations after crashes or aborted commands."
+            ),
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "path": {
+                        "type": "string",
+                        "description": "Workspace root directory containing the .git folder",
+                        "default": ".",
+                    },
+                },
+            },
+        },
+    ]
+
+    def __init__(self):
+        self.running = True
+
+    def run(self):
+        """Run the MCP server over stdio reading JSON-RPC 2.0 lines."""
+        # Ensure utf-8
+        if hasattr(sys.stdin, "reconfigure"):
+            sys.stdin.reconfigure(encoding="utf-8")
+        if hasattr(sys.stdout, "reconfigure"):
+            sys.stdout.reconfigure(encoding="utf-8")
+
+        while self.running:
+            try:
+                line = sys.stdin.readline()
+                if not line:
+                    break
+                line = line.strip()
+                if not line:
+                    continue
+
+                request = json.loads(line)
+                response = self.handle_request(request)
+                if response is not None:
+                    sys.stdout.write(json.dumps(response) + "\n")
+                    sys.stdout.flush()
+            except (KeyboardInterrupt, SystemExit):
+                break
+            except Exception as e:
+                err_response = {
+                    "jsonrpc": "2.0",
+                    "id": None,
+                    "error": {
+                        "code": -32603,
+                        "message": f"Internal MCP server error: {e}",
+                        "data": traceback.format_exc(),
+                    },
+                }
+                sys.stdout.write(json.dumps(err_response) + "\n")
+                sys.stdout.flush()
+
+    def handle_request(self, req: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """Dispatch JSON-RPC request to appropriate handler."""
+        req_id = req.get("id")
+        method = req.get("method")
+        params = req.get("params", {})
+
+        if method == "initialize":
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {
+                    "protocolVersion": "2024-11-05",
+                    "capabilities": {"tools": {}},
+                    "serverInfo": {
+                        "name": self.SERVER_NAME,
+                        "version": self.SERVER_VERSION,
+                    },
+                },
+            }
+
+        if method == "notifications/initialized":
+            return None
+
+        if method == "tools/list":
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {"tools": self.TOOLS},
+            }
+
+        if method == "tools/call":
+            tool_name = params.get("name")
+            tool_args = params.get("arguments", {})
+            return self.execute_tool(req_id, tool_name, tool_args)
+
+        if method == "ping":
+            return {"jsonrpc": "2.0", "id": req_id, "result": {}}
+
+        # Unknown method
+        return {
+            "jsonrpc": "2.0",
+            "id": req_id,
+            "error": {"code": -32601, "message": f"Method not found: {method}"},
+        }
+
+    def execute_tool(self, req_id: Any, name: str, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Execute MCP tool by name."""
+        try:
+            if name == "pc_fixer_diagnose":
+                path = args.get("path", ".")
+                report = FixerOrchestrator.diagnose(path)
+                result_data = {
+                    "status": "success",
+                    "total_issues": report.total_issues,
+                    "critical": report.critical_count,
+                    "errors": report.error_count,
+                    "warnings": report.warning_count,
+                    "issues": [
+                        {
+                            "category": str(i.category.value if hasattr(i.category, "value") else i.category),
+                            "severity": str(i.severity.value if hasattr(i.severity, "value") else i.severity),
+                            "description": i.description,
+                            "file_path": i.file_path,
+                            "line_number": i.line_number,
+                            "suggested_fix": i.suggested_fix,
+                        }
+                        for i in report.issues
+                    ],
+                }
+                return self._tool_success(req_id, result_data)
+
+            elif name == "pc_fixer_auto_heal":
+                path = args.get("path", ".")
+                dry_run = bool(args.get("dry_run", False))
+                manifest = FixerOrchestrator.auto_heal(path, dry_run=dry_run)
+                result_data = {
+                    "status": "success",
+                    "dry_run": dry_run,
+                    "transaction_id": manifest.transaction_id,
+                    "healed_count": len(manifest.actions_taken),
+                    "files_modified": [str(p) for p in manifest.files_modified],
+                    "details": [a.details for a in manifest.actions_taken],
+                }
+                return self._tool_success(req_id, result_data)
+
+            elif name == "pc_fixer_rollback":
+                path = args.get("path", ".")
+                tx_id = args.get("transaction_id", "")
+                ok = FixerOrchestrator.rollback_transaction(path, tx_id)
+                result_data = {
+                    "status": "success" if ok else "failed",
+                    "transaction_id": tx_id,
+                    "restored": ok,
+                }
+                return self._tool_success(req_id, result_data)
+
+            elif name == "pc_fixer_check_system":
+                ports = args.get("ports")
+                port_conflicts = HardwareAndDiskSurgeon.check_dev_port_status(ports)
+                disk_health = HardwareAndDiskSurgeon.check_disk_space()
+                result_data = {
+                    "status": "success",
+                    "port_conflicts": [
+                        {
+                            "port": c.port,
+                            "process_id": c.process_id,
+                            "process_name": c.process_name,
+                            "command_line": c.command_line,
+                        }
+                        for c in port_conflicts
+                    ],
+                    "disk_partitions": [
+                        {
+                            "mount_point": d.mount_point,
+                            "total_gb": round(d.total_gb, 2),
+                            "free_gb": round(d.free_gb, 2),
+                            "used_pct": round(d.used_pct, 1),
+                            "is_critical": d.is_critical,
+                        }
+                        for d in disk_health
+                    ],
+                }
+                return self._tool_success(req_id, result_data)
+
+            elif name == "pc_fixer_cwe_audit":
+                path = args.get("path", ".")
+                root = Path(path).resolve()
+                issues: List[Any] = []
+                for p in root.rglob("*.py"):
+                    if not any(part in {".venv", "venv", ".git", "node_modules", "dist", "build"} for part in p.parts):
+                        issues.extend(SecurityZeroLeakDoctor.diagnose_file(str(p)))
+                # Add CWE rule scans
+                result_data = {
+                    "status": "success",
+                    "workspace": str(root),
+                    "vulnerabilities_found": len(issues),
+                    "findings": [
+                        {
+                            "category": str(i.category.value if hasattr(i.category, "value") else i.category),
+                            "severity": str(i.severity.value if hasattr(i.severity, "value") else i.severity),
+                            "description": i.description,
+                            "file_path": i.file_path,
+                            "line_number": i.line_number,
+                        }
+                        for i in issues
+                    ],
+                }
+                return self._tool_success(req_id, result_data)
+
+            elif name == "pc_fixer_kill_port_process":
+                port = int(args.get("port", 0))
+                conflicts = HardwareAndDiskSurgeon.check_dev_port_status([port])
+                if not conflicts or not conflicts[0].process_id:
+                    return self._tool_success(req_id, {"status": "not_found", "message": f"No active listener on port {port}"})
+
+                pid = conflicts[0].process_id
+                success = HardwareAndDiskSurgeon.terminate_process(pid)
+                return self._tool_success(req_id, {
+                    "status": "terminated" if success else "failed",
+                    "port": port,
+                    "process_id": pid,
+                    "process_name": conflicts[0].process_name,
+                })
+
+            elif name == "pc_fixer_clean_git_locks":
+                path = args.get("path", ".")
+                git_issues = GitAdvancedSurgeon.diagnose_workspace(path)
+                lock_issues = [i for i in git_issues if i.metadata.get("issue_type") == "stale_git_lock"]
+                healed = []
+                for li in lock_issues:
+                    res = GitAdvancedSurgeon.heal_issue(li, dry_run=False)
+                    healed.append(res.details)
+                return self._tool_success(req_id, {
+                    "status": "success",
+                    "locks_found": len(lock_issues),
+                    "details": healed,
+                })
+
+            else:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "error": {"code": -32601, "message": f"Tool '{name}' not found"},
+                }
+
+        except Exception as e:
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "error": {
+                    "code": -32000,
+                    "message": f"Error executing '{name}': {str(e)}",
+                    "data": traceback.format_exc(),
+                },
+            }
+
+    def _tool_success(self, req_id: Any, result_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Wrap result in standard MCP tool response."""
+        return {
+            "jsonrpc": "2.0",
+            "id": req_id,
+            "result": {
+                "content": [
+                    {
+                        "type": "text",
+                        "text": json.dumps(result_data, indent=2, ensure_ascii=False),
+                    }
+                ]
+            },
+        }
+
+
+def main():
+    """Main CLI entrypoint for PC-Fixer MCP Server."""
+    server = PCFixerMcpServer()
+    server.run()
+
+
+if __name__ == "__main__":
+    main()
 
 # ==============================================================================
 # MODULE: pc_fixer_doctor.py
@@ -10338,6 +11974,15 @@ class FixerOrchestrator:
         # 3. Import Graph & Cycles
         issues.extend(ImportGraphHealer.diagnose_workspace(workspace_dir))
 
+        # 4. Packaging, PEP 517 & ABI
+        issues.extend(PackagingAbiSurgeon.diagnose_workspace(workspace_dir))
+
+        # 5. Git VCS Integrity & Locks
+        issues.extend(GitAdvancedSurgeon.diagnose_workspace(workspace_dir))
+
+        # 6. Polyglot Build & Infrastructure
+        issues.extend(PolyglotBuildHealer.diagnose_workspace(workspace_dir))
+
         # 4. File-by-file AST, Smells, Security
         scanned_files = 0
         for root_dir, dirs, files in os.walk(str(root)):
@@ -10432,6 +12077,18 @@ class FixerOrchestrator:
 
             # 6. Security Heals
             pass_actions.extend(SecurityZeroLeakDoctor.execute_security_heals(current_issues, workspace_dir, dry_run=dry_run))
+
+            # 7. Packaging Heals
+            for issue in [i for i in current_issues if i.metadata.get("issue_type") in ("missing_build_system", "broken_pyvenv_home", "stale_egg_info", "legacy_setup_py")]:
+                pass_actions.append(PackagingAbiSurgeon.heal_issue(issue, dry_run=dry_run))
+
+            # 8. Git VCS Heals
+            for issue in [i for i in current_issues if i.metadata.get("issue_type") in ("stale_git_lock", "missing_gitattributes")]:
+                pass_actions.append(GitAdvancedSurgeon.heal_issue(issue, dry_run=dry_run))
+
+            # 9. Polyglot Build Heals
+            for issue in [i for i in current_issues if i.metadata.get("issue_type") in ("missing_dockerignore", "makefile_spaces_to_tabs", "makefile_missing_phony", "docker_add_to_copy")]:
+                pass_actions.append(PolyglotBuildHealer.heal_issue(issue, dry_run=dry_run))
 
             all_actions.extend(pass_actions)
 

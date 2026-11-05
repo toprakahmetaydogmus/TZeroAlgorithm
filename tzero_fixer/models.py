@@ -64,6 +64,8 @@ class DiagnosticCategory(enum.Enum):
     POLYGLOT = "polyglot"          # Node, Rust, Go, Git, Docker system diagnostics
     TYPE_HINTS = "type_hints"      # PEP-484 / 585 / 604 type annotation modernizations
     PERFORMANCE = "performance"    # Quadratic string concatenations, memory leaks
+    WORKSPACE = "workspace"        # Workspace layout, git, VCS, locks, editorconfig
+    DEPENDENCY = "dependency"      # PEP 517 build, virtualenv packages, ABI drift
 
 
 # Backward & forward compatibility alias bindings
@@ -190,7 +192,7 @@ class DiagnosticIssue:
 @dataclass
 class HealAction:
     """Record of a surgical repair action executed on disk or in memory."""
-    category: str                       # Value of DiagnosticCategory
+    category: str = "workspace"         # Value of DiagnosticCategory
     file_path: Optional[str] = None     # Target file modified
     description: str = ""               # Summary of action
     success: bool = True                # Did the patch succeed?
@@ -199,6 +201,45 @@ class HealAction:
     backup_path: Optional[str] = None   # Path to original file snapshot in rollback buffer
     duration_ms: float = 0.0            # Execution latency in milliseconds
     metadata: Dict[str, Any] = field(default_factory=dict)
+
+    def __init__(
+        self,
+        category: Optional[Any] = None,
+        file_path: Optional[str] = None,
+        description: str = "",
+        success: bool = True,
+        diff: Optional[str] = None,
+        action_type: str = "patch",
+        backup_path: Optional[str] = None,
+        duration_ms: float = 0.0,
+        metadata: Optional[Dict[str, Any]] = None,
+        # Tolerant alias kwargs:
+        issue: Optional[Any] = None,
+        details: Optional[str] = None,
+        **extra: Any,
+    ):
+        if issue is not None:
+            cat_val = getattr(issue, "category", "workspace")
+            self.category = cat_val.value if hasattr(cat_val, "value") else str(cat_val)
+            self.file_path = getattr(issue, "file_path", file_path)
+        else:
+            cat_val = category or "workspace"
+            self.category = cat_val.value if hasattr(cat_val, "value") else str(cat_val)
+            self.file_path = file_path
+
+        self.description = details if details is not None else description
+        self.success = success
+        self.diff = diff
+        self.action_type = action_type
+        self.backup_path = backup_path
+        self.duration_ms = duration_ms
+        self.metadata = metadata or {}
+        if extra:
+            self.metadata.update(extra)
+
+    @property
+    def details(self) -> str:
+        return self.description
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)

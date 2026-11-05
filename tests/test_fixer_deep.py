@@ -16,6 +16,7 @@ Tests:
 
 import os
 import tempfile
+import time
 import unittest
 from pathlib import Path
 
@@ -36,6 +37,11 @@ from tzero_fixer.polyglot_schema_validator import PureJsonSchemaValidator, OpenA
 from tzero_fixer.smart_patch_recommender import SmartPatchRecommender
 from tzero_fixer.code_duplicity_and_refactorer import ASTDuplicityRefactorer
 from tzero_fixer.synthetic_workspace_generator import SyntheticWorkspaceGenerator
+from tzero_fixer.hardware_and_disk_doctor import HardwareAndDiskSurgeon
+from tzero_fixer.packaging_abi_surgeon import PackagingAbiSurgeon
+from tzero_fixer.git_advanced_surgeon import GitAdvancedSurgeon
+from tzero_fixer.polyglot_build_healer import PolyglotBuildHealer
+from tzero_fixer.mcp_server import PCFixerMcpServer
 
 
 class TestPCFixerMasterEdition(unittest.TestCase):
@@ -198,6 +204,83 @@ class TestPCFixerMasterEdition(unittest.TestCase):
         self.assertGreater(rep.healed_actions_count, 0)
         self.assertTrue(rep.rollback_verified)
         self.assertGreater(rep.final_health_score, rep.initial_health_score)
+
+    def test_packaging_abi_surgeon(self):
+        """Verifies PEP 517 detection and pyvenv.cfg repair."""
+        with tempfile.TemporaryDirectory() as td:
+            p = Path(td)
+            # Create a broken pyproject.toml missing build-system
+            (p / "pyproject.toml").write_text("[project]\nname = 'demo'\nversion = '1.0.0'\n", encoding="utf-8")
+            issues = PackagingAbiSurgeon.diagnose_workspace(td)
+            self.assertTrue(any(i.metadata.get("issue_type") == "missing_build_system" for i in issues))
+
+            # Heal it
+            for i in issues:
+                if i.metadata.get("issue_type") == "missing_build_system":
+                    action = PackagingAbiSurgeon.heal_issue(i, dry_run=False)
+                    self.assertTrue(action.success)
+            self.assertIn("[build-system]", (p / "pyproject.toml").read_text(encoding="utf-8"))
+
+    def test_git_advanced_surgeon(self):
+        """Verifies stale lock detection and .gitattributes generation."""
+        with tempfile.TemporaryDirectory() as td:
+            p = Path(td)
+            git_dir = p / ".git"
+            git_dir.mkdir()
+            # Stale lock
+            lock = git_dir / "index.lock"
+            lock.write_text("lock", encoding="utf-8")
+            # Fake old timestamp
+            old_time = time.time() - 600
+            os.utime(lock, (old_time, old_time))
+
+            issues = GitAdvancedSurgeon.diagnose_workspace(td)
+            self.assertTrue(any(i.metadata.get("issue_type") == "stale_git_lock" for i in issues))
+
+            # Remove lock
+            for i in issues:
+                if i.metadata.get("issue_type") == "stale_git_lock":
+                    res = GitAdvancedSurgeon.heal_issue(i, dry_run=False)
+                    self.assertTrue(res.success)
+            self.assertFalse(lock.exists())
+
+    def test_polyglot_build_healer(self):
+        """Verifies Makefile space-to-tab repair and .dockerignore creation."""
+        with tempfile.TemporaryDirectory() as td:
+            p = Path(td)
+            makefile = p / "Makefile"
+            makefile.write_text("build:\n    python setup.py build\n", encoding="utf-8")
+            dockerfile = p / "Dockerfile"
+            dockerfile.write_text("FROM python:3.11\nRUN pip install requests\n", encoding="utf-8")
+
+            issues = PolyglotBuildHealer.diagnose_workspace(td)
+            self.assertTrue(any(i.metadata.get("issue_type") == "makefile_spaces_to_tabs" for i in issues))
+            self.assertTrue(any(i.metadata.get("issue_type") == "missing_dockerignore" for i in issues))
+
+            for i in issues:
+                PolyglotBuildHealer.heal_issue(i, dry_run=False)
+
+            self.assertIn("\tpython setup.py build", makefile.read_text(encoding="utf-8"))
+            self.assertTrue((p / ".dockerignore").is_file())
+
+    def test_hardware_and_mcp_server(self):
+        """Verifies hardware checks and MCP tool dispatching."""
+        # Hardware check
+        disk_health = HardwareAndDiskSurgeon.check_disk_space()
+        self.assertGreater(len(disk_health), 0)
+
+        # MCP Server initialize and tools/list
+        mcp = PCFixerMcpServer()
+        init_res = mcp.handle_request({"jsonrpc": "2.0", "id": 1, "method": "initialize"})
+        self.assertEqual(init_res["result"]["serverInfo"]["name"], "tzero-pc-fixer-mcp")
+
+        list_res = mcp.handle_request({"jsonrpc": "2.0", "id": 2, "method": "tools/list"})
+        tools = list_res["result"]["tools"]
+        tool_names = [t["name"] for t in tools]
+        self.assertIn("pc_fixer_diagnose", tool_names)
+        self.assertIn("pc_fixer_auto_heal", tool_names)
+        self.assertIn("pc_fixer_check_system", tool_names)
+
 
 
 if __name__ == "__main__":

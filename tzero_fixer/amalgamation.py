@@ -56,6 +56,11 @@ MODULE_ORDER = [
     "dependency_vulnerability_auditor.py",
     "polyglot_schema_validator.py",
     "smart_patch_recommender.py",
+    "hardware_and_disk_doctor.py",
+    "packaging_abi_surgeon.py",
+    "git_advanced_surgeon.py",
+    "polyglot_build_healer.py",
+    "mcp_server.py",
     "pc_fixer_doctor.py",
     "orchestrator.py",
 ]
