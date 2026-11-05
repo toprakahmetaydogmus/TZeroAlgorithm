@@ -49,6 +49,8 @@ code --install-extension dist/tzero-vscode-10.0.0.vsix
 
 ### 🧭 Navigation & Interactive Jump Stations
 
+[![T-Zero PC-Fixer](https://img.shields.io/badge/T--Zero%20PC--Fixer-12%2C200%2B%20Lines%20Doctor-purple?style=for-the-badge&logo=shield&logoColor=white)](https://github.com/toprakahmetaydogmus/tzero-pc-fixer)
+
 [![TDQS 5.0 Anchor](https://img.shields.io/badge/TDQS_5.0-Anchor_Certified-10b981?style=for-the-badge&logo=checkmarx&logoColor=white)](#tdqs-certification)
 [![Why T-Zero](https://img.shields.io/badge/Why_T--Zero-0284c7?style=for-the-badge&logo=rocket&logoColor=white)](#why-t-zero)
 [![Task Benchmark](https://img.shields.io/badge/Task_Benchmark-10b981?style=for-the-badge&logo=speedtest&logoColor=white)](#task-completion-benchmark)
