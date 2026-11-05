@@ -1,5 +1,28 @@
 # Changelog
 
+## [10.6.0] - 2026-11-05
+
+### Released (Official V10.6.0 Sovereign Master Release: 1-Click Auto-Vault, Pre-Flight Reality-Lock, Blast Radius Analyzer & Global Canonical Edition)
+
+- **1-Click Auto-Vault Secret Migrator (`tzero --vault --migrate`):**
+  - Automatically identifies hardcoded API keys across 13 providers.
+  - Generates secured `.env` and `.gitignore` entries automatically.
+  - Surgically refactors Python source code replacing literals with `os.environ.get(...)`.
+- **Pre-Flight AI Reality-Lock (`tzero --guard <code_or_file>`):**
+  - Validates AI-generated code proposals against live workspace AST before applying changes.
+  - Eliminates ghost package hallucinations and signature/argument mismatches.
+- **AST Change Impact & Blast Radius Analyzer (`tzero --impact <symbol>`):**
+  - Computes 0-100 quantitative risk scores for symbol refactorings.
+  - Maps direct callers and downstream transitive consumers with exact file lines.
+  - Outputs targeted minimal regression test commands.
+- **8-Tab Zero-GPU Web Studio on Hugging Face Spaces:**
+  - Modernized `app.py` on NVIDIA RTX 6000 with 100% clean ASCII and authentic BPE tokenization.
+  - 8 dedicated tabs covering AST Reducer, Reality-Lock, Blast Radius, Auto-Vault, Doctor, ROI, MCP, and Benchmarks.
+- **100% Canonical English Documentation Standard:**
+  - Main `README.md` elevated to Silicon Valley tier-1 English reference.
+  - Native Turkish guide organized into dedicated `README.tr.md`.
+- **86/86 Green Tests Passed (100% Zero-Leak Certified, $0.00 Cost).**
+
 ## [10.5.0] - 2026-11-05
 
 ### Released (Official V10.5.0 Sovereign Master Release: PC-Fixer Ecosystem, 12,274-Line Monolith, 4 New Surgeons, Standalone MCP, 344/344 Green Tests, $0.00 Cost)
