@@ -148,3 +148,4 @@ class ASTDuplicityRefactorer:
                 )
 
         return duplicate_groups, issues
+

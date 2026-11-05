@@ -271,3 +271,4 @@ class PerformanceProfilerHealer:
                 )
 
         return actions
+

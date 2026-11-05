@@ -82,3 +82,4 @@ Install or integrate T-Zero v10.4.0:
 - **Scoop:** `scoop install installers/scoop/tzero.json`
 - **Winget:** `winget install -m installers/winget/tzero.yaml`
 - **VS Code / Cursor:** `tzero-vscode-10.4.0.vsix`
+

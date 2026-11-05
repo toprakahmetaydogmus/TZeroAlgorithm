@@ -310,3 +310,4 @@ class ShellScriptDoctor:
             )
 
         return issues
+

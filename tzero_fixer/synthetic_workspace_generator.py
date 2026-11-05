@@ -217,3 +217,4 @@ class SyntheticWorkspaceGenerator:
                     shutil.rmtree(temp_dir)
                 except Exception:
                     pass
+
