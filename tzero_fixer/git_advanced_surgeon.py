@@ -276,3 +276,4 @@ class GitAdvancedSurgeon:
                 return HealAction(issue=issue, success=False, details=f"Submodule sync failed: {e}")
 
         return HealAction(issue=issue, success=False, details=f"No automated repair for issue type '{itype}'")
+

@@ -361,3 +361,4 @@ class PolyglotBuildHealer:
                 return HealAction(issue=issue, success=True, details=f"Replaced 'ADD' with 'COPY' on line {line_num} of Dockerfile")
 
         return HealAction(issue=issue, success=False, details=f"No automated repair for issue type '{itype}'")
+

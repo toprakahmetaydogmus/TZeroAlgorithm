@@ -320,3 +320,4 @@ dependencies = []
                 return HealAction(issue=issue, success=True, details=f"Generated modern PEP 517/621 pyproject.toml for '{pkg_name}'")
 
         return HealAction(issue=issue, success=False, details=f"No automated surgical repair for issue type '{itype}'")
+
