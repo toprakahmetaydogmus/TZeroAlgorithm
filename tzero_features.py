@@ -1960,7 +1960,7 @@ class ZeroHallucinationGuard:
                 "repaired_code": "",
                 "can_auto_heal": False,
                 "repairs_applied": [],
-                "report": f"❌ [HALLUCINATION BLOCKED] Proposed code failed Python syntax parsing at line {e.lineno}: {e.msg}"
+                "report": f"[HALLUCINATION BLOCKED] Proposed code failed Python syntax parsing at line {e.lineno}: {e.msg}"
             }
 
         violations: List[str] = []
@@ -2146,10 +2146,10 @@ class ZeroHallucinationGuard:
 
         passed = len(violations) == 0
         if passed:
-            report_str = "✅ [PASS] Zero-Hallucination Guard verified. All imports, call contracts, dependency manifests, and schemas are valid."
+            report_str = "[PASS] Zero-Hallucination Guard verified. All imports, call contracts, dependency manifests, and schemas are valid."
         else:
             report_lines = [
-                f"❌ [HALLUCINATION BLOCKED] Found {len(violations)} contract violation(s) in proposed code:\n"
+                f"[HALLUCINATION BLOCKED] Found {len(violations)} contract violation(s) in proposed code:\n"
             ]
             for i, v in enumerate(violations, 1):
                 report_lines.append(f"{i}. {v}")

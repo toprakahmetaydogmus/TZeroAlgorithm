@@ -8303,6 +8303,8 @@ def main():
     parser.add_argument("--output", "-o", default="README.md", help="Output filepath for generated markdown (default: README.md)")
     parser.add_argument("--provider", "-p", choices=list(PROVIDERS.keys()), help="AI Provider to use (default: active profile)")
     parser.add_argument("--impact", metavar="SYMBOL", help="Analyze blast radius and change impact for a symbol")
+    parser.add_argument("--vault", "--auto-vault", nargs="?", const=".", default=None, metavar="PATH", dest="vault", help="Scan and auto-migrate hardcoded secrets to .env (100%% Zero-Leak Auto-Vault)")
+    parser.add_argument("--migrate", action="store_true", help="Apply auto-vault secret migration to disk (.env and refactored code)")
     parser.add_argument("--enforce-boundaries", "--enforce-rules", nargs="?", const="tzero.rules.json", default=None, metavar="CONFIG", dest="enforce_boundaries", help="Enforce architectural boundary rules in CI (exits with code 1 if violated)")
     parser.add_argument("--search", metavar="QUERY", help="Run private local hybrid semantic code search (BM25 RAG)")
     parser.add_argument("--export-agent-rules", action="store_true", help="Generate all native AI agent rules (.cursorrules, .cursor/rules/*.mdc, .clinerules, Copilot)")
@@ -8519,6 +8521,8 @@ Generate tailored subagent manifests (.tzero/agents/ + SKILL.md) in 1 second:
         sub = sys.argv[1].lower()
         sub_map = {
             "audit": "--audit",
+            "vault": "--vault",
+            "auto-vault": "--auto-vault",
             "scan": "--scan",
             "pack": "--pack",
             "gui": "--gui",
@@ -9003,6 +9007,55 @@ Generate tailored subagent manifests (.tzero/agents/ + SKILL.md) in 1 second:
         launch_gui()
     elif args.scan is not None:
         run_scan_cli(args.scan or args.dir)
+    elif getattr(args, "vault", None) is not None:
+        from tzero_security import ZeroLeakEngine
+        target = args.vault or args.dir
+        if os.path.isfile(target):
+            with open(target, "r", encoding="utf-8", errors="ignore") as f:
+                c = f.read()
+            migrated_code, env_file, count, report = ZeroLeakEngine.auto_migrate_to_env(
+                c,
+                env_file_path=".env" if args.migrate else None,
+                gitignore_path=".gitignore" if args.migrate else None
+            )
+            if args.migrate:
+                with open(target, "w", encoding="utf-8") as f:
+                    f.write(migrated_code)
+                print(f"[AUTO-VAULT] Successfully migrated {count} secret(s) from {target} into .env and updated code.")
+            else:
+                print(report)
+                print("\n--- .env preview ---")
+                print(env_file)
+                print("\n--- Refactored Code Preview ---")
+                print(migrated_code[:1000])
+        else:
+            findings = ZeroLeakEngine.scan_workspace(target)
+            violations = findings.get("violations", [])
+            print(f"[AUTO-VAULT] Scanned {findings.get('files_scanned', 0)} files in {target}.")
+            if not violations:
+                print("[AUTO-VAULT] 100% Zero-Leak Verified. No hardcoded credentials found.")
+            else:
+                print(f"[AUTO-VAULT] Found {len(violations)} secret(s) across {findings.get('files_with_violations', 0)} file(s).")
+                for v in violations:
+                    print(f"  - [{v['provider']}] {v['file']}:{v['line']} -> {v['preview']}")
+                if args.migrate:
+                    total_migrated = 0
+                    for vf in findings.get("files_with_violations", []):
+                        if os.path.isfile(vf):
+                            with open(vf, "r", encoding="utf-8", errors="ignore") as f:
+                                sc = f.read()
+                            mc, ef, c_cnt, _ = ZeroLeakEngine.auto_migrate_to_env(
+                                sc,
+                                env_file_path=os.path.join(target, ".env"),
+                                gitignore_path=os.path.join(target, ".gitignore")
+                            )
+                            with open(vf, "w", encoding="utf-8") as f:
+                                f.write(mc)
+                            total_migrated += c_cnt
+                    print(f"[AUTO-VAULT] Successfully secured and migrated {total_migrated} secret(s) into {os.path.join(target, '.env')}.")
+                else:
+                    print("\n[TIP] Run with --migrate to automatically extract these secrets into .env and refactor source files.")
+        sys.exit(0)
     elif args.audit is not None:
         run_audit_cli(args.audit or args.dir, output_format=getattr(args, "format", "text"))
     elif args.export_agents is not None:

@@ -5,6 +5,9 @@
 
 ### *Empirically Proven Token Optimization Engine, 14 Canonical MCP Tools, Real BPE Tokenizer Benchmarks & Pre-Flight Reality-Lock for AI Coding Assistants.*
 
+**[English](README.md)** | **[Türkçe](README.tr.md)** | **[Hugging Face Space](https://huggingface.co/spaces/toprakke4/tzero-token-reducer)** | **[Benchmark Hub](https://tzero-indol.vercel.app)**
+
+
 [![Glama MCP Badge](https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm/badges/score.svg)](https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm)
 [![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Zero--GPU%20Live%20Demo-ffd21e?style=for-the-badge&logo=huggingface&logoColor=black)](https://huggingface.co/spaces/toprakke4/tzero-token-reducer)
 [![Live Vercel Hub](https://img.shields.io/badge/%E2%9A%A1%20Live%20Benchmark-Vercel%20Gateway-000000?style=for-the-badge&logo=vercel)](https://tzero-indol.vercel.app)
@@ -359,42 +362,31 @@ Empirical measurements conducted across real software repositories comparing raw
 
 ---
 
-<a id="turkce"></a>
-## 🇹🇷 Türkçe Dokümantasyon
-
-T-Zero (Token Zero), yapay zeka kodlama asistanları (Cursor, Claude Desktop, Antigravity IDE, Windsurf, Cline, VS Code, Zed) için geliştirilmiş, **deterministik AST bağlam sıkıştırıcısı ve Model Context Protocol (MCP) sunucusudur**.
-
-### Neden T-Zero?
-Yapay zeka modellerine tüm kaynak kodlar metin olarak verildiğinde, fonksiyon gövdelerindeki döngüler ve ara hesaplamalar yüzünden **bağlam penceresinin %80 ila %95'i israf edilir**. T-Zero, kodu metin olarak değil AST (Soyut Sözdizimi Ağacı) olarak okur; fonksiyon gövdelerini çıkarıp arayüzleri, tipleri ve sınıf yapılarını korur.
-
-### Temel Özellikler:
-- **14 Standart MCP Aracı:** `get_project_context_tree`, `prune_code_snippet`, `audit_codebase_quality`, `verify_hallucination_guard` vb.
-- **Smart Skeleton (Tier-2):** Üzerinde çalışılan hedef dosya %100 tam kod kalırken, çevresindeki 1. derece bağımlılıklar imza iskeleti haline getirilir.
-- **Reality-Lock Halüsinasyon Kontrolü:** Modelin uydurduğu import ve fonksiyon çağrılarını koda yazılmadan önce statik AST üzerinde yakalar.
-- **Shannon Entropi Güvenlik Filtresi:** Yüksek entropili ($H \ge 4.75$) gizli anahtarları ve şifreleri yerel olarak tespit eder.
-- **%100 Yerel ve Çevrimdışı:** Dış bulut embedding API'si gerektirmez, $0 maliyetle çalışır.
-- **Hugging Face Canlı Demo:** [https://huggingface.co/spaces/toprakke4/tzero-token-reducer](https://huggingface.co/spaces/toprakke4/tzero-token-reducer)
-
-### 30 Saniyede Hızlı Kurulum:
-```bash
-# Kurulum:
-pip install tzero-mcp
-
-# 1 saniyede tüm IDE'leri otomatik yapılandır:
-tzero init
-
-# (İsteğe bağlı) VS Code & Cursor Eklentisini (.vsix) yükle:
-code --install-extension dist/tzero-vscode-10.5.0.vsix
-
-# Kod tabanını sıkıştır ve ağaç çıkar:
-tzero --tree . --out context.txt
-
-# Canlı web demosunu yerel başlat:
-tzero space
-```
-
 ---
 
+<a id="global-ecosystem"></a>
+## 🌐 Global Ecosystem & Multilingual Architecture
+
+T-Zero is engineered from the ground up for global software engineering teams, supporting cross-platform operating systems and international coding standards.
+
+### Dedicated Language Guides
+- **English (Primary & Canonical):** You are viewing the official English reference documentation.
+- **Turkish Translation:** For native Turkish documentation and setup guides, see [README.tr.md](README.tr.md).
+
+### 30-Second Turnkey Quickstart
+```bash
+# 1. Install via PyPI:
+pip install tzero-mcp
+
+# 2. One-click auto-configure Cursor, Claude Desktop, Antigravity, and Windsurf:
+tzero init
+
+# 3. Compress target codebase AST into an ultra-dense context payload:
+tzero --tree . --out context.txt
+
+# 4. Launch local Zero-GPU Web Studio:
+tzero space
+```
 <a id="tzero-pc-fixer"></a>
 ## 🩺 T-Zero PC-Fixer & Codebase Doctor: The 12,600+ Line Autonomous Self-Healing Monolith
 

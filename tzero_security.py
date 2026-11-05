@@ -215,6 +215,7 @@ class SecretFinding:
     preview: str
     entropy: float = 0.0
     is_entropy_anomaly: bool = False
+    secret_value: str = ""
 
 
 class ZeroLeakEngine:
@@ -281,7 +282,8 @@ class ZeroLeakEngine:
                         line_no=lineno,
                         preview=cls.mask_preview(line),
                         entropy=round(ent, 2),
-                        is_entropy_anomaly=False
+                        is_entropy_anomaly=False,
+                        secret_value=val
                     ))
                     if rule.provider != "Generic":
                         has_specific_provider_match = True
@@ -316,7 +318,8 @@ class ZeroLeakEngine:
                                 line_no=lineno,
                                 preview=cls.mask_preview(line),
                                 entropy=round(ent, 2),
-                                is_entropy_anomaly=True
+                                is_entropy_anomaly=True,
+                                secret_value=tok
                             ))
 
         return findings
@@ -396,3 +399,130 @@ class ZeroLeakEngine:
             "files_with_violations": files_with_violations,
             "status": "100% ZERO-LEAK VERIFIED" if not violations else "PROHIBITED CREDENTIALS DETECTED"
         }
+
+    @classmethod
+    def scan_workspace(cls, workspace_dir: str = ".") -> dict:
+        """Scans a workspace directory for any hardcoded secrets and returns violations dict."""
+        files_map = {}
+        for root, dirs, files in os.walk(workspace_dir):
+            dirs[:] = [d for d in dirs if not d.startswith(".") and d not in ("__pycache__", "venv", ".venv", "node_modules", "dist", "build", ".git")]
+            for f in files:
+                if f.endswith((".py", ".js", ".ts", ".json", ".yaml", ".yml", ".env.example", ".sh", ".toml", ".txt")):
+                    fp = os.path.join(root, f)
+                    try:
+                        with open(fp, "r", encoding="utf-8", errors="ignore") as fh:
+                            files_map[fp] = fh.read()
+                    except Exception:
+                        pass
+        return cls.scan_files_map(files_map)
+
+    @classmethod
+    def auto_migrate_to_env(
+        cls,
+        code_str: str,
+        env_file_path: Optional[str] = None,
+        gitignore_path: Optional[str] = None
+    ) -> Tuple[str, str, int, str]:
+        """Automatically extracts detected hardcoded secrets into .env format and refactors code with os.environ.get."""
+        findings = cls.scan_text(code_str)
+        valid_findings = [f for f in findings if f.secret_value and not cls.is_placeholder(f.secret_value)]
+        
+        if not valid_findings:
+            return code_str, "# No secrets detected.", 0, "### 100% Zero-Leak Certified\nNo hardcoded credentials found in source code."
+
+        migrated_code = code_str
+        env_entries: Dict[str, str] = {}
+        used_vars: Set[str] = set()
+        counter = 1
+
+        # Sort findings descending by length to avoid partial substrings
+        unique_findings = []
+        seen_vals = set()
+        for f in valid_findings:
+            if f.secret_value not in seen_vals:
+                seen_vals.add(f.secret_value)
+                unique_findings.append(f)
+        unique_findings.sort(key=lambda x: len(x.secret_value), reverse=True)
+
+        provider_map = {
+            "OpenAI": "OPENAI_API_KEY",
+            "Anthropic": "ANTHROPIC_API_KEY",
+            "Google": "GEMINI_API_KEY",
+            "HuggingFace": "HF_TOKEN",
+            "NVIDIA": "NVIDIA_API_KEY",
+            "AWS": "AWS_SECRET_ACCESS_KEY",
+            "GitHub": "GITHUB_TOKEN",
+            "GitLab": "GITLAB_TOKEN",
+            "Stripe": "STRIPE_SECRET_KEY",
+            "Slack": "SLACK_BOT_TOKEN",
+            "Database": "DATABASE_URL",
+            "JWT": "JWT_SECRET_TOKEN",
+            "PrivateKey": "PRIVATE_KEY_PEM",
+        }
+
+        report_lines = [
+            "### T-Zero Zero-Leak Auto-Vault Migration",
+            f"Extracted and secured **{len(unique_findings)}** hardcoded secret(s) into environment configuration:\n",
+            "| Provider | Variable Assigned | Redacted Secret |",
+            "| :--- | :--- | :--- |",
+        ]
+
+        for f in unique_findings:
+            base_var = provider_map.get(f.provider, "")
+            if not base_var:
+                clean_desc = re.sub(r"[^A-Z0-9_]", "_", f.description.upper()[:20])
+                base_var = f"{clean_desc}_TOKEN"
+                
+            var_name = base_var
+            while var_name in used_vars:
+                var_name = f"{base_var}_{counter}"
+                counter += 1
+            used_vars.add(var_name)
+
+            env_entries[var_name] = f.secret_value
+            redacted = f.secret_value[:6] + "..." + f.secret_value[-4:] if len(f.secret_value) > 12 else "***"
+            report_lines.append(f"| `{f.provider}` | `{var_name}` | `{redacted}` |")
+
+            # Replace quotes in code
+            pat_d = f'"{f.secret_value}"'
+            pat_s = f"'{f.secret_value}'"
+            replacement = f'os.environ.get("{var_name}", "")'
+            if pat_d in migrated_code:
+                migrated_code = migrated_code.replace(pat_d, replacement)
+            elif pat_s in migrated_code:
+                migrated_code = migrated_code.replace(pat_s, replacement)
+            else:
+                migrated_code = migrated_code.replace(f.secret_value, replacement)
+
+        # Check if os is imported
+        if "os.environ" in migrated_code and "import os" not in migrated_code and "from os import" not in migrated_code:
+            migrated_code = "import os\n" + migrated_code
+
+        # Build .env text
+        env_lines = ["# Auto-Vault Generated by T-Zero Zero-Leak Engine", "# DO NOT COMMIT THIS FILE TO PUBLIC REPOSITORIES", ""]
+        for k, v in env_entries.items():
+            env_lines.append(f"{k}={v}")
+        env_content = "\n".join(env_lines) + "\n"
+
+        # If file paths provided, update physical .env and .gitignore
+        if env_file_path:
+            try:
+                with open(env_file_path, "a", encoding="utf-8") as ef:
+                    ef.write("\n" + "\n".join(f"{k}={v}" for k, v in env_entries.items()) + "\n")
+            except Exception:
+                pass
+
+        if gitignore_path:
+            try:
+                gi_content = ""
+                if os.path.exists(gitignore_path):
+                    with open(gitignore_path, "r", encoding="utf-8") as gf:
+                        gi_content = gf.read()
+                if ".env" not in gi_content:
+                    with open(gitignore_path, "a", encoding="utf-8") as gf:
+                        gf.write("\n.env\n*.env\n")
+            except Exception:
+                pass
+
+        return migrated_code, env_content, len(unique_findings), "\n".join(report_lines)
+
