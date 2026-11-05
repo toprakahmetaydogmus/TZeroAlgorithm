@@ -157,7 +157,8 @@ CUSTOM_CSS = """
 
 # ENTERPRISE SOURCE PRESETS FOR INSTANT BENCHMARKING
 # ==================================================================================================
-PRESET_ENTERPRISE_CLOUD = r'''"""
+PRESET_ENTERPRISE_CLOUD = r'''
+"""
 ENTERPRISE CLOUD SHARDED DATA PLATFORM & HIGH-THROUGHPUT PIPELINE
 High-volume distributed microservices platform with sharding, consensus quorum,
 in-memory caching, cryptographic HMAC telemetry and partition auto-healing.
@@ -177,25 +178,6 @@ from dataclasses import dataclass, field
 
 logger = logging.getLogger("enterprise.cloud.platform")
 
-@dataclass
-class ShardTelemetryRecord:
-    shard_id: int
-    leader_node: str
-    active_connections: int
-    queue_depth: int
-    throughput_ops_sec: float
-    error_rate_pct: float
-    last_heartbeat: float = field(default_factory=time.time)
-    metadata: Dict[str, Any] = field(default_factory=dict)
-
-class ShardQuorumException(Exception):
-    """Raised when consensus write quorum cannot be established across distributed replicas."""
-    def __init__(self, shard_id: int, healthy_nodes: int, required_quorum: int) -> None:
-        super().__init__(f"Shard {shard_id} failed quorum: {healthy_nodes} healthy < {required_quorum} required")
-        self.shard_id = shard_id
-        self.healthy_nodes = healthy_nodes
-        self.required_quorum = required_quorum
-
 class DistributedShardRouter:
     """Computes consistent hash rings and routes requests to active replica clusters."""
     def __init__(self, cluster_name: str, total_shards: int = 256, replication_factor: int = 3) -> None:
@@ -205,115 +187,297 @@ class DistributedShardRouter:
         self._hash_ring: Dict[int, str] = {}
         self._node_health: Dict[str, bool] = {}
         self._shard_topology: Dict[int, List[str]] = {}
-        self._initialize_hash_ring()
-
-    def _initialize_hash_ring(self) -> None:
-        """Constructs deterministic virtual nodes on 32-bit consistent hashing boundary."""
-        for shard in range(self.total_shards):
-            v_nodes = []
-            for rep in range(self.replication_factor):
-                node_addr = f"node-{shard % 32}.region-{(shard + rep) % 4}.datacenter.internal"
-                v_nodes.append(node_addr)
-                self._node_health[node_addr] = True
-            self._shard_topology[shard] = v_nodes
+        
+        # Build virtual node distribution across geographic data centers
+        for shard_idx in range(self.total_shards):
+            virtual_replicas: List[str] = []
+            for rep_idx in range(self.replication_factor):
+                region_id = (shard_idx + rep_idx) % 8
+                rack_id = (shard_idx * 7 + rep_idx * 13) % 64
+                node_hostname = f"shard-{shard_idx:04d}.rep-{rep_idx}.region-{region_id}.rack-{rack_id}.internal.cloud"
+                virtual_replicas.append(node_hostname)
+                self._node_health[node_hostname] = True
+                
+                # Register consistent ring token points using SHA-256 dispersion
+                ring_token_seed = f"{self.cluster_name}:{shard_idx}:{rep_idx}:{node_hostname}".encode("utf-8")
+                token_hash = int(hashlib.sha256(ring_token_seed).hexdigest()[:8], 16)
+                self._hash_ring[token_hash] = node_hostname
+                
+            self._shard_topology[shard_idx] = virtual_replicas
+            logger.debug(f"Initialized topology for shard {shard_idx} with {len(virtual_replicas)} virtual replica targets")
 
     def resolve_target_shard(self, partition_key: str) -> int:
-        """Determines target shard index using FNV-1a 32-bit cryptographic dispersion."""
-        h = 2166136261
-        for char in partition_key.encode("utf-8"):
-            h = ((h ^ char) * 16777619) & 0xFFFFFFFF
-        return h % self.total_shards
+        """Determines target shard index using FNV-1a 32-bit cryptographic dispersion algorithm."""
+        if not partition_key:
+            logger.error("Empty or null partition key provided to resolve_target_shard; raising ValueError")
+            raise ValueError("Partition key must be non-empty string for deterministic hash ring projection")
+            
+        fnv_offset_basis = 2166136261
+        fnv_prime = 16777619
+        hash_register = fnv_offset_basis
+        key_octets = partition_key.encode("utf-8")
+        
+        for octet in key_octets:
+            hash_register = hash_register ^ octet
+            hash_register = (hash_register * fnv_prime) & 0xFFFFFFFF
+            
+        # Uniform projection onto continuous shard space
+        normalized_float = float(hash_register) / 4294967295.0
+        projected_index = int(math.floor(normalized_float * float(self.total_shards))) % self.total_shards
+        
+        if projected_index < 0 or projected_index >= self.total_shards:
+            logger.warning(f"Calculated shard index {projected_index} out of range [0, {self.total_shards}); clamping to safe index 0")
+            projected_index = 0
+            
+        logger.debug(f"Partition key '{partition_key}' [reg=0x{hash_register:08x}] dispatched to shard index {projected_index}")
+        return projected_index
 
     def get_healthy_replicas(self, shard_id: int) -> List[str]:
         """Filters assigned shard nodes and returns only responsive online instances."""
-        assigned = self._shard_topology.get(shard_id, [])
-        healthy = [node for node in assigned if self._node_health.get(node, False)]
-        quorum_min = (self.replication_factor // 2) + 1
-        if len(healthy) < quorum_min:
-            logger.error(f"Quorum failure on shard {shard_id}: {len(healthy)}/{self.replication_factor}")
-            raise ShardQuorumException(shard_id, len(healthy), quorum_min)
-        return healthy
+        if shard_id not in self._shard_topology:
+            logger.critical(f"FATAL: Attempted access to non-existent shard index {shard_id} in cluster '{self.cluster_name}'")
+            raise KeyError(f"Shard index {shard_id} outside cluster topology bounds [0, {self.total_shards})")
+            
+        assigned_nodes = self._shard_topology[shard_id]
+        online_nodes: List[str] = []
+        
+        for candidate in assigned_nodes:
+            is_active = self._node_health.get(candidate, False)
+            if is_active:
+                online_nodes.append(candidate)
+            else:
+                logger.warning(f"Health probe check failed for replica node '{candidate}' on shard {shard_id}; omitting from active set")
+                
+        quorum_threshold = (self.replication_factor // 2) + 1
+        active_count = len(online_nodes)
+        
+        if active_count < quorum_threshold:
+            logger.critical(
+                f"Consensus Quorum Violated on shard {shard_id}: {active_count} active replicas available, "
+                f"minimum quorum {quorum_threshold} required across total {self.replication_factor} replicas"
+            )
+            raise RuntimeError(f"Shard {shard_id} quorum failed: {active_count} < {quorum_threshold}")
+            
+        return online_nodes
 
 class ShardedBufferEngine:
     """Manages high-throughput ingestion buffers, batch compaction, and zero-loss commits."""
-    def __init__(self, router: DistributedShardRouter, buffer_capacity_mb: int = 512) -> None:
+    def __init__(self, router: DistributedShardRouter, buffer_capacity_mb: int = 512, flush_threshold: float = 0.85) -> None:
         self.router = router
         self.buffer_capacity = buffer_capacity_mb * 1024 * 1024
+        self.flush_threshold_bytes = int(self.buffer_capacity * flush_threshold)
         self._in_memory_shards: Dict[int, List[Dict[str, Any]]] = {}
         self._current_buffer_bytes = 0
         self._commit_log_offset = 0
+        self._secret_salt = os.environ.get("CLUSTER_HMAC_SALT", "enterprise-telemetry-sec-salt-prod-v1")
+        self._shard_stats: Dict[int, Dict[str, Any]] = {}
+        
+        for s in range(self.router.total_shards):
+            self._in_memory_shards[s] = []
+            self._shard_stats[s] = {
+                "shard_id": s,
+                "leader": f"shard-{s:04d}.rep-0.region-0.rack-0.internal.cloud",
+                "queue_depth": 0,
+                "ops_per_sec": 1420.5,
+                "error_rate": 0.001,
+                "last_flush_epoch": time.time(),
+                "wal_commit_head": 0
+            }
 
     def ingest_payload(self, partition_key: str, event_data: Dict[str, Any]) -> Tuple[bool, str]:
         """Ingests high-velocity record with HMAC integrity stamp and atomic buffer compaction."""
         if not partition_key or not event_data:
+            logger.error("Empty payload or null partition key provided to ingest_payload; rejecting transaction")
             return False, "INVALID_RECORD_PAYLOAD"
-        shard = self.router.resolve_target_shard(partition_key)
-        replicas = self.router.get_healthy_replicas(shard)
+            
+        target_shard = self.router.resolve_target_shard(partition_key)
         
-        # Serialize and compute HMAC checksum
-        raw_bytes = json.dumps(event_data, sort_keys=True).encode("utf-8")
-        payload_size = len(raw_bytes)
+        try:
+            active_replicas = self.router.get_healthy_replicas(target_shard)
+        except RuntimeError as q_err:
+            logger.error(f"Ingest rejected due to quorum violation: {q_err}")
+            return False, f"QUORUM_REJECTED: {q_err}"
+            
+        serialized_payload_bytes = json.dumps(event_data, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        payload_byte_length = len(serialized_payload_bytes)
         
-        if self._current_buffer_bytes + payload_size > self.buffer_capacity:
-            logger.warning("Buffer overflow protection triggered; flushing high water mark.")
+        # Buffer overflow safeguard and emergency compaction trigger
+        if self._current_buffer_bytes + payload_byte_length > self.buffer_capacity:
+            logger.warning(
+                f"Emergency buffer compaction triggered: current {self._current_buffer_bytes} bytes + "
+                f"incoming {payload_byte_length} bytes exceeds capacity {self.buffer_capacity} bytes"
+            )
             self.flush_all_shards()
             
-        digest = hmac.new(b"STREAM_ENCRYPTION_SECRET", raw_bytes, hashlib.sha256).hexdigest()
-        stamped_record = {
-            "offset": self._commit_log_offset,
-            "shard": shard,
-            "key": partition_key,
-            "digest": digest,
-            "replicas": replicas,
-            "bytes": payload_size,
-            "ts": time.time()
+        timestamp_epoch = time.time()
+        record_offset = self._commit_log_offset
+        
+        # Compute tamper-proof cryptographic HMAC-SHA256 signature
+        signature_builder = hmac.new(self._secret_salt.encode("utf-8"), digestmod=hashlib.sha256)
+        signature_builder.update(f"{partition_key}:{record_offset}:{timestamp_epoch}".encode("utf-8"))
+        signature_builder.update(serialized_payload_bytes)
+        tamper_proof_signature = signature_builder.hexdigest()
+        
+        commit_entry: Dict[str, Any] = {
+            "offset": record_offset,
+            "partition": partition_key,
+            "shard_id": target_shard,
+            "payload": event_data,
+            "size_bytes": payload_byte_length,
+            "hmac_sha256": tamper_proof_signature,
+            "timestamp": timestamp_epoch,
+            "assigned_nodes": active_replicas,
+            "checksum_crc32": hash(partition_key) & 0xFFFFFFFF
         }
         
-        shard_list = self._in_memory_shards.setdefault(shard, [])
-        shard_list.append(stamped_record)
-        self._current_buffer_bytes += payload_size
+        self._in_memory_shards[target_shard].append(commit_entry)
+        self._current_buffer_bytes += payload_byte_length
         self._commit_log_offset += 1
-        return True, digest
+        
+        # Update telemetry metrics
+        stat = self._shard_stats[target_shard]
+        stat["queue_depth"] = len(self._in_memory_shards[target_shard])
+        stat["wal_commit_head"] = record_offset
+        
+        if self._current_buffer_bytes >= self.flush_threshold_bytes:
+            logger.info(f"High-water threshold ({self.flush_threshold_bytes} bytes) reached; performing non-blocking flush for shard {target_shard}")
+            self.flush_shard(target_shard)
+            
+        return True, f"COMMIT_ACK_OFFSET_{record_offset}"
 
-    def flush_all_shards(self) -> int:
-        """Flushes in-flight memory partitions to distributed persistent storage layer."""
-        flushed_count = sum(len(records) for records in self._in_memory_shards.values())
-        self._in_memory_shards.clear()
-        self._current_buffer_bytes = 0
-        logger.info(f"Committed {flushed_count} queued records to distributed storage layer.")
+    def flush_shard(self, shard_id: int) -> int:
+        """Serializes pending transactions for a shard to WAL cold storage."""
+        if shard_id not in self._in_memory_shards:
+            return 0
+        pending_records = self._in_memory_shards[shard_id]
+        if not pending_records:
+            return 0
+            
+        flushed_count = len(pending_records)
+        freed_bytes = sum(item["size_bytes"] for item in pending_records)
+        
+        # Emulate atomic Write-Ahead-Log write and persistent disk fsync
+        logger.info(
+            f"Flushed {flushed_count} transactions ({freed_bytes} bytes) from in-memory queue for shard {shard_id} to durable cold storage"
+        )
+        
+        self._in_memory_shards[shard_id] = []
+        self._current_buffer_bytes = max(0, self._current_buffer_bytes - freed_bytes)
+        
+        stat = self._shard_stats[shard_id]
+        stat["queue_depth"] = 0
+        stat["last_flush_epoch"] = time.time()
         return flushed_count
 
-class CloudPlatformManager:
-    """Master orchestrator controlling router, buffers, telemetry, and background reconciler."""
-    def __init__(self, cluster_id: str = "PROD-GLOBAL-01") -> None:
-        self.cluster_id = cluster_id
-        self.router = DistributedShardRouter(cluster_name=cluster_id)
-        self.engine = ShardedBufferEngine(router=self.router)
-        self._telemetry: Dict[int, ShardTelemetryRecord] = {}
-        self._is_running = True
+    def flush_all_shards(self) -> int:
+        """Drains entire memory pipeline across all 256 active shards."""
+        total_flushed_records = 0
+        for s_idx in list(self._in_memory_shards.keys()):
+            total_flushed_records += self.flush_shard(s_idx)
+            
+        logger.info(f"Cluster buffer flush completed: total {total_flushed_records} events drained across all shards")
+        return total_flushed_records
 
-    def run_health_sweep(self) -> Dict[str, Any]:
-        """Performs full end-to-end diagnostic heartbeat across all sharded boundaries."""
-        healthy_shards = 0
-        degraded_shards = 0
-        for s in range(self.router.total_shards):
-            try:
-                nodes = self.router.get_healthy_replicas(s)
-                if len(nodes) == self.router.replication_factor:
-                    healthy_shards += 1
-                else:
-                    degraded_shards += 1
-            except ShardQuorumException:
-                degraded_shards += 1
+    def get_cluster_telemetry(self) -> Dict[str, Any]:
+        """Calculates cluster-wide operational health, queue depth, and throughput stats."""
+        total_pending = sum(len(items) for items in self._in_memory_shards.values())
+        total_throughput = sum(s["ops_per_sec"] for s in self._shard_stats.values())
+        avg_error = sum(s["error_rate"] for s in self._shard_stats.values()) / max(1, len(self._shard_stats))
+        
+        capacity_utilization_pct = (self._current_buffer_bytes / self.buffer_capacity) * 100.0 if self.buffer_capacity > 0 else 0.0
+        
         return {
-            "cluster_id": self.cluster_id,
-            "total_shards": self.router.total_shards,
-            "healthy_shards": healthy_shards,
-            "degraded_shards": degraded_shards,
-            "buffer_memory_bytes": self.engine._current_buffer_bytes,
-            "commit_log_head": self.engine._commit_log_offset,
-            "status": "OPERATIONAL" if degraded_shards == 0 else "WARNING"
-        }'''
+            "cluster_name": self.router.cluster_name,
+            "buffer_utilization_pct": round(capacity_utilization_pct, 2),
+            "total_bytes_buffered": self._current_buffer_bytes,
+            "commit_log_offset": self._commit_log_offset,
+            "total_pending_records": total_pending,
+            "aggregate_throughput_ops_sec": round(total_throughput, 1),
+            "mean_error_rate_pct": round(avg_error, 4),
+            "healthy_active_shards": len([s for s in range(self.router.total_shards) if len(self.router._shard_topology.get(s, [])) >= 2])
+        }
+
+
+class DistributedConsensusLeaderElector:
+    """Implements Raft leader election algorithm with randomized timeout leases."""
+    def __init__(self, node_id: str, peers: List[str], lease_duration_sec: float = 5.0) -> None:
+        self.node_id = node_id
+        self.peers = peers
+        self.lease_duration = lease_duration_sec
+        self.current_term = 0
+        self.voted_for: Optional[str] = None
+        self.leader_id: Optional[str] = None
+        self.lease_expiry = 0.0
+        self.state = "FOLLOWER"
+
+    def request_vote(self, term: int, candidate_id: str, last_log_index: int, last_log_term: int) -> Tuple[bool, int]:
+        """Processes vote request from candidate replica evaluating election safety invariants."""
+        if term > self.current_term:
+            logger.info(f"Node '{self.node_id}' discovered higher term {term} > {self.current_term}; transitioning to FOLLOWER")
+            self.current_term = term
+            self.state = "FOLLOWER"
+            self.voted_for = None
+            
+        vote_granted = False
+        if term == self.current_term and (self.voted_for is None or self.voted_for == candidate_id):
+            vote_granted = True
+            self.voted_for = candidate_id
+            self.lease_expiry = time.time() + self.lease_duration
+            logger.info(f"Node '{self.node_id}' cast affirmative vote FOR candidate '{candidate_id}' in term {term}")
+        else:
+            logger.info(f"Node '{self.node_id}' DENIED vote to candidate '{candidate_id}' in term {term}")
+            
+        return vote_granted, self.current_term
+
+    def initiate_election(self) -> bool:
+        """Transitions node to candidate role and broadcasts vote requests to peer quorum."""
+        self.current_term += 1
+        self.state = "CANDIDATE"
+        self.voted_for = self.node_id
+        granted_votes = 1
+        
+        total_cluster_nodes = len(self.peers) + 1
+        quorum_boundary = (total_cluster_nodes // 2) + 1
+        
+        logger.info(
+            f"Node '{self.node_id}' initiating election campaign for term {self.current_term} "
+            f"(requires {quorum_boundary} votes out of {total_cluster_nodes} members)"
+        )
+        
+        for peer_addr in self.peers:
+            try:
+                granted, term_ack = self.request_vote(self.current_term, self.node_id, 0, 0)
+                if granted:
+                    granted_votes += 1
+            except Exception as rpc_err:
+                logger.error(f"Failed to communicate with peer '{peer_addr}' during election: {rpc_err}")
+                
+        if granted_votes >= quorum_boundary:
+            self.state = "LEADER"
+            self.leader_id = self.node_id
+            self.lease_expiry = time.time() + self.lease_duration
+            logger.info(
+                f"ELECTION WON! Node '{self.node_id}' elected CLUSTER LEADER for term {self.current_term} with {granted_votes} affirmative votes"
+            )
+            return True
+            
+        logger.warning(
+            f"Election lost by '{self.node_id}' in term {self.current_term}: received {granted_votes}/{quorum_boundary} votes; reverting to follower"
+        )
+        self.state = "FOLLOWER"
+        return False
+
+    def check_lease_health(self) -> bool:
+        """Validates that current leader heartbeat lease remains active."""
+        current_clock = time.time()
+        if self.state == "LEADER" and current_clock > self.lease_expiry:
+            logger.critical(f"FATAL: Leader heartbeat lease expired for node '{self.node_id}'! Relinquishing leadership and stepping down to follower.")
+            self.state = "FOLLOWER"
+            self.leader_id = None
+            return False
+            
+        return self.state == "LEADER"
+'''
 
 PRESET_BANKING_CORE = '''"""
 ENTERPRISE BANKING CORE & DISTRIBUTED TRANSACTION LEDGER
@@ -637,7 +801,7 @@ class ASTContextArchitect:
 
         # 1. T-1 Topology: High-Density Symbol Topology & Architecture Map (92-98% savings)
         if "T-1" in tier:
-            top_lines = ["# [T-Zero Tier-1] System Architecture Topology & Symbol Map"]
+            top_lines = ["# [T-Zero Topology]"]
             for node in tree.body:
                 if isinstance(node, (ast.Import, ast.ImportFrom)):
                     stats["imports_found"] += 1
@@ -714,7 +878,7 @@ class ASTContextArchitect:
                 pruned_tree.body = pruned_tree.body[1:]
 
         pruned_code = ast.unparse(pruned_tree)
-        header = f"# [T-Zero AST Context | Tier: {tier} | 100% Typed Contract | 0% Performance Loss]\n"
+        header = "# [T-Zero AST Context]\n"
         compressed_result = header + pruned_code
 
         stats["duration_ms"] = round((time.perf_counter() - start_t) * 1000.0, 2)
@@ -1106,7 +1270,7 @@ def run_security_audit_controller(code_text: str) -> Tuple[str, str, str, str]:
     """
 
     if not findings:
-        report_md = "### ✅ 100% Zero-Leak & Quality Pass\nNo hardcoded credentials, secret leaks, or structural code smells detected."
+        report_md = "###  100% Zero-Leak & Quality Pass\nNo hardcoded credentials, secret leaks, or structural code smells detected."
     else:
         table_rows = []
         table_rows.append("| Tier | Severity | Line | Issue Title | Recommendation |")
@@ -1229,8 +1393,57 @@ THEME = gr.themes.Soft(
     font_mono=[gr.themes.GoogleFont("JetBrains Mono"), "monospace"],
 )
 
+
+def _generate_preset_compression_bundle(source_code: str, model_name: str = "OpenAI GPT-4o") -> Tuple[str, str, str, str, str, str, str]:
+    """Pre-computes full AST compression and live metrics for a code preset."""
+    if not source_code.strip():
+        return "", "", "0", "0", "0.0%", "$0.00 / 1K", "<div class='metric-box'><div class='metric-lbl'>STATUS</div><div class='metric-val' style='color:#94a3b8'>IDLE</div></div>"
+    
+    comp_code, stats = ASTContextArchitect.compress_python_ast(
+        source_code,
+        tier="T-4 Maximum Token Reduction (95%+ Guaranteed)",
+        strip_docstrings=True,
+        mask_secrets=True,
+    )
+    raw_tokens = ASTContextArchitect.estimate_tokens(source_code, model_name)
+    comp_tokens = ASTContextArchitect.estimate_tokens(comp_code, model_name)
+    saved = max(0, raw_tokens - comp_tokens)
+    pct = (saved / raw_tokens * 100.0) if raw_tokens > 0 else 0.0
+    
+    rate = MODEL_PRICING.get(model_name, MODEL_PRICING["OpenAI GPT-4o"])["input_per_m"]
+    cost_saved = ((raw_tokens - comp_tokens) / 1_000_000.0) * rate * 1000.0
+    cost_str = f"${cost_saved:.2f} / 1K"
+    
+    color = "#10b981" if pct >= 88.0 else "#38bdf8"
+    badge_html = f"""
+    <div class="metric-box" style="border-color: {color}44; margin-bottom: 12px;">
+        <div class="metric-lbl">AST TOKEN REDUCTION (BPE AUTHENTIC)</div>
+        <div class="metric-val" style="color: {color};">{pct:.1f}%</div>
+        <div style="font-size: 11.5px; color: #94a3b8; margin-top: 4px;">
+            Saved <strong>{saved:,}</strong> tokens across {stats.get('classes_found', 0)} classes & {stats.get('functions_found', 0)} functions ({stats.get('duration_ms', 0)}ms AST parse)
+        </div>
+    </div>
+    """
+    return source_code, comp_code, f"{raw_tokens:,}", f"{comp_tokens:,}", f"{pct:.1f}%", cost_str, badge_html
+
+def load_preset_cloud_handler() -> Tuple[str, str, str, str, str, str, str]:
+    return _generate_preset_compression_bundle(PRESET_ENTERPRISE_CLOUD)
+
+def load_preset_banking_handler() -> Tuple[str, str, str, str, str, str, str]:
+    return _generate_preset_compression_bundle(PRESET_BANKING_CORE)
+
+def load_preset_gateway_handler() -> Tuple[str, str, str, str, str, str, str]:
+    return _generate_preset_compression_bundle(PRESET_MICROSERVICE_GATEWAY)
+
+def load_preset_quant_handler() -> Tuple[str, str, str, str, str, str, str]:
+    return _generate_preset_compression_bundle(PRESET_QUANT_TRADING)
+
+def clear_all_code_handler() -> Tuple[str, str, str, str, str, str, str]:
+    return _generate_preset_compression_bundle("")
+
 def build_tzero_gradio_app() -> gr.Blocks:
     """Builds the comprehensive multi-tab luxury web application interface."""
+    _init_bundle = _generate_preset_compression_bundle(PRESET_ENTERPRISE_CLOUD)
     with gr.Blocks(title="T-Zero | Enterprise AST Token Architect", theme=THEME, css=CUSTOM_CSS) as demo:
         # Top Global Hero Banner
         gr.HTML(f"""
@@ -1253,7 +1466,7 @@ def build_tzero_gradio_app() -> gr.Blocks:
             <div style="display: flex; gap: 10px; align-items: center;">
                 <a href="{VERCEL_URL}" target="_blank" style="text-decoration: none;">
                     <button style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: #f8fafc; padding: 10px 18px; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s;">
-                        🌐 Live Benchmark
+                         Live Benchmark
                     </button>
                 </a>
                 <a href="{REPO_URL}" target="_blank" style="text-decoration: none;">
@@ -1271,7 +1484,7 @@ def build_tzero_gradio_app() -> gr.Blocks:
             # ======================================================================================
             # TAB 1: AST TOKEN REDUCTION & CONTEXT ARCHITECT
             # ======================================================================================
-            with gr.TabItem("⚡ AST Token Reducer", id="tab_reducer"):
+            with gr.TabItem(" AST Token Reducer", id="tab_reducer"):
                 with gr.Row():
                     # Left Column: Configuration & Input
                     with gr.Column(scale=5):
@@ -1279,11 +1492,11 @@ def build_tzero_gradio_app() -> gr.Blocks:
                         
                         # Presets Selector
                         with gr.Row():
-                            preset_btn_cloud = gr.Button("☁️ Cloud Platform (95% Reduction)", size="sm", variant="primary")
-                            preset_btn_banking = gr.Button("🏦 Enterprise Banking", size="sm")
-                            preset_btn_gateway = gr.Button("🌐 Microservices API", size="sm")
-                            preset_btn_quant = gr.Button("📈 Quant Matcher", size="sm")
-                            clear_code_btn = gr.Button("🧹 Clear", size="sm")
+                            preset_btn_cloud = gr.Button("Cloud Platform (Enterprise Multi-Class)", size="sm", variant="primary")
+                            preset_btn_banking = gr.Button(" Enterprise Banking", size="sm")
+                            preset_btn_gateway = gr.Button(" Microservices API", size="sm")
+                            preset_btn_quant = gr.Button(" Quant Matcher", size="sm")
+                            clear_code_btn = gr.Button(" Clear", size="sm")
 
                         input_code_box = gr.Code(
                             value=PRESET_ENTERPRISE_CLOUD,
@@ -1292,7 +1505,7 @@ def build_tzero_gradio_app() -> gr.Blocks:
                             lines=20,
                         )
 
-                        with gr.Accordion("⚙️ AST Compression Parameters", open=True):
+                        with gr.Accordion(" AST Compression Parameters", open=True):
                             with gr.Row():
                                 tier_dropdown = gr.Dropdown(
                                     choices=[
@@ -1319,7 +1532,7 @@ def build_tzero_gradio_app() -> gr.Blocks:
                                     value=True,
                                 )
 
-                        compress_btn = gr.Button("⚡ Run T-Zero AST Pruning", variant="primary", elem_classes=["tzero-btn-primary"])
+                        compress_btn = gr.Button("Run T-Zero AST Pruning", variant="primary", elem_classes=["tzero-btn-primary"])
 
                     # Right Column: Output & Live Real-Time Analytics
                     with gr.Column(scale=5):
@@ -1327,33 +1540,58 @@ def build_tzero_gradio_app() -> gr.Blocks:
                         
                         # Live Analytics Metric Cards
                         with gr.Row():
-                            token_raw_stat = gr.Textbox(label="Raw Tokens", value="824", interactive=False)
-                            token_comp_stat = gr.Textbox(label="T-Zero Tokens", value="74", interactive=False)
-                            pct_stat = gr.Textbox(label="Net Savings", value="91.0%", interactive=False)
-                            cost_stat = gr.Textbox(label="Cost Savings Rate", value="$1.87 / 1K", interactive=False)
+                            token_raw_stat = gr.Textbox(label="Raw Tokens", value=_init_bundle[2], interactive=False)
+                            token_comp_stat = gr.Textbox(label="T-Zero Tokens", value=_init_bundle[3], interactive=False)
+                            pct_stat = gr.Textbox(label="Net Savings", value=_init_bundle[4], interactive=False)
+                            cost_stat = gr.Textbox(label="Cost Savings Rate", value=_init_bundle[5], interactive=False)
 
-                        gauge_html_box = gr.HTML(
-                            """
-                            <div class="metric-box" style="border-color: #10b98144;">
-                                <div class="metric-lbl">AST TOKEN REDUCTION</div>
-                                <div class="metric-val" style="color: #10b981;">91.0%</div>
-                                <div style="font-size: 11px; color: #94a3b8; margin-top: 4px;">Verified Pure Python AST Contract</div>
-                            </div>
-                            """
-                        )
+                        gauge_html_box = gr.HTML(_init_bundle[6])
 
                         output_context_box = gr.Code(
+                            value=_generate_preset_compression_bundle(PRESET_ENTERPRISE_CLOUD)[1],
                             language="python",
                             label="Optimized AST System Context (Ready for LLM Prompt)",
                             lines=20,
                         )
 
-                # Tab 1 Event Bindings
-                preset_btn_cloud.click(lambda: PRESET_ENTERPRISE_CLOUD, None, input_code_box)
-                preset_btn_banking.click(lambda: PRESET_BANKING_CORE, None, input_code_box)
-                preset_btn_gateway.click(lambda: PRESET_MICROSERVICE_GATEWAY, None, input_code_box)
-                preset_btn_quant.click(lambda: PRESET_QUANT_TRADING, None, input_code_box)
-                clear_code_btn.click(lambda: "", None, input_code_box)
+                # Tab 1 Event Bindings - Instant Atomic Synchronization
+                tab1_outputs = [
+                    input_code_box,
+                    output_context_box,
+                    token_raw_stat,
+                    token_comp_stat,
+                    pct_stat,
+                    cost_stat,
+                    gauge_html_box,
+                ]
+
+                preset_btn_cloud.click(fn=load_preset_cloud_handler, inputs=None, outputs=tab1_outputs)
+                preset_btn_banking.click(fn=load_preset_banking_handler, inputs=None, outputs=tab1_outputs)
+                preset_btn_gateway.click(fn=load_preset_gateway_handler, inputs=None, outputs=tab1_outputs)
+                preset_btn_quant.click(fn=load_preset_quant_handler, inputs=None, outputs=tab1_outputs)
+                clear_code_btn.click(fn=clear_all_code_handler, inputs=None, outputs=tab1_outputs)
+
+                
+                # Live dynamic recalculation on parameter adjustment
+                param_inputs = [
+                    input_code_box,
+                    tier_dropdown,
+                    strip_docstrings_check,
+                    mask_secrets_check,
+                    model_eval_dropdown,
+                ]
+                param_outputs = [
+                    output_context_box,
+                    token_raw_stat,
+                    token_comp_stat,
+                    pct_stat,
+                    cost_stat,
+                    gauge_html_box,
+                ]
+                tier_dropdown.change(fn=process_code_compression, inputs=param_inputs, outputs=param_outputs)
+                strip_docstrings_check.change(fn=process_code_compression, inputs=param_inputs, outputs=param_outputs)
+                mask_secrets_check.change(fn=process_code_compression, inputs=param_inputs, outputs=param_outputs)
+                model_eval_dropdown.change(fn=process_code_compression, inputs=param_inputs, outputs=param_outputs)
 
                 compress_btn.click(
                     fn=process_code_compression,
@@ -1377,7 +1615,7 @@ def build_tzero_gradio_app() -> gr.Blocks:
             # ======================================================================================
             # TAB 2: ZERO-LEAK SECURITY & CODE QUALITY AUDITOR (T-001..T-004)
             # ======================================================================================
-            with gr.TabItem("🛡️ Zero-Leak Security Studio", id="tab_security"):
+            with gr.TabItem(" Zero-Leak Security Studio", id="tab_security"):
                 gr.HTML("""
                 <div style="margin-bottom: 16px;">
                     <h3 style="margin: 0; color: #f8fafc;">Enterprise Static Analysis & Credential Sanitizer</h3>
@@ -1396,7 +1634,7 @@ def build_tzero_gradio_app() -> gr.Blocks:
                             label="Source Code to Audit",
                             lines=18,
                         )
-                        run_audit_btn = gr.Button("🛡️ Perform Zero-Leak & Smell Audit", variant="primary")
+                        run_audit_btn = gr.Button("Perform Zero-Leak & Code Smell Audit", variant="primary")
 
                     with gr.Column(scale=5):
                         audit_score_hidden = gr.Textbox(visible=False)
@@ -1410,7 +1648,7 @@ def build_tzero_gradio_app() -> gr.Blocks:
                         )
                         audit_findings_markdown = gr.Markdown("### Click 'Perform Zero-Leak Audit' to inspect code.")
 
-                with gr.Accordion("📄 Full Markdown Audit Export", open=False):
+                with gr.Accordion(" Full Markdown Audit Export", open=False):
                     audit_export_box = gr.TextArea(lines=10, label="Exportable Report (Markdown)")
 
                 run_audit_btn.click(
@@ -1422,7 +1660,7 @@ def build_tzero_gradio_app() -> gr.Blocks:
             # ======================================================================================
             # TAB 3: MULTI-MODEL ROI & FINANCIAL SAVINGS CALCULATOR
             # ======================================================================================
-            with gr.TabItem("💰 Financial ROI Simulator", id="tab_roi"):
+            with gr.TabItem(" Financial ROI Simulator", id="tab_roi"):
                 gr.HTML("""
                 <div style="margin-bottom: 20px;">
                     <h3 style="margin: 0; color: #f8fafc;">Quantitative Token Economy & Budget Calculator</h3>
@@ -1491,11 +1729,12 @@ def build_tzero_gradio_app() -> gr.Blocks:
                     comp.change(fn=calculate_roi_controller, inputs=roi_inputs, outputs=roi_outputs)
 
                 demo.load(fn=calculate_roi_controller, inputs=roi_inputs, outputs=roi_outputs)
+                demo.load(fn=load_preset_cloud_handler, inputs=None, outputs=tab1_outputs)
 
             # ======================================================================================
             # TAB 4: MCP (MODEL CONTEXT PROTOCOL) 20-TOOL REGISTRY
             # ======================================================================================
-            with gr.TabItem("🔌 MCP 20-Tool Showcase", id="tab_mcp"):
+            with gr.TabItem(" MCP 20-Tool Showcase", id="tab_mcp"):
                 gr.HTML("""
                 <div style="margin-bottom: 16px;">
                     <h3 style="margin: 0; color: #f8fafc;">Model Context Protocol (MCP) Official Specification</h3>
@@ -1535,7 +1774,7 @@ def build_tzero_gradio_app() -> gr.Blocks:
             # ======================================================================================
             # TAB 5: LIVE BENCHMARK & VERIFIED METRICS
             # ======================================================================================
-            with gr.TabItem("📊 Verified Benchmark Data", id="tab_benchmark"):
+            with gr.TabItem(" Verified Benchmark Data", id="tab_benchmark"):
                 gr.HTML(f"""
                 <div class="tzero-card">
                     <h3 style="color: #38bdf8; margin-top: 0;">Empirical Benchmark on Production Codebases</h3>
@@ -1584,12 +1823,12 @@ def build_tzero_gradio_app() -> gr.Blocks:
                     <div style="margin-top: 24px; display: flex; gap: 12px;">
                         <a href="{VERCEL_URL}" target="_blank">
                             <button class="tzero-btn-primary" style="cursor: pointer;">
-                                🚀 Open Interactive Vercel Visualizer
+                                 Open Interactive Vercel Visualizer
                             </button>
                         </a>
                         <a href="{REPO_URL}" target="_blank">
                             <button style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 14px 24px; border-radius: 12px; font-weight: 700; cursor: pointer;">
-                                📖 Inspect CITATION.cff & Docs
+                                 Inspect CITATION.cff & Docs
                             </button>
                         </a>
                     </div>
@@ -1599,10 +1838,10 @@ def build_tzero_gradio_app() -> gr.Blocks:
         # Footer
         gr.HTML(f"""
         <div style="text-align: center; padding: 30px 0 10px 0; border-top: 1px solid rgba(255,255,255,0.06); margin-top: 30px; font-size: 13px; color: #64748b;">
-            T-Zero Algorithm v{APP_VERSION} • 100% Free Open Source Software • Licensed under MIT<br>
-            Authored by <strong style="color: #94a3b8;">Toprak Ahmet Aydoğmuş</strong> • 
-            <a href="{REPO_URL}" target="_blank" style="color: #38bdf8; text-decoration: none;">GitHub</a> • 
-            <a href="{VERCEL_URL}" target="_blank" style="color: #38bdf8; text-decoration: none;">Benchmark Gateway</a> • 
+            T-Zero Algorithm v{APP_VERSION} | 100% Free Open Source Software | Licensed under MIT<br>
+            Authored by <strong style="color: #94a3b8;">Toprak Ahmet Aydogmus</strong> | 
+            <a href="{REPO_URL}" target="_blank" style="color: #38bdf8; text-decoration: none;">GitHub</a> | 
+            <a href="{VERCEL_URL}" target="_blank" style="color: #38bdf8; text-decoration: none;">Benchmark Gateway</a> | 
             <a href="{SPACE_URL}" target="_blank" style="color: #38bdf8; text-decoration: none;">Hugging Face Space</a>
         </div>
         """)
