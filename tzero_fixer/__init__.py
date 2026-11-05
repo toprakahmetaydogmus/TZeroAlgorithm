@@ -2,7 +2,7 @@
 """T-Zero Autonomous PC-Fixer & Codebase Doctor Package.
 
 Author: Toprak Ahmet Aydogmus (Siber Akademi)
-Version: 10.3.0
+Version: 10.4.0
 """
 
 from .models import (
@@ -25,7 +25,7 @@ from .code_smells_healer import CodeSmellsHealer
 from .security_zero_leak import SecurityZeroLeakDoctor
 from .orchestrator import FixerOrchestrator
 
-__version__ = "10.3.0"
+__version__ = "10.4.0"
 __all__ = [
     "SeverityLevel",
     "DiagnosticCategory",

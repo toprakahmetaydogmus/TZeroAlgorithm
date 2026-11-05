@@ -12,7 +12,7 @@ Performs static code analysis across Python AST structures:
 - High cyclomatic complexity calculations (McCabe complexity > 15).
 
 Author: Toprak Ahmet Aydogmus (Siber Akademi)
-Version: 10.3.0
+Version: 10.4.0
 """
 
 import ast

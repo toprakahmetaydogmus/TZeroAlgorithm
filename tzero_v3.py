@@ -8361,7 +8361,7 @@ def main():
     parser.add_argument("--replay", nargs="?", const=15, type=int, default=None, metavar="COMMITS", help="Historical git token and financial ROI replay (default: 15 commits)")
     parser.add_argument("--pc-fixer", "--fixer", nargs="?", const=".", default=None, metavar="DIR", help="Autonomous self-healing PC & codebase doctor (heal syntax, imports, venv, caches)")
     parser.add_argument("--explain", metavar="FILE", default=None, help="Generate high-density AST architectural passport for file or LLM prompt")
-    parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect v10.3.0 Master Edition (engine v4.1.0)")
+    parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect v10.4.0 Master Edition (engine v4.1.0)")
 
 
     def print_master_tutorial():

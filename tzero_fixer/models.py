@@ -5,7 +5,7 @@ Defines all diagnostic entities, severity tiers, platform descriptors,
 diff structures, transactional rollback manifests, and reporting schemas.
 
 Author: Toprak Ahmet Aydogmus (Siber Akademi)
-Version: 10.3.0
+Version: 10.4.0
 Master Edition / Security Certified Zero-Leak
 """
 
@@ -292,7 +292,7 @@ class DiagnosticReport:
                 "tool": {
                     "driver": {
                         "name": "T-Zero PC-Fixer Doctor",
-                        "version": "10.3.0",
+                        "version": "10.4.0",
                         "informationUri": "https://tzero-indol.vercel.app"
                     }
                 },

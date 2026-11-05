@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tzero-mcp"
-version = "10.3.0"
+version = "10.4.0"
 description = "Enterprise Codebase Context Builder, AST Signatures Analyzer, & Token Reducer for LLMs"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -90,7 +90,7 @@ tzero-fixer = "tzero_v3:main"
 tzero-explain = "tzero_v3:main"
 
 [tool.setuptools]
-packages = ["tzero_jarvis"]
+packages = ["tzero_jarvis", "tzero_fixer"]
 py-modules = [
     "main",
     "tzero",

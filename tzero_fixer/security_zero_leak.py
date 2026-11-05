@@ -9,7 +9,7 @@ Forensic secret scanner, dangerous deserialization detector, and autonomous .env
 - SQL injection string concatenation heuristics.
 
 Author: Toprak Ahmet Aydogmus (Siber Akademi)
-Version: 10.3.0
+Version: 10.4.0
 """
 
 import ast

@@ -11,7 +11,7 @@ root-cause analyses, CWE / OWASP security references, and surgical remediation g
 - Polyglot Node, Rust, Go, and Container defects (TZ-PLG-001 to TZ-PLG-025)
 
 Author: Toprak Ahmet Aydogmus (Siber Akademi)
-Version: 10.3.0
+Version: 10.4.0
 """
 
 from typing import Dict, NamedTuple, Optional

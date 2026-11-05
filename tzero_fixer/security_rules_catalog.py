@@ -6,7 +6,7 @@ spanning all major cloud providers, AI/LLM vendors, payment gateways, databases,
 CI/CD platforms, communication tools, and cryptographic key formats.
 
 Author: Toprak Ahmet Aydogmus (Siber Akademi)
-Version: 10.3.0
+Version: 10.4.0
 """
 
 from typing import List, NamedTuple

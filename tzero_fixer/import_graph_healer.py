@@ -9,7 +9,7 @@ Performs deep static graph analysis on module imports:
 - Standard library module shadowing detection (e.g. workspace email.py or random.py).
 
 Author: Toprak Ahmet Aydogmus (Siber Akademi)
-Version: 10.3.0
+Version: 10.4.0
 """
 
 import ast

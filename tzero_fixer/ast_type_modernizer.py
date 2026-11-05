@@ -8,7 +8,7 @@ Performs static AST transforms to modernize Python type annotations:
 - PEP 654 Exception Groups validation and modernization.
 
 Author: Toprak Ahmet Aydogmus (Siber Akademi)
-Version: 10.3.0
+Version: 10.4.0
 """
 
 import ast

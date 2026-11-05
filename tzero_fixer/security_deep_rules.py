@@ -6,7 +6,7 @@ covering cloud infrastructure, databases, AI/ML APIs, payment processors,
 and cryptographic tokens.
 
 Author: Toprak Ahmet Aydogmus (Siber Akademi)
-Version: 10.3.0
+Version: 10.4.0
 """
 
 from typing import Dict, List, NamedTuple

@@ -200,7 +200,7 @@ class SarifReportExporter:
                     "tool": {
                         "driver": {
                             "name": "T-Zero PC-Fixer & Codebase Doctor",
-                            "semanticVersion": "10.3.0",
+                            "semanticVersion": "10.4.0",
                             "informationUri": "https://tzero-indol.vercel.app",
                             "rules": list(rules_map.values()),
                         }

@@ -3,8 +3,8 @@ class Tzero < Formula
 
   desc "AST Codebase Context Architect, Token Reducer & Autonomous MCP Engine"
   homepage "https://tzero-indol.vercel.app"
-  url "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/archive/refs/tags/v10.3.0.tar.gz"
-  version "10.3.0"
+  url "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/archive/refs/tags/v10.4.0.tar.gz"
+  version "10.4.0"
   license "MIT"
 
   depends_on "python@3.12"

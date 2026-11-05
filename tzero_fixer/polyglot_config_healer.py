@@ -8,7 +8,7 @@ Performs forensic repair and hygiene checks on configuration files:
 - EditorConfig generator and validator.
 
 Author: Toprak Ahmet Aydogmus (Siber Akademi)
-Version: 10.3.0
+Version: 10.4.0
 """
 
 import difflib

@@ -9,7 +9,7 @@ Performs forensic diagnosis and autonomous healing on:
 - Package version conflicts and Python minor version drift.
 
 Author: Toprak Ahmet Aydogmus (Siber Akademi)
-Version: 10.3.0
+Version: 10.4.0
 """
 
 import importlib.metadata

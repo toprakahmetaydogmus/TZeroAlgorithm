@@ -10,7 +10,7 @@ Performs deep hardware, runtime environment, CLI toolchain, and OS-level diagnos
 - Hardware metrics: RAM availability, disk space, and temp bloat inspection.
 
 Author: Toprak Ahmet Aydogmus (Siber Akademi)
-Version: 10.3.0
+Version: 10.4.0
 """
 
 import os

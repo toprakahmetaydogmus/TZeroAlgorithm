@@ -9,7 +9,7 @@ Performs forensic diagnostics across polyglot project architectures:
 - GitHub Actions CI/CD: .github/workflows YAML syntax, unpinned actions SHA, hardcoded secret leaks in workflows.
 
 Author: Toprak Ahmet Aydogmus (Siber Akademi)
-Version: 10.3.0
+Version: 10.4.0
 """
 
 import json

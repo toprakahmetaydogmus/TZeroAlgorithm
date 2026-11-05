@@ -10,7 +10,7 @@ Performs intelligent, deterministic, and surgical healing for:
 - Unclosed delimiters and unclosed string literals.
 
 Author: Toprak Ahmet Aydogmus (Siber Akademi)
-Version: 10.3.0
+Version: 10.4.0
 """
 
 import ast

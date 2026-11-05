@@ -2,7 +2,7 @@
 """
 T-Zero PC-Fixer & Codebase Doctor (Master Single-File Edition)
 ============================================================
-Version: 10.3.0 Master Edition | Zero-Leak Certified | 100% Free & Local
+Version: 10.4.0 Master Edition | Zero-Leak Certified | 100% Free & Local
 Architectural Specification: Monolithic Self-Healing Operating System & Codebase Doctor
 
 Components Integrated:
@@ -355,7 +355,7 @@ class DiagnosticReport:
                 "tool": {
                     "driver": {
                         "name": "T-Zero PC-Fixer Doctor",
-                        "version": "10.3.0",
+                        "version": "10.4.0",
                         "informationUri": "https://tzero-indol.vercel.app"
                     }
                 },
@@ -8659,7 +8659,7 @@ class SarifReportExporter:
                     "tool": {
                         "driver": {
                             "name": "T-Zero PC-Fixer & Codebase Doctor",
-                            "semanticVersion": "10.3.0",
+                            "semanticVersion": "10.4.0",
                             "informationUri": "https://tzero-indol.vercel.app",
                             "rules": list(rules_map.values()),
                         }
@@ -10464,7 +10464,7 @@ class FixerOrchestrator:
     def render_cli(cls, diag: DiagnosticReport, heal: Optional[HealReport] = None):
         """Render high-contrast, beautiful ANSI terminal cockpit report."""
         print("=" * 80)
-        print("\033[1;36m🩺 T-ZERO MASTER PC-FIXER & ENVIRONMENT AUTONOMOUS DOCTOR v10.3.0\033[0m")
+        print("\033[1;36m🩺 T-ZERO MASTER PC-FIXER & ENVIRONMENT AUTONOMOUS DOCTOR v10.4.0\033[0m")
         print("=" * 80)
         print(f"Target Directory: \033[33m{diag.target_dir}\033[0m")
         print(f"Host OS:          \033[32m{diag.environment.os_release}\033[0m (Arch: {diag.environment.python_architecture})")
@@ -10542,7 +10542,7 @@ def main():
     parser.add_argument("--generate-ci", action="store_true", help="Generate GitHub Actions quality gate workflow")
     parser.add_argument("--verify-e2e", action="store_true", help="Run end-to-end synthetic stress verification")
     parser.add_argument("--benchmark", action="store_true", help="Run synthetic self-healing benchmarks")
-    parser.add_argument("--version", action="version", version="%(prog)s 10.3.0 (Master Zero-Leak Edition)")
+    parser.add_argument("--version", action="version", version="%(prog)s 10.4.0 (Master Zero-Leak Edition)")
 
     args = parser.parse_args()
 
@@ -10580,9 +10580,8 @@ def main():
     # Benchmark
     if args.benchmark:
         print("⚡ Running T-Zero Self-Healing Benchmarks...")
-        b_res = FixerBenchmarkSuite.run_all()
-        for r in b_res:
-            print(f"  [{r.category}] {r.scenario}: {'PASSED' if r.success else 'FAILED'} ({r.duration_ms:.2f}ms)")
+        b_res = FixerBenchmarkSuite.run_benchmark()
+        FixerBenchmarkSuite.render_benchmark_report(b_res)
         sys.exit(0)
 
     # Diagnosis or Auto-Heal

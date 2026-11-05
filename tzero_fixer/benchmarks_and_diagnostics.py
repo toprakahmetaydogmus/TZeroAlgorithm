@@ -13,7 +13,7 @@ Computes detection recall, healing success percentages, latency distributions,
 and before-and-after health score transformations.
 
 Author: Toprak Ahmet Aydogmus (Siber Akademi)
-Version: 10.3.0
+Version: 10.4.0
 """
 
 import os

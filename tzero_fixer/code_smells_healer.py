@@ -10,7 +10,7 @@ Detects and surgically heals Python anti-patterns and code smells:
 - Resource leaks: unclosed file handles without 'with' statement.
 
 Author: Toprak Ahmet Aydogmus (Siber Akademi)
-Version: 10.3.0
+Version: 10.4.0
 """
 
 import ast
