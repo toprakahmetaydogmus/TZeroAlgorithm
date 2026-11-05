@@ -168,3 +168,4 @@ class SecurityCweRemediator:
                 return HealAction(issue=issue, success=True, details="Remediated CWE-78 by setting shell=False on subprocess invocation")
 
         return HealAction(issue=issue, success=False, details=f"Automated surgical remediation not implemented for {itype}")
+

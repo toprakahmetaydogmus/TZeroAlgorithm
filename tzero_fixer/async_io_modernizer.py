@@ -124,3 +124,4 @@ class AsyncIoModernizer:
                 return HealAction(issue=issue, success=True, details="Converted 'time.sleep()' to non-blocking 'await asyncio.sleep()' with auto-import")
 
         return HealAction(issue=issue, success=False, details=f"No automated heal for issue type '{itype}'")
+

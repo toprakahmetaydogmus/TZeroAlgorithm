@@ -22,24 +22,8 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple
 
 # ==================================================================================================
-# ZERO-GPU COMPATIBILITY LAYER
-# ==================================================================================================
-try:
-    import spaces  # type: ignore
-
-    HAS_SPACES = True
-except ImportError:
-    HAS_SPACES = False
-
-    class spaces:  # type: ignore
-        @staticmethod
-        def GPU(func=None, duration=60):
-            def decorator(f):
-                return f
-
-            return decorator(func) if func else decorator
-
-
+# PURE PYTHON AST ENGINE (High Performance CPU - Sub-5ms Execution)
+# Zero cloud dependencies, zero socket leaks, 100% offline local processing.
 import gradio as gr
 
 # ==================================================================================================
@@ -100,149 +84,62 @@ MODEL_PRICING: Dict[str, Dict[str, Any]] = {
 # CUSTOM ULTRA-LUXURY GLASSMORPHISM CSS
 # ==================================================================================================
 CUSTOM_CSS = """
-/* T-Zero Global Theme Styling */
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap');
-
-:root {
-    --bg-primary: #07090e;
-    --bg-card: rgba(15, 23, 42, 0.75);
-    --border-color: rgba(56, 189, 248, 0.2);
-    --accent-cyan: #06b6d4;
-    --accent-emerald: #10b981;
-    --accent-purple: #8b5cf6;
-    --accent-amber: #f59e0b;
-    --accent-rose: #f43f5e;
-    --text-primary: #f8fafc;
-    --text-muted: #94a3b8;
+/* T-Zero Clean High-Contrast Enterprise Styling */
+.metric-box {
+    background: rgba(30, 41, 59, 0.75);
+    border: 1px solid rgba(56, 189, 248, 0.35);
+    border-radius: 12px;
+    padding: 14px 18px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
 }
-
-body, .gradio-container {
-    background-color: var(--bg-primary) !important;
-    font-family: 'Plus Jakarta Sans', sans-serif !important;
-    color: var(--text-primary) !important;
+.metric-val {
+    font-size: 26px;
+    font-weight: 800;
+    font-family: 'JetBrains Mono', monospace;
+    margin: 4px 0;
+    color: #38bdf8;
 }
-
-/* Glassmorphism Card Panels */
-.tzero-card {
-    background: var(--bg-card);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid var(--border-color);
-    border-radius: 16px;
-    padding: 24px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+.metric-lbl {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #94a3b8;
 }
-
-.tzero-card:hover {
-    border-color: rgba(6, 182, 212, 0.45);
-    box-shadow: 0 16px 40px rgba(6, 182, 212, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.15);
-}
-
-/* Header & Glow Typography */
 .tzero-header-badge {
     display: inline-flex;
     align-items: center;
     gap: 8px;
     padding: 6px 14px;
-    background: rgba(6, 182, 212, 0.12);
-    border: 1px solid rgba(6, 182, 212, 0.3);
+    background: rgba(6, 182, 212, 0.15);
+    border: 1px solid rgba(6, 182, 212, 0.4);
     border-radius: 9999px;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 700;
-    letter-spacing: 0.05em;
     color: #38bdf8;
     text-transform: uppercase;
-    box-shadow: 0 0 20px rgba(6, 182, 212, 0.25);
 }
-
-.tzero-title-glow {
-    background: linear-gradient(135deg, #ffffff 0%, #38bdf8 50%, #818cf8 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    font-weight: 800;
-    letter-spacing: -0.03em;
-}
-
-/* Metric Display Counters */
-.metric-box {
-    background: rgba(15, 23, 42, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 12px;
-    padding: 16px 20px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-}
-
-.metric-box::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, #06b6d4, #10b981);
-}
-
-.metric-val {
-    font-size: 32px;
-    font-weight: 800;
-    font-family: 'JetBrains Mono', monospace;
-    letter-spacing: -0.02em;
-    margin-top: 4px;
-}
-
-.metric-lbl {
-    font-size: 12px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--text-muted);
-}
-
-/* Code Mirror & Monospace Fields */
-textarea, pre, code {
-    font-family: 'JetBrains Mono', monospace !important;
-    font-size: 13.5px !important;
-}
-
-/* Primary Action Neon Button */
-.tzero-btn-primary {
-    background: linear-gradient(135deg, #06b6d4 0%, #0284c7 100%) !important;
-    border: none !important;
-    color: #ffffff !important;
-    font-weight: 700 !important;
-    letter-spacing: 0.02em !important;
-    border-radius: 12px !important;
-    padding: 14px 28px !important;
-    box-shadow: 0 4px 20px rgba(6, 182, 212, 0.4) !important;
-    transition: all 0.25s ease !important;
-}
-
-.tzero-btn-primary:hover {
-    transform: translateY(-2px) !important;
-    box-shadow: 0 8px 30px rgba(6, 182, 212, 0.6) !important;
-}
-
-/* Pulse Animation */
-@keyframes tzero-pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.7; transform: scale(1.05); }
-}
-
 .tzero-live-indicator {
     display: inline-block;
-    width: 10px;
-    height: 10px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
     background-color: #10b981;
-    box-shadow: 0 0 12px #10b981;
-    animation: tzero-pulse 2s infinite ease-in-out;
+}
+.tzero-title-glow {
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+.tzero-btn-primary {
+    background: linear-gradient(135deg, #06b6d4 0%, #0284c7 100%) !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    border-radius: 10px !important;
 }
 """
 
-# ==================================================================================================
 # ENTERPRISE SOURCE PRESETS FOR INSTANT BENCHMARKING
 # ==================================================================================================
 PRESET_ENTERPRISE_CLOUD = r'''"""
@@ -1073,7 +970,6 @@ MCP_TOOLS_CATALOG = [
 # ==================================================================================================
 # GRADIO CONTROLLERS & INTERACTION LOGIC
 # ==================================================================================================
-@spaces.GPU
 def process_code_compression(
     code_text: str,
     tier_choice: str,
@@ -1304,9 +1200,17 @@ def generate_mcp_config_controller(ide_type: str) -> str:
 # ==================================================================================================
 # UI CONSTRUCTION WITH GRADIO BLOCKS
 # ==================================================================================================
+THEME = gr.themes.Soft(
+    primary_hue="cyan",
+    secondary_hue="blue",
+    neutral_hue="slate",
+    font=[gr.themes.GoogleFont("Plus Jakarta Sans"), "system-ui", "sans-serif"],
+    font_mono=[gr.themes.GoogleFont("JetBrains Mono"), "monospace"],
+)
+
 def build_tzero_gradio_app() -> gr.Blocks:
     """Builds the comprehensive multi-tab luxury web application interface."""
-    with gr.Blocks(title="T-Zero | Enterprise AST Token Architect", css=CUSTOM_CSS, theme=gr.themes.Default()) as demo:
+    with gr.Blocks(title="T-Zero | Enterprise AST Token Architect", theme=THEME, css=CUSTOM_CSS) as demo:
         # Top Global Hero Banner
         gr.HTML(f"""
         <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 24px;">

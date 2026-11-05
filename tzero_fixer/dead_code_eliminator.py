@@ -147,3 +147,4 @@ class DeadCodeEliminator:
             return HealAction(issue=issue, success=True, details=f"Commented out unreachable statements on lines {start_line}-{end_line}")
 
         return HealAction(issue=issue, success=False, details=f"No automated prune for issue type '{itype}'")
+
