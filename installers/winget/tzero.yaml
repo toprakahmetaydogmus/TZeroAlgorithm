@@ -1,5 +1,5 @@
 PackageIdentifier: SiberAkademi.TZero
-PackageVersion: 10.4.0
+PackageVersion: 10.6.0
 PackageName: T-Zero Context Architect
 Publisher: Siber Akademi
 Author: Toprak Ahmet Aydogmus
@@ -9,7 +9,7 @@ PackageUrl: https://tzero-indol.vercel.app
 Installers:
   - Architecture: x64
     InstallerType: portable
-    InstallerUrl: https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/download/v10.4.0/tzero_mcp-10.4.0-py3-none-any.whl
+    InstallerUrl: https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/download/v10.6.0/TZeroAlgorithm.exe
 ManifestType: singleton
 ManifestVersion: 1.6.0
 

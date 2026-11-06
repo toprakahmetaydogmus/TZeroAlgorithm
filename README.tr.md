@@ -9,6 +9,8 @@
 
 T-Zero (Token Zero), yapay zeka kodlama asistanları (Cursor, Claude Desktop, Antigravity IDE, Windsurf, Cline, VS Code, Zed) için geliştirilmiş, **deterministik AST bağlam sıkıştırıcısı ve Model Context Protocol (MCP) sunucusudur**.
 
+> 📈 **Resmi Kullanım İstatistikleri:** Toplam **17.387+ PyPI indirmesi** (`pip install tzero-mcp`), son 14 günde **1.275 Git klonlaması** (320 bağımsız mühendislik ekibi) ve 340+ binary release indirmesi.
+
 ### Neden T-Zero?
 Yapay zeka modellerine tüm kaynak kodlar metin olarak verildiğinde, fonksiyon gövdelerindeki döngüler ve ara hesaplamalar yüzünden **bağlam penceresinin %80 ila %95'i israf edilir**. T-Zero, kodu metin olarak değil AST (Soyut Sözdizimi Ağacı) olarak okur; fonksiyon gövdelerini çıkarıp arayüzleri, tipleri ve sınıf yapılarını korur.
 

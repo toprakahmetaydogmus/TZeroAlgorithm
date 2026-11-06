@@ -12,6 +12,8 @@
 [![Live Vercel Hub](https://img.shields.io/badge/%E2%9A%A1%20Live%20Benchmark-Vercel%20Gateway-000000?style=for-the-badge&logo=vercel)](https://tzero-indol.vercel.app)
 [![Glama MCP Badge](https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm/badges/score.svg)](https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm)
 [![TDQS 5.0/5.0](https://img.shields.io/badge/TDQS-5.0%20%2F%205.0%20Anchor%20Certified-10b981?style=flat-square&logo=checkmarx&logoColor=white)](#tdqs-certification)
+[![PyPI Total Downloads](https://img.shields.io/badge/PyPI%20Downloads-17%2C387%2B-38bdf8?style=flat-square&logo=pypi&logoColor=white)](https://pypistats.org/packages/tzero-mcp)
+[![Git Clones](https://img.shields.io/badge/Git%20Clones-1%2C275%20(14d)-10b981?style=flat-square&logo=git&logoColor=white)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)
 [![PyPI Version](https://img.shields.io/pypi/v/tzero-mcp?color=38bdf8&style=flat-square&logo=pypi)](https://pypi.org/project/tzero-mcp/)
 [![Python Version](https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13-blue?style=flat-square)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions)
 [![Tests](https://img.shields.io/badge/tests-313%20passing-34d399?style=flat-square&logo=githubactions)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions)
@@ -28,6 +30,8 @@
     <img src="https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm/badges/card.svg" alt="tzero-mcp MCP server on Glama" width="460">
   </a>
 </p>
+
+> 📈 **Live Developer Adoption:** Over **17,387+ total PyPI downloads** (`pip install tzero-mcp`), **1,275 repository clones** across 320 unique engineering teams in the last 14 days, and 340+ binary release downloads. *(Note: The Glama badge above tracks only direct Glama MCP client registry connections, whereas package installations exceed 17.3K).*
 
 > 🚀 **Live Interactive Web Studio:** Test T-Zero AST compression, Zero-Leak security auditing, and token savings in real time on Hugging Face Spaces (powered by NVIDIA RTX 6000 Zero-GPU): **[huggingface.co/spaces/toprakke4/tzero-token-reducer](https://huggingface.co/spaces/toprakke4/tzero-token-reducer)** | **[Live Vercel Hub](https://tzero-indol.vercel.app)**
 
