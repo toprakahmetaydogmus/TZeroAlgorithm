@@ -5,12 +5,12 @@
 
 ### *Empirically Proven Token Optimization Engine, 14 Canonical MCP Tools, Real BPE Tokenizer Benchmarks & Pre-Flight Reality-Lock for AI Coding Assistants.*
 
-**[English](README.md)** | **[Türkçe](README.tr.md)** | **[Hugging Face Space](https://huggingface.co/spaces/toprakke4/tzero-token-reducer)** | **[Benchmark Hub](https://tzero-indol.vercel.app)**
+**[English](README.md)** | **[Türkçe](README.tr.md)** | **[Interactive Colab](https://colab.research.google.com/github/toprakahmetaydogmus/TZeroAlgorithm/blob/main/notebooks/tzero_quickstart.ipynb)** | **[Hugging Face Space](https://huggingface.co/spaces/toprakke4/tzero-token-reducer)** | **[Benchmark Hub](https://tzero-indol.vercel.app)**
 
-
-[![Glama MCP Badge](https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm/badges/score.svg)](https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm)
+[![Open In Colab](https://img.shields.io/badge/%F0%9F%9A%80%20Open%20in-Colab-f9ab00?style=for-the-badge&logo=googlecolab&logoColor=white)](https://colab.research.google.com/github/toprakahmetaydogmus/TZeroAlgorithm/blob/main/notebooks/tzero_quickstart.ipynb)
 [![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Zero--GPU%20Live%20Demo-ffd21e?style=for-the-badge&logo=huggingface&logoColor=black)](https://huggingface.co/spaces/toprakke4/tzero-token-reducer)
 [![Live Vercel Hub](https://img.shields.io/badge/%E2%9A%A1%20Live%20Benchmark-Vercel%20Gateway-000000?style=for-the-badge&logo=vercel)](https://tzero-indol.vercel.app)
+[![Glama MCP Badge](https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm/badges/score.svg)](https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm)
 [![TDQS 5.0/5.0](https://img.shields.io/badge/TDQS-5.0%20%2F%205.0%20Anchor%20Certified-10b981?style=flat-square&logo=checkmarx&logoColor=white)](#tdqs-certification)
 [![PyPI Version](https://img.shields.io/pypi/v/tzero-mcp?color=38bdf8&style=flat-square&logo=pypi)](https://pypi.org/project/tzero-mcp/)
 [![Python Version](https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13-blue?style=flat-square)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions)
@@ -443,6 +443,20 @@ If T-Zero helped you cut AI prompt token costs, eliminate hallucinations, or spe
 
 **T-Zero is 100% Free, Open-Source & Offline Forever.**  
 *Built with passion by Siber Akademi for developers worldwide.*
+
+</div>
+
+---
+
+## 📈 Star History
+
+Join the revolution in context engineering and deterministic token pruning!
+
+<div align="center">
+
+<a href="https://star-history.com/#toprakahmetaydogmus/TZeroAlgorithm&Date">
+  <img src="https://api.star-history.com/svg?repos=toprakahmetaydogmus/TZeroAlgorithm&type=Date" alt="T-Zero Star History Chart" width="100%" style="max-width: 800px; border-radius: 10px;">
+</a>
 
 </div>
 
