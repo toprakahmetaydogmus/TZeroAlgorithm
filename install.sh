@@ -20,7 +20,7 @@ cat << "EOF"
    | |   / / |  _| | |_) | | | |
    | |  / /_ | |___|  _ <| |_| |
    |_| /____|_____|_| \_\\___/ 
-      CONTEXT ARCHITECT v6.0 MASTER
+      SOVEREIGN MASTER v10.6.0 EDITION
 EOF
 echo -e "${NC}"
 
@@ -45,13 +45,15 @@ $PY_CMD -m tzero_mcp --install || true
 
 echo -e "${GREEN}"
 echo "================================================================================"
-echo "⚡ T-ZERO INSTALLED SUCCESSFULLY!"
+echo "⚡ T-ZERO v10.6.0 INSTALLED SUCCESSFULLY!"
 echo "================================================================================"
 echo -e "${NC}"
-echo "Usage:"
-echo "  - Start MCP stdio server : uvx tzero-mcp"
-echo "  - Launch Web Dashboard   : tzero --dashboard"
-echo "  - Run Codebase Scan      : tzero --scan ."
-echo "  - Zero-Leak Audit        : tzero --audit ."
+echo "Key Capabilities:"
+echo "  - 1-Click Auto-Vault  : tzero --vault --migrate"
+echo "  - Pre-Flight Guard    : tzero --guard <file_or_code>"
+echo "  - Change Blast Radius : tzero --impact <symbol>"
+echo "  - Autonomous Doctor   : tzero pc-fixer"
+echo "  - Zero-GPU Web Studio : tzero space"
+echo "  - Start MCP Server    : uvx tzero-mcp (or tzero --mcp)"
 echo ""
 echo -e "${CYAN}⭐ Don't forget to star the repo: https://github.com/toprakahmetaydogmus/TZeroAlgorithm${NC}"

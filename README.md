@@ -40,17 +40,24 @@
 ### ⚡ 30-Second Quickstart
 
 ```bash
-# 1. Install via pip:
-pip install tzero-mcp
+# 🌟 Option A: Universal 1-Line Zero-Config Installer
+# Linux / macOS / WSL:
+curl -fsSL https://raw.githubusercontent.com/toprakahmetaydogmus/TZeroAlgorithm/main/install.sh | bash
 
-# 2. Extract deterministic AST context tree (up to ~94% token savings):
-tzero --tree . --out context.txt
+# Windows (PowerShell):
+irm https://raw.githubusercontent.com/toprakahmetaydogmus/TZeroAlgorithm/main/install.ps1 | iex
 
-# 3. Turnkey 1-click configure Cursor, Claude, Antigravity, Windsurf, Cline:
+# 📦 Option B: Standard Python package:
+pip install tzero-mcp --upgrade
+
+# 🚀 Turnkey 1-click configure Cursor, Claude, Antigravity, Windsurf, Cline:
 tzero init
 
-# (Optional) Install official VS Code / Cursor Extension (.vsix):
-code --install-extension dist/tzero-vscode-10.0.0.vsix
+# 🔐 1-Click Auto-Vault secrets into .env:
+tzero --vault --migrate
+
+# 🧩 (Optional) Install official VS Code / Cursor Extension (.vsix):
+code --install-extension dist/tzero-vscode-10.6.0.vsix
 ```
 
 ### 🧭 Navigation & Interactive Jump Stations
@@ -61,7 +68,7 @@ code --install-extension dist/tzero-vscode-10.0.0.vsix
 [![Why T-Zero](https://img.shields.io/badge/Why_T--Zero-0284c7?style=for-the-badge&logo=rocket&logoColor=white)](#why-t-zero)
 [![Task Benchmark](https://img.shields.io/badge/Task_Benchmark-10b981?style=for-the-badge&logo=speedtest&logoColor=white)](#task-completion-benchmark)
 [![IDE Setup](https://img.shields.io/badge/IDE_Setup-6366f1?style=for-the-badge&logo=visualstudiocode&logoColor=white)](#universal-1-click-ide-setup)
-[![14 MCP Tools](https://img.shields.io/badge/14_MCP_Tools-8b5cf6?style=for-the-badge&logo=microchip&logoColor=white)](#the-14-canonical-mcp-tools)
+[![20 MCP Tools](https://img.shields.io/badge/20_MCP_Tools-8b5cf6?style=for-the-badge&logo=microchip&logoColor=white)](#the-14-canonical-mcp-tools)
 [![Reality-Lock](https://img.shields.io/badge/Reality--Lock-0ea5e9?style=for-the-badge&logo=shield&logoColor=white)](#pre-flight-reality-lock)
 [![Language Support](https://img.shields.io/badge/Language_Support-f59e0b?style=for-the-badge&logo=python&logoColor=white)](#language-support-breakdown)
 [![Hugging Face](https://img.shields.io/badge/Hugging_Face-Live_Demo-ffd21e?style=for-the-badge&logo=huggingface&logoColor=black)](#huggingface-space)
@@ -72,7 +79,7 @@ code --install-extension dist/tzero-vscode-10.0.0.vsix
   <b><a href="#why-t-zero">Why T-Zero</a></b> &bull; 
   <b><a href="#task-completion-benchmark">Task Benchmark</a></b> &bull; 
   <b><a href="#universal-1-click-ide-setup">Universal IDE Setup</a></b> &bull; 
-  <b><a href="#the-14-canonical-mcp-tools">14 MCP Tools</a></b> &bull; 
+  <b><a href="#the-14-canonical-mcp-tools">20 MCP Tools</a></b> &bull; 
   <b><a href="#pre-flight-reality-lock">Reality-Lock</a></b> &bull; 
   <b><a href="#language-support-breakdown">Language Support</a></b> &bull; 
   <b><a href="#huggingface-space">Hugging Face Space</a></b> &bull; 
@@ -94,7 +101,7 @@ It solves the **Context Token Crisis**: when AI coding models ingest entire code
 
 | Dimension | Raw Prompt Ingestion | Vector DB / Embedding RAG | Repomix (Raw Concat) | Aider (Repo-Map) | T-Zero Deterministic AST Engine |
 | :--- | :---: | :---: | :---: | :---: | :---: |
-| **Token Reduction** | 0% (Massive waste) | 40-70% (Fragmented) | 0% (Dumps raw files) | 70-85% (Symbol list only) | **Up to 94.6% (AST Skeleton)** |
+| **Token Reduction** | 0% (Massive waste) | 40-70% (Fragmented) | 0% (Dumps raw files) | 70-85% (Symbol list only) | **Up to 95.0% (AST Skeleton)** |
 | **Context Strategy** | Full files | Naive text chunks | Flattened text dump | Top symbol signatures | **Smart Skeleton (Focus full + 1st-deg types)** |
 | **Hallucination Guard**| None (Blind) | None (Lost caller context)| None | None | **Pre-Flight Reality-Lock (Static AST)** |
 | **Protocol Support** | Manual copy/paste | Custom proprietary API | CLI file export | CLI only | **Universal MCP (Cursor, Claude, Antigravity)** |
