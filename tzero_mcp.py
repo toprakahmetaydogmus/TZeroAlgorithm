@@ -4770,6 +4770,15 @@ def print_welcome_guide():
 
 💡 Bu komutu doğrudan stdio sunucusu olarak test etmek isterseniz:
     $ tzero-mcp --stdio
+
+================================================================================
+⭐ A MESSAGE FROM THE CREATOR (TOPRAK AHMET AYDOĞMUŞ, 15-YEAR-OLD DEVELOPER)
+================================================================================
+Hi! I'm Toprak, a 15-year-old self-taught developer from Siber Akademi.
+I built T-Zero from scratch to solve token bloat and AI hallucinations.
+If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
+👉 https://github.com/toprakahmetaydogmus/TZeroAlgorithm
+Every star means the world to a young open-source developer! 🚀
 ================================================================================
 """)
 

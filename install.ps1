@@ -52,5 +52,17 @@ Write-Host "  - Autonomous Doctor   : tzero pc-fixer" -ForegroundColor Cyan
 Write-Host "  - Zero-GPU Web Studio : tzero space" -ForegroundColor Cyan
 Write-Host "  - Start MCP Server    : uvx tzero-mcp (or tzero --mcp)" -ForegroundColor Cyan
 Write-Host ""
-Write-Host "⭐ Don't forget to star the repo: https://github.com/toprakahmetaydogmus/TZeroAlgorithm" -ForegroundColor Yellow
+Write-Host "┌──────────────────────────────────────────────────────────────────────────────┐" -ForegroundColor Yellow
+Write-Host "│  ⭐ A MESSAGE FROM THE CREATOR                                               │" -ForegroundColor Yellow
+Write-Host "│                                                                              │" -ForegroundColor Yellow
+Write-Host "│  Hi! I'm Toprak Ahmet Aydogmus, a 15-year-old self-taught developer from     │" -ForegroundColor Yellow
+Write-Host "│  Siber Akademi. I built T-Zero from scratch to eliminate token bloat and     │" -ForegroundColor Yellow
+Write-Host "│  AI hallucinations for programmers worldwide ($0.00 cloud cost).             │" -ForegroundColor Yellow
+Write-Host "│                                                                              │" -ForegroundColor Yellow
+Write-Host "│  If this open-source tool saved you tokens or helped your coding flow:       │" -ForegroundColor Yellow
+Write-Host "│  👉 Please consider giving it a ⭐ on GitHub:                                │" -ForegroundColor Yellow
+Write-Host "│     https://github.com/toprakahmetaydogmus/TZeroAlgorithm                    │" -ForegroundColor Cyan
+Write-Host "│                                                                              │" -ForegroundColor Yellow
+Write-Host "│  Every star means the world and helps a young open-source developer grow! 🚀 │" -ForegroundColor Yellow
+Write-Host "└──────────────────────────────────────────────────────────────────────────────┘" -ForegroundColor Yellow
 Write-Host ""

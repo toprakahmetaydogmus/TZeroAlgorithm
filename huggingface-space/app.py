@@ -851,6 +851,9 @@ def build_tzero_gradio_app() -> gr.Blocks:
                     Eliminate up to <strong style="color: #38bdf8;">95% of prompt tokens</strong> when feeding large codebases into LLMs.
                     Pure Python AST analysis, 100% Zero-Leak offline security, pre-flight reality lock, and change blast radius.
                 </p>
+                <p style="font-size: 13px; color: #fbbf24; margin-top: 6px; font-weight: 600;">
+                    ⭐ Built by Toprak Ahmet Aydoğmuş (15-year-old developer @ Siber Akademi). If this tool helps you, please support with a Star on GitHub!
+                </p>
             </div>
             <div style="display: flex; gap: 10px; align-items: center;">
                 <a href="{VERCEL_URL}" target="_blank" style="text-decoration: none;">

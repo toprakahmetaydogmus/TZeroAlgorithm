@@ -8457,7 +8457,14 @@ Generate tailored subagent manifests (.tzero/agents/ + SKILL.md) in 1 second:
   • Desktop GUI Studio:      $ tzero-gui (or $ tzero --gui)
   • 3D Synaptic Web Lab:     $ python benchmark-site/serve.py (Opens on http://localhost:8080)
 
-⭐ Star T-Zero on GitHub: https://github.com/toprakahmetaydogmus/TZeroAlgorithm
+================================================================================
+⭐ A MESSAGE FROM THE CREATOR (TOPRAK AHMET AYDOĞMUŞ, 15-YEAR-OLD DEVELOPER)
+================================================================================
+Hi! I'm Toprak, a 15-year-old self-taught developer from Siber Akademi.
+I built T-Zero from scratch to solve token bloat and AI hallucinations.
+If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
+👉 https://github.com/toprakahmetaydogmus/TZeroAlgorithm
+Every star means the world to a young open-source developer! 🚀
 ================================================================================
 """)
 
@@ -8507,8 +8514,11 @@ Generate tailored subagent manifests (.tzero/agents/ + SKILL.md) in 1 second:
 9️⃣  Hugging Face Space & Canlı Web Paneli:
     $ tzero hf
 
-⭐ GitHub'da projeyi yıldızlayarak destek olun:
-    https://github.com/toprakahmetaydogmus/TZeroAlgorithm
+⭐ 15 YAŞINDAKİ GENÇ GELİŞTİRİCİYE BİR YILDIZLA DESTEK OLUN:
+    Merhaba! Ben Toprak Ahmet Aydoğmuş (15 yaşındayım). T-Zero'yu sıfırdan geliştirdim.
+    İşinize yaradıysa lütfen GitHub'da yıldız vermeyi unutmayın:
+    👉 https://github.com/toprakahmetaydogmus/TZeroAlgorithm
+    (Her yıldız benim gibi genç açık kaynak geliştiriciler için çok değerli!)
 ================================================================================
 """)
 

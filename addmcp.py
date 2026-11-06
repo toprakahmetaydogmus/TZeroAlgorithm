@@ -1169,7 +1169,19 @@ def run_init(argv: Optional[List[str]] = None) -> int:
    \033[36m"Use T-Zero to get the project skeleton and analyze the blast radius."\033[0m
    \033[36m"Use tzero reduce_tokens to prune noise and audit zero-leak security."\033[0m
 
-\033[90m⭐ Star T-Zero on GitHub: https://github.com/toprakahmetaydogmus/TZeroAlgorithm\033[0m
+\033[1;33m┌──────────────────────────────────────────────────────────────────────────────┐
+│  ⭐ A MESSAGE FROM THE CREATOR                                               │
+│                                                                              │
+│  Hi! I'm Toprak Ahmet Aydoğmuş, a 15-year-old self-taught developer from     │
+│  Siber Akademi. I built T-Zero from scratch to eliminate token bloat and     │
+│  AI hallucinations for programmers worldwide ($0.00 cloud cost).             │
+│                                                                              │
+│  If this open-source tool saved you tokens or helped your coding flow:       │
+│  👉 Please consider giving it a ⭐ on GitHub:                                │
+│     https://github.com/toprakahmetaydogmus/TZeroAlgorithm                    │
+│                                                                              │
+│  Every star means the world and helps a young open-source developer grow! 🚀 │
+└──────────────────────────────────────────────────────────────────────────────┘\033[0m
 """)
     return 0 if failures == 0 else 1
 

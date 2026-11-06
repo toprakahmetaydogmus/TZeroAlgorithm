@@ -42,6 +42,20 @@ tzero --tree . --out context.txt
 
 ---
 
+## ⭐ 15 Yaşındaki Genç Bir Açık Kaynak Geliştiriciyi Destekleyin!
+
+Merhaba! Ben **Toprak Ahmet Aydoğmuş**, Siber Akademi'den 15 yaşında genç bir yazılımcıyım. T-Zero'yu sıfırdan, yapay zeka kodlama araçlarındaki token israfını ve halüsinasyonları çözmek için %100 yerel ve ücretsiz ($0 maliyet) olarak geliştirdim.
+
+Eğer T-Zero işinize yaradıysa lütfen GitHub üzerinden bir ⭐ vermeyi unutmayın! Her yıldız genç bir açık kaynak geliştirici için dünyalara bedel. 🚀
+
+<div align="center">
+
+[![GitHub stars](https://img.shields.io/github/stars/toprakahmetaydogmus/TZeroAlgorithm?style=social)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)
+
+</div>
+
+---
+
 ## 📈 Yıldız Geçmişi (Star History)
 
 <div align="center">
