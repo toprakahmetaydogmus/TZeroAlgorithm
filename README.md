@@ -67,6 +67,9 @@ tzero init
 # 🔐 1-Click Auto-Vault secrets into .env:
 tzero --vault --migrate
 
+# ⚡ Live Background Watcher (Auto-updates AST context on file save):
+tzero --watch
+
 # 🧩 Option C: Official Global Package Managers
 # VS Code / Cursor Marketplace:
 code --install-extension siber-akademi.tzero-vscode

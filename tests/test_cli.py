@@ -90,6 +90,11 @@ class TestCLI(unittest.TestCase):
         self.assertIn("QUICKSTART", res.stdout)
         self.assertIn("tzero-add-mcp", res.stdout)
 
+    def test_watch_mode(self):
+        import tzero_v3
+        res = tzero_v3.run_watch_mode("tests", once_test=True)
+        self.assertTrue(res)
+
     def test_natural_subcommands_without_dashes(self):
         # 1. 'tzero audit' should map to '--audit'
         res_audit = subprocess.run(

@@ -110,6 +110,48 @@ SECRET_RULES: List[SecretRule] = [
         pattern=re.compile(r"\b(nvapi-[a-zA-Z0-9_\-]{30,})\b"),
         mask_tag="[ZERO_LEAK_MASKED_NVIDIA_KEY]"
     ),
+    SecretRule(
+        rule_id="SEC-AI-006",
+        provider="Groq",
+        description="Groq Cloud API Key (gsk_...)",
+        pattern=re.compile(r"\b(gsk_[a-zA-Z0-9]{48,})\b"),
+        mask_tag="[ZERO_LEAK_MASKED_GROQ_KEY]"
+    ),
+    SecretRule(
+        rule_id="SEC-AI-007",
+        provider="OpenRouter",
+        description="OpenRouter API Key (sk-or-v1-...)",
+        pattern=re.compile(r"\b(sk-or-v1-[a-f0-9]{64})\b"),
+        mask_tag="[ZERO_LEAK_MASKED_OPENROUTER_KEY]"
+    ),
+    SecretRule(
+        rule_id="SEC-AI-008",
+        provider="Perplexity",
+        description="Perplexity AI API Key (pplx-...)",
+        pattern=re.compile(r"\b(pplx-[a-zA-Z0-9]{48,})\b"),
+        mask_tag="[ZERO_LEAK_MASKED_PERPLEXITY_KEY]"
+    ),
+    SecretRule(
+        rule_id="SEC-AI-009",
+        provider="Replicate",
+        description="Replicate API Token (r8_...)",
+        pattern=re.compile(r"\b(r8_[a-zA-Z0-9]{32,})\b"),
+        mask_tag="[ZERO_LEAK_MASKED_REPLICATE_KEY]"
+    ),
+    SecretRule(
+        rule_id="SEC-AI-010",
+        provider="Cohere",
+        description="Cohere API Key (co-...)",
+        pattern=re.compile(r"\b(co-[a-zA-Z0-9]{40,})\b"),
+        mask_tag="[ZERO_LEAK_MASKED_COHERE_KEY]"
+    ),
+    SecretRule(
+        rule_id="SEC-REG-001",
+        provider="NPM",
+        description="NPM Registry Access Token (npm_...)",
+        pattern=re.compile(r"\b(npm_[a-zA-Z0-9]{32,40})\b"),
+        mask_tag="[ZERO_LEAK_MASKED_NPM_TOKEN]"
+    ),
 
     # --- Cloud Infrastructure & VCS ---
     SecretRule(

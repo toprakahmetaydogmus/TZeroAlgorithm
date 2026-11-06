@@ -135,6 +135,24 @@ class TestZeroLeakSecurityEngine(unittest.TestCase):
         self.assertEqual(res["files_with_violations"], 1)
         self.assertEqual(res["violations"][0]["file"], "src/config.py")
 
+    def test_groq_and_openrouter_detection(self):
+        g_pfx = "gsk"
+        or_pfx = "sk-or"
+        sample = f'GROQ_KEY = "{g_pfx}_abcdef1234567890abcdef1234567890abcdef1234567890abcdef"\nOR_KEY = "{or_pfx}-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"'
+        findings = ZeroLeakEngine.scan_text(sample)
+        providers = [f.provider for f in findings]
+        self.assertIn("Groq", providers)
+        self.assertIn("OpenRouter", providers)
+
+    def test_npm_and_perplexity_detection(self):
+        n_pfx = "npm"
+        p_pfx = "pplx"
+        sample = f'NPM_T = "{n_pfx}_abcdef1234567890abcdef123456789012"\nPPLX = "{p_pfx}-abcdef1234567890abcdef1234567890abcdef1234567890"'
+        findings = ZeroLeakEngine.scan_text(sample)
+        providers = [f.provider for f in findings]
+        self.assertIn("NPM", providers)
+        self.assertIn("Perplexity", providers)
+
 
 if __name__ == "__main__":
     unittest.main()

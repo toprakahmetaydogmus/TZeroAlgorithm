@@ -8285,6 +8285,84 @@ def run_export_cli(project_dir: str, export_type: str, out_file: str):
     print(f"\n\033[32m[SUCCESS] Exported {export_type.upper()} blueprint to: {out_path}\033[0m\n")
 
 
+def run_watch_mode(target_dir: str = ".", interval: float = 1.0, once_test: bool = False) -> bool:
+    """Continuous background AST context watcher.
+    Monitors workspace files, re-indexes AST trees on file save,
+    and updates .tzero/context.txt automatically for Cursor, Windsurf, and Claude.
+    """
+    import time
+    from datetime import datetime
+
+    target_dir = os.path.abspath(target_dir)
+    print("\033[36m" + "=" * 80)
+    print("⚡ [T-ZERO LIVE AST CONTEXT WATCHER] Active & Monitoring")
+    print("=" * 80 + "\033[0m")
+    print(f"📁 Workspace Root : {target_dir}")
+    print(f"🎯 Target Output  : .tzero/context.txt")
+    print("💡 Cursor, Claude Desktop & Windsurf will automatically receive fresh AST context on save.")
+    print("🛑 Press Ctrl+C to terminate watcher.\n")
+
+    out_dir = os.path.join(target_dir, ".tzero")
+    os.makedirs(out_dir, exist_ok=True)
+    out_file = os.path.join(out_dir, "context.txt")
+
+    def get_file_mtimes():
+        mtimes = {}
+        ignored = {".git", "__pycache__", ".venv", "venv", "node_modules", "dist", "build", ".tzero"}
+        valid_exts = {".py", ".ts", ".js", ".tsx", ".jsx", ".rs", ".go", ".json", ".md"}
+        for root, dirs, files in os.walk(target_dir):
+            dirs[:] = [d for d in dirs if d not in ignored and not d.startswith(".")]
+            for f in files:
+                ext = os.path.splitext(f)[1].lower()
+                if ext in valid_exts:
+                    fp = os.path.join(root, f)
+                    try:
+                        mtimes[fp] = os.path.getmtime(fp)
+                    except OSError:
+                        pass
+        return mtimes
+
+    def reindex():
+        scanner = CodebaseScanner()
+        files, sizes, snippets = scanner.scan_directory(target_dir)
+        raw_chars = sum(sizes.values())
+        raw_tokens = max(1, raw_chars // 4)
+        reduced_text = "\n\n".join(f"# --- {rel} ---\n{snip}" for rel, snip in snippets.items())
+        reduced_tokens = max(1, count_tokens_precise(reduced_text))
+        sav = ((raw_tokens - reduced_tokens) / raw_tokens) * 100.0 if raw_tokens > 0 else 0.0
+        with open(out_file, "w", encoding="utf-8") as out_f:
+            out_f.write(reduced_text)
+        now = datetime.now().strftime("%H:%M:%S")
+        print(f"\033[32m[{now}] ⚡ Re-indexed {len(snippets)} AST modules (~{reduced_tokens:,} tokens vs {raw_tokens:,} raw, -{sav:.1f}% savings)\033[0m")
+
+    reindex()
+    if once_test:
+        return True
+
+    last_mtimes = get_file_mtimes()
+    try:
+        while True:
+            time.sleep(interval)
+            current_mtimes = get_file_mtimes()
+            changes = []
+            for fp, mt in current_mtimes.items():
+                if fp not in last_mtimes or mt > last_mtimes[fp]:
+                    changes.append(os.path.relpath(fp, target_dir))
+            for fp in last_mtimes:
+                if fp not in current_mtimes:
+                    changes.append(f"deleted:{os.path.relpath(fp, target_dir)}")
+
+            if changes:
+                now = datetime.now().strftime("%H:%M:%S")
+                rel_disp = ", ".join(changes[:3]) + (f" (+{len(changes)-3} more)" if len(changes) > 3 else "")
+                print(f"\033[33m[{now}] 🔄 File change detected: {rel_disp}\033[0m")
+                reindex()
+                last_mtimes = current_mtimes
+    except KeyboardInterrupt:
+        print("\n\033[36m[🛑 T-ZERO WATCHER STOPPED] Goodbye!\033[0m")
+        return True
+
+
 def main():
     import argparse
     parser = argparse.ArgumentParser(
@@ -8293,6 +8371,7 @@ def main():
     )
     parser.add_argument("--cli", "-c", action="store_true", help="Run interactive guided terminal wizard")
     parser.add_argument("--scan", "-s", nargs="?", const=".", default=None, metavar="DIR", help="Scan codebase directory and print summary metrics")
+    parser.add_argument("--watch", "-w", nargs="?", const=".", default=None, metavar="DIR", help="Continuous background AST context watcher (auto-reindexes on file save for Cursor/Claude)")
     parser.add_argument("--audit", "-a", nargs="?", const=".", default=None, metavar="DIR", help="Run AST static code analysis & audit for code smells")
     parser.add_argument("--dry-run", "-d", action="store_true", help="Generate complete context tree offline without API call (100%% free)")
     parser.add_argument("--export-agents", nargs="?", const="AGENTS.md", default=None, metavar="FILE", help="Generate AI agent blueprint (AGENTS.md / CLAUDE.md)")
@@ -9015,6 +9094,9 @@ Every star means the world to a young open-source developer! 🚀
         TZeroTerminalCockpit.run_interactive(args.dir)
     elif args.gui:
         launch_gui()
+    elif getattr(args, "watch", None) is not None:
+        target = args.watch or args.dir
+        run_watch_mode(target)
     elif args.scan is not None:
         run_scan_cli(args.scan or args.dir)
     elif getattr(args, "vault", None) is not None:

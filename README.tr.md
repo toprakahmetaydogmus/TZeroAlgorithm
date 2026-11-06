@@ -35,6 +35,9 @@ tzero init
 # Sızıntıları otomatik .env dosyasına taşı:
 tzero --vault --migrate
 
+# Canlı Arka Plan İzleyicisi (Dosya kaydettikçe AST bağlamını otomatik yeniler):
+tzero --watch
+
 # (İsteğe bağlı) Resmi VS Code Marketplace üzerinden kur:
 code --install-extension siber-akademi.tzero-vscode
 # Veya yerel (.vsix) paketini yükle:
