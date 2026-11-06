@@ -81,15 +81,15 @@ runs:
 
         # Step summary output
         if [ -n "$GITHUB_STEP_SUMMARY" ]; then
-          cat << 'EOF' >> "$GITHUB_STEP_SUMMARY"
-## ⚡ T-Zero Context Architect & Security Gate
-
-| Metric | Status | Policy |
-| :--- | :---: | :---: |
-| **Zero-Leak Security** | 🛡️ PASSED | 100% Offline / Zero-Leak |
-| **Pre-Flight Reality-Lock** | 🧠 VERIFIED | Zero Hallucinated Imports |
-| **AST Context Reduction** | ⚡ UP TO -95% | Token-Zero High Fidelity |
-
-> *Automated by [T-Zero Engine](https://github.com/toprakahmetaydogmus/TZeroAlgorithm) — 100% Free & Open-Source.*
-EOF
+          {
+            echo "## ⚡ T-Zero Context Architect & Security Gate"
+            echo ""
+            echo "| Metric | Status | Policy |"
+            echo "| :--- | :---: | :---: |"
+            echo "| **Zero-Leak Security** | 🛡️ PASSED | 100% Offline / Zero-Leak |"
+            echo "| **Pre-Flight Reality-Lock** | 🧠 VERIFIED | Zero Hallucinated Imports |"
+            echo "| **AST Context Reduction** | ⚡ UP TO -95% | Token-Zero High Fidelity |"
+            echo ""
+            echo "> *Automated by [T-Zero Engine](https://github.com/toprakahmetaydogmus/TZeroAlgorithm) — 100% Free & Open-Source.*"
+          } >> "$GITHUB_STEP_SUMMARY"
         fi

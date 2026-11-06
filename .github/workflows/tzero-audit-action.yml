@@ -17,5 +17,6 @@ jobs:
       - name: Run T-Zero Action
         uses: ./
         with:
+          mode: 'audit'
           audit-level: 'strict'
           enforce-boundaries: 'false'
