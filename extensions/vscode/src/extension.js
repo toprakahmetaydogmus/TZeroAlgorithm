@@ -21,6 +21,8 @@ function activate(context) {
     const openMenuCmd = vscode.commands.registerCommand('tzero.openMenu', async () => {
         const selected = await vscode.window.showQuickPick([
             { label: "$(zap) 1-Click MCP Initialize", description: "Connect T-Zero MCP to Cursor, Claude, Windsurf, VS Code", cmd: "tzero.init" },
+            { label: "$(search) Autonomous Code Review & Reality-Lock", description: "Audit working tree or commit before pushing", cmd: "tzero.review" },
+            { label: "$(eye) Start Live AST Watcher", description: "Auto-rebuilds compact context on file save", cmd: "tzero.watch" },
             { label: "$(clippy) Compress Selection to Clipboard", description: "Prune selected block and copy AST signatures", cmd: "tzero.compressSelection" },
             { label: "$(file-code) Compress Current File", description: "Prune active file to AST signatures (-85% tokens)", cmd: "tzero.compressFile" },
             { label: "$(type-hierarchy) Show Project AST Skeleton", description: "Generate compact architecture outline", cmd: "tzero.showTree" },
@@ -173,6 +175,22 @@ function activate(context) {
         vscode.env.openExternal(vscode.Uri.parse('http://localhost:8421'));
     });
     context.subscriptions.push(openDashCmd);
+
+    // Command: Autonomous Code Review Gate
+    const reviewCmd = vscode.commands.registerCommand('tzero.review', () => {
+        const term = vscode.window.createTerminal("T-Zero Review Gate");
+        term.show();
+        term.sendText("tzero review");
+    });
+    context.subscriptions.push(reviewCmd);
+
+    // Command: Start Live AST Watcher Daemon
+    const watchCmd = vscode.commands.registerCommand('tzero.watch', () => {
+        const term = vscode.window.createTerminal("T-Zero Live Watcher");
+        term.show();
+        term.sendText("tzero --watch");
+    });
+    context.subscriptions.push(watchCmd);
 
     // Command: Run Doctor / PC-Fixer
     const doctorCmd = vscode.commands.registerCommand('tzero.doctor', async () => {
