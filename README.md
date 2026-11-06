@@ -25,13 +25,17 @@
 
 <br>
 
-<p align="center">
-  <a href="https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm">
-    <img src="https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm/badges/card.svg" alt="tzero-mcp MCP server on Glama" width="460">
-  </a>
-</p>
+<div align="center">
 
-> 📈 **Live Developer Adoption:** Over **17,387+ total PyPI downloads** (`pip install tzero-mcp`), **1,275 repository clones** across 320 unique engineering teams in the last 14 days, and 340+ binary release downloads. *(Note: The Glama badge above tracks only direct Glama MCP client registry connections, whereas package installations exceed 17.3K).*
+[![PyPI Downloads](https://img.shields.io/badge/%F0%9F%93%A5%20Total%20PyPI%20Downloads-17%2C387%2B-38bdf8?style=for-the-badge&logo=pypi&logoColor=white)](https://pypistats.org/packages/tzero-mcp)
+[![Git Clones](https://img.shields.io/badge/%F0%9F%9A%80%20Repository%20Clones-1%2C275%20(14d)-10b981?style=for-the-badge&logo=git&logoColor=white)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)
+[![Glama Grade A](https://img.shields.io/badge/%E2%9A%A1%20Glama%20MCP-Grade%20A%20Verified-8b5cf6?style=for-the-badge&logo=checkmarx&logoColor=white)](https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm)
+
+</div>
+
+<br>
+
+> 📈 **Live Developer Adoption:** Over **17,387+ total PyPI downloads** (`pip install tzero-mcp`), **1,275 repository clones** across 320 unique engineering teams in the last 14 days, and 340+ binary release downloads.
 
 > 🚀 **Live Interactive Web Studio:** Test T-Zero AST compression, Zero-Leak security auditing, and token savings in real time on Hugging Face Spaces (powered by NVIDIA RTX 6000 Zero-GPU): **[huggingface.co/spaces/toprakke4/tzero-token-reducer](https://huggingface.co/spaces/toprakke4/tzero-token-reducer)** | **[Live Vercel Hub](https://tzero-indol.vercel.app)**
 

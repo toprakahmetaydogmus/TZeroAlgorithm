@@ -6,6 +6,7 @@
   "architecture": {
     "64bit": {
       "url": "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/download/v10.6.0/TZeroAlgorithm.exe",
+      "hash": "3d8238f7d85bebbe67ba897b1430fed25353e6cc9aa434ef0405fe7d309c7b07",
       "bin": [
         [
           "TZeroAlgorithm.exe",
