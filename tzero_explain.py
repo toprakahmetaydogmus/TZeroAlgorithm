@@ -73,12 +73,13 @@ class ArchitecturalPassportGenerator:
 
     @classmethod
     def _classify_role(cls, path_str: str, symbols: List[SymbolPassport]) -> str:
-        lower = path_str.lower()
-        if "cli" in lower or "ui" in lower or "view" in lower or "api" in lower or "mcp" in lower:
+        name = Path(path_str).stem.lower()
+        parent_parts = [p.lower() for p in Path(path_str).parent.parts]
+        if any(k in name for k in ("cli", "gui", "tui", "view", "api", "mcp", "endpoint", "controller")) or any(k in parent_parts for k in ("cli", "gui", "ui", "views", "api", "mcp", "routes", "controllers")):
             return "presentation"
-        elif "model" in lower or "schema" in lower or "dto" in lower:
+        elif any(k in name for k in ("model", "schema", "dto", "entity")) or any(k in parent_parts for k in ("models", "schemas", "dtos", "entities")):
             return "data_model"
-        elif "util" in lower or "helper" in lower or "common" in lower:
+        elif any(k in name for k in ("util", "helper", "common", "tools")) or any(k in parent_parts for k in ("utils", "helpers", "common")):
             return "utility"
         elif any(s.name.endswith(("Service", "Engine", "Manager", "Analyzer", "Architect", "Orchestrator")) for s in symbols):
             return "business_service"
