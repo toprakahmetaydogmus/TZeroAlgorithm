@@ -1,258 +1,242 @@
-# 🚀 T-ZERO v7.3.1 — Zero-Cost ($0.00) Viral Growth & Developer Distribution Engine
-
-> **100% Free / Zero Budget**: Zero ad spend, zero paid promotion. Driven entirely by open-source distribution channels, MCP ecosystem directories, and developer community virality.
-
----
-
-## ⚠️ CRITICAL NOTICE: Why You Should NEVER Spam 100 GitHub Issues
-
-Opening promotion issues on external repositories (e.g., DeepSeek, LangChain, Claude, etc.) like *"Hey check out my project"* is the fastest way to kill your reputation and get banned:
-1. **GitHub Shadowban & Account Termination**: Automated anti-spam heuristics flag identical or promotional issues across repositories. Your account can be banned or your repository made invisible.
-2. **"Scam / Slop" Tagging**: The open-source community will actively downvote, flag, and boycott projects that spam issue trackers meant for bug reports.
-3. **The High-Converting Ethical Alternative**:
-   - Submit Pull Requests to curated **Awesome Lists** (listed below) where you are welcomed and indexed permanently.
-   - Post in repository **Discussions** (e.g., DeepSeek / LangChain GitHub Discussions) as a technical case study: *"How we cut prompt context overhead by 88% using AST tree pruning"*.
-   - Join discussions where developers actively complain about context limits, slow TTFT, and prompt costs, offering T-Zero as an open-source solution.
+# 🚀 T-Zero v10.6.0 — Zero-Cost ($0.00) Viral Launch & 10K Star Playbook
+*Engine: Siber Akademi T-Zero Growth Engine | $0.00 Budget | 100% Free Organic Reach*
 
 ---
 
-## 1. 💬 Discord Community Showcases (Copy & Paste Ready)
+## 📅 Optimal Launch Windows (Global Timezones)
 
-### A. Cursor Community Discord (`#showcase` or `#tools`)
+To maximize your chances of hitting the **Hacker News Front Page**, **GitHub Trending #1**, and **Reddit Hot**:
 
-```markdown
-**Title:** We reduced Cursor context consumption by 88% using an AST Skeleton MCP server
+| Target Platform | Best Days | Optimal Time (UTC) | Turkey Time (UTC+3) | US East (EST) |
+| :--- | :--- | :--- | :--- | :--- |
+| **Hacker News (Show HN)** | Tuesday or Wednesday | 13:30 - 15:30 UTC | 16:30 - 18:30 | 08:30 - 10:30 AM |
+| **Reddit (r/LocalLLaMA)** | Tuesday or Thursday | 14:00 - 16:00 UTC | 17:00 - 19:00 | 09:00 - 11:00 AM |
+| **Reddit (r/Python)** | Saturday ("Showcase Saturday") | 13:00 - 15:00 UTC | 16:00 - 18:00 | 08:00 - 10:00 AM |
+| **Product Hunt** | Tuesday or Wednesday | 07:01 UTC (12:01 AM PST) | 10:01 AM | 12:01 AM PST |
+| **Dev.to & Medium** | Tuesday or Wednesday | 12:00 - 14:00 UTC | 15:00 - 17:00 | 07:00 - 09:00 AM |
 
-Hey everyone 👋  
-If you work on large repositories in Cursor, you know the pain: indexing hundreds of files burns context fast, slows down responses, and often causes Composer to lose track of earlier instructions.
+> 💡 **The GitHub Trending Flywheel:** GitHub Trending tracks star velocity over 24 hours. If T-Zero gets **50 to 80 stars in 24 hours** from HN, Reddit, and Dev.to, it enters **GitHub Trending #1 (Python)**, which automatically exposes the repo to hundreds of thousands of developers and drives an additional 500 - 2,500 organic stars over 72 hours!
 
-We built **T-Zero**, a local AST-level context optimizer and MCP server designed to keep Cursor fast and lean:
+---
 
-**What it does:**
-- Generates Tier-1 to Tier-4 hierarchical AST skeletons of your workspace.
-- Preserves exact class contracts, method signatures, docstrings, and call chains while stripping out internal function bodies.
-- Tested on our 38,000 LOC codebase: dropped raw context from **5.2M tokens to 632K tokens (88% reduction)**.
-- Runs 100% locally with zero cloud API keys (pure Python AST parser + local BM25 ranking).
-- Native Superdesign tools for generating and iterating on UI components directly in Composer.
+## 1. 📰 Hacker News (Show HN) Submission Kit
 
-**How to hook it into Cursor in 30 seconds:**
-1. Open Cursor Settings → Features → MCP:
-   - Name: `tzero`
-   - Type: `command`
-   - Command: `uvx tzero-mcp` (or `python -m tzero_mcp`)
-2. Ask Cursor: *"Use T-Zero to get the project skeleton and analyze the blast radius of modifying user_service.py"*.
+*Submit on [news.ycombinator.com/submit](https://news.ycombinator.com/submit)*
 
-🔗 **Open Source Repo & Benchmarks:** https://github.com/toprakahmetaydogmus/TZeroAlgorithm  
-Feedback on edge-case parsing (especially complex decorators) would be greatly appreciated!
+- **Title (Strictly <= 80 characters):**  
+  `Show HN: T-Zero – Deterministic AST token compressor and MCP server`  
+  *(Exactly 66 characters — safe and clean)*
+
+- **URL:**  
+  `https://github.com/toprakahmetaydogmus/TZeroAlgorithm`
+
+- **Maker First Comment (Post in the comments thread immediately after submitting):**
+```text
+Hey HN, I'm Toprak from Siber Akademi.
+
+We built T-Zero (https://github.com/toprakahmetaydogmus/TZeroAlgorithm) because modern AI coding assistants (Claude Desktop, Cursor, Windsurf, Copilot) choke when fed medium-to-large repositories:
+1. Prompts blow past 100k tokens in 3 turns, costing serious money.
+2. Models lose earlier constraints ("Lost in the Middle").
+3. Models hallucinate functions that don't exist in the project.
+
+Instead of heavy vector databases, T-Zero uses pure, deterministic Abstract Syntax Trees:
+- Focus files stay at 100% full implementation.
+- Surrounding dependencies are pruned of loop bodies and intermediate variables, keeping class interfaces, type signatures, and docstrings.
+- Cuts prompt token consumption by up to 94.6% (e.g. Flask drops from 48k to 2.4k tokens).
+
+In v10.6.0, we added:
+- Pre-Flight Reality-Lock (validates code against workspace AST to eliminate hallucinations before applying).
+- 1-Click Auto-Vault (finds leaked secrets via Shannon entropy and automatically refactors into .env).
+- Change Impact & Blast Radius analysis (0-100 risk score and upstream callers).
+- 20 canonical MCP tools.
+
+Zero cloud API keys, zero cost ($0.00), 100% offline.
+
+- Colab Demo: https://colab.research.google.com/github/toprakahmetaydogmus/TZeroAlgorithm/blob/main/notebooks/tzero_quickstart.ipynb
+- Hugging Face Space: https://huggingface.co/spaces/toprakke4/tzero-token-reducer
+
+Would love your candid technical feedback and questions!
 ```
 
-#### 💬 Objection Handling & Community Responses:
+---
 
-**Q: "The token drop on big repos is neat. Does the pruning ever hide something the model actually needed, like a helper it should've reused? And are you mostly on Cursor's own models or bringing your own key?"**
+## 2. 📝 Dev.to / Medium / Substack Article (Full Draft)
 
-**A:**
-> Great question! We built a dedicated engine for this exact problem:
->
-> 1. **Anti-Reinvention Guard (`suggest_reusable_helpers`):**
->    Even when method bodies are pruned, signatures, parameters, return types, and docstrings stay in context. In addition, T-Zero includes an active Helper Suggester: before generating code, it scans the repository AST for utility helpers and surfaces them (`from utils.date import parse_iso_date`) so Composer/LLM never reinvents the wheel.
->
-> 2. **Focus-Aware Skeletonization (`get_smart_skeleton_context`):**
->    The target file being modified retains 100% full implementation, while 1st-degree dependencies and matching reusable helpers are skeletonized with ready-to-use imports.
->
-> 3. **Models & BYOK:**
->    T-Zero is **100% offline and model-agnostic**. The AST pruner and BM25 indexer run locally on your CPU with zero API keys. You can use it with Cursor's built-in models (Claude 3.7 / GPT-4o) or bring your own keys (OpenAI, Anthropic, Gemini, DeepSeek, or local Ollama).
+*Post this on [dev.to/new](https://dev.to/new). Dev.to posts rank instantly on Google and get syndicated to 1M+ developers.*
+
+**Title:**  
+Why AI Coding Assistants Choke on Big Codebases (and How We Cut Context Tokens by 94.6% with Pure ASTs)
+
+**Tags:**  
+`python`, `ai`, `productivity`, `opensource`
+
+**Cover Image:**  
+`https://raw.githubusercontent.com/toprakahmetaydogmus/TZeroAlgorithm/main/assets/tzero_terminal_benchmark.svg`
+
+**Body:**
+
+```markdown
+Every developer using Claude 3.5 Sonnet, Cursor, or Copilot hits the same invisible brick wall:
+
+You give the AI a repository with 50 files. Within 4 prompts:
+1. Your token consumption skyrockets past 100k tokens per query.
+2. The model starts hallucinating methods that don't exist in your codebase.
+3. You burn $15 in API credits in an afternoon or hit hourly rate limits.
+4. The model forgets constraints you specified in prompt #1 ("Lost in the Middle" phenomenon).
+
+For the past several months, we analyzed why this happens at **Siber Akademi**. 
+
+The fundamental problem is naive text ingestion: **AI coding tools treat source code like Shakespeare prose, feeding full loop bodies and implementation details into the prompt.**
+
+When an LLM is trying to write a payment controller, it doesn't need to read 200 lines of socket retry loops inside your database driver. It only needs the **Abstract Syntax Tree (AST) contract**: class names, method signatures, return types, and docstrings.
 
 ---
 
-### B. Official Model Context Protocol (MCP) Discord (`#showcase` or `#servers`)
+### Enter T-Zero: Deterministic AST Pruning
 
-```markdown
-**Title:** [Showcase] T-Zero MCP — Zero-Leak AST Codebase Pruner & Context Minimizer (47 Tools)
+We built and open-sourced **T-Zero** ([GitHub Repo](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)), a zero-dependency, 100% local context compression engine and Model Context Protocol (MCP) server.
 
-Hi MCP community! 🚀  
-Just released **T-Zero MCP v7.3.1**, an open-source MCP server focused on solving the massive token cost and latency overhead of feeding entire codebases to AI models.
+Instead of running slow vector embeddings or paid cloud chunkers, T-Zero parses your code directly into a language-native AST:
+- **Tier 1 (Focus File):** Kept at 100% full implementation.
+- **Tier 2 (1st-Degree Dependencies):** Stripped of loop bodies and intermediate variables, preserving type signatures and docstrings.
+- **Tier 3 (Broader Repository):** Compact module symbols and dependency topologies.
 
-**Key Capabilities exposed via 47 MCP Tools:**
-- `get_project_context_tree`: Hierarchical AST tree generator (Tier 1-4) achieving 80-95% token savings.
-- `analyze_change_impact`: Calculates AST blast radius (0-100 score) before refactoring.
-- `verify_zero_leak_security`: Local static scanner ensuring zero secrets/API keys enter the context stream.
-- `verify_hallucination_guard`: Validates suggested imports/calls against actual workspace AST nodes.
-- `superdesign_generate` & `superdesign_gallery`: Structured design system orchestrator with live HTML card galleries.
+The result? **A 94.6% reduction in prompt tokens with zero loss of semantic grounding.**
 
-💡 **Why offline matters:** Zero embeddings sent to third-party vector databases. Built using pure native AST parsing + local BM25 ranking.
+| Benchmark Repository | Raw Tokens | T-Zero AST Pruned | Savings |
+| :--- | :--- | :--- | :--- |
+| `pallets/flask` | 48,210 tokens | 2,410 tokens | **95.0%** |
+| `fastapi/fastapi` | 89,450 tokens | 4,920 tokens | **94.5%** |
+| `psf/requests` | 31,100 tokens | 1,710 tokens | **94.5%** |
 
-📦 **Quickstart:**
+---
+
+### Beyond Token Savings: 3 New Superpowers in v10.6.0
+
+#### 1. 🛡️ Pre-Flight Reality-Lock (Eliminating Hallucinations)
+Before an AI assistant applies generated code to disk, T-Zero checks every imported module, called method, and argument against the workspace AST. If the model hallucinations a non-existent method, T-Zero catches it, suggests the closest real function, and auto-synthesizes a repair.
+
 ```bash
-uvx tzero-mcp
-# or pip install tzero-mcp
+tzero --guard generated_snippet.py
 ```
 
-💻 **GitHub:** https://github.com/toprakahmetaydogmus/TZeroAlgorithm  
-Would love your feedback on language coverage and tool performance!
-```
+#### 2. 🔐 1-Click Auto-Vault Secret Migrator
+Accidentally pasted a Stripe or OpenAI key into your source code?
+`tzero --vault --migrate` uses Shannon entropy ($H \ge 4.75$) to find all hardcoded secrets, automatically extracts them into `.env`, adds `.env` to `.gitignore`, and rewrites your source code with `os.environ.get(...)`.
 
----
-
-### C. Google Developer Community / AI Discord (`#project-showcase` or `#ai-ml`)
-
-```markdown
-**Title:** [Showcase] Solving LLM Context Window Waste with Local AST Pruning
-
-Hello developers! 👋  
-While modern LLMs feature 1M+ context windows, stuffing raw code into prompts creates two major issues: needle-in-a-haystack retrieval degradation and severe token latency.
-
-I built **T-Zero Algorithm**, a local context engineering engine that compiles codebases into hyper-efficient AST skeletons before context ingestion.
-
-**Highlights:**
-- **Up to 94.9% context reduction:** Tested on a 237-file / 38K LOC workspace (166K raw tokens down to 8.4K tokens).
-- **10+ Languages Supported:** Zero-dependency offline parsing for Python, TypeScript, JavaScript, Go, Rust, Java, C#, C++, PHP, and Ruby.
-- **Zero-Leak Security:** Guaranteed 0-leak compliance; never sends source code to external servers for indexing.
-- Compatible with Antigravity IDE, Cursor, Claude Code, and standard MCP clients.
-
-💻 **GitHub:** https://github.com/toprakahmetaydogmus/TZeroAlgorithm  
-Check out the live interactive benchmark and let me know your thoughts!
+#### 3. 💥 Change Impact & Blast Radius Analyzer
+Calculates a 0-100 risk score and traces upstream callers across your codebase before you refactor a core function:
+```bash
+tzero --impact PolyglotTokenReducer
 ```
 
 ---
 
-## 2. 🌟 GitHub Awesome Lists Submissions (Top Priority)
+### Try It in 30 Seconds ($0.00 Cost)
 
-The MCP ecosystem is heavily cataloged by these high-star curated lists. Submitting PRs gets you indexed permanently by thousands of developers.
+You don't even need to install it locally to test it:
+- 🧪 **Interactive Google Colab:** [Run the 1-Click Demo](https://colab.research.google.com/github/toprakahmetaydogmus/TZeroAlgorithm/blob/main/notebooks/tzero_quickstart.ipynb)
+- 🌐 **Live Web Studio:** [Hugging Face Spaces](https://huggingface.co/spaces/toprakke4/tzero-token-reducer) (Powered by Zero-GPU RTX 6000)
 
-### A. [punkpeye/awesome-mcp-servers](https://github.com/punkpeye/awesome-mcp-servers) (~15k+ Stars)
-* **Category**: `Development Tools` or `Code Analysis`
-* **Entry**:
-```markdown
-- [T-Zero MCP](https://github.com/toprakahmetaydogmus/TZeroAlgorithm) - Enterprise-grade codebase context architect and token reducer for AI coding agents. Provides 47 MCP tools for AST signature pruning, 95% prompt token reduction, and 100% Zero-Leak security across 10+ programming languages.
-```
-* **PR Title**: `Add T-Zero MCP (Codebase context architect & token reducer)`
-* **PR Description**:
-```markdown
-### Summary
-Added [T-Zero MCP](https://github.com/toprakahmetaydogmus/TZeroAlgorithm) to Developer Tools / Code Analysis.
-
-T-Zero provides 47 MCP tools enabling AI coding assistants (Claude Desktop, Cursor, Antigravity, Cline) to:
-- Compress prompt context tokens by up to 95% using polyglot AST pruning (Python, TS, Rust, Go, C++, Java).
-- Enforce T-1 to T-4 architectural boundaries.
-- Provide 100% Zero-Leak secret detection before LLM transmission.
-- PyPI package: `pip install tzero-mcp` or `uvx tzero-mcp`
+Or install via pip:
+```bash
+pip install tzero-mcp --upgrade
+tzero init
 ```
 
-### B. [appcypher/awesome-mcp-servers](https://github.com/appcypher/awesome-mcp-servers)
-* **Category**: `Developer Tools`
-* **Entry**:
-```markdown
-- [toprakahmetaydogmus/TZeroAlgorithm](https://github.com/toprakahmetaydogmus/TZeroAlgorithm) - Context architect reducing codebase tokens by 95% with 47 AST & memory intelligence MCP tools.
-```
-
-### C. [wong2/awesome-mcp-servers](https://github.com/wong2/awesome-mcp-servers)
-* **Entry**:
-```markdown
-- [T-Zero Context Engine](https://github.com/toprakahmetaydogmus/TZeroAlgorithm) 🐍 🦀 - 47 tools for AI agent context engineering, AST skeletonization, and 95% token savings.
+The project is 100% free, offline, and open-source under the MIT license:
+👉 **[Star T-Zero on GitHub](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)**
 ```
 
 ---
 
-## 3. 🟠 Hacker News — "Show HN" Launch Post
+## 3. 🏆 Product Hunt Launch Kit
 
-* **Target URL**: [news.ycombinator.com/submit](https://news.ycombinator.com/submit)
-* **Best Posting Time**: Tuesday / Wednesday between 13:00 - 15:00 UTC (09:00 - 11:00 EST).
-* **Title**:
+*Submit on [producthunt.com/posts/new](https://producthunt.com/posts/new).*
+
+- **Name of Product:** `T-Zero (Token Zero)`
+- **Tagline:** `Cut AI coding token bills by 95% with deterministic ASTs & 20 MCP tools` (71 characters)
+- **Links:**
+  - Website: `https://tzero-indol.vercel.app`
+  - GitHub: `https://github.com/toprakahmetaydogmus/TZeroAlgorithm`
+  - Colab: `https://colab.research.google.com/github/toprakahmetaydogmus/TZeroAlgorithm/blob/main/notebooks/tzero_quickstart.ipynb`
+- **Pricing:** `100% Free / Open Source`
+- **Topics:** `Developer Tools`, `Artificial Intelligence`, `Open Source`, `GitHub`
+- **Short Description:**  
+  `T-Zero is a zero-dependency AST context compressor and MCP server for Cursor, Claude Desktop, and Copilot. Shrink prompt token volume by up to 95%, eliminate AI hallucinations with pre-flight reality-locks, and auto-migrate leaked secrets into .env.`
+
+- **Maker First Comment:**  
 ```text
-Show HN: T-Zero – 47 MCP tools that cut AI coding tokens by 94.9% via AST pruning
-```
-* **Text / Comment**:
-```text
-Hi HN,
+Hey Product Hunt! 👋 I'm Toprak from Siber Akademi.
 
-We built T-Zero (https://github.com/toprakahmetaydogmus/TZeroAlgorithm) to solve the context window tax in AI-assisted coding.
+We built T-Zero out of pure frustration with modern AI coding assistants. Whenever we worked on codebases with more than 30 files, Claude and Cursor would either blow past token limits, cost a fortune in API calls, or hallucinate functions that didn't exist.
 
-When feeding an entire repository into Claude 3.5 Sonnet, GPT-4o, or Gemini 1.5 Pro, 80-90% of the ingested tokens are routine function bodies, boilerplate loops, and private implementations that the model doesn't need to understand architecture or draft edits.
+Instead of building another heavy vector database, we took a compiler-grade approach: parse code into Abstract Syntax Trees, keep full implementation on the active file, and prune surrounding files to type contracts and signatures.
 
-T-Zero runs locally as a standard Model Context Protocol (MCP) server with 47 tools:
-1. Polyglot AST Skeleton Pruning: Keeps class interfaces, type signatures, and docstrings while stripping bodies across Python, TypeScript, Rust, Go, Java, and C++ (up to 94.9% token reduction).
-2. T-1 to T-4 Architectural Boundary Enforcer: Automatically injects modular rules so agents don't violate layers.
-3. 100% Zero-Leak Security Keyring: Local pre-flight regex scanner that blocks hardcoded API keys and credentials before anything hits an LLM API.
-4. Native Superdesign Orchestrator: UI/UX specification and canvas generator.
-5. Local Web Control Center: Live 4D causal graph and memory dashboard on localhost:8421.
+The result is up to 94.6% fewer tokens per prompt, near-instant responses, and zero cloud API costs.
 
-It's completely local, offline, open-source (MIT), and zero-telemetry.
+In v10.6.0, we also added:
+- Pre-Flight Reality-Lock (blocks AI hallucinations before writing to disk)
+- 1-Click Auto-Vault (moves hardcoded API keys into .env automatically)
+- Change Impact & Blast Radius analysis (0-100 risk score)
+- 20 native MCP tools for Cursor & Claude Desktop
 
-Quickstart:
-$ uvx tzero-mcp
-# or: pip install tzero-mcp
-
-Or configure in Claude Desktop / Cursor:
-{
-  "mcpServers": {
-    "tzero": {
-      "command": "uvx",
-      "args": ["tzero-mcp"]
-    }
-  }
-}
-
-Would love your thoughts, benchmark feedback, and critique!
+T-Zero is 100% free, offline forever, and open-source under the MIT license.
+Check out the live Colab playground or Hugging Face Space, and let us know what you think! 🚀
 ```
 
 ---
 
-## 4. 🔴 Reddit Technical Communities
+## 4. 💬 Discord & Community Drop Messages
 
-### A. r/LocalLLaMA (Post flair: `Tool` or `Resource`)
-* **Title**: `We open-sourced T-Zero: 47 MCP tools to compress codebase context by 95% for local & cloud models`
-* **Content**:
-```markdown
-Hey everyone! One of the biggest challenges with agentic coding (whether using local models via Ollama/vLLM or frontier models) is blowing out context limits and paying massive token penalties for full repos.
+### A. Cursor Discord (`#showcase` or `#tools` channel)
+```text
+Hey everyone! 👋 Built an open-source tool for Cursor that solves the context-window bloat & hallucination problem on large repos:
 
-We built **T-Zero** (https://github.com/toprakahmetaydogmus/TZeroAlgorithm), an open-source MCP server that gives Cursor, Claude Desktop, and Cline 47 specialized context-architect tools:
+**T-Zero** parses your codebase into AST signatures, reducing prompt tokens by up to 95% without vector DBs or paid APIs. It also includes a Pre-Flight Reality-Lock that catches hallucinated method calls before Cursor writes them to disk.
 
-- **AST Skeleton Pruning**: Drops function bodies, keeps typed signatures. Works across Python, Rust, Go, TypeScript, Java, C++.
-- **Zero-Cost Local Execution**: Runs 100% offline via native AST/regex, no external embeddings or extra LLM calls required.
-- **100% Zero-Leak Protection**: Prevents accidental leakage of `.env` secrets, API keys, or JWTs.
-- **Interactive Terminal Benchmark**: View exact token savings offline before feeding code to models.
+- 1-Click setup: `pip install tzero-mcp && tzero init`
+- Interactive Colab Lab: https://colab.research.google.com/github/toprakahmetaydogmus/TZeroAlgorithm/blob/main/notebooks/tzero_quickstart.ipynb
+- Repo: https://github.com/toprakahmetaydogmus/TZeroAlgorithm
 
-PyPI package: `pip install tzero-mcp` or `uvx tzero-mcp`
+100% free & local. Would love your feedback! ⭐
+```
+
+### B. Anthropic Developer Discord (`#mcp-showcase` channel)
+```text
+Hey folks! Sharing our 20-tool open-source MCP server for Claude Desktop & AI coding assistants: **T-Zero**.
+
+It provides deterministic AST context compression (up to 95% prompt reduction), pre-flight hallucination detection, 1-click secret auto-vaulting, and architectural blast radius scoring.
+
+- GitHub: https://github.com/toprakahmetaydogmus/TZeroAlgorithm
+- Glama MCP Registry: https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm
+- Live HF Space (RTX 6000 Zero-GPU): https://huggingface.co/spaces/toprakke4/tzero-token-reducer
+
+Would love to hear how it performs on your enterprise repos!
+```
+
+### C. LocalLLaMA Discord (`#projects` or `#showcase`)
+```text
+Built a 100% offline, local context engineering tool for people running local models with limited context windows (8k-32k):
+
+**T-Zero** uses native AST pruning to compress repository context by 90-95% before feeding it into your local LLM. No cloud APIs, no embedding models required.
+
+Includes AST skeletonizer, Shannon entropy secret filter, and pre-flight contract verification.
+
 GitHub: https://github.com/toprakahmetaydogmus/TZeroAlgorithm
-
-Check it out and let us know what features you want next!
+Colab: https://colab.research.google.com/github/toprakahmetaydogmus/TZeroAlgorithm/blob/main/notebooks/tzero_quickstart.ipynb
 ```
-
-### B. r/Cursor & r/ClaudeAI
-* **Title**: `Cut Cursor / Claude Desktop token costs by 94.9% using this open-source MCP server (47 tools)`
-* **Focus**: Show the token difference before/after on a standard 100,000-token repository (166k tokens -> 8.4k tokens, $0.40 per prompt -> $0.02 per prompt).
 
 ---
 
-## 5. 🐦 X / Twitter Developer Launch Thread
+## 5. ⚡ GitHub Marketplace One-Click Action Publication
 
-* **Post 1 (Hook)**:
-```text
-Tired of burning 100,000+ tokens every time your AI coding assistant reads a repo? 💸
+Because `action.yml` is in the repository root, you can publish `T-Zero` directly to the **GitHub Marketplace** for $0.00:
+1. Go to your repo: `https://github.com/toprakahmetaydogmus/TZeroAlgorithm`
+2. You will see a banner: *"Use this Action in your workflow or release it to the GitHub Marketplace"*.
+3. Click **"Draft a release"** or edit `v10.6.0`.
+4. Check the box: **"Publish this Action to the GitHub Marketplace"**.
+5. Category: Select `Code quality` and `Security`.
+6. Click **Save and Publish**.
 
-We just launched T-Zero v7.3.1: an open-source MCP server with 47 tools that cuts codebase token consumption by up to 94.9% using AST skeleton pruning.
-
-100% offline. Zero cloud spend.
-
-Thread 🧵👇
-```
-
-* **Post 2 (Features)**:
-```text
-What T-Zero does:
-⚡ Polyglot AST Pruning: Keeps signatures & types, strips bodies (Python, TS, Rust, Go, C++)
-🛡️ 100% Zero-Leak Keyring: Prevents secrets from ever reaching LLMs
-🎨 Native Superdesign Orchestrator for UI/UX specifications
-🛰️ Built-in Cyberpunk Dashboard on localhost:8421
-```
-
-* **Post 3 (Installation & Link)**:
-```text
-Install in 5 seconds without cloning:
-$ uvx tzero-mcp
-
-Compatible with Cursor, Claude Desktop, Antigravity, and Cline.
-
-⭐ Star the repo on GitHub:
-https://github.com/toprakahmetaydogmus/TZeroAlgorithm
-```
+Now millions of GitHub developers can search for `T-Zero` directly inside the GitHub Marketplace!
