@@ -29,6 +29,9 @@ Yapay zeka modellerine tüm kaynak kodlar metin olarak verildiğinde, fonksiyon 
 # Kurulum:
 pip install tzero-mcp --upgrade
 
+# ⚡ Canlı İnteraktif Demo (AST sıkıştırma ve Reality-Lock'u 0.5 saniyede görün):
+tzero demo
+
 # 1 saniyede tüm IDE'leri otomatik yapılandır:
 tzero init
 

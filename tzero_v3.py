@@ -8320,6 +8320,99 @@ def run_review_cli(target_dir: str = ".", ref: str = "auto") -> bool:
         return False
 
 
+def run_demo_cli():
+    """Runs a 100ms instant live interactive demonstration of T-Zero core engines."""
+    import time
+    from tzero_features import ZeroHallucinationGuard
+    from tzero_security import ZeroLeakEngine
+    from tzero_polyglot import PolyglotTokenReducer
+
+    sample_code = '''import os
+import sys
+from dataclasses import dataclass
+from typing import List, Optional, Dict, Any
+
+@dataclass
+class UserSession:
+    user_id: str
+    auth_token: str
+    roles: List[str]
+
+    def has_permission(self, role: str) -> bool:
+        if not self.roles:
+            return False
+        return role in self.roles
+
+class AutonomousPaymentGateway:
+    """Enterprise payment processor service handling transactions."""
+    def __init__(self, api_key: str, endpoint: str = "https://api.gateway.internal"):
+        self.api_key = api_key
+        self.endpoint = endpoint
+        self._retry_count = 3
+
+    def process_transaction(self, session: UserSession, amount_cents: int, currency: str = "USD") -> Dict[str, Any]:
+        """Validates session credentials and routes transaction to banking network."""
+        if not session.has_permission("billing_admin"):
+            raise PermissionError("Unauthorized billing operation")
+        return {"status": "success", "tx_id": "tx_99841", "amount": amount_cents}
+'''
+
+    print("\033[36m" + "=" * 80)
+    print("⚡ [T-ZERO CONTEXT ARCHITECT: LIVE INSTANT DEMONSTRATION]")
+    print("=" * 80 + "\033[0m\n")
+
+    t0 = time.perf_counter()
+    pruned, _ = TokenReducer.reduce_content("gateway.py", sample_code, mode="ultra")
+    dt_ms = (time.perf_counter() - t0) * 1000
+
+    raw_tokens = max(1, len(sample_code) // 4)
+    pruned_tokens = max(1, len(pruned) // 4)
+    savings = (1 - pruned_tokens / raw_tokens) * 100
+
+    print("\033[1m📁 1. Original Code (What developer/LLM wrote):\033[0m")
+    print("\033[90m" + "-" * 80)
+    for line in sample_code.strip().splitlines()[:11]:
+        print(f"  {line}")
+    print("  ... [18 lines of implementation omitted] ...")
+    print("-" * 80 + "\033[0m")
+    print(f"📊 Raw Footprint: {len(sample_code.splitlines())} lines | ~{raw_tokens} tokens\n")
+
+    print("\033[1m⚡ 2. T-Zero AST Compressed Skeleton (What LLM receives):\033[0m")
+    print("\033[32m" + "-" * 80)
+    for line in pruned.strip().splitlines():
+        print(f"  {line}")
+    print("-" * 80 + "\033[0m")
+    print(f"🎯 Pruned Footprint: {len(pruned.splitlines())} lines | ~{pruned_tokens} tokens")
+    print(f"\033[1m\033[32m🚀 AST Token Reduction: -{savings:.1f}% savings in {dt_ms:.2f}ms!\033[0m\n")
+
+    # Anti-Hallucination Demo
+    print("\033[1m🧠 3. Pre-Flight Reality-Lock Guard Test:\033[0m")
+    fake_code = "from tzero_features import NonExistentModuleClass123; NonExistentModuleClass123.fake_call()"
+    guard = ZeroHallucinationGuard(".")
+    res = guard.validate_code(fake_code)
+    print("   Input: `from tzero_features import NonExistentModuleClass123`")
+    if not res["passed"]:
+        print(f"   Result: \033[31m[BLOCKED]\033[0m {res['violations'][0]}")
+    else:
+        print("   Result: [PASSED]")
+
+    # Zero-Leak Security Demo
+    print("\n\033[1m🛡️ 4. Zero-Leak Shannon Entropy Security Scan:\033[0m")
+    dummy_pfx = "sk-ant-api" + "03"
+    dummy_text = f"API_KEY = \"{dummy_pfx}-abcdef1234567890abcdef1234567890abcdef12345\""
+    findings = ZeroLeakEngine.scan_text(dummy_text)
+    print(f"   Input: `API_KEY = \"{dummy_pfx}-...\"`")
+    if findings:
+        print(f"   Result: \033[31m[INTERCEPTED]\033[0m Detected {findings[0].provider} ({findings[0].description})")
+    else:
+        print("   Result: [PASSED]")
+
+    print("\n\033[36m" + "=" * 80)
+    print("✅ [T-ZERO DEMO COMPLETE] Ready to optimize your codebase context & IDEs!")
+    print("💡 Run `tzero init` to connect to Cursor, Claude Desktop, Antigravity & Windsurf.")
+    print("=" * 80 + "\033[0m\n")
+
+
 def run_dry_run_cli(target_dir: str, output_path: str):
     target_dir = os.path.abspath(target_dir)
     print(f"\n\033[1m\033[36m=== T-ZERO OFFLINE CONTEXT BUILDER (DRY-RUN) ===\033[0m")
@@ -8545,6 +8638,7 @@ def main():
     parser.add_argument("--format", choices=["text", "json", "sarif"], default="text", help="Output format for audit/scan reports (default: text)")
     parser.add_argument("--pr-report", nargs="?", const="HEAD~1", default=None, metavar="REF", help="Generate GitHub PR summary report with Blast Radius and Security tables")
     parser.add_argument("--review", nargs="?", const="auto", default=None, metavar="REF", help="Run autonomous pre-commit & PR review (Zero-Leak, Reality-Lock & Blast Radius)")
+    parser.add_argument("--demo", action="store_true", help="Run instant live interactive demonstration of AST compression, Reality-Lock & Zero-Leak")
     parser.add_argument("--mcp", action="store_true", help="Start Model Context Protocol (MCP) stdio server for Cursor/Claude/Antigravity")
     parser.add_argument("--init", nargs="?", const="auto", default=None, metavar="CLIENT", help="1-Click MCP initialization for Cursor, Claude, Windsurf, VS Code, etc. (e.g. --init cursor, --init all)")
     parser.add_argument("--add-mcp", action="store_true", help="Install T-Zero MCP server into Cursor, Claude Desktop, Antigravity, VS Code, etc.")
@@ -8813,6 +8907,7 @@ Every star means the world to a young open-source developer! 🚀
             "explain": "--explain",
             "review": "--review",
             "watch": "--watch",
+            "demo": "--demo",
         }
         if sub in sub_map:
             sys.argv[1] = sub_map[sub]
@@ -9126,6 +9221,9 @@ Every star means the world to a young open-source developer! 🚀
         target_ref = args.review if args.review != "auto" else "auto"
         clean = run_review_cli(args.dir, target_ref)
         sys.exit(0 if clean else 1)
+    elif getattr(args, "demo", False):
+        run_demo_cli()
+        return
     elif args.apply_patch is not None:
         from tzero_patch import ASTFuzzyPatcher, patch_file
         patch_arg = args.apply_patch

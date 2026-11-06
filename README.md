@@ -62,6 +62,9 @@ irm https://raw.githubusercontent.com/toprakahmetaydogmus/TZeroAlgorithm/main/in
 # 📦 Option B: Standard Python package:
 pip install tzero-mcp --upgrade
 
+# ⚡ Instant Live Interactive Demo (See AST pruning & Reality-Lock in 0.5s):
+tzero demo
+
 # 🚀 Turnkey 1-click configure Cursor, Claude, Antigravity, Windsurf, Cline:
 tzero init
 

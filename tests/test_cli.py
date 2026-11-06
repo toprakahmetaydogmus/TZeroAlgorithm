@@ -151,6 +151,18 @@ class TestCLI(unittest.TestCase):
         self.assertEqual(res_rev.returncode, 0)
         self.assertIn("T-ZERO AUTONOMOUS CODE REVIEW & REALITY-LOCK GATE", res_rev.stdout)
 
+        # 6. 'tzero demo' should run live instant demo
+        res_demo = subprocess.run(
+            [sys.executable, "tzero_v3.py", "demo"],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace"
+        )
+        self.assertEqual(res_demo.returncode, 0)
+        self.assertIn("LIVE INSTANT DEMONSTRATION", res_demo.stdout)
+        self.assertIn("AST Token Reduction", res_demo.stdout)
+
 
 if __name__ == "__main__":
     unittest.main()
