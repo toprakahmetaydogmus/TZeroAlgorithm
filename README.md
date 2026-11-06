@@ -70,6 +70,9 @@ tzero --vault --migrate
 # ⚡ Live Background Watcher (Auto-updates AST context on file save):
 tzero --watch
 
+# 🔍 Autonomous Pre-Commit & PR Reality-Lock Gate:
+tzero review
+
 # 🧩 Option C: Official Global Package Managers
 # VS Code / Cursor Marketplace:
 code --install-extension siber-akademi.tzero-vscode

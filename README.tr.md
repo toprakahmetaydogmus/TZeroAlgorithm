@@ -38,6 +38,9 @@ tzero --vault --migrate
 # Canlı Arka Plan İzleyicisi (Dosya kaydettikçe AST bağlamını otomatik yeniler):
 tzero --watch
 
+# Otonom Commit Öncesi ve PR Güvenlik Kapısı:
+tzero review
+
 # (İsteğe bağlı) Resmi VS Code Marketplace üzerinden kur:
 code --install-extension siber-akademi.tzero-vscode
 # Veya yerel (.vsix) paketini yükle:

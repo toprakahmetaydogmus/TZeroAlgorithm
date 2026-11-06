@@ -140,6 +140,17 @@ class TestCLI(unittest.TestCase):
         self.assertEqual(res_drift.returncode, 0)
         self.assertIn("INSTRUCTION & ARCHITECTURAL DRIFT ANALYZER", res_drift.stdout)
 
+        # 5. 'tzero review' should run autonomous code review gate
+        res_rev = subprocess.run(
+            [sys.executable, "tzero_v3.py", "review"],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace"
+        )
+        self.assertEqual(res_rev.returncode, 0)
+        self.assertIn("T-ZERO AUTONOMOUS CODE REVIEW & REALITY-LOCK GATE", res_rev.stdout)
+
 
 if __name__ == "__main__":
     unittest.main()

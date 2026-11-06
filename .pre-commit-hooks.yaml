@@ -5,6 +5,13 @@
   language: python
   pass_filenames: false
 
+- id: tzero-review
+  name: T-Zero Autonomous Code Review & Reality-Lock Gate
+  description: Autonomous pre-commit review verifying Zero-Leak security, Pre-Flight Reality-Lock, and Blast Radius
+  entry: tzero review
+  language: python
+  pass_filenames: false
+
 - id: tzero-audit
   name: T-Zero Code Quality & Security Audit
   description: AST static analysis, code smell detection, and zero hardcoded secrets verification

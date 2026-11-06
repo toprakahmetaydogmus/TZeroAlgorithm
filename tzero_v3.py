@@ -8169,6 +8169,157 @@ def run_pr_report_cli(target_dir: str, base_ref: str = "HEAD~1"):
             pass
 
 
+def run_review_cli(target_dir: str = ".", ref: str = "auto") -> bool:
+    """Autonomous Pre-Commit & Pull Request Reviewer.
+    Inspects git diff (working tree or target ref), runs:
+    1. Zero-Leak Security Audit on added lines.
+    2. Pre-Flight Reality-Lock on added imports.
+    3. Blast Radius impact analysis on modified symbols.
+    Exits with code 0 if clean, or code 1 if critical violations found.
+    """
+    target_dir = os.path.abspath(target_dir)
+    import subprocess
+    from tzero_security import ZeroLeakEngine
+    from tzero_features import ZeroHallucinationGuard, ChangeImpactAnalyzer
+
+    print("\033[36m" + "=" * 80)
+    print("🔍 [T-ZERO AUTONOMOUS CODE REVIEW & REALITY-LOCK GATE]")
+    print("=" * 80 + "\033[0m")
+
+    diff_cmd = ["git", "diff"]
+    if ref and ref != "auto":
+        diff_cmd.append(ref)
+
+    try:
+        p = subprocess.run(diff_cmd, cwd=target_dir, capture_output=True, text=True, errors="replace")
+        diff_text = p.stdout
+    except Exception:
+        diff_text = ""
+
+    if not diff_text.strip() and (ref == "auto" or not ref):
+        try:
+            p = subprocess.run(["git", "diff", "HEAD~1"], cwd=target_dir, capture_output=True, text=True, errors="replace")
+            diff_text = p.stdout
+            ref_label = "HEAD~1 (last commit)"
+        except Exception:
+            ref_label = "working tree"
+    else:
+        ref_label = "uncommitted working tree" if (ref == "auto" or not ref) else ref
+
+    if not diff_text.strip():
+        print(f"\033[32m[INFO] No changes detected in {ref_label}. Codebase is in sync.\033[0m")
+        return True
+
+    added_lines = []
+    added_code_lines = []
+    changed_files = set()
+    current_file = None
+
+    for line in diff_text.splitlines():
+        if line.startswith("+++ b/"):
+            current_file = line[6:].strip()
+            changed_files.add(current_file)
+        elif line.startswith("+") and not line.startswith("+++"):
+            content = line[1:]
+            added_lines.append(content)
+            if current_file and current_file.endswith(".py"):
+                added_code_lines.append(content)
+
+    full_added_text = "\n".join(added_lines)
+    full_added_code = "\n".join(added_code_lines)
+
+    sec_findings = ZeroLeakEngine.scan_text(full_added_text)
+
+    guard = ZeroHallucinationGuard(target_dir)
+    hallucination_violations = []
+    for line in added_lines:
+        line_s = line.strip()
+        if line_s.startswith("import ") or line_s.startswith("from "):
+            try:
+                parsed_imp = ast.parse(line_s)
+                for node in ast.walk(parsed_imp):
+                    if isinstance(node, ast.Import):
+                        for alias in node.names:
+                            base = alias.name.split('.')[0]
+                            if (base not in guard.stdlib_modules and 
+                                base not in guard.declared_packages and 
+                                base not in guard.installed_packages and 
+                                base not in guard.modules and 
+                                base not in ("typing", "collections", "setuptools", "os", "sys")):
+                                hallucination_violations.append(f"Ghost Dependency: Package '{base}' is not in stdlib or dependencies")
+                    elif isinstance(node, ast.ImportFrom):
+                        if node.module:
+                            base = node.module.split('.')[0]
+                            if base in guard.modules:
+                                avail = guard.exported_symbols.get(node.module, guard.exported_symbols.get(base, set()))
+                                for alias in node.names:
+                                    if alias.name != '*' and alias.name not in avail:
+                                        hallucination_violations.append(f"Workspace Import Hallucination: '{alias.name}' does not exist in '{node.module}'")
+                            elif (base not in guard.stdlib_modules and 
+                                  base not in guard.declared_packages and 
+                                  base not in guard.installed_packages and 
+                                  base not in ("typing", "collections", "setuptools", "os", "sys")):
+                                hallucination_violations.append(f"Ghost Dependency: Package '{base}' is not in stdlib or dependencies")
+            except Exception:
+                pass
+
+    analyzer = ChangeImpactAnalyzer(target_dir)
+    impact_items = []
+    for f in list(changed_files)[:5]:
+        fp = os.path.join(target_dir, f)
+        if os.path.exists(fp) and f.endswith(".py"):
+            symbols = []
+            try:
+                with open(fp, "r", encoding="utf-8", errors="ignore") as f_obj:
+                    parsed_tree = ast.parse(f_obj.read())
+                for node in ast.walk(parsed_tree):
+                    if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                        symbols.append(node.name)
+            except Exception:
+                pass
+            for s in symbols[:3]:
+                imp = analyzer.analyze_symbol(s)
+                if imp:
+                    score = imp.get("blast_score", imp.get("risk_score", 0))
+                    level = imp.get("risk_level", "LOW")
+                    impact_items.append((s, score, level))
+
+    passed = (len(sec_findings) == 0) and (len(hallucination_violations) == 0)
+
+    print(f"📁 Target Scope : {len(changed_files)} file(s) changed in {ref_label}")
+    print(f"📊 Net Addition : {len(added_lines)} added line(s)")
+    print("-" * 80)
+
+    if not sec_findings:
+        print("🛡️ Zero-Leak Security      : \033[32m[PASSED]\033[0m 0 secrets detected")
+    else:
+        print(f"🛡️ Zero-Leak Security      : \033[31m[FAILED]\033[0m {len(sec_findings)} secret leak(s) detected!")
+        for sf in sec_findings:
+            print(f"   \033[31m• [{sf.provider}] {sf.description} -> {sf.preview}\033[0m")
+
+    if not hallucination_violations:
+        print("🧠 Pre-Flight Reality-Lock : \033[32m[PASSED]\033[0m 0 hallucinated imports")
+    else:
+        print(f"🧠 Pre-Flight Reality-Lock : \033[31m[FAILED]\033[0m {len(hallucination_violations)} hallucination(s) detected!")
+        for v in hallucination_violations:
+            print(f"   \033[31m• {v}\033[0m")
+
+    if impact_items:
+        max_score = max(item[1] for item in impact_items)
+        max_level = "CRITICAL" if max_score >= 80 else ("HIGH" if max_score >= 50 else "MODERATE")
+        print(f"💥 Max Blast Radius Score  : {max_score}/100 ({max_level})")
+    else:
+        print("💥 Max Blast Radius Score  : 0/100 (LOW)")
+
+    print("-" * 80)
+    if passed:
+        print("\033[32m✅ [STATUS: APPROVED] Changes meet all Zero-Leak & Reality-Lock standards. Safe to commit/merge!\033[0m\n")
+        return True
+    else:
+        print("\033[31m🛑 [STATUS: BLOCKED] Critical security or hallucination violations detected. Fix before committing.\033[0m\n")
+        return False
+
+
 def run_dry_run_cli(target_dir: str, output_path: str):
     target_dir = os.path.abspath(target_dir)
     print(f"\n\033[1m\033[36m=== T-ZERO OFFLINE CONTEXT BUILDER (DRY-RUN) ===\033[0m")
@@ -8393,6 +8544,7 @@ def main():
     parser.add_argument("--web", "--dashboard", nargs="?", const=8421, type=int, default=None, metavar="PORT", dest="web", help="Launch local web dashboard on localhost:8421")
     parser.add_argument("--format", choices=["text", "json", "sarif"], default="text", help="Output format for audit/scan reports (default: text)")
     parser.add_argument("--pr-report", nargs="?", const="HEAD~1", default=None, metavar="REF", help="Generate GitHub PR summary report with Blast Radius and Security tables")
+    parser.add_argument("--review", nargs="?", const="auto", default=None, metavar="REF", help="Run autonomous pre-commit & PR review (Zero-Leak, Reality-Lock & Blast Radius)")
     parser.add_argument("--mcp", action="store_true", help="Start Model Context Protocol (MCP) stdio server for Cursor/Claude/Antigravity")
     parser.add_argument("--init", nargs="?", const="auto", default=None, metavar="CLIENT", help="1-Click MCP initialization for Cursor, Claude, Windsurf, VS Code, etc. (e.g. --init cursor, --init all)")
     parser.add_argument("--add-mcp", action="store_true", help="Install T-Zero MCP server into Cursor, Claude Desktop, Antigravity, VS Code, etc.")
@@ -8659,6 +8811,8 @@ Every star means the world to a young open-source developer! 🚀
             "pc-fixer": "--pc-fixer",
             "fixer": "--pc-fixer",
             "explain": "--explain",
+            "review": "--review",
+            "watch": "--watch",
         }
         if sub in sub_map:
             sys.argv[1] = sub_map[sub]
@@ -8968,6 +9122,10 @@ Every star means the world to a young open-source developer! 🚀
         print(res["markdown"])
     elif args.pr_report is not None:
         run_pr_report_cli(args.dir, args.pr_report)
+    elif getattr(args, "review", None) is not None:
+        target_ref = args.review if args.review != "auto" else "auto"
+        clean = run_review_cli(args.dir, target_ref)
+        sys.exit(0 if clean else 1)
     elif args.apply_patch is not None:
         from tzero_patch import ASTFuzzyPatcher, patch_file
         patch_arg = args.apply_patch
