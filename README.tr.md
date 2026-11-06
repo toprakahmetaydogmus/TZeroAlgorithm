@@ -35,7 +35,9 @@ tzero init
 # Sızıntıları otomatik .env dosyasına taşı:
 tzero --vault --migrate
 
-# (İsteğe bağlı) VS Code & Cursor Eklentisini (.vsix) yükle:
+# (İsteğe bağlı) Resmi VS Code Marketplace üzerinden kur:
+code --install-extension siber-akademi.tzero-vscode
+# Veya yerel (.vsix) paketini yükle:
 code --install-extension dist/tzero-vscode-10.6.0.vsix
 
 # Kod tabanını sıkıştır ve ağaç çıkar:

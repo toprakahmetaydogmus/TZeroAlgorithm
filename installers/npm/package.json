@@ -1,0 +1,36 @@
+{
+  "name": "tzero-mcp",
+  "version": "10.6.0",
+  "description": "Deterministic AST Context Compressor, 95% Token Reducer & 20-Tool MCP Server for Cursor, Claude Desktop & Copilot.",
+  "main": "index.js",
+  "bin": {
+    "tzero": "bin/tzero.js",
+    "tzero-mcp": "bin/tzero-mcp.js"
+  },
+  "scripts": {
+    "test": "node bin/tzero.js --version"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git"
+  },
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "cursor",
+    "claude",
+    "claude-desktop",
+    "token-reduction",
+    "ast-pruning",
+    "context-window",
+    "ai-coding",
+    "antigravity",
+    "windsurf"
+  ],
+  "author": "Toprak Ahmet Aydoğmuş (Siber Akademi) <siberakademi@org.tr> (https://github.com/toprakahmetaydogmus)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/issues"
+  },
+  "homepage": "https://github.com/toprakahmetaydogmus/TZeroAlgorithm#readme"
+}
