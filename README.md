@@ -29,6 +29,7 @@
 
 [![PyPI Downloads](https://img.shields.io/badge/%F0%9F%93%A5%20Total%20PyPI%20Downloads-17%2C387%2B-38bdf8?style=for-the-badge&logo=pypi&logoColor=white)](https://pypistats.org/packages/tzero-mcp)
 [![VS Code Marketplace](https://img.shields.io/visual-studio-marketplace/v/siber-akademi.tzero-vscode?style=for-the-badge&logo=visual-studio-code&logoColor=white&label=VS%20Code%20Marketplace&color=007ACC)](https://marketplace.visualstudio.com/items?itemName=siber-akademi.tzero-vscode)
+[![Smithery Badge](https://smithery.ai/badge/@toprakahmetaydogmus/TZeroAlgorithm)](https://smithery.ai/server/@toprakahmetaydogmus/TZeroAlgorithm)
 [![Git Clones](https://img.shields.io/badge/%F0%9F%9A%80%20Repository%20Clones-1%2C275%20(14d)-10b981?style=for-the-badge&logo=git&logoColor=white)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)
 [![Glama Grade A](https://img.shields.io/badge/%E2%9A%A1%20Glama%20MCP-Grade%20A%20Verified-8b5cf6?style=for-the-badge&logo=checkmarx&logoColor=white)](https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm)
 
@@ -65,8 +66,18 @@ tzero init
 # 🔐 1-Click Auto-Vault secrets into .env:
 tzero --vault --migrate
 
-# 🧩 (Optional) Install official VS Code / Cursor Extension (.vsix):
-code --install-extension dist/tzero-vscode-10.6.0.vsix
+# 🧩 Option C: Official Global Package Managers
+# VS Code / Cursor Marketplace:
+code --install-extension siber-akademi.tzero-vscode
+
+# macOS / Linux (Homebrew):
+brew tap toprakahmetaydogmus/tzero && brew install tzero
+
+# Windows (Scoop):
+scoop bucket add tzero https://github.com/toprakahmetaydogmus/scoop-tzero && scoop install tzero
+
+# 1-Click MCP Install via Smithery:
+npx -y @smithery/cli install @toprakahmetaydogmus/TZeroAlgorithm --client claude
 ```
 
 ### 🧭 Navigation & Interactive Jump Stations
