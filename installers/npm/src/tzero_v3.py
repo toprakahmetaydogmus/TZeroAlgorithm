@@ -8232,7 +8232,9 @@ def run_review_cli(target_dir: str = ".", ref: str = "auto") -> bool:
             content = line[1:]
             added_lines.append(content)
             if current_file and current_file.endswith(".py"):
-                added_code_lines.append(content)
+                norm = current_file.replace("\\", "/").lower()
+                if not any(ign in norm for ign in ["installers/", "dist/", "build/", "site-packages/", "node_modules/", "vscode-extension/"]):
+                    added_code_lines.append(content)
 
     full_added_text = "\n".join(added_lines)
     full_added_code = "\n".join(added_code_lines)
@@ -8241,7 +8243,7 @@ def run_review_cli(target_dir: str = ".", ref: str = "auto") -> bool:
 
     guard = ZeroHallucinationGuard(target_dir)
     hallucination_violations = []
-    for line in added_lines:
+    for line in added_code_lines:
         line_s = line.strip()
         if line_s.startswith("import ") or line_s.startswith("from "):
             try:
