@@ -94,7 +94,8 @@ class TestTurboAccelerator(unittest.TestCase):
 
     def test_status_report(self):
         report = self.turbo.format_status_report()
-        self.assertIn("KAMÇILAMA / BURST ACCELERATOR", report)
+        self.assertIn("TURBO OVERDRIVE", report)
+        self.assertIn("BURST ACCELERATOR", report)
         self.assertIn("Worker Threads Pool", report)
         self.assertIn("Fast-Path In-Memory", report)
 
@@ -104,10 +105,13 @@ class TestTurboAccelerator(unittest.TestCase):
             [sys.executable, "tzero_v3.py", "--turbo"],
             capture_output=True,
             text=True,
+            encoding="utf-8",
+            errors="replace",
             cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         )
         self.assertEqual(proc.returncode, 0)
-        self.assertIn("KAMÇILAMA", proc.stdout)
+        self.assertIn("TURBO OVERDRIVE", proc.stdout)
+        self.assertIn("BURST ACCELERATOR", proc.stdout)
 
     def test_cli_kamcilama_alias(self):
         # Test CLI --kamcilama alias
@@ -115,10 +119,13 @@ class TestTurboAccelerator(unittest.TestCase):
             [sys.executable, "tzero_v3.py", "--kamcilama"],
             capture_output=True,
             text=True,
+            encoding="utf-8",
+            errors="replace",
             cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         )
         self.assertEqual(proc.returncode, 0)
-        self.assertIn("KAMÇILAMA", proc.stdout)
+        self.assertIn("TURBO OVERDRIVE", proc.stdout)
+        self.assertIn("BURST ACCELERATOR", proc.stdout)
 
 
 if __name__ == "__main__":
