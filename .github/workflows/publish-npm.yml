@@ -19,10 +19,16 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
 
       - name: Publish package to npm
-        if: env.NODE_AUTH_TOKEN != ''
+        if: ${{ secrets.NPM_TOKEN != '' }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           cd installers/npm
-          npm publish --access public
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          REMOTE_VERSION=$(npm view tzero-mcp version 2>/dev/null || echo "0.0.0")
+          if [ "$PACKAGE_VERSION" = "$REMOTE_VERSION" ]; then
+            echo "Version $PACKAGE_VERSION is already published on npm. Skipping."
+          else
+            npm publish --access public
+          fi
 

@@ -1,12 +1,12 @@
 {
-  "version": "10.7.0",
+  "version": "10.7.4",
   "description": "Enterprise-Grade AST Codebase Context Architect, Token Reducer & PC-Fixer Doctor",
   "homepage": "https://tzero-indol.vercel.app",
   "license": "MIT",
   "architecture": {
     "64bit": {
-      "url": "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/download/v10.7.0/TZeroAlgorithm.exe",
-      "hash": "112135c805521bdc09b165037b6ce3e7e8b4705f9933306949f05ee18c04d596",
+      "url": "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/download/v10.7.4/TZeroAlgorithm.exe",
+      "hash": "e38b03b31a1c786324a39321252aef407b2296a4adf0dd6823eaca643f90bf5c",
       "bin": [
         [
           "TZeroAlgorithm.exe",
@@ -22,9 +22,8 @@
   "autoupdate": {
     "architecture": {
       "64bit": {
-        "url": "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/download/v$version/tzero_mcp-$version-py3-none-any.whl"
+        "url": "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/download/v$version/TZeroAlgorithm.exe"
       }
     }
   }
 }
-
