@@ -96,6 +96,7 @@ npx -y @smithery/cli install @toprakahmetaydogmus/TZeroAlgorithm --client claude
 
 ### 🧭 Navigation & Interactive Jump Stations
 
+[![Technical Whitepaper](https://img.shields.io/badge/%F0%9F%93%91%20Scientific%20Whitepaper-v10.7%20Specification-0284c7?style=for-the-badge&logo=googledocs&logoColor=white)](docs/WHITE_PAPER_TZERO_V10.md)
 [![T-Zero PC-Fixer](https://img.shields.io/badge/T--Zero%20PC--Fixer-12%2C200%2B%20Lines%20Doctor-purple?style=for-the-badge&logo=shield&logoColor=white)](https://github.com/toprakahmetaydogmus/tzero-pc-fixer)
 
 [![TDQS 5.0 Anchor](https://img.shields.io/badge/TDQS_5.0-Anchor_Certified-10b981?style=for-the-badge&logo=checkmarx&logoColor=white)](#tdqs-certification)

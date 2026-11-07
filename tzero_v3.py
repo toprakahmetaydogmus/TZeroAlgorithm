@@ -1640,7 +1640,8 @@ class TokenReducer:
 
     @staticmethod
     def _reduce_python(code: str, mode: str) -> str:
-        if mode.lower() == "ultra":
+        mode_clean = mode.lower()
+        if mode_clean in ("ultra", "balanced", "adaptive", "contract"):
             try:
                 tree = ast.parse(code)
             except (SyntaxError, ValueError):
@@ -1671,6 +1672,14 @@ class TokenReducer:
                                     c_start = child.lineno
                                     c_end = getattr(child, "end_lineno", child.lineno) or child.lineno
                                     preserved_lines.update(range(c_start, c_end + 1))
+
+                        # In balanced / adaptive / contract mode: also preserve the docstring summary!
+                        if mode_clean in ("balanced", "adaptive", "contract"):
+                            doc = ast.get_docstring(node, clean=False)
+                            if doc and first_body:
+                                d_start = first_body.lineno
+                                d_end = getattr(first_body, "end_lineno", first_body.lineno) or first_body.lineno
+                                preserved_lines.update(range(d_start, min(d_start + 2, d_end + 1)))
 
                     elif isinstance(node, (ast.Import, ast.ImportFrom)):
                         start_line = node.lineno
@@ -8684,7 +8693,7 @@ def main():
     parser.add_argument("--snapshot", nargs="?", const=".", default=None, metavar="DIR", help="Pre-compute sub-8ms AST context snapshot cache (.tzero/snapshot.json)")
     parser.add_argument("--fix", metavar="FILE_OR_CODE", default=None, help="Self-healing AST auto-corrector for hallucinated AI methods and phantom imports")
     parser.add_argument("--bridge", metavar="FILE", default=None, help="Polyglot type & schema transpiler: convert Python models to TS, Rust, or Go")
-    parser.add_argument("--bridge-lang", choices=["ts", "rust", "go", "all"], default="ts", help="Target language for --bridge (default: ts)")
+    parser.add_argument("--bridge-lang", choices=["ts", "rust", "go", "kt", "swift", "all"], default="ts", help="Target language for --bridge (ts, rust, go, kt, swift, all)")
     parser.add_argument("--replay", nargs="?", const=15, type=int, default=None, metavar="COMMITS", help="Historical git token and financial ROI replay (default: 15 commits)")
     parser.add_argument("--pc-fixer", "--fixer", nargs="?", const=".", default=None, metavar="DIR", help="Autonomous self-healing PC & codebase doctor (heal syntax, imports, venv, caches)")
     parser.add_argument("--explain", metavar="FILE", default=None, help="Generate high-density AST architectural passport for file or LLM prompt")

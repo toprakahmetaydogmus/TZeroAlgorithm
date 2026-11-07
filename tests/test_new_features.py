@@ -127,6 +127,18 @@ val = calculate_token_savings(100, 20)
         self.assertIn("Username string", go_out)
         self.assertIn("Email *string", go_out)
 
+        # Kotlin check
+        kt_out = PolyglotTypeBridge.transpile_file(self.sample_py, "kt")
+        self.assertIn("data class UserProfile(", kt_out)
+        self.assertIn("val username: String", kt_out)
+        self.assertIn("val email: String? = null", kt_out)
+
+        # Swift check
+        swift_out = PolyglotTypeBridge.transpile_file(self.sample_py, "swift")
+        self.assertIn("public struct UserProfile: Codable, Equatable", swift_out)
+        self.assertIn("public let username: String", swift_out)
+        self.assertIn("public let email: String?", swift_out)
+
     # 4. HistoricalTokenReplay Tests
     def test_historical_replay(self):
         # Run replay on active git repo

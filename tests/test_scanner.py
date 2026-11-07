@@ -130,6 +130,27 @@ export class MyService {
         code = "def foo():\n    return 42\n"
         self.assertEqual(TokenReducer.reduce(code, "foo.py", mode="none"), code)
 
+    def test_python_reduction_adaptive_preserves_docstrings(self):
+        code = '''import os
+class UserService:
+    """Manages user authentication and state."""
+    db_url: str = "sqlite:///:memory:"
+
+    def authenticate(self, user_id: str) -> bool:
+        """Verifies session credentials."""
+        # Internal secret logic
+        secret = "salt123"
+        return True
+'''
+        reduced = TokenReducer.reduce(code, "service.py", mode="adaptive")
+        self.assertIn("class UserService:", reduced)
+        self.assertIn('"""Manages user authentication and state."""', reduced)
+        self.assertIn('db_url: str = "sqlite:///:memory:"', reduced)
+        self.assertIn("def authenticate(self, user_id: str) -> bool:", reduced)
+        self.assertIn('"""Verifies session credentials."""', reduced)
+        self.assertNotIn('secret = "salt123"', reduced)
+        self.assertNotIn("return True", reduced)
+
 
 class TestDependencyAnalyzer(unittest.TestCase):
     def test_import_extraction(self):
