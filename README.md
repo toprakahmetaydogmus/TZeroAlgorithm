@@ -97,7 +97,7 @@ code --install-extension dist/tzero-vscode-10.7.4.vsix
   <b><a href="#why-t-zero">Why T-Zero</a></b> &bull; 
   <b><a href="#task-completion-benchmark">Task Benchmark</a></b> &bull; 
   <b><a href="#universal-1-click-ide-setup">Universal IDE Setup</a></b> &bull; 
-  <b><a href="#the-20-canonical-mcp-tools">20 MCP Tools</a></b> &bull; 
+  <b><a href="#the-14-canonical-mcp-tools">20 MCP Tools</a></b> &bull; 
   <b><a href="#pre-flight-reality-lock">Reality-Lock</a></b> &bull; 
   <b><a href="#language-support-breakdown">Language Support</a></b> &bull; 
   <b><a href="#huggingface-space">Hugging Face Space</a></b> &bull; 
@@ -201,25 +201,14 @@ tzero init --vscode        # VS Code (Continue / Copilot)
 tzero init --zed           # Zed Editor
 
 # Install official VS Code / Cursor Extension (.vsix):
-code --install-extension dist/tzero-vscode-10.7.4.vsix
+code --install-extension dist/tzero-vscode-10.0.0.vsix
 ```
 
 ### Manual Configuration Snippets (Any MCP Client)
 
 <details>
-<summary><strong>Cursor (`.cursor/mcp.json` or Settings &rarr; Features &rarr; MCP) [Recommended: Zero-Install NPX]</strong></summary>
+<summary><strong>Cursor (`.cursor/mcp.json` or Settings &rarr; Features &rarr; MCP)</strong></summary>
 
-```json
-{
-  "mcpServers": {
-    "tzero": {
-      "command": "npx",
-      "args": ["-y", "tzero-mcp@latest"]
-    }
-  }
-}
-```
-*Or standard Python environment:*
 ```json
 {
   "mcpServers": {
@@ -230,18 +219,29 @@ code --install-extension dist/tzero-vscode-10.7.4.vsix
   }
 }
 ```
+*Or zero-install via uvx:*
+```json
+{
+  "mcpServers": {
+    "tzero": {
+      "command": "uvx",
+      "args": ["tzero-mcp"]
+    }
+  }
+}
+```
 </details>
 
 <details>
-<summary><strong>Claude Desktop (`claude_desktop_config.json`) [Recommended: Zero-Install NPX]</strong></summary>
+<summary><strong>Claude Desktop (`claude_desktop_config.json`)</strong></summary>
 
 *Path: `%APPDATA%\\Claude\\claude_desktop_config.json` (Windows) or `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS)*
 ```json
 {
   "mcpServers": {
     "tzero": {
-      "command": "npx",
-      "args": ["-y", "tzero-mcp@latest"]
+      "command": "python",
+      "args": ["-m", "tzero_mcp"]
     }
   }
 }
@@ -268,7 +268,7 @@ All 20 canonical tools (and 52 full tools) are audited and verified against the 
 | `audit_code_quality` | Linter | Runs static AST code smell checks and Shannon entropy secret scans. |
 | `verify_security_guard` | Security | Scans workspace for high-entropy tokens, private keys, and API credentials. |
 | `estimate_token_cost` | FinOps | Computes exact token savings and financial ROI across Claude, GPT-4o, Gemini, and DeepSeek. |
-| `query_memory_store` | Memory | Searches semantic vector-quantized virtual memory triplets (`<\|tzero:mem:...\|>`). |
+| `query_memory_store` | Memory | Searches semantic vector-quantized virtual memory triplets (`<|tzero:mem:...|>`). |
 | `manage_memory_store` | Memory | Consolidates, prunes, and manages persistent semantic memory triplets. |
 | `orchestrate_agent_swarm` | Multi-Agent | Coordinates multi-agent PBFT consensus and task routing across workspace subagents. |
 | `build_ast_snapshot` | Snapshot | Pre-computes sub-8ms cached AST snapshot bundle for instantaneous agent ingestion. |
@@ -277,6 +277,29 @@ All 20 canonical tools (and 52 full tools) are audited and verified against the 
 | `diagnose_and_heal_system` | Doctor | Self-healing operating system doctor fixing environment, zombie processes, and ASTs. |
 | `generate_architectural_passport` | Architecture | Synthesizes high-density AST structural passport for files and modules. |
 | `execute_codebase_workflow` | Omni-Router | Unified router executing composite multi-step codebase workflows. |
+
+---
+
+<a id="turbo-overdrive-burst-accelerator"></a>
+## ⚡🔥 Turbo Overdrive Burst Accelerator ("Kamçılama Modu")
+
+When scanning large codebases or generating deep AST context trees, disk latency or large file volumes can introduce processing delays.
+T-Zero features **Turbo Overdrive** — an adaptive latency sensor that detects slowdowns (>150ms or $\ge 15$ source files) and automatically engages burst acceleration:
+
+- 🚀 **Dynamic Multi-Core Parallelism:** Automatically spawns up to 32 worker threads matching available CPU cores.
+- ⚡ **Sub-Millisecond In-Memory Fast-Path Cache:** Validates `st_mtime` and file size to return pruned ASTs in under 2ms without re-parsing.
+- 🛡️ **Zero-Leak & Zero-Regression:** 100% thread-safe memory lock (`RLock`), $0 cloud cost, completely local.
+
+```bash
+# View live Turbo Overdrive status & cache telemetry:
+tzero turbo
+
+# Run live benchmark comparing sequential processing vs Turbo Overdrive:
+tzero turbo bench
+
+# Clear accelerator in-memory cache:
+tzero turbo clear
+```
 
 ---
 

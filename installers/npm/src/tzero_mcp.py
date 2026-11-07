@@ -305,11 +305,26 @@ def create_mcp_server():
             selected_files = files[:50]
 
         reduced_snippets: Dict[str, str] = {}
-        for f in selected_files:
-            raw_code = snippets.get(f, "")
-            if include_file_contents:
-                reduced_snippets[f] = TokenReducer.reduce(raw_code, f, mode=reduction_mode)
-            else:
+        if include_file_contents:
+            try:
+                from tzero_turbo import get_turbo_accelerator
+                turbo = get_turbo_accelerator()
+                # Turbo Overdrive ("Kamçılama"): multi-core parallel reduction with mtime cache
+                full_paths = [os.path.join(abs_root, f) for f in selected_files]
+                reduced_map = turbo.parallel_reduce_batch(
+                    full_paths,
+                    lambda code, path, mode: TokenReducer.reduce(code, path, mode=mode),
+                    mode=reduction_mode
+                )
+                for f, full_p in zip(selected_files, full_paths):
+                    reduced_snippets[f] = reduced_map.get(full_p, snippets.get(f, ""))
+            except Exception:
+                for f in selected_files:
+                    raw_code = snippets.get(f, "")
+                    reduced_snippets[f] = TokenReducer.reduce(raw_code, f, mode=reduction_mode)
+        else:
+            for f in selected_files:
+                raw_code = snippets.get(f, "")
                 reduced_snippets[f] = f"# File: {f} ({len(raw_code.splitlines())} lines)"
 
         raw_context = generate_offline_context(abs_root, selected_files, reduced_snippets)
