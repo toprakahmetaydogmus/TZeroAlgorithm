@@ -1,4 +1,4 @@
-﻿# ==============================================================================
+# ==============================================================================
 # ⚡ T-ZERO CONTEXT ARCHITECT & MCP SERVER — ZERO-CONFIG POWERSHELL INSTALLER
 # Supported: Windows 10, Windows 11, Windows Server (PowerShell 5.1+ / PS Core)
 # Developer: Toprak Ahmet Aydoğmuş (Siber Akademi)
