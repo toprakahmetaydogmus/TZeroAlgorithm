@@ -64,8 +64,9 @@ jobs:
         run: |
           if (-not (Test-Path dist)) { New-Item -ItemType Directory -Path dist -Force }
           Copy-Item LICENSE extensions\vscode\LICENSE -Force -ErrorAction SilentlyContinue
+          npm install -g @vscode/vsce
           cd extensions\vscode
-          npx --yes @vscode/vsce package --no-dependencies --allow-missing-repository -o ..\..\dist\
+          vsce package --no-dependencies --allow-missing-repository -o ..\..\dist\
           cd ..\..
           $vsix = Get-ChildItem dist\*.vsix | Select-Object -First 1
           if ($vsix) {
