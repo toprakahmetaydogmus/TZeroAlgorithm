@@ -8719,6 +8719,11 @@ def main():
     parser.add_argument("--explain", metavar="FILE", default=None, help="Generate high-density AST architectural passport for file or LLM prompt")
     parser.add_argument("--turbo", "--overdrive", "--kamcilama", nargs="?", const="status", default=None, metavar="CMD", help="Turbo Overdrive Burst Accelerator (Kamçılama): adaptive latency sensing & multi-core fast-path cache")
     parser.add_argument("--merge-heal", metavar="FILE", default=None, help="Autonomous AST semantic 3-way merge conflict healer")
+    parser.add_argument("--generate-arch-tests", nargs="?", const="tests/test_architecture_guard.py", default=None, metavar="OUT_PATH", help="Generate zero-dependency standalone unittest architecture guard test suite from tzero.rules.json")
+    parser.add_argument("--check-arch", "--arch-audit", action="store_true", help="Run live in-memory validation of layer boundaries, circular imports, and zero-leak security")
+    parser.add_argument("--mutate", "--mutation-test", metavar="FILE", default=None, help="Autonomous AST mutation testing & test suite quality score (0-100%%)")
+    parser.add_argument("--test-cmd", metavar="CMD", default=None, help="Target test command for --mutate (default: auto-detected unittest)")
+    parser.add_argument("--max-mutants", type=int, default=10, metavar="N", help="Maximum AST mutants to generate and evaluate (default: 10)")
     parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect v10.8.0 Master Edition (engine v4.1.0)")
 
 
@@ -8944,6 +8949,11 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
             "turbo": "--turbo",
             "overdrive": "--turbo",
             "kamcilama": "--turbo",
+            "generate-arch-tests": "--generate-arch-tests",
+            "check-arch": "--check-arch",
+            "arch-audit": "--check-arch",
+            "mutate": "--mutate",
+            "mutation-test": "--mutate",
         }
         if sub in sub_map:
             sys.argv[1] = sub_map[sub]
@@ -9078,6 +9088,45 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
         res = ASTSemanticMerger.heal_file_on_disk(target, write_in_place=not getattr(args, "dry_run", False))
         ASTSemanticMerger.render_cli(res, file_hint=target)
         sys.exit(0 if res.success else 1)
+    elif getattr(args, "generate_arch_tests", None) is not None:
+        from tzero_arch_test import ArchitectureTestSuiteGenerator
+        gen = ArchitectureTestSuiteGenerator(args.dir)
+        target_p = os.path.join(args.dir, args.generate_arch_tests) if not os.path.isabs(args.generate_arch_tests) else args.generate_arch_tests
+        out_p = gen.write_test_file(target_p)
+        print(f"\n[⚡ T-ZERO ARCH-GUARD] Generated standalone architecture test suite at: {out_p}")
+        print("[⚡ T-ZERO ARCH-GUARD] Run in CI/CD with: python -m unittest " + os.path.relpath(out_p, args.dir).replace("\\", "/"))
+        sys.exit(0)
+    elif getattr(args, "check_arch", False):
+        from tzero_arch_test import ArchitectureTestSuiteGenerator
+        gen = ArchitectureTestSuiteGenerator(args.dir)
+        report = gen.run_live_audit()
+        if report["success"]:
+            print(f"\n✅ [T-ZERO ARCH-AUDIT PASS] All {report['scanned_files']} modules satisfy declared layer boundaries.")
+            print(f"   - Layers Configured : {report['layers_count']}")
+            print("   - Circular Imports  : 0 cycles detected")
+            print("   - Zero-Leak Guard   : 100% clean (0 secret leaks)\n")
+            sys.exit(0)
+        else:
+            print("\n❌ [T-ZERO ARCH-AUDIT FAILED] Detected architectural infractions:")
+            for v in report["layer_violations"]:
+                print(f"   [LAYER VIOLATION] {v['file']}:{v['line']} (layer: {v['layer']}) imports forbidden '{v['imported']}' - {v['reason']}")
+            for c in report["circular_cycles"]:
+                print(f"   [CIRCULAR IMPORT] Cycle detected: {c}")
+            for s in report["secret_leaks"]:
+                print(f"   [SECRET LEAK] {s['file']}: {s['pattern']}")
+            print()
+            sys.exit(1)
+    elif getattr(args, "mutate", None) is not None:
+        from tzero_mutation import ASTMutationEngine
+        target = args.mutate
+        print(f"\n🧬 [T-ZERO MUTATION ENGINE] Analyzing test robustness for '{target}'...")
+        report = ASTMutationEngine.run_mutation_analysis(
+            target_file=target,
+            test_command=getattr(args, "test_cmd", None),
+            max_mutants=getattr(args, "max_mutants", 10)
+        )
+        print(ASTMutationEngine.format_markdown_report(report))
+        sys.exit(0 if report.mutation_score >= 70.0 else 1)
     elif getattr(args, "replay", None) is not None:
         from tzero_replay import HistoricalTokenReplay
         max_c = args.replay if isinstance(args.replay, int) else 15

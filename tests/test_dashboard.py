@@ -56,5 +56,60 @@ class TestTZeroDashboard(unittest.TestCase):
             self.assertTrue(data.get("success"))
             self.assertIn("files_to_create", data["data"])
 
+    def test_get_api_blackboard(self):
+        url = f"http://localhost:{self.test_port}/api/blackboard"
+        with urllib.request.urlopen(url) as resp:
+            self.assertEqual(resp.status, 200)
+            data = json.loads(resp.read().decode("utf-8"))
+            self.assertTrue(data.get("success"))
+            self.assertIn("markdown", data)
+            self.assertIn("T-Zero Multi-Agent Blackboard State", data["markdown"])
+
+    def test_post_api_bridge_reverse(self):
+        url = f"http://localhost:{self.test_port}/api/bridge/reverse"
+        payload = json.dumps({
+            "code": "interface User { id: number; name: string; }",
+            "lang": "ts",
+            "flavor": "dataclass"
+        }).encode("utf-8")
+        req = urllib.request.Request(url, data=payload, headers={"Content-Type": "application/json"})
+        with urllib.request.urlopen(req) as resp:
+            self.assertEqual(resp.status, 200)
+            data = json.loads(resp.read().decode("utf-8"))
+            self.assertTrue(data.get("success"))
+            self.assertIn("class User:", data["python_code"])
+
+    def test_post_api_merge_heal(self):
+        url = f"http://localhost:{self.test_port}/api/merge/heal"
+        conflict_code = (
+            "<<<<<<< HEAD\n"
+            "def foo():\n"
+            "    return 1\n"
+            "=======\n"
+            "def bar():\n"
+            "    return 2\n"
+            ">>>>>>> branch\n"
+        )
+        payload = json.dumps({"code": conflict_code}).encode("utf-8")
+        req = urllib.request.Request(url, data=payload, headers={"Content-Type": "application/json"})
+        with urllib.request.urlopen(req) as resp:
+            self.assertEqual(resp.status, 200)
+            data = json.loads(resp.read().decode("utf-8"))
+            self.assertTrue(data.get("success"))
+            self.assertIn("def foo():", data["merged_code"])
+            self.assertIn("def bar():", data["merged_code"])
+
+    def test_post_api_mutation_test(self):
+        url = f"http://localhost:{self.test_port}/api/mutation/test"
+        # Test on a small file with 0 or 1 mutants
+        payload = json.dumps({"file": "siber_akademi_icon.py", "max_mutants": 1}).encode("utf-8")
+        req = urllib.request.Request(url, data=payload, headers={"Content-Type": "application/json"})
+        with urllib.request.urlopen(req) as resp:
+            self.assertEqual(resp.status, 200)
+            data = json.loads(resp.read().decode("utf-8"))
+            self.assertTrue(data.get("success"))
+            self.assertIn("score", data)
+            self.assertIn("markdown", data)
+
 if __name__ == "__main__":
     unittest.main()

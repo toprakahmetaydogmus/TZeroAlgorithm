@@ -2,6 +2,14 @@
 
 All notable changes to the `tzero-mcp` package are documented in this file.
 
+## [10.9.0] - 2026-11-07
+
+### Added
+- Automated Architecture Guard Test Suite Generator (`tzero_arch_test.py` / `--generate-arch-tests` / `--check-arch`).
+- Autonomous AST Mutation Testing & Test Quality Engine (`tzero_mutation.py` / `--mutate`).
+- New MCP omni-tool workflow actions: `generate_architecture_tests`, `check_architecture`, `mutation_test`.
+- Dashboard POST endpoint `/api/mutation/test`.
+
 ## [10.8.0] - 2026-11-07
 
 ### Added

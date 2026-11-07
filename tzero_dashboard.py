@@ -1364,6 +1364,18 @@ class DashboardRequestHandler(http.server.BaseHTTPRequestHandler):
             else:
                 self.send_response(404)
                 self.end_headers()
+        elif parsed.path == "/api/blackboard":
+            try:
+                from tzero_blackboard import get_shared_blackboard
+                bb = get_shared_blackboard(".")
+                resp = {"success": True, "markdown": bb.export_status_markdown()}
+            except Exception as e:
+                resp = {"success": False, "error": str(e)}
+
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps(resp, ensure_ascii=False).encode("utf-8"))
         else:
             self.send_response(404)
             self.end_headers()
@@ -1407,6 +1419,72 @@ class DashboardRequestHandler(http.server.BaseHTTPRequestHandler):
                 import tzero_superdesign
                 res = tzero_superdesign.superdesign_generate(prompt=prompt, design_type=design_type, workspace_path=".")
                 resp = {"success": True, "data": res}
+            except Exception as e:
+                resp = {"success": False, "error": str(e)}
+
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps(resp, ensure_ascii=False).encode("utf-8"))
+        elif parsed.path == "/api/bridge/reverse":
+            content_length = int(self.headers.get("Content-Length", 0))
+            body = self.rfile.read(content_length).decode("utf-8")
+            try:
+                payload = json.loads(body)
+                src_code = payload.get("code", "")
+                src_lang = payload.get("lang", "ts")
+                flavor = payload.get("flavor", "dataclass")
+                from tzero_bridge import PolyglotTypeBridge
+                py_out = PolyglotTypeBridge.reverse_transpile(src_code, source_lang=src_lang, model_flavor=flavor)
+                resp = {"success": True, "python_code": py_out}
+            except Exception as e:
+                resp = {"success": False, "error": str(e)}
+
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps(resp, ensure_ascii=False).encode("utf-8"))
+
+        elif parsed.path == "/api/merge/heal":
+            content_length = int(self.headers.get("Content-Length", 0))
+            body = self.rfile.read(content_length).decode("utf-8")
+            try:
+                payload = json.loads(body)
+                code = payload.get("code", "")
+                from tzero_semantic_merge import ASTSemanticMerger
+                res = ASTSemanticMerger.heal_conflict_file(code)
+                resp = {
+                    "success": res.success,
+                    "merged_code": res.merged_code,
+                    "auto_resolved_conflicts": res.auto_resolved_conflicts,
+                    "unresolved_conflicts": res.unresolved_conflicts,
+                    "details": res.details
+                }
+            except Exception as e:
+                resp = {"success": False, "error": str(e)}
+
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps(resp, ensure_ascii=False).encode("utf-8"))
+
+        elif parsed.path == "/api/mutation/test":
+            content_length = int(self.headers.get("Content-Length", 0))
+            body = self.rfile.read(content_length).decode("utf-8")
+            try:
+                payload = json.loads(body)
+                tgt_file = payload.get("file", "tzero_arch_test.py")
+                max_m = int(payload.get("max_mutants", 5))
+                from tzero_mutation import ASTMutationEngine
+                rep = ASTMutationEngine.run_mutation_analysis(target_file=tgt_file, max_mutants=max_m)
+                resp = {
+                    "success": True,
+                    "score": rep.mutation_score,
+                    "killed": rep.killed,
+                    "survived": rep.survived,
+                    "total": rep.total_mutants,
+                    "markdown": ASTMutationEngine.format_markdown_report(rep)
+                }
             except Exception as e:
                 resp = {"success": False, "error": str(e)}
 

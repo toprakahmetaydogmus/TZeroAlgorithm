@@ -4443,6 +4443,48 @@ def create_mcp_server():
             else:
                 return bb.export_status_markdown()
 
+        elif act in ("generate_architecture_tests", "generate_arch_tests", "arch_tests"):
+            from tzero_arch_test import ArchitectureTestSuiteGenerator
+            target_dir = target if os.path.isdir(target) else "."
+            gen = ArchitectureTestSuiteGenerator(target_dir)
+            out_path = opts.get("out_path") or (query if query and query.endswith(".py") else None)
+            written = gen.write_test_file(out_path)
+            return f"✅ Standalone Architecture Guard test suite generated at: {written}"
+
+        elif act in ("check_architecture", "check_arch", "arch_audit", "validate_architecture"):
+            from tzero_arch_test import ArchitectureTestSuiteGenerator
+            target_dir = target if os.path.isdir(target) else "."
+            gen = ArchitectureTestSuiteGenerator(target_dir)
+            report = gen.run_live_audit()
+            if report["success"]:
+                return (
+                    f"✅ ARCH-AUDIT PASS: All {report['scanned_files']} modules satisfy declared layer boundaries.\n"
+                    f"- Configured Layers: {report['layers_count']}\n"
+                    f"- Circular Import Cycles: 0\n"
+                    f"- Zero-Leak Violations: 0"
+                )
+            else:
+                lines = [f"❌ ARCH-AUDIT FAILED ({len(report['layer_violations'])} boundary violations, {len(report['circular_cycles'])} cycles, {len(report['secret_leaks'])} leaks):"]
+                for v in report["layer_violations"]:
+                    lines.append(f"  - [BOUNDARY] {v['file']}:{v['line']} (layer: {v['layer']}) imports forbidden '{v['imported']}'")
+                for c in report["circular_cycles"]:
+                    lines.append(f"  - [CYCLE] {c}")
+                for s in report["secret_leaks"]:
+                    lines.append(f"  - [LEAK] {s['file']}: {s['pattern']}")
+                return "\n".join(lines)
+
+        elif act in ("mutation_test", "mutate", "test_quality", "mutation"):
+            from tzero_mutation import ASTMutationEngine
+            file_to_mutate = target if (target and os.path.isfile(target)) else (query if query and os.path.isfile(query) else "tzero_v3.py")
+            t_cmd = opts.get("test_cmd")
+            max_m = int(opts.get("max_mutants", 10))
+            rep = ASTMutationEngine.run_mutation_analysis(
+                target_file=file_to_mutate,
+                test_command=t_cmd,
+                max_mutants=max_m
+            )
+            return ASTMutationEngine.format_markdown_report(rep)
+
         # Fallback to general dispatch
         handler = _CANONICAL_DISPATCH.get(act) or _LEGACY_DISPATCH.get(act)
         if handler:

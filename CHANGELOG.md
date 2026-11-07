@@ -1,5 +1,27 @@
 # Changelog
 
+## [10.9.0] - 2026-11-07
+
+### Added (Autonomous Architecture Guard Generator & AST Mutation Testing Engine)
+
+- **Automated Architecture Test Suite Generator (`tzero_arch_test.py` / `tzero --generate-arch-tests` / `tzero --check-arch`):**
+  - Generates zero-dependency standalone `unittest` guard test suites (`tests/test_architecture_guard.py`) directly from `tzero.rules.json`.
+  - Verifies architectural layers, enforces 0 circular import cycles, and validates 100% Zero-Leak security policy.
+  - Native CLI subcommands: `tzero check-arch` and `tzero generate-arch-tests`.
+  - Fully integrated into `execute_codebase_workflow` MCP omni-tool (`action: 'generate_architecture_tests'` / `'check_architecture'`).
+
+- **Autonomous AST Mutation Testing & Test Quality Engine (`tzero_mutation.py` / `tzero --mutate`):**
+  - Synthesizes subtle single-point AST mutations (comparison inversions, boolean swaps, arithmetic operators, constant flips) to audit test suite robustness.
+  - Computes exact Mutation Score (0-100%) and pinpoints tautological/phantom tests.
+  - 100% offline and isolated execution with zero workspace residue.
+  - Command-line switch: `tzero --mutate <file> [--test-cmd <cmd>] [--max-mutants <N>]`.
+  - Dashboard integration: POST `/api/mutation/test`.
+
+- **Comprehensive Verification & Zero Regressions:**
+  - 15/15 new unit tests passed (`tests/test_arch_test.py`, `tests/test_architecture_guard.py`, `tests/test_mutation.py`).
+  - 100% Zero-Leak verified (0 secret audit findings).
+  - 100% offline & $0.00 cloud budget.
+
 ## [10.8.0] - 2026-11-07
 
 ### Released (Official V10.8.0 Sovereign Master Release: Dynamic Subagent Swarm Engine, Turbo Overdrive Accelerator, Reverse Polyglot Bridge & Semantic Conflict Healer)

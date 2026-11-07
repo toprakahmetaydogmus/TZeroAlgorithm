@@ -818,7 +818,21 @@ diff --git a/core.py b/core.py
         }))
         self.assertIn("T-Zero Multi-Agent Blackboard State", tool_result_text(res_bb))
 
-        # Test 10: Unknown action error handling
+        # Test 10: Action = 'generate_architecture_tests'
+        res_arch_gen = self.run_async(self.server.call_tool("execute_codebase_workflow", {
+            "action": "generate_architecture_tests",
+            "target": "."
+        }))
+        self.assertIn("Standalone Architecture Guard test suite generated", tool_result_text(res_arch_gen))
+
+        # Test 11: Action = 'check_architecture'
+        res_arch_check = self.run_async(self.server.call_tool("execute_codebase_workflow", {
+            "action": "check_architecture",
+            "target": "."
+        }))
+        self.assertIn("ARCH-AUDIT PASS", tool_result_text(res_arch_check))
+
+        # Test 12: Unknown action error handling
         res_err = self.run_async(self.server.call_tool("execute_codebase_workflow", {"action": "invalid_unknown_action"}))
         self.assertIn("Unknown action", tool_result_text(res_err))
 
