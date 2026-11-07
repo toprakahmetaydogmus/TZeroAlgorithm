@@ -12,7 +12,7 @@ const process = require("process");
 // In MCP mode, banner is printed to stderr to keep stdout strictly for JSON-RPC
 const banner = `\x1b[33m
 ┌──────────────────────────────────────────────────────────────────────────────┐
-│  ⭐ T-ZERO MCP SERVER v10.6.0 (Model Context Protocol)                       │
+│  ⭐ T-ZERO MCP SERVER v10.7.0 (Model Context Protocol)                       │
 │                                                                              │
 │  Hi! I'm Toprak Ahmet Aydoğmuş, a 15-year-old developer from Siber Akademi. │
 │  If this tool helps you, please star:                                        │

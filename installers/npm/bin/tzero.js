@@ -11,7 +11,7 @@ const process = require("process");
 
 const banner = `\x1b[33m
 ┌──────────────────────────────────────────────────────────────────────────────┐
-│  ⭐ T-ZERO CONTEXT ARCHITECT & MCP ENGINE v10.6.0                            │
+│  ⭐ T-ZERO CONTEXT ARCHITECT & MCP ENGINE v10.7.0                            │
 │                                                                              │
 │  Hi! I'm Toprak Ahmet Aydoğmuş, a 15-year-old developer from Siber Akademi. │
 │  I built T-Zero from scratch to eliminate token bloat and AI hallucinations. │

@@ -20,7 +20,7 @@ cat << "EOF"
    | |   / / |  _| | |_) | | | |
    | |  / /_ | |___|  _ <| |_| |
    |_| /____|_____|_| \_\\___/ 
-      SOVEREIGN MASTER v10.6.0 EDITION
+      SOVEREIGN MASTER v10.7.0 EDITION
 EOF
 echo -e "${NC}"
 
@@ -45,7 +45,7 @@ $PY_CMD -m tzero_mcp --install || true
 
 echo -e "${GREEN}"
 echo "================================================================================"
-echo "⚡ T-ZERO v10.6.0 INSTALLED SUCCESSFULLY!"
+echo "⚡ T-ZERO v10.7.0 INSTALLED SUCCESSFULLY!"
 echo "================================================================================"
 echo -e "${NC}"
 echo "Key Capabilities:"

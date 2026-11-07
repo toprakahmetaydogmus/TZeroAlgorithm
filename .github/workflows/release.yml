@@ -26,7 +26,13 @@ jobs:
         shell: pwsh
         run: |
           python -m pip install --upgrade pip
+          python -m pip install build
           python -m pip install .
+          python -m build
+          Get-ChildItem dist\*.whl, dist\*.tar.gz | ForEach-Object {
+            $hash = (Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLower()
+            "$hash  $($_.Name)" | Out-File -Encoding ascii "$($_.FullName).sha256"
+          }
 
       - name: Run tests
         shell: pwsh
@@ -88,6 +94,10 @@ jobs:
             dist/AddMCP.exe.sha256
             dist/*.vsix
             dist/*.vsix.sha256
+            dist/*.whl
+            dist/*.whl.sha256
+            dist/*.tar.gz
+            dist/*.tar.gz.sha256
 
       - name: Publish GitHub Release
         if: startsWith(github.ref, 'refs/tags/')
@@ -102,4 +112,8 @@ jobs:
             dist/AddMCP.exe.sha256
             dist/*.vsix
             dist/*.vsix.sha256
+            dist/*.whl
+            dist/*.whl.sha256
+            dist/*.tar.gz
+            dist/*.tar.gz.sha256
           generate_release_notes: true

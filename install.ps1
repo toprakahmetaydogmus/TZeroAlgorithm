@@ -12,7 +12,7 @@ Write-Host " |_   _|__  /| ____|  _ \ / _ \ " -ForegroundColor Cyan
 Write-Host "   | |   / / |  _| | |_) | | | |" -ForegroundColor Cyan
 Write-Host "   | |  / /_ | |___|  _ <| |_| |" -ForegroundColor Cyan
 Write-Host "   |_| /____|_____|_| \_\\___/ " -ForegroundColor Cyan
-Write-Host "      SOVEREIGN MASTER v10.6.0 EDITION" -ForegroundColor Yellow
+Write-Host "      SOVEREIGN MASTER v10.7.0 EDITION" -ForegroundColor Yellow
 Write-Host ""
 
 Write-Host "[1/4] Checking Python environment..." -ForegroundColor Magenta
@@ -41,7 +41,7 @@ try {
 
 Write-Host ""
 Write-Host "================================================================================" -ForegroundColor Green
-Write-Host "⚡ T-ZERO v10.6.0 INSTALLED SUCCESSFULLY ON WINDOWS!" -ForegroundColor Green
+Write-Host "⚡ T-ZERO v10.7.0 INSTALLED SUCCESSFULLY ON WINDOWS!" -ForegroundColor Green
 Write-Host "================================================================================" -ForegroundColor Green
 Write-Host ""
 Write-Host "Key Capabilities:" -ForegroundColor White
