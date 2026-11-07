@@ -8,4 +8,9 @@ include install.sh
 include action.yml
 include .pre-commit-hooks.yaml
 include requirements.txt
+include LICENSE
+include README.md
+include README.tr.md
 recursive-include tzero_jarvis *.py
+recursive-include tzero_fixer *.py
+recursive-include tzero *.py

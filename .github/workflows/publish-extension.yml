@@ -1,0 +1,61 @@
+name: Publish VS Code / Open VSX Extension
+
+on:
+  workflow_dispatch:
+    inputs:
+      publish_openvsx:
+        description: 'Publish to Open VSX Registry (Cursor, Windsurf, VSCodium)'
+        type: boolean
+        default: true
+      publish_vscode:
+        description: 'Publish to VS Code Marketplace'
+        type: boolean
+        default: true
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  package-and-publish:
+    name: Package & Publish VSIX
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Package VSIX
+        run: |
+          cd extensions/vscode
+          npx --yes @vscode/vsce package --no-dependencies -o ../../dist/
+          cd ../..
+          mkdir -p dist
+          ls -la dist/
+
+      - name: Upload VSIX Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tzero-vscode-vsix
+          path: dist/*.vsix
+
+      - name: Publish to Open VSX Registry
+        if: ${{ (github.event_name == 'push' || inputs.publish_openvsx) && env.OVSX_PAT != '' }}
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
+        run: |
+          VSIX_PATH=$(ls dist/*.vsix | head -n 1)
+          echo "Publishing $VSIX_PATH to Open VSX..."
+          npx --yes ovsx publish "$VSIX_PATH" -p "$OVSX_PAT"
+
+      - name: Publish to VS Code Marketplace
+        if: ${{ (github.event_name == 'push' || inputs.publish_vscode) && env.VSCE_PAT != '' }}
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        run: |
+          VSIX_PATH=$(ls dist/*.vsix | head -n 1)
+          echo "Publishing $VSIX_PATH to VS Code Marketplace..."
+          npx --yes @vscode/vsce publish --packagePath "$VSIX_PATH" -p "$VSCE_PAT"

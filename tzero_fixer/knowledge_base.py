@@ -14,7 +14,7 @@ Author: Toprak Ahmet Aydogmus (Siber Akademi)
 Version: 10.4.0
 """
 
-from typing import Dict, NamedTuple, Optional
+from typing import Dict, NamedTuple, Optional, List
 
 
 class ErrorSpecification(NamedTuple):

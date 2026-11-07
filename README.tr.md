@@ -44,10 +44,19 @@ tzero --watch
 # Otonom Commit Öncesi ve PR Güvenlik Kapısı:
 tzero review
 
+# Windows (WinGet):
+winget install SiberAkademi.TZero
+
+# macOS / Linux (Homebrew):
+brew tap toprakahmetaydogmus/tzero && brew install tzero
+
+# Windows (Scoop):
+scoop bucket add tzero https://github.com/toprakahmetaydogmus/scoop-tzero && scoop install tzero
+
 # (İsteğe bağlı) Resmi VS Code Marketplace üzerinden kur:
 code --install-extension siber-akademi.tzero-vscode
 # Veya yerel (.vsix) paketini yükle:
-code --install-extension dist/tzero-vscode-10.6.0.vsix
+code --install-extension dist/tzero-vscode-10.7.0.vsix
 
 # Kod tabanını sıkıştır ve ağaç çıkar:
 tzero --tree . --out context.txt

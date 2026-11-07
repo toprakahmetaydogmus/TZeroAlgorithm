@@ -90,7 +90,7 @@ tzero-fixer = "tzero_v3:main"
 tzero-explain = "tzero_v3:main"
 
 [tool.setuptools]
-packages = ["tzero_jarvis", "tzero_fixer"]
+packages = ["tzero_jarvis", "tzero_fixer", "tzero", "tzero.jarvis"]
 py-modules = [
     "main",
     "tzero",
@@ -101,25 +101,34 @@ py-modules = [
     "addmcp",
     "siber_akademi_icon",
     "app",
-    "tzero_guard",
-    "tzero_patch",
-    "tzero_superdesign",
+    "pc_fixer_mcp",
+    "tzero_benchmark",
+    "tzero_bridge",
+    "tzero_ci",
+    "tzero_commit",
+    "tzero_cost",
+    "tzero_dashboard",
+    "tzero_drift",
+    "tzero_explain",
+    "tzero_fix",
     "tzero_gateway",
+    "tzero_guard",
     "tzero_infra",
+    "tzero_neural_cortex",
+    "tzero_packer",
+    "tzero_patch",
+    "tzero_pc_fixer",
     "tzero_pipe",
     "tzero_polyglot",
     "tzero_reachability",
-    "tzero_dashboard",
-    "tzero_security",
-    "tzero_sync",
-    "tzero_cost",
-    "tzero_drift",
-    "tzero_snapshot",
-    "tzero_fix",
-    "tzero_bridge",
     "tzero_replay",
-    "tzero_pc_fixer",
-    "tzero_explain"
+    "tzero_security",
+    "tzero_snapshot",
+    "tzero_stubs",
+    "tzero_superdesign",
+    "tzero_sync",
+    "tzero_task_benchmark",
+    "tzero_tui"
 ]
 
 [tool.setuptools.package-data]

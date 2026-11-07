@@ -16,6 +16,7 @@ class Tzero < Formula
 
   test do
     system "#{bin}/tzero", "--version"
+    system "#{bin}/tzero", "--demo"
     system "#{bin}/tzero", "pc-fixer", "--dry-run"
   end
 end

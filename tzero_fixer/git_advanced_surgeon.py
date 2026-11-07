@@ -21,6 +21,7 @@ Version: 10.5.0 | 100% Free & Local Offline | Zero-Leak Certified
 from __future__ import annotations
 
 import os
+import re
 import shutil
 import subprocess
 import time

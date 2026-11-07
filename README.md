@@ -78,6 +78,9 @@ tzero --watch
 tzero review
 
 # 🧩 Option C: Official Global Package Managers
+# Windows (WinGet):
+winget install SiberAkademi.TZero
+
 # VS Code / Cursor Marketplace:
 code --install-extension siber-akademi.tzero-vscode
 
