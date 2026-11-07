@@ -270,3 +270,4 @@ Built for developers, by developers. 100% open-source under MIT.
 - **Primary Category:** Developer Tools / Artificial Intelligence / Open Source
 - **Maker First Comment:**  
   "Hey Product Hunt! We created T-Zero to solve the runaway token cost and context drift in modern AI coding agents..."
+

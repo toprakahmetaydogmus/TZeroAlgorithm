@@ -19,10 +19,13 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
 
       - name: Publish package to npm
-        if: ${{ secrets.NPM_TOKEN != '' }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
+          if [ -z "$NODE_AUTH_TOKEN" ]; then
+            echo "NPM_TOKEN secret is not set. Skipping npm publish."
+            exit 0
+          fi
           cd installers/npm
           PACKAGE_VERSION=$(node -p "require('./package.json').version")
           REMOTE_VERSION=$(npm view tzero-mcp version 2>/dev/null || echo "0.0.0")
