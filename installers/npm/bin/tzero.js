@@ -45,6 +45,21 @@ if (!py) {
   process.exit(1);
 }
 
+// Ensure tzero_v3 module is installed in this python environment
+try {
+  execSync(`${py} -c "import tzero_v3"`, { stdio: "ignore" });
+} catch (e) {
+  if (process.stdout.isTTY) {
+    console.log("\x1b[36m[T-Zero] First-time setup: installing tzero-mcp from PyPI...\x1b[0m");
+  }
+  try {
+    execSync(`${py} -m pip install -U tzero-mcp`, { stdio: "inherit" });
+  } catch (err) {
+    console.error("\x1b[31m[ERROR] Failed to auto-install tzero-mcp. Please run: pip install -U tzero-mcp\x1b[0m");
+    process.exit(1);
+  }
+}
+
 const args = ["-m", "tzero_v3", ...process.argv.slice(2)];
 const child = spawn(py, args, { stdio: "inherit" });
 
