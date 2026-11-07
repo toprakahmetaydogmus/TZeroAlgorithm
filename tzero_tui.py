@@ -122,7 +122,7 @@ class TZeroTerminalCockpit:
         box_bottom = f"{c.CYAN}╚══════════════════════════════════════════════════════════════════════════════╝{c.RESET}"
 
         lines.append(box_top)
-        lines.append(f"{c.CYAN}║{c.RESET}  {c.BOLD}{c.BRIGHT_CYAN}⚡ SİBER AKADEMİ — T-ZERO CONTEXT ARCHITECT & LIVE COCKPIT v10.0.0{c.RESET}    {c.CYAN}║{c.RESET}")
+        lines.append(f"{c.CYAN}║{c.RESET}  {c.BOLD}{c.BRIGHT_CYAN}⚡ SİBER AKADEMİ — T-ZERO CONTEXT ARCHITECT & LIVE COCKPIT v10.9.0{c.RESET}    {c.CYAN}║{c.RESET}")
         lines.append(f"{c.CYAN}║{c.RESET}  {c.DIM}Zero-Leak AST Intelligence | 100% Offline | $0 Cloud Cost Guarantee{c.RESET}       {c.CYAN}║{c.RESET}")
         lines.append(box_mid)
 
@@ -160,6 +160,8 @@ class TZeroTerminalCockpit:
         lines.append(f"{c.CYAN}║{c.RESET}    [5] 🛠️  Apply AST-Tolerant Patch (`tzero --patch <diff>`)                 {c.CYAN}║{c.RESET}")
         lines.append(f"{c.CYAN}║{c.RESET}    [6] 🌐 Launch Web Comparison Dashboard (`tzero --web`)                   {c.CYAN}║{c.RESET}")
         lines.append(f"{c.CYAN}║{c.RESET}    [7] 🛡️  Install Git Zero-Leak Guard & CI (`tzero --guard-install`)        {c.CYAN}║{c.RESET}")
+        lines.append(f"{c.CYAN}║{c.RESET}    [8] 🏛️  Verify Architecture & 0 Cycles (`tzero --check-arch`)            {c.CYAN}║{c.RESET}")
+        lines.append(f"{c.CYAN}║{c.RESET}    [9] 🧬 Run AST Mutation Test Suite (`tzero --mutate <file>`)             {c.CYAN}║{c.RESET}")
         lines.append(f"{c.CYAN}║{c.RESET}    [0] 🚪 Exit TUI                                                          {c.CYAN}║{c.RESET}")
         lines.append(box_bottom)
 
@@ -227,6 +229,28 @@ class TZeroTerminalCockpit:
                 res = GitSecurityGuard.install_hook(workspace_dir)
                 CIPipelineGenerator.install_github_workflow(workspace_dir)
                 print(f"{cls.GREEN}[SUCCESS] Pre-commit hook & GitHub Actions CI installed!{cls.RESET}")
+                input("Press Enter to return to cockpit...")
+            elif choice == "8":
+                from tzero_arch_test import ArchitectureTestSuiteGenerator
+                print(f"\n{cls.YELLOW}[Verifying Layer Boundaries, Cycles & Zero-Leak Security]...{cls.RESET}")
+                gen = ArchitectureTestSuiteGenerator(workspace_dir)
+                rep = gen.run_live_audit()
+                if rep["success"]:
+                    print(f"\n{cls.GREEN}✅ [ARCH-AUDIT PASS] All {rep['scanned_files']} files conform to rules! Zero violations.{cls.RESET}\n")
+                else:
+                    print(f"\n{cls.RED}❌ [ARCH-AUDIT FAILED] Violations detected:{cls.RESET}")
+                    for v in rep["layer_violations"]:
+                        print(f"   • {v['file']} (layer: {v['layer']}) imports forbidden '{v['imported']}'")
+                input("Press Enter to return to cockpit...")
+            elif choice == "9":
+                target_f = input("Enter path to file for mutation test (default: tzero_arch_test.py): ").strip() or "tzero_arch_test.py"
+                if os.path.exists(target_f):
+                    from tzero_mutation import ASTMutationEngine
+                    print(f"\n{cls.YELLOW}[Running AST Mutation Analysis on {target_f}]...{cls.RESET}")
+                    m_rep = ASTMutationEngine.run_mutation_analysis(target_file=target_f, max_mutants=5)
+                    print(f"{cls.GREEN}[RESULT] Mutation Score: {m_rep.mutation_score}% ({m_rep.killed}/{m_rep.total_mutants} killed).{cls.RESET}")
+                else:
+                    print(f"{cls.RED}Target file not found.{cls.RESET}")
                 input("Press Enter to return to cockpit...")
 
 
