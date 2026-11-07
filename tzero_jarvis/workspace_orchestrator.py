@@ -131,7 +131,7 @@ class WorkspaceProfiler:
     IGNORE_DIRS: Set[str] = {
         ".git", ".svn", ".hg", "__pycache__", "node_modules", "dist", "build",
         ".venv", "venv", "env", "target", "vendor", ".idea", ".vscode",
-        ".next", ".nuxt", "out", "bin", "obj", ".turbo", ".cache"
+        ".next", ".nuxt", "out", "bin", "obj", ".turbo", ".cache", "installers"
     }
 
     def __init__(self, workspace_root: str):

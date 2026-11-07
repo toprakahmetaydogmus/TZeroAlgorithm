@@ -22,3 +22,4 @@ export declare const cli: string;
 
 declare const tzero: TZeroPackageInfo;
 export default tzero;
+

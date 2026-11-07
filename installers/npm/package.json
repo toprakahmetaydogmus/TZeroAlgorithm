@@ -1,9 +1,10 @@
 {
   "name": "tzero-mcp",
-  "version": "10.7.2",
-  "description": "Deterministic AST Context Compressor, 95% Token Reducer & 20-Tool MCP Server for Cursor, Claude Desktop & Copilot.",
+  "version": "10.7.3",
+  "description": "Deterministic AST Context Compressor, 95% Token Reducer & 20-Tool MCP Server for Cursor, Claude Desktop & Copilot",
   "main": "index.js",
   "types": "index.d.ts",
+  "type": "commonjs",
   "exports": {
     ".": {
       "types": "./index.d.ts",
@@ -13,11 +14,13 @@
   },
   "sideEffects": false,
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
   },
   "files": [
     "bin",
     "src",
+    "test",
     "index.js",
     "index.d.ts",
     "README.md",
@@ -31,8 +34,7 @@
     "tzero-mcp": "bin/tzero-mcp.js"
   },
   "scripts": {
-    "postinstall": "node bin/postinstall.js",
-    "test": "node bin/tzero.js --version"
+    "test": "node --test test/package.test.js"
   },
   "repository": {
     "type": "git",

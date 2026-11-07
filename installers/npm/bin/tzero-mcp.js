@@ -6,7 +6,7 @@
  * Repository: https://github.com/toprakahmetaydogmus/TZeroAlgorithm
  */
 
-const { spawn, execSync } = require("child_process");
+const { spawn, spawnSync } = require("child_process");
 const process = require("process");
 const path = require("path");
 const pkg = require("../package.json");
@@ -34,8 +34,8 @@ function findPython() {
   const candidates = ["python3", "python", "py"];
   for (const cmd of candidates) {
     try {
-      execSync(`${cmd} --version`, { stdio: "ignore" });
-      return cmd;
+      const res = spawnSync(cmd, ["--version"], { stdio: "ignore", shell: false });
+      if (res.status === 0) return cmd;
     } catch (e) {
       // continue
     }
@@ -58,7 +58,7 @@ const env = Object.assign({}, process.env, {
 });
 
 const args = [scriptPath, ...process.argv.slice(2)];
-const child = spawn(py, args, { stdio: "inherit", env });
+const child = spawn(py, args, { stdio: "inherit", shell: false, env });
 
 child.on("close", (code) => {
   process.exit(code ?? 0);
