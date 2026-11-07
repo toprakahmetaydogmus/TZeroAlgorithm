@@ -847,7 +847,15 @@ diff --git a/core.py b/core.py
         }))
         self.assertIn("Code Health & Technical Debt Index", tool_result_text(res_debt))
 
-        # Test 14: Unknown action error handling
+        # Test 14: Action = 'budget'
+        res_budget = self.run_async(self.server.call_tool("execute_codebase_workflow", {
+            "action": "budget",
+            "target": "tests",
+            "query": "5000"
+        }))
+        self.assertIn("T-Zero Context Budget & Compression Certificate", tool_result_text(res_budget))
+
+        # Test 15: Unknown action error handling
         res_err = self.run_async(self.server.call_tool("execute_codebase_workflow", {"action": "invalid_unknown_action"}))
         self.assertIn("Unknown action", tool_result_text(res_err))
 

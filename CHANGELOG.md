@@ -2,7 +2,12 @@
 
 ## [10.9.0] - 2026-11-07
 
-### Added (AST Public API Contract Guardian, Technical Debt Index & Mutation Testing Engine)
+### Added (AST Public API Contract Guardian, Technical Debt Index & Context Budget Certifier)
+
+- **Autonomous AST Context Budget Enforcer & Compression Certifier (`tzero_budget.py` / `tzero budget`):**
+  - Dynamically calculates token density and selects optimal AST reduction tiers (T-1 to T-4) to fit any AI context window (e.g. 16k, 64k, 128k, 200k, 1M).
+  - Issues cryptographically verifiable SHA-256 compression certificates (`.tzero/compression_cert.json`).
+  - Integrated into CLI (`tzero budget [DIR] [--target-tokens N] [--target-model MODEL]`), MCP Server (`action: 'budget'`), Dashboard API (`POST /api/budget/optimize`), and Terminal Cockpit TUI (`option [11]`).
 
 - **Autonomous AST Public API Contract & SemVer Guardian (`tzero_contracts.py` / `tzero contracts` / `tzero breaking-changes`):**
   - Extracts public function, method, and class interface contracts without executing code.

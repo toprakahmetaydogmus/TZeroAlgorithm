@@ -1555,6 +1555,35 @@ class DashboardRequestHandler(http.server.BaseHTTPRequestHandler):
             self.send_header("Content-Type", "application/json")
             self.end_headers()
             self.wfile.write(json.dumps(resp, ensure_ascii=False).encode("utf-8"))
+        elif parsed.path == "/api/budget/optimize":
+            content_length = int(self.headers.get("Content-Length", 0))
+            body = self.rfile.read(content_length).decode("utf-8")
+            try:
+                payload = json.loads(body) if body.strip() else {}
+                target_p = payload.get("path", ".")
+                target_tokens = payload.get("target_tokens")
+                model_name = payload.get("model", "claude-3-7")
+                from tzero_budget import ASTTokenBudgetOptimizer
+                cert = ASTTokenBudgetOptimizer.optimize_budget(target_p, target_tokens=target_tokens, model_name=model_name)
+                resp = {
+                    "success": True,
+                    "target_model": cert.target_model,
+                    "budget_limit_tokens": cert.budget_limit_tokens,
+                    "raw_tokens": cert.raw_tokens,
+                    "compressed_tokens": cert.compressed_tokens,
+                    "savings_percentage": cert.savings_percentage,
+                    "tier_applied": cert.tier_applied,
+                    "fits_budget": cert.fits_budget,
+                    "sha256_checksum": cert.sha256_checksum,
+                    "markdown": ASTTokenBudgetOptimizer.format_markdown_certificate(cert)
+                }
+            except Exception as e:
+                resp = {"success": False, "error": str(e)}
+
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps(resp, ensure_ascii=False).encode("utf-8"))
         else:
             self.send_response(404)
             self.end_headers()

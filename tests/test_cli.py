@@ -196,6 +196,17 @@ class TestCLI(unittest.TestCase):
         self.assertEqual(res_debt.returncode, 0)
         self.assertIn("T-Zero Code Health & Technical Debt Index", res_debt.stdout)
 
+        # 10. 'tzero budget' should run context budget optimizer and compression certifier
+        res_budget = subprocess.run(
+            [sys.executable, "tzero_v3.py", "budget", "tests/test_cli.py", "--target-tokens", "5000"],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace"
+        )
+        self.assertEqual(res_budget.returncode, 0)
+        self.assertIn("T-Zero Context Budget & Compression Certificate", res_budget.stdout)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -4498,6 +4498,14 @@ def create_mcp_server():
             rep = CodeHealthAnalyzer.analyze_workspace(target_dir)
             return CodeHealthAnalyzer.format_markdown_report(rep)
 
+        elif act in ("budget", "certificate", "cert", "token_budget", "fit_context"):
+            from tzero_budget import ASTTokenBudgetOptimizer
+            target_dir = target if os.path.isdir(target) else "."
+            t_tok = opts.get("target_tokens") or (int(query) if query.isdigit() else None)
+            m_name = opts.get("model", "claude-3-7")
+            cert = ASTTokenBudgetOptimizer.optimize_budget(target_dir, target_tokens=t_tok, model_name=m_name)
+            return ASTTokenBudgetOptimizer.format_markdown_certificate(cert)
+
         # Fallback to general dispatch
         handler = _CANONICAL_DISPATCH.get(act) or _LEGACY_DISPATCH.get(act)
         if handler:

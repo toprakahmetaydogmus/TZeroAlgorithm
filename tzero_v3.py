@@ -8727,6 +8727,9 @@ def main():
     parser.add_argument("--contracts", "--check-contracts", nargs="?", const="HEAD~1", default=None, metavar="BASE_REF", help="Audit public AST API contracts and SemVer compatibility against git base ref")
     parser.add_argument("--breaking-changes", nargs="?", const="HEAD~1", default=None, metavar="BASE_REF", help="Enforce zero-breaking-changes gate against git base ref (fails if breaking changes detected)")
     parser.add_argument("--debt", "--code-health", nargs="?", const=".", default=None, metavar="DIR", help="Autonomous AST technical debt, cognitive complexity & maintainability index")
+    parser.add_argument("--budget", "--token-budget", nargs="?", const=".", default=None, metavar="DIR", help="Optimize codebase context payload to fit AI model token budget and issue SHA-256 certificate")
+    parser.add_argument("--target-tokens", type=int, default=None, metavar="N", help="Target token budget for --budget (e.g. 16000, 64000)")
+    parser.add_argument("--target-model", default="claude-3-7", metavar="MODEL", help="Target LLM model for --budget context sizing")
     parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect v10.9.0 Master Edition (engine v4.1.0)")
 
 
@@ -8963,6 +8966,9 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
             "debt": "--debt",
             "health": "--debt",
             "code-health": "--debt",
+            "budget": "--budget",
+            "cert": "--budget",
+            "certificate": "--budget",
         }
         if sub in sub_map:
             sys.argv[1] = sub_map[sub]
@@ -9156,6 +9162,18 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
         rep = CodeHealthAnalyzer.analyze_workspace(target)
         md = CodeHealthAnalyzer.format_markdown_report(rep)
         print("\n" + md + "\n")
+        sys.exit(0)
+    elif getattr(args, "budget", None) is not None:
+        from tzero_budget import ASTTokenBudgetOptimizer
+        target = args.budget or args.dir
+        m_name = getattr(args, "target_model", "claude-3-7")
+        b_tok = getattr(args, "target_tokens", None)
+        print(f"\n📜 [T-ZERO BUDGET] Sizing context payload for '{target}' ({m_name})...")
+        cert = ASTTokenBudgetOptimizer.optimize_budget(target, target_tokens=b_tok, model_name=m_name)
+        saved_path = ASTTokenBudgetOptimizer.save_certificate(cert)
+        md = ASTTokenBudgetOptimizer.format_markdown_certificate(cert)
+        print("\n" + md + "\n")
+        print(f"✅ Certificate issued & cryptographically signed at: {saved_path}\n")
         sys.exit(0)
     elif getattr(args, "replay", None) is not None:
         from tzero_replay import HistoricalTokenReplay

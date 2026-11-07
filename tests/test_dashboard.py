@@ -139,5 +139,17 @@ class TestTZeroDashboard(unittest.TestCase):
             self.assertIn("maintainability_index", data)
             self.assertIn("rating", data)
 
+    def test_post_api_budget_optimize(self):
+        url = f"http://localhost:{self.test_port}/api/budget/optimize"
+        payload = json.dumps({"path": "tests", "target_tokens": 10000, "model": "gpt-4o"}).encode("utf-8")
+        req = urllib.request.Request(url, data=payload, headers={"Content-Type": "application/json"})
+        with urllib.request.urlopen(req) as resp:
+            self.assertEqual(resp.status, 200)
+            data = json.loads(resp.read().decode("utf-8"))
+            self.assertTrue(data.get("success"))
+            self.assertEqual(data.get("target_model"), "gpt-4o")
+            self.assertIn("tier_applied", data)
+            self.assertIn("markdown", data)
+
 if __name__ == "__main__":
     unittest.main()

@@ -163,6 +163,7 @@ class TZeroTerminalCockpit:
         lines.append(f"{c.CYAN}║{c.RESET}    [8] 🏛️  Verify Architecture & 0 Cycles (`tzero --check-arch`)            {c.CYAN}║{c.RESET}")
         lines.append(f"{c.CYAN}║{c.RESET}    [9] 🧬 Run AST Mutation Test Suite (`tzero --mutate <file>`)             {c.CYAN}║{c.RESET}")
         lines.append(f"{c.CYAN}║{c.RESET}    [10] 🏥 Code Health & Technical Debt Index (`tzero --debt`)             {c.CYAN}║{c.RESET}")
+        lines.append(f"{c.CYAN}║{c.RESET}    [11] 📜 Context Budget Optimizer & Certificate (`tzero --budget`)       {c.CYAN}║{c.RESET}")
         lines.append(f"{c.CYAN}║{c.RESET}    [0] 🚪 Exit TUI                                                          {c.CYAN}║{c.RESET}")
         lines.append(box_bottom)
 
@@ -258,6 +259,14 @@ class TZeroTerminalCockpit:
                 print(f"\n{cls.YELLOW}[Analyzing Code Health & Technical Debt Index for {workspace_dir}]...{cls.RESET}")
                 rep = CodeHealthAnalyzer.analyze_workspace(workspace_dir)
                 print(f"\n{cls.BRIGHT_CYAN}{CodeHealthAnalyzer.format_markdown_report(rep)}{cls.RESET}\n")
+                input("Press Enter to return to cockpit...")
+            elif choice == "11":
+                from tzero_budget import ASTTokenBudgetOptimizer
+                print(f"\n{cls.YELLOW}[Sizing Context Payload & Issuing Compression Certificate for {workspace_dir}]...{cls.RESET}")
+                cert = ASTTokenBudgetOptimizer.optimize_budget(workspace_dir)
+                saved_p = ASTTokenBudgetOptimizer.save_certificate(cert)
+                print(f"\n{cls.BRIGHT_CYAN}{ASTTokenBudgetOptimizer.format_markdown_certificate(cert)}{cls.RESET}\n")
+                print(f"{cls.GREEN}[SUCCESS] Certificate saved to: {saved_p}{cls.RESET}")
                 input("Press Enter to return to cockpit...")
 
 
