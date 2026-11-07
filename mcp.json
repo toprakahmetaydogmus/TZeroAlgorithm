@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "tzero": {
+      "command": "npx",
+      "args": ["-y", "tzero-mcp@latest"]
+    }
+  }
+}

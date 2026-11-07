@@ -1,11 +1,13 @@
 # Smithery Configuration for T-Zero Context Architect MCP Server
-# Enables one-click installation via Smithery.ai for Cursor, Claude Desktop, Windsurf, and Cline
+# Enables one-click installation via Smithery.ai for Cursor, Claude Desktop, Windsurf, Antigravity, and Cline
 startCommand:
   type: stdio
   configSchema:
     type: object
     properties: {}
-  commandFunction:
-    command: "uvx"
-    args:
-      - "tzero-mcp"
+  commandFunction: |-
+    (config) => ({
+      command: 'npx',
+      args: ['-y', 'tzero-mcp@latest'],
+      env: {}
+    })
