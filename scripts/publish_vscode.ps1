@@ -1,4 +1,4 @@
-﻿# T-Zero VS Code Extension Automated Publisher
+# T-Zero VS Code Extension Automated Publisher
 # Siber Akademi - 100% Free & Zero-Leak Tooling
 
 param(
@@ -46,3 +46,4 @@ Write-Host "`n[2/3] Publishing to VS Code Marketplace via VSCE CLI..." -Foregrou
 npx --yes @vscode/vsce publish --packagePath $latestVsix -p $PatToken
 
 Write-Host "`n[3/3] Successfully published to VS Code Marketplace!" -ForegroundColor Green
+
