@@ -832,7 +832,22 @@ diff --git a/core.py b/core.py
         }))
         self.assertIn("ARCH-AUDIT PASS", tool_result_text(res_arch_check))
 
-        # Test 12: Unknown action error handling
+        # Test 12: Action = 'contracts'
+        res_contracts = self.run_async(self.server.call_tool("execute_codebase_workflow", {
+            "action": "contracts",
+            "target": ".",
+            "query": "HEAD"
+        }))
+        self.assertIn("Public API Contracts", tool_result_text(res_contracts))
+
+        # Test 13: Action = 'debt'
+        res_debt = self.run_async(self.server.call_tool("execute_codebase_workflow", {
+            "action": "debt",
+            "target": "tests"
+        }))
+        self.assertIn("Code Health & Technical Debt Index", tool_result_text(res_debt))
+
+        # Test 14: Unknown action error handling
         res_err = self.run_async(self.server.call_tool("execute_codebase_workflow", {"action": "invalid_unknown_action"}))
         self.assertIn("Unknown action", tool_result_text(res_err))
 

@@ -4485,6 +4485,19 @@ def create_mcp_server():
             )
             return ASTMutationEngine.format_markdown_report(rep)
 
+        elif act in ("contracts", "check_contracts", "api_contracts", "semver", "breaking_changes"):
+            from tzero_contracts import ASTContractComparator
+            target_dir = target if os.path.isdir(target) else "."
+            base_ref = opts.get("base_ref") or query or "HEAD~1"
+            reports = ASTContractComparator.compare_git_revision(repo_dir=target_dir, base_ref=base_ref)
+            return ASTContractComparator.format_markdown_report(reports)
+
+        elif act in ("debt", "technical_debt", "code_health", "health", "maintainability"):
+            from tzero_debt import CodeHealthAnalyzer
+            target_dir = target if os.path.isdir(target) else "."
+            rep = CodeHealthAnalyzer.analyze_workspace(target_dir)
+            return CodeHealthAnalyzer.format_markdown_report(rep)
+
         # Fallback to general dispatch
         handler = _CANONICAL_DISPATCH.get(act) or _LEGACY_DISPATCH.get(act)
         if handler:

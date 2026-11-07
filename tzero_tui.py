@@ -162,6 +162,7 @@ class TZeroTerminalCockpit:
         lines.append(f"{c.CYAN}║{c.RESET}    [7] 🛡️  Install Git Zero-Leak Guard & CI (`tzero --guard-install`)        {c.CYAN}║{c.RESET}")
         lines.append(f"{c.CYAN}║{c.RESET}    [8] 🏛️  Verify Architecture & 0 Cycles (`tzero --check-arch`)            {c.CYAN}║{c.RESET}")
         lines.append(f"{c.CYAN}║{c.RESET}    [9] 🧬 Run AST Mutation Test Suite (`tzero --mutate <file>`)             {c.CYAN}║{c.RESET}")
+        lines.append(f"{c.CYAN}║{c.RESET}    [10] 🏥 Code Health & Technical Debt Index (`tzero --debt`)             {c.CYAN}║{c.RESET}")
         lines.append(f"{c.CYAN}║{c.RESET}    [0] 🚪 Exit TUI                                                          {c.CYAN}║{c.RESET}")
         lines.append(box_bottom)
 
@@ -251,6 +252,12 @@ class TZeroTerminalCockpit:
                     print(f"{cls.GREEN}[RESULT] Mutation Score: {m_rep.mutation_score}% ({m_rep.killed}/{m_rep.total_mutants} killed).{cls.RESET}")
                 else:
                     print(f"{cls.RED}Target file not found.{cls.RESET}")
+                input("Press Enter to return to cockpit...")
+            elif choice == "10":
+                from tzero_debt import CodeHealthAnalyzer
+                print(f"\n{cls.YELLOW}[Analyzing Code Health & Technical Debt Index for {workspace_dir}]...{cls.RESET}")
+                rep = CodeHealthAnalyzer.analyze_workspace(workspace_dir)
+                print(f"\n{cls.BRIGHT_CYAN}{CodeHealthAnalyzer.format_markdown_report(rep)}{cls.RESET}\n")
                 input("Press Enter to return to cockpit...")
 
 

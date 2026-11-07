@@ -163,6 +163,39 @@ class TestCLI(unittest.TestCase):
         self.assertIn("LIVE INSTANT DEMONSTRATION", res_demo.stdout)
         self.assertIn("AST Token Reduction", res_demo.stdout)
 
+        # 7. 'tzero check-arch' should run architecture live audit
+        res_arch = subprocess.run(
+            [sys.executable, "tzero_v3.py", "check-arch"],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace"
+        )
+        self.assertEqual(res_arch.returncode, 0)
+        self.assertIn("T-ZERO ARCH-AUDIT PASS", res_arch.stdout)
+
+        # 8. 'tzero contracts' should run public API contract guardian
+        res_contracts = subprocess.run(
+            [sys.executable, "tzero_v3.py", "contracts", "HEAD"],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace"
+        )
+        self.assertEqual(res_contracts.returncode, 0)
+        self.assertIn("T-ZERO CONTRACT GUARDIAN", res_contracts.stdout)
+
+        # 9. 'tzero debt' should run code health and technical debt index
+        res_debt = subprocess.run(
+            [sys.executable, "tzero_v3.py", "debt", "tests/test_cli.py"],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace"
+        )
+        self.assertEqual(res_debt.returncode, 0)
+        self.assertIn("T-Zero Code Health & Technical Debt Index", res_debt.stdout)
+
 
 if __name__ == "__main__":
     unittest.main()

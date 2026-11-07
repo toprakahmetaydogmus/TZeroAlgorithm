@@ -8,7 +8,7 @@
 3. Anti-Reinvention: Always reuse existing helper functions before writing new utilities.
 4. AST Compression: When ingesting code, prioritize interface signatures and contracts over raw method bodies.
 
-# Key Workspace Classes (807 total)
+# Key Workspace Classes (821 total)
 - ClientTarget (addmcp.py)
 - AddMCPApp (addmcp.py)
 - ASTContextArchitect (app.py)

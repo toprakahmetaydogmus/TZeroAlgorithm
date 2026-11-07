@@ -5,10 +5,12 @@ All notable changes to the `tzero-mcp` package are documented in this file.
 ## [10.9.0] - 2026-11-07
 
 ### Added
+- Autonomous AST Public API Contract & SemVer Guardian (`tzero_contracts.py` / `tzero contracts` / `tzero breaking-changes`).
+- Autonomous AST Code Health, Cognitive Complexity & Technical Debt Index (`tzero_debt.py` / `tzero debt`).
 - Automated Architecture Guard Test Suite Generator (`tzero_arch_test.py` / `--generate-arch-tests` / `--check-arch`).
 - Autonomous AST Mutation Testing & Test Quality Engine (`tzero_mutation.py` / `--mutate`).
-- New MCP omni-tool workflow actions: `generate_architecture_tests`, `check_architecture`, `mutation_test`.
-- Dashboard POST endpoint `/api/mutation/test`.
+- New MCP omni-tool workflow actions: `contracts`, `debt`, `generate_architecture_tests`, `check_architecture`, `mutation_test`.
+- Dashboard POST endpoints: `/api/contracts/compare`, `/api/debt/analyze`, `/api/mutation/test`.
 
 ## [10.8.0] - 2026-11-07
 

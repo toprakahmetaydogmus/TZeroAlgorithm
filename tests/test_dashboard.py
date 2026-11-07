@@ -111,5 +111,33 @@ class TestTZeroDashboard(unittest.TestCase):
             self.assertIn("score", data)
             self.assertIn("markdown", data)
 
+    def test_post_api_contracts_compare(self):
+        url = f"http://localhost:{self.test_port}/api/contracts/compare"
+        payload = json.dumps({
+            "old_code": "def query(term: str) -> list:\n    return []\n",
+            "new_code": "def query(term: str, limit: int = 10) -> list:\n    return []\n",
+            "file_path": "search.py"
+        }).encode("utf-8")
+        req = urllib.request.Request(url, data=payload, headers={"Content-Type": "application/json"})
+        with urllib.request.urlopen(req) as resp:
+            self.assertEqual(resp.status, 200)
+            data = json.loads(resp.read().decode("utf-8"))
+            self.assertTrue(data.get("success"))
+            self.assertEqual(data.get("semver_bump"), "MINOR")
+            self.assertFalse(data.get("is_breaking"))
+            self.assertIn("markdown", data)
+
+    def test_post_api_debt_analyze(self):
+        url = f"http://localhost:{self.test_port}/api/debt/analyze"
+        payload = json.dumps({"path": "tests/test_debt.py"}).encode("utf-8")
+        req = urllib.request.Request(url, data=payload, headers={"Content-Type": "application/json"})
+        with urllib.request.urlopen(req) as resp:
+            self.assertEqual(resp.status, 200)
+            data = json.loads(resp.read().decode("utf-8"))
+            self.assertTrue(data.get("success"))
+            self.assertEqual(data.get("type"), "file")
+            self.assertIn("maintainability_index", data)
+            self.assertIn("rating", data)
+
 if __name__ == "__main__":
     unittest.main()

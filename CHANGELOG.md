@@ -2,7 +2,23 @@
 
 ## [10.9.0] - 2026-11-07
 
-### Added (Autonomous Architecture Guard Generator & AST Mutation Testing Engine)
+### Added (AST Public API Contract Guardian, Technical Debt Index & Mutation Testing Engine)
+
+- **Autonomous AST Public API Contract & SemVer Guardian (`tzero_contracts.py` / `tzero contracts` / `tzero breaking-changes`):**
+  - Extracts public function, method, and class interface contracts without executing code.
+  - Detects caller-breaking changes: removed public functions/methods/classes, added required parameters without defaults, altered return types.
+  - Automatically recommends exact Semantic Versioning (SemVer) bump: `MAJOR` (breaking changes), `MINOR` (backward-compatible additions), or `PATCH` (internal refactor).
+  - Evaluates working tree or Git commit diffs against any base revision (`tzero contracts [base_ref]`).
+  - Strict CI/CD quality gate: `tzero breaking-changes` immediately fails with exit code 1 if unauthorized breaking changes are discovered.
+  - Integrated into `execute_codebase_workflow` MCP omni-tool (`action: 'contracts'`) and Dashboard API (`POST /api/contracts/compare`).
+
+- **Autonomous AST Code Health, Cognitive Complexity & Technical Debt Index (`tzero_debt.py` / `tzero debt`):**
+  - Calculates Sonar-style AST Cognitive Complexity accounting for nested branching, loops, and boolean chains.
+  - Computes standard Maintainability Index (MI 0-100: Grade A, B, C, D) and McCabe Cyclomatic Complexity.
+  - Detects God Classes (>12 methods, >300 LOC) and Long Functions (>50 LOC).
+  - Automatically tracks lingering debt markers (`# TODO`, `# FIXME`, `# HACK`, `# XXX`).
+  - Computes quantitative refactoring debt hours and dollar ROI budget based on engineering standard rate ($75/hr).
+  - Integrated into CLI (`tzero debt [dir]`), MCP Server (`action: 'debt'`), Dashboard (`POST /api/debt/analyze`), and Terminal Cockpit TUI (`option [10]`).
 
 - **Automated Architecture Test Suite Generator (`tzero_arch_test.py` / `tzero --generate-arch-tests` / `tzero --check-arch`):**
   - Generates zero-dependency standalone `unittest` guard test suites (`tests/test_architecture_guard.py`) directly from `tzero.rules.json`.
@@ -18,7 +34,7 @@
   - Dashboard integration: POST `/api/mutation/test`.
 
 - **Comprehensive Verification & Zero Regressions:**
-  - 15/15 new unit tests passed (`tests/test_arch_test.py`, `tests/test_architecture_guard.py`, `tests/test_mutation.py`).
+  - 30/30 new unit tests passed (`tests/test_arch_test.py`, `tests/test_architecture_guard.py`, `tests/test_mutation.py`, `tests/test_contracts.py`, `tests/test_debt.py`).
   - 100% Zero-Leak verified (0 secret audit findings).
   - 100% offline & $0.00 cloud budget.
 

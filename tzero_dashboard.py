@@ -1492,6 +1492,69 @@ class DashboardRequestHandler(http.server.BaseHTTPRequestHandler):
             self.send_header("Content-Type", "application/json")
             self.end_headers()
             self.wfile.write(json.dumps(resp, ensure_ascii=False).encode("utf-8"))
+        elif parsed.path == "/api/contracts/compare":
+            content_length = int(self.headers.get("Content-Length", 0))
+            body = self.rfile.read(content_length).decode("utf-8")
+            try:
+                payload = json.loads(body)
+                old_code = payload.get("old_code", "")
+                new_code = payload.get("new_code", "")
+                file_path = payload.get("file_path", "module.py")
+                from tzero_contracts import ASTContractComparator
+                rep = ASTContractComparator.compare_code(old_code, new_code, file_path=file_path)
+                resp = {
+                    "success": True,
+                    "semver_bump": rep.semver_bump.value,
+                    "is_breaking": rep.is_breaking,
+                    "breaking_count": len(rep.breaking_changes),
+                    "additions_count": len(rep.non_breaking_additions),
+                    "modifications_count": len(rep.modifications),
+                    "markdown": ASTContractComparator.format_markdown_report([rep])
+                }
+            except Exception as e:
+                resp = {"success": False, "error": str(e)}
+
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps(resp, ensure_ascii=False).encode("utf-8"))
+        elif parsed.path == "/api/debt/analyze":
+            content_length = int(self.headers.get("Content-Length", 0))
+            body = self.rfile.read(content_length).decode("utf-8")
+            try:
+                payload = json.loads(body) if body.strip() else {}
+                target_p = payload.get("path", ".")
+                from tzero_debt import CodeHealthAnalyzer
+                if os.path.isfile(target_p):
+                    rep = CodeHealthAnalyzer.analyze_file(target_p)
+                    resp = {
+                        "success": True,
+                        "type": "file",
+                        "maintainability_index": rep.maintainability_index,
+                        "rating": rep.rating,
+                        "debt_hours": rep.debt_hours,
+                        "debt_cost_usd": rep.debt_cost_usd,
+                        "todo_count": rep.todo_count
+                    }
+                else:
+                    rep = CodeHealthAnalyzer.analyze_workspace(target_p)
+                    resp = {
+                        "success": True,
+                        "type": "workspace",
+                        "average_maintainability_index": rep.average_maintainability_index,
+                        "rating": rep.overall_rating,
+                        "total_debt_hours": rep.total_debt_hours,
+                        "total_debt_cost_usd": rep.total_debt_cost_usd,
+                        "total_todo_markers": rep.total_todo_markers,
+                        "markdown": CodeHealthAnalyzer.format_markdown_report(rep)
+                    }
+            except Exception as e:
+                resp = {"success": False, "error": str(e)}
+
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps(resp, ensure_ascii=False).encode("utf-8"))
         else:
             self.send_response(404)
             self.end_headers()

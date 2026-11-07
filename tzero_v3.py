@@ -8724,7 +8724,10 @@ def main():
     parser.add_argument("--mutate", "--mutation-test", metavar="FILE", default=None, help="Autonomous AST mutation testing & test suite quality score (0-100%%)")
     parser.add_argument("--test-cmd", metavar="CMD", default=None, help="Target test command for --mutate (default: auto-detected unittest)")
     parser.add_argument("--max-mutants", type=int, default=10, metavar="N", help="Maximum AST mutants to generate and evaluate (default: 10)")
-    parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect v10.8.0 Master Edition (engine v4.1.0)")
+    parser.add_argument("--contracts", "--check-contracts", nargs="?", const="HEAD~1", default=None, metavar="BASE_REF", help="Audit public AST API contracts and SemVer compatibility against git base ref")
+    parser.add_argument("--breaking-changes", nargs="?", const="HEAD~1", default=None, metavar="BASE_REF", help="Enforce zero-breaking-changes gate against git base ref (fails if breaking changes detected)")
+    parser.add_argument("--debt", "--code-health", nargs="?", const=".", default=None, metavar="DIR", help="Autonomous AST technical debt, cognitive complexity & maintainability index")
+    parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect v10.9.0 Master Edition (engine v4.1.0)")
 
 
     def print_master_tutorial():
@@ -8832,7 +8835,7 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
     def print_quickstart_guide():
         print("""
 ================================================================================
-⚡ SİBER AKADEMİ — T-ZERO CONTEXT ARCHITECT & MCP v10.2.0 MASTER (engine v4.1.0)
+⚡ SİBER AKADEMİ — T-ZERO CONTEXT ARCHITECT & MCP v10.9.0 MASTER (engine v4.1.0)
 ================================================================================
 🎯 %95'e Varan Token Tasarrufu & Otonom Yapay Zeka Mimari Bağlam Motoru
 
@@ -8954,6 +8957,12 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
             "arch-audit": "--check-arch",
             "mutate": "--mutate",
             "mutation-test": "--mutate",
+            "contracts": "--contracts",
+            "check-contracts": "--contracts",
+            "breaking-changes": "--breaking-changes",
+            "debt": "--debt",
+            "health": "--debt",
+            "code-health": "--debt",
         }
         if sub in sub_map:
             sys.argv[1] = sub_map[sub]
@@ -9127,6 +9136,27 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
         )
         print(ASTMutationEngine.format_markdown_report(report))
         sys.exit(0 if report.mutation_score >= 70.0 else 1)
+    elif getattr(args, "contracts", None) is not None or getattr(args, "breaking_changes", None) is not None:
+        from tzero_contracts import ASTContractComparator
+        base_ref = args.contracts or args.breaking_changes or "HEAD~1"
+        is_gate = getattr(args, "breaking_changes", None) is not None
+        print(f"\n🛡️ [T-ZERO CONTRACT GUARDIAN] Evaluating AST public API changes against '{base_ref}'...")
+        reports = ASTContractComparator.compare_git_revision(repo_dir=args.dir, base_ref=base_ref)
+        md = ASTContractComparator.format_markdown_report(reports)
+        print("\n" + md + "\n")
+        has_breaking = any(r.is_breaking for r in reports)
+        if is_gate and has_breaking:
+            print("❌ [T-ZERO CONTRACT GATE FAILED] Incompatible breaking changes detected in public API.\n")
+            sys.exit(1)
+        sys.exit(0)
+    elif getattr(args, "debt", None) is not None:
+        from tzero_debt import CodeHealthAnalyzer
+        target = args.debt or args.dir
+        print(f"\n🏥 [T-ZERO HEALTH] Computing AST technical debt & maintainability index for '{target}'...")
+        rep = CodeHealthAnalyzer.analyze_workspace(target)
+        md = CodeHealthAnalyzer.format_markdown_report(rep)
+        print("\n" + md + "\n")
+        sys.exit(0)
     elif getattr(args, "replay", None) is not None:
         from tzero_replay import HistoricalTokenReplay
         max_c = args.replay if isinstance(args.replay, int) else 15
