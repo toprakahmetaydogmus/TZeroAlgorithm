@@ -30,6 +30,7 @@ if (process.stdout.isTTY && !process.argv.includes("--json") && !process.argv.in
 }
 
 function findPython() {
+  if (process.env.PYTHON) return process.env.PYTHON;
   const candidates = ["python3", "python", "py"];
   for (const cmd of candidates) {
     try {

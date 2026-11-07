@@ -1,6 +1,6 @@
 {
   "name": "tzero-mcp",
-  "version": "10.7.3",
+  "version": "10.7.4",
   "description": "Deterministic AST Context Compressor, 95% Token Reducer & 20-Tool MCP Server for Cursor, Claude Desktop & Copilot",
   "main": "index.js",
   "types": "index.d.ts",
@@ -13,6 +13,7 @@
     "./package.json": "./package.json"
   },
   "sideEffects": false,
+  "preferGlobal": true,
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=9.0.0"
@@ -38,13 +39,18 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git",
-    "directory": "installers/npm"
+    "url": "git+https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git"
   },
-  "funding": {
-    "type": "github",
-    "url": "https://github.com/toprakahmetaydogmus/TZeroAlgorithm"
-  },
+  "funding": [
+    {
+      "type": "github",
+      "url": "https://github.com/sponsors/toprakahmetaydogmus"
+    },
+    {
+      "type": "individual",
+      "url": "https://github.com/toprakahmetaydogmus/TZeroAlgorithm"
+    }
+  ],
   "keywords": [
     "mcp",
     "mcp-server",
@@ -59,9 +65,24 @@
     "windsurf"
   ],
   "author": "Toprak Ahmet Aydoğmuş (Siber Akademi) <siberakademi@org.tr> (https://github.com/toprakahmetaydogmus)",
+  "contributors": [
+    {
+      "name": "Toprak Ahmet Aydoğmuş",
+      "email": "siberakademi@org.tr",
+      "url": "https://github.com/toprakahmetaydogmus"
+    },
+    {
+      "name": "Siber Akademi Core Team",
+      "email": "contact@siberakademi.org.tr",
+      "url": "https://github.com/toprakahmetaydogmus"
+    }
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/issues"
   },
-  "homepage": "https://github.com/toprakahmetaydogmus/TZeroAlgorithm#readme"
+  "homepage": "https://github.com/toprakahmetaydogmus/TZeroAlgorithm#readme",
+  "publishConfig": {
+    "access": "public"
+  }
 }

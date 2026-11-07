@@ -33,7 +33,8 @@ jobs:
           mkdir -p dist
           cp LICENSE extensions/vscode/ 2>/dev/null || true
           cd extensions/vscode
-          npx --yes @vscode/vsce package --no-dependencies -o ../../dist/
+          npx --yes @vscode/vsce package --no-dependencies
+          mv *.vsix ../../dist/
           cd ../..
           ls -la dist/
 
