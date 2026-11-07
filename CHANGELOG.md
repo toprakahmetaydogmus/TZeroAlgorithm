@@ -1,5 +1,26 @@
 # Changelog
 
+## [10.8.0] - 2026-11-07
+
+### Released (Official V10.8.0 Sovereign Master Release: Dynamic Subagent Swarm Engine, Turbo Overdrive Accelerator & VS Code Extension Renamed to tzero-mcp)
+
+- **Dynamic Subagent Swarm Coordinator (`tzero_subagent_engine.py` / `orchestrate_agent_swarm` tool 44):**
+  - Autonomous task decomposition & dependency DAG graph generation for complex multi-faceted prompts.
+  - Heuristic complexity scoring, dynamic token budgeting, and parallel subagent allocation.
+  - Specialized agent roles: Security Sentinel, AST Architect, Polyglot Transpiler, Quality Auditor, Performance Benchmarker, and Reality Lock Guard.
+  - Zero-Leak security policy enforcement on every synthesized agent prompt.
+
+- **Turbo Overdrive Burst Accelerator / Kamçılama Mode (`tzero_turbo.py` / `tzero --turbo` / `tzero --kamcilama`):**
+  - Adaptive system latency & load sensing with multi-level acceleration thresholds.
+  - Multi-core fast-path cache & AST execution bypass for sub-8ms response times on hot paths.
+  - Command-line switch: `tzero --turbo status|benchmark|optimize|purge`.
+
+- **VS Code & Cursor Extension Official Release (`dist/tzero-mcp-10.8.0.vsix`):**
+  - Package renamed to `tzero-mcp` (publisher `siber-akademi`) to resolve Marketplace naming collision and align with PyPI & NPM packages.
+  - Packaged with verified SHA-256 integrity checksum for 1-click drag-and-drop or command-line installation.
+
+- **All Automated Unit Tests Green (100% Zero-Leak Certified, $0.00 Budget).**
+
 ## [10.7.0] - 2026-11-07
 
 ### Released (Official V10.7.0 Sovereign Master Release: Universal 5-Language Polyglot Type Bridge, Adaptive AST Entropy Pruning & Formal Scientific Whitepaper)

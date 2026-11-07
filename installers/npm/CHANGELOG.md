@@ -2,6 +2,14 @@
 
 All notable changes to the `tzero-mcp` package are documented in this file.
 
+## [10.8.0] - 2026-11-07
+
+### Added
+- Dynamic Multi-Agent Swarm Coordinator (`tzero_subagent_engine.py` / `orchestrate_agent_swarm` MCP tool).
+- Turbo Overdrive Burst Accelerator / Kamçılama Mode (`tzero_turbo.py` / `--turbo` / `--kamcilama`).
+- VS Code & Cursor Extension official release renamed to `tzero-mcp` with pre-built `.vsix`.
+- Sub-8ms multi-core AST response caching and adaptive latency sensing.
+
 ## [10.7.4] - 2026-11-07
 
 ### Added

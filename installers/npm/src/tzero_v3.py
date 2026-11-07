@@ -8715,7 +8715,7 @@ def main():
     parser.add_argument("--pc-fixer", "--fixer", nargs="?", const=".", default=None, metavar="DIR", help="Autonomous self-healing PC & codebase doctor (heal syntax, imports, venv, caches)")
     parser.add_argument("--explain", metavar="FILE", default=None, help="Generate high-density AST architectural passport for file or LLM prompt")
     parser.add_argument("--turbo", "--overdrive", "--kamcilama", nargs="?", const="status", default=None, metavar="CMD", help="Turbo Overdrive Burst Accelerator (Kamçılama): adaptive latency sensing & multi-core fast-path cache")
-    parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect v10.7.0 Master Edition (engine v4.1.0)")
+    parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect v10.8.0 Master Edition (engine v4.1.0)")
 
 
     def print_master_tutorial():

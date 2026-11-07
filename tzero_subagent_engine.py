@@ -446,3 +446,4 @@ class AutonomousSwarmCoordinator:
 def get_autonomous_swarm_coordinator(workspace_root: str = ".") -> AutonomousSwarmCoordinator:
     """Factory helper to obtain an AutonomousSwarmCoordinator instance."""
     return AutonomousSwarmCoordinator(workspace_root=workspace_root)
+
