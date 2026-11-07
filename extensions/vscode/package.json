@@ -4,6 +4,7 @@
   "description": "Cut AI token costs by up to 95% with local AST pruning, Zero-Leak security audit, and 1-click MCP initialization for Cursor, Windsurf, and VS Code Copilot.",
   "version": "10.7.4",
   "publisher": "siber-akademi",
+  "icon": "icon.png",
   "author": {
     "name": "Toprak Ahmet Aydoğmuş (Siber Akademi)",
     "url": "https://github.com/toprakahmetaydogmus/TZeroAlgorithm"
@@ -41,6 +42,7 @@
     "src",
     "README.md",
     "LICENSE",
+    "icon.png",
     "package.json"
   ],
   "contributes": {
