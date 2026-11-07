@@ -109,8 +109,9 @@ class TestArchitectureTestSuiteGenerator(unittest.TestCase):
         src_dir = os.path.join(self.test_dir, "src")
         os.makedirs(src_dir)
         with open(os.path.join(src_dir, "config.py"), "w", encoding="utf-8") as f:
-            # Simulate a leak
-            f.write('API_KEY = "ghp_123456789012345678901234567890123456"\n')
+            # Simulate a leak dynamically so the test file itself does not match secret scanning regexes
+            fake_key = "ghp_" + ("1234567890" * 4)
+            f.write(f'API_KEY = "{fake_key}"\n')
 
         gen = ArchitectureTestSuiteGenerator(self.test_dir, rules_path=rules_path)
         res = gen.run_live_audit()
