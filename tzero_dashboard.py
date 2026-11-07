@@ -1584,6 +1584,29 @@ class DashboardRequestHandler(http.server.BaseHTTPRequestHandler):
             self.send_header("Content-Type", "application/json")
             self.end_headers()
             self.wfile.write(json.dumps(resp, ensure_ascii=False).encode("utf-8"))
+        elif parsed.path == "/api/golden/verify":
+            content_length = int(self.headers.get("Content-Length", 0))
+            body = self.rfile.read(content_length).decode("utf-8")
+            try:
+                payload = json.loads(body) if body.strip() else {}
+                target_p = payload.get("path", ".")
+                from tzero_golden import ASTGoldenRegressionEngine
+                rep = ASTGoldenRegressionEngine.verify_against_golden(target_p)
+                resp = {
+                    "success": rep.get("success", False),
+                    "clean": rep.get("clean", False),
+                    "removed_count": len(rep.get("removed_symbols", [])),
+                    "modified_count": len(rep.get("modified_signatures", [])),
+                    "added_count": len(rep.get("added_symbols", [])),
+                    "markdown": ASTGoldenRegressionEngine.format_markdown_report(rep)
+                }
+            except Exception as e:
+                resp = {"success": False, "error": str(e)}
+
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps(resp, ensure_ascii=False).encode("utf-8"))
         else:
             self.send_response(404)
             self.end_headers()

@@ -2,7 +2,12 @@
 
 ## [10.9.0] - 2026-11-07
 
-### Added (AST Public API Contract Guardian, Technical Debt Index & Context Budget Certifier)
+### Added (AST Public API Contract Guardian, Golden Baseline Engine & Technical Debt Index)
+
+- **Autonomous Golden Baseline & AST Regression Engine (`tzero_golden.py` / `tzero golden`):**
+  - Captures cryptographically signed golden baselines of all public AST signatures across the repository (`.tzero/goldens.json`).
+  - Verifies current code against baseline in CI/CD (`tzero golden verify`), preventing silent public signature deletions or interface drift.
+  - Integrated into CLI (`tzero golden [generate|verify|update]`), MCP Server (`action: 'golden'`), and Dashboard API (`POST /api/golden/verify`).
 
 - **Autonomous AST Context Budget Enforcer & Compression Certifier (`tzero_budget.py` / `tzero budget`):**
   - Dynamically calculates token density and selects optimal AST reduction tiers (T-1 to T-4) to fit any AI context window (e.g. 16k, 64k, 128k, 200k, 1M).

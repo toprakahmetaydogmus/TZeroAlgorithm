@@ -4506,6 +4506,18 @@ def create_mcp_server():
             cert = ASTTokenBudgetOptimizer.optimize_budget(target_dir, target_tokens=t_tok, model_name=m_name)
             return ASTTokenBudgetOptimizer.format_markdown_certificate(cert)
 
+        elif act in ("golden", "goldens", "verify_golden", "check_golden"):
+            from tzero_golden import ASTGoldenRegressionEngine
+            target_dir = target if os.path.isdir(target) else "."
+            sub_op = opts.get("operation") or query or "verify"
+            if sub_op in ("generate", "update", "capture"):
+                baseline = ASTGoldenRegressionEngine.generate_baseline(target_dir)
+                out_p = ASTGoldenRegressionEngine.save_baseline(baseline)
+                return f"✅ Captured {baseline.total_symbols} golden public AST signatures to: {out_p}"
+            else:
+                rep = ASTGoldenRegressionEngine.verify_against_golden(target_dir)
+                return ASTGoldenRegressionEngine.format_markdown_report(rep)
+
         # Fallback to general dispatch
         handler = _CANONICAL_DISPATCH.get(act) or _LEGACY_DISPATCH.get(act)
         if handler:

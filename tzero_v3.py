@@ -8730,6 +8730,7 @@ def main():
     parser.add_argument("--budget", "--token-budget", nargs="?", const=".", default=None, metavar="DIR", help="Optimize codebase context payload to fit AI model token budget and issue SHA-256 certificate")
     parser.add_argument("--target-tokens", type=int, default=None, metavar="N", help="Target token budget for --budget (e.g. 16000, 64000)")
     parser.add_argument("--target-model", default="claude-3-7", metavar="MODEL", help="Target LLM model for --budget context sizing")
+    parser.add_argument("--golden", "--goldens", nargs="?", const="generate", default=None, metavar="ACTION", help="Generate or verify golden AST public signature baseline (generate, verify, update)")
     parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect v10.9.0 Master Edition (engine v4.1.0)")
 
 
@@ -8969,6 +8970,8 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
             "budget": "--budget",
             "cert": "--budget",
             "certificate": "--budget",
+            "golden": "--golden",
+            "goldens": "--golden",
         }
         if sub in sub_map:
             sys.argv[1] = sub_map[sub]
@@ -9175,6 +9178,21 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
         print("\n" + md + "\n")
         print(f"✅ Certificate issued & cryptographically signed at: {saved_path}\n")
         sys.exit(0)
+    elif getattr(args, "golden", None) is not None:
+        from tzero_golden import ASTGoldenRegressionEngine
+        act = (args.golden or "generate").lower()
+        if act in ("verify", "check", "audit"):
+            print(f"\n🔍 [T-ZERO GOLDEN GUARD] Verifying AST signatures against baseline for '{args.dir}'...")
+            rep = ASTGoldenRegressionEngine.verify_against_golden(args.dir)
+            print("\n" + ASTGoldenRegressionEngine.format_markdown_report(rep) + "\n")
+            sys.exit(0 if rep.get("clean", False) else 1)
+        else:
+            print(f"\n🏆 [T-ZERO GOLDEN ENGINE] Capturing golden AST signature baseline for '{args.dir}'...")
+            baseline = ASTGoldenRegressionEngine.generate_baseline(args.dir)
+            out_path = ASTGoldenRegressionEngine.save_baseline(baseline)
+            print(f"✅ Captured {baseline.total_symbols} golden public AST signatures.")
+            print(f"📁 Baseline stored & cryptographically signed at: {out_path}\n")
+            sys.exit(0)
     elif getattr(args, "replay", None) is not None:
         from tzero_replay import HistoricalTokenReplay
         max_c = args.replay if isinstance(args.replay, int) else 15

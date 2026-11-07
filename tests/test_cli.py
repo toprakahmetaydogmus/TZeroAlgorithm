@@ -207,6 +207,17 @@ class TestCLI(unittest.TestCase):
         self.assertEqual(res_budget.returncode, 0)
         self.assertIn("T-Zero Context Budget & Compression Certificate", res_budget.stdout)
 
+        # 11. 'tzero golden' should generate golden baseline
+        res_golden = subprocess.run(
+            [sys.executable, "tzero_v3.py", "golden", "generate"],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace"
+        )
+        self.assertEqual(res_golden.returncode, 0)
+        self.assertIn("T-ZERO GOLDEN ENGINE", res_golden.stdout)
+
 
 if __name__ == "__main__":
     unittest.main()

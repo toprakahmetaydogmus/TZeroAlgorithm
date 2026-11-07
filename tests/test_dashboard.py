@@ -151,5 +151,14 @@ class TestTZeroDashboard(unittest.TestCase):
             self.assertIn("tier_applied", data)
             self.assertIn("markdown", data)
 
+    def test_post_api_golden_verify(self):
+        url = f"http://localhost:{self.test_port}/api/golden/verify"
+        payload = json.dumps({"path": "tests"}).encode("utf-8")
+        req = urllib.request.Request(url, data=payload, headers={"Content-Type": "application/json"})
+        with urllib.request.urlopen(req) as resp:
+            self.assertEqual(resp.status, 200)
+            data = json.loads(resp.read().decode("utf-8"))
+            self.assertIn("markdown", data)
+
 if __name__ == "__main__":
     unittest.main()
