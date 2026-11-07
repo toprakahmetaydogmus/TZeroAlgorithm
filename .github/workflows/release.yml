@@ -60,20 +60,18 @@ jobs:
           node-version: 20
 
       - name: Package VS Code & Cursor Extension (.vsix)
-        shell: pwsh
+        shell: bash
         run: |
-          if (-not (Test-Path dist)) { New-Item -ItemType Directory -Path dist -Force }
-          Copy-Item LICENSE extensions\vscode\LICENSE -Force -ErrorAction SilentlyContinue
-          npm install -g @vscode/vsce
-          cd extensions\vscode
-          vsce package --no-dependencies --allow-missing-repository -o ..\..\dist\
-          cd ..\..
-          $vsix = Get-ChildItem dist\*.vsix | Select-Object -First 1
-          if ($vsix) {
-            $hash = (Get-FileHash $vsix.FullName -Algorithm SHA256).Hash.ToLower()
-            "$hash  $($vsix.Name)" | Out-File -Encoding ascii "$($vsix.FullName).sha256"
-            Write-Host "VSIX Packaged: $($vsix.Name) (SHA-256: $hash)"
-          }
+          mkdir -p dist
+          cp LICENSE extensions/vscode/ 2>/dev/null || true
+          cd extensions/vscode
+          npx --yes @vscode/vsce package --no-dependencies -o ../../dist/
+          cd ../..
+          VSIX=$(ls dist/*.vsix 2>/dev/null | head -n 1)
+          if [ -n "$VSIX" ]; then
+            sha256sum "$VSIX" | awk '{print $1 "  " $2}' > "${VSIX}.sha256"
+            echo "VSIX Packaged: $VSIX"
+          fi
 
       - name: Compute SHA-256 checksums
         shell: pwsh
