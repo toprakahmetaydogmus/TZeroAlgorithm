@@ -25,49 +25,28 @@ Yapay zeka modellerine tüm kaynak kodlar metin olarak verildiğinde, fonksiyon 
 - **Bilimsel ve Teknik Whitepaper:** [docs/WHITE_PAPER_TZERO_V10.md](docs/WHITE_PAPER_TZERO_V10.md) (Matematiksel ispatlar, DAG-AC sıkıştırma ve Reality-Lock analizi)
 - **Hugging Face Canlı Demo:** [https://huggingface.co/spaces/toprakke4/tzero-token-reducer](https://huggingface.co/spaces/toprakke4/tzero-token-reducer)
 
-### 30 Saniyede Hızlı Kurulum:
+### ⚡ 30 Saniyede Hızlı Kurulum
+
 ```bash
-# 📦 Node.js / npm ile Anında Çalıştırma (Kurulumsuz, Sıfır Ayar):
-# Claude Desktop, Cursor, Antigravity, Copilot için:
+# 📦 Seçenek A: Node.js / npx ile Anında Çalıştırma (Sıfır Kurulum):
+# Cursor, Claude Desktop, Antigravity, Copilot için:
 npx -y tzero-mcp@latest
 
-# Global NPM Kurulumu:
+# Global NPM CLI Kurulumu:
 npm install -g tzero-mcp
 
-# 📦 Python pip ile Kurulum:
-pip install tzero-mcp --upgrade
+# 🐍 Seçenek B: Python pip ile Kurulum:
+pip install --upgrade tzero-mcp
 
-# ⚡ Canlı İnteraktif Demo (AST sıkıştırma ve Reality-Lock'u 0.5 saniyede görün):
-tzero demo
+# 🌟 Seçenek C: Tek Satır Otomatik Yükleyici:
+# Linux / macOS: curl -fsSL https://raw.githubusercontent.com/toprakahmetaydogmus/TZeroAlgorithm/main/install.sh | bash
+# Windows:       irm https://raw.githubusercontent.com/toprakahmetaydogmus/TZeroAlgorithm/main/install.ps1 | iex
 
-# 1 saniyede tüm IDE'leri otomatik yapılandır:
+# 🚀 Tek Tıkla IDE'leri (Cursor, Claude, Windsurf, VS Code) Bağla:
 tzero init
 
-# Sızıntıları otomatik .env dosyasına taşı:
-tzero --vault --migrate
-
-# Canlı Arka Plan İzleyicisi (Dosya kaydettikçe AST bağlamını otomatik yeniler):
-tzero --watch
-
-# Otonom Commit Öncesi ve PR Güvenlik Kapısı:
-tzero review
-
-# Windows (WinGet):
-winget install SiberAkademi.TZero
-
-# macOS / Linux (Homebrew):
-brew tap toprakahmetaydogmus/tzero && brew install tzero
-
-# Windows (Scoop):
-scoop bucket add tzero https://github.com/toprakahmetaydogmus/scoop-tzero && scoop install tzero
-
-# (İsteğe bağlı) Resmi VS Code Marketplace üzerinden kur:
-code --install-extension siber-akademi.tzero-vscode
-# Veya yerel (.vsix) paketini yükle:
-code --install-extension dist/tzero-vscode-10.7.0.vsix
-
-# Kod tabanını sıkıştır ve ağaç çıkar:
-tzero --tree . --out context.txt
+# 🧩 VS Code / Cursor Eklentisini (.vsix) Yükle:
+code --install-extension dist/tzero-vscode-10.7.4.vsix
 ```
 
 ---

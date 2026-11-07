@@ -54,53 +54,27 @@
 ### ⚡ 30-Second Quickstart
 
 ```bash
-# 🌟 Option A: Universal 1-Line Zero-Config Installer
-# Linux / macOS / WSL:
-curl -fsSL https://raw.githubusercontent.com/toprakahmetaydogmus/TZeroAlgorithm/main/install.sh | bash
-
-# Windows (PowerShell):
-irm https://raw.githubusercontent.com/toprakahmetaydogmus/TZeroAlgorithm/main/install.ps1 | iex
-
-# 📦 Option B: Node.js / npm (Zero-Config Global & NPX Runner):
-# Instant 1-line execution (Claude Desktop, Cursor, Antigravity, Copilot):
+# 📦 Option A: Node.js / npx (Zero-Config Instant MCP Runner):
+# Run directly in Claude Desktop, Cursor, Antigravity, Copilot:
 npx -y tzero-mcp@latest
 
 # Global CLI installation via npm:
 npm install -g tzero-mcp
 
-# 📦 Option C: Standard Python package:
-pip install tzero-mcp --upgrade
+# 🐍 Option B: Python PyPI Package:
+pip install --upgrade tzero-mcp
 
-# ⚡ Instant Live Interactive Demo (See AST pruning & Reality-Lock in 0.5s):
-tzero demo
+# 🌟 Option C: 1-Line Native Shell Installers:
+# Linux / macOS / WSL:
+curl -fsSL https://raw.githubusercontent.com/toprakahmetaydogmus/TZeroAlgorithm/main/install.sh | bash
+# Windows (PowerShell):
+irm https://raw.githubusercontent.com/toprakahmetaydogmus/TZeroAlgorithm/main/install.ps1 | iex
 
-# 🚀 Turnkey 1-click configure Cursor, Claude, Antigravity, Windsurf, Cline:
+# 🚀 1-Click Configure MCP in Cursor, Claude, Antigravity, Windsurf:
 tzero init
 
-# 🔐 1-Click Auto-Vault secrets into .env:
-tzero --vault --migrate
-
-# ⚡ Live Background Watcher (Auto-updates AST context on file save):
-tzero --watch
-
-# 🔍 Autonomous Pre-Commit & PR Reality-Lock Gate:
-tzero review
-
-# 🧩 Option D: Official Global Package Managers
-# Windows (WinGet):
-winget install SiberAkademi.TZero
-
-# VS Code / Cursor Marketplace:
-code --install-extension siber-akademi.tzero-vscode
-
-# macOS / Linux (Homebrew):
-brew tap toprakahmetaydogmus/tzero && brew install tzero
-
-# Windows (Scoop):
-scoop bucket add tzero https://github.com/toprakahmetaydogmus/scoop-tzero && scoop install tzero
-
-# 1-Click MCP Install via Smithery:
-npx -y @smithery/cli install @toprakahmetaydogmus/TZeroAlgorithm --client claude
+# 🧩 Install VS Code / Cursor Extension (.vsix):
+code --install-extension dist/tzero-vscode-10.7.4.vsix
 ```
 
 ### 🧭 Navigation & Interactive Jump Stations
