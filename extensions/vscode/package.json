@@ -37,6 +37,12 @@
     "onStartupFinished"
   ],
   "main": "./src/extension.js",
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE",
+    "package.json"
+  ],
   "contributes": {
     "commands": [
       {
