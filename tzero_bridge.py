@@ -11,6 +11,7 @@ Rust structs, and Go structs deterministically via AST.
 import os
 import sys
 import ast
+import re
 from dataclasses import dataclass, field
 from typing import Dict, List, Any, Optional, Tuple
 
@@ -348,6 +349,189 @@ class PolyglotTypeBridge:
                 f"// --- {m.class_name} ---\n// TypeScript:\n{m.typescript}\n\n// Rust:\n{m.rust}\n\n// Go:\n{m.golang}\n\n// Kotlin:\n{m.kotlin}\n\n// Swift:\n{m.swift}"
                 for m in models
             )
+
+    @staticmethod
+    def _camel_to_snake(name: str) -> str:
+        s1 = re.sub(r'(.)([A-Z][a-z]+)', r'\1_\2', name)
+        return re.sub(r'([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
+
+    @classmethod
+    def _map_source_type_to_python(cls, type_str: str, source_lang: str) -> str:
+        t = type_str.strip()
+        lang = source_lang.lower().strip()
+        if lang in ("ts", "typescript"):
+            if t.endswith("[]"):
+                inner = cls._map_source_type_to_python(t[:-2], source_lang)
+                return f"List[{inner}]"
+            if t.startswith("Array<") and t.endswith(">"):
+                inner = cls._map_source_type_to_python(t[6:-1], source_lang)
+                return f"List[{inner}]"
+            if t.startswith("Record<") and t.endswith(">"):
+                parts = [p.strip() for p in t[7:-1].split(",", 1)]
+                k = cls._map_source_type_to_python(parts[0], source_lang) if len(parts) > 0 else "str"
+                v = cls._map_source_type_to_python(parts[1], source_lang) if len(parts) > 1 else "Any"
+                return f"Dict[{k}, {v}]"
+            ts_map = {
+                "string": "str",
+                "number": "int",
+                "boolean": "bool",
+                "any": "Any",
+                "void": "None",
+                "null": "None",
+                "undefined": "None",
+                "Date": "datetime",
+            }
+            return ts_map.get(t, t)
+        elif lang in ("rust", "rs"):
+            if t.startswith("Vec<") and t.endswith(">"):
+                inner = cls._map_source_type_to_python(t[4:-1], source_lang)
+                return f"List[{inner}]"
+            if t.startswith("HashMap<") and t.endswith(">"):
+                parts = [p.strip() for p in t[8:-1].split(",", 1)]
+                k = cls._map_source_type_to_python(parts[0], source_lang) if len(parts) > 0 else "str"
+                v = cls._map_source_type_to_python(parts[1], source_lang) if len(parts) > 1 else "Any"
+                return f"Dict[{k}, {v}]"
+            rust_map = {
+                "String": "str",
+                "&str": "str",
+                "i8": "int", "i16": "int", "i32": "int", "i64": "int", "isize": "int",
+                "u8": "int", "u16": "int", "u32": "int", "u64": "int", "usize": "int",
+                "f32": "float", "f64": "float",
+                "bool": "bool",
+                "DateTime": "datetime",
+                "Uuid": "UUID",
+            }
+            return rust_map.get(t, t)
+        elif lang in ("go", "golang"):
+            if t.startswith("[]"):
+                inner = cls._map_source_type_to_python(t[2:], source_lang)
+                return f"List[{inner}]"
+            if t.startswith("map["):
+                closing = t.find("]")
+                if closing != -1:
+                    k = cls._map_source_type_to_python(t[4:closing], source_lang)
+                    v = cls._map_source_type_to_python(t[closing + 1:], source_lang)
+                    return f"Dict[{k}, {v}]"
+            go_map = {
+                "string": "str",
+                "int": "int", "int8": "int", "int16": "int", "int32": "int", "int64": "int",
+                "uint": "int", "uint8": "int", "uint16": "int", "uint32": "int", "uint64": "int",
+                "float32": "float", "float64": "float",
+                "bool": "bool",
+                "byte": "int",
+                "interface{}": "Any",
+                "any": "Any",
+            }
+            return go_map.get(t, t)
+        return t
+
+    @classmethod
+    def reverse_transpile(cls, code: str, source_lang: str = "ts", model_flavor: str = "dataclass") -> str:
+        """Parses TypeScript interfaces, Rust structs, or Go structs and emits idiomatic Python models."""
+        lang = source_lang.lower().strip()
+        flavor = model_flavor.lower().strip()
+        models = []
+
+        if lang in ("ts", "typescript"):
+            pattern = re.compile(r'(?:export\s+)?(?:interface|type)\s+([A-Za-z0-9_]+)(?:\s*=\s*)?\s*\{([^}]+)\}', re.MULTILINE)
+            for m in pattern.finditer(code):
+                name = m.group(1)
+                body = m.group(2)
+                fields = []
+                for line in re.split(r'[\n;]+', body):
+                    line = line.strip().rstrip(";,")
+                    if not line or line.startswith("//"):
+                        continue
+                    if ":" in line:
+                        fn, ft = line.split(":", 1)
+                        fn = fn.strip()
+                        is_opt = fn.endswith("?")
+                        if is_opt:
+                            fn = fn[:-1].strip()
+                        py_type = cls._map_source_type_to_python(ft.strip(), "ts")
+                        fields.append((cls._camel_to_snake(fn), py_type, is_opt))
+                models.append((name, fields))
+
+        elif lang in ("rust", "rs"):
+            pattern = re.compile(r'(?:pub\s+)?struct\s+([A-Za-z0-9_]+)\s*\{([^}]+)\}', re.MULTILINE)
+            for m in pattern.finditer(code):
+                name = m.group(1)
+                body = m.group(2)
+                fields = []
+                for line in re.split(r'[\n,;]+', body):
+                    line = line.strip().rstrip(",")
+                    if not line or line.startswith("//"):
+                        continue
+                    if line.startswith("pub "):
+                        line = line[4:].strip()
+                    if ":" in line:
+                        fn, ft = line.split(":", 1)
+                        fn = fn.strip()
+                        ft = ft.strip()
+                        is_opt = ft.startswith("Option<") and ft.endswith(">")
+                        if is_opt:
+                            ft = ft[7:-1].strip()
+                        py_type = cls._map_source_type_to_python(ft, "rust")
+                        fields.append((cls._camel_to_snake(fn), py_type, is_opt))
+                models.append((name, fields))
+
+        elif lang in ("go", "golang"):
+            pattern = re.compile(r'type\s+([A-Za-z0-9_]+)\s+struct\s*\{([^}]+)\}', re.MULTILINE)
+            for m in pattern.finditer(code):
+                name = m.group(1)
+                body = m.group(2)
+                fields = []
+                for line in re.split(r'[\n;]+', body):
+                    line = re.sub(r'`[^`]*`', '', line).strip()
+                    if not line or line.startswith("//"):
+                        continue
+                    parts = line.split()
+                    if len(parts) >= 2:
+                        fn, ft = parts[0], parts[1]
+                        is_opt = ft.startswith("*")
+                        if is_opt:
+                            ft = ft[1:]
+                        py_type = cls._map_source_type_to_python(ft, "go")
+                        fields.append((cls._camel_to_snake(fn), py_type, is_opt))
+                models.append((name, fields))
+
+        if not models:
+            return "# No recognizable schemas detected in input code."
+
+        output_blocks = []
+        # Header imports
+        if flavor == "pydantic":
+            header = "from pydantic import BaseModel, Field\nfrom typing import Optional, List, Dict, Any\nfrom datetime import datetime\nfrom uuid import UUID\n"
+        else:
+            header = "from dataclasses import dataclass, field\nfrom typing import Optional, List, Dict, Any\nfrom datetime import datetime\nfrom uuid import UUID\n"
+        output_blocks.append(header)
+
+        for name, fields in models:
+            req_fields = [f for f in fields if not f[2]]
+            opt_fields = [f for f in fields if f[2]]
+
+            lines = []
+            if flavor == "pydantic":
+                lines.append(f"class {name}(BaseModel):")
+                lines.append(f'    """Reverse-transpiled {name} model from {lang.upper()} schema."""')
+            else:
+                lines.append("@dataclass")
+                lines.append(f"class {name}:")
+                lines.append(f'    """Reverse-transpiled {name} dataclass from {lang.upper()} schema."""')
+
+            if not fields:
+                lines.append("    pass")
+            else:
+                # Required first
+                for fn, ft, _ in req_fields:
+                    lines.append(f"    {fn}: {ft}")
+                # Optional second with default
+                for fn, ft, _ in opt_fields:
+                    lines.append(f"    {fn}: Optional[{ft}] = None")
+
+            output_blocks.append("\n".join(lines))
+
+        return "\n\n".join(output_blocks)
 
     @classmethod
     def render_cli(cls, py_file: str, lang: str):

@@ -33,6 +33,7 @@ from tzero_neural_cortex import (
     HallucinationGuard
 )
 from tzero_turbo import get_turbo_accelerator
+from tzero_blackboard import get_shared_blackboard, MultiAgentBlackboard
 
 
 @dataclass
@@ -266,6 +267,7 @@ class AutonomousSwarmCoordinator:
         self.forge = AgentForge()
         self.decomposer = DynamicSubagentDecomposer()
         self.turbo = get_turbo_accelerator()
+        self.blackboard = get_shared_blackboard(workspace_root=self.workspace_root)
 
     def _execute_subtask(
         self,
@@ -345,6 +347,11 @@ class AutonomousSwarmCoordinator:
 
         # Step 1: Decompose mission into subtasks
         subtasks = self.decomposer.decompose(mission_goal, workspace_root=self.workspace_root)
+        self.blackboard.post_discovery(
+            author_agent="OrchestratorPrime",
+            topic="mission_launched",
+            payload={"goal": mission_goal, "subtasks": len(subtasks)}
+        )
 
         group_1 = [t for t in subtasks if t.parallel_group == 1]
         group_2 = [t for t in subtasks if t.parallel_group == 2]
@@ -428,6 +435,9 @@ class AutonomousSwarmCoordinator:
         summary_md.append("```mermaid")
         summary_md.append(mermaid_dag)
         summary_md.append("```")
+        summary_md.append("")
+        summary_md.append("## 📋 Swarm Working Memory & Blackboard")
+        summary_md.append(self.blackboard.export_status_markdown())
 
         return SwarmExecutiveDossier(
             mission_title=mission_goal,

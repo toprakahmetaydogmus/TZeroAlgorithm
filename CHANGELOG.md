@@ -2,21 +2,29 @@
 
 ## [10.8.0] - 2026-11-07
 
-### Released (Official V10.8.0 Sovereign Master Release: Dynamic Subagent Swarm Engine, Turbo Overdrive Accelerator & VS Code Extension Renamed to tzero-mcp)
+### Released (Official V10.8.0 Sovereign Master Release: Dynamic Subagent Swarm Engine, Turbo Overdrive Accelerator, Reverse Polyglot Bridge & Semantic Conflict Healer)
 
-- **Dynamic Subagent Swarm Coordinator (`tzero_subagent_engine.py` / `orchestrate_agent_swarm` tool 44):**
-  - Autonomous task decomposition & dependency DAG graph generation for complex multi-faceted prompts.
+- **Dynamic Subagent Swarm Coordinator & Shared Working Memory (`tzero_subagent_engine.py` / `tzero_blackboard.py`):**
+  - Autonomous task decomposition & dependency DAG graph generation for complex multi-faceted coding missions.
   - Heuristic complexity scoring, dynamic token budgeting, and parallel subagent allocation.
+  - Thread-safe Multi-Agent Swarm Blackboard with symbol-level mutex locks (`claim_symbol`), shared architectural invariants (`post_invariant`), and zero-token in-memory AST context caching.
   - Specialized agent roles: Security Sentinel, AST Architect, Polyglot Transpiler, Quality Auditor, Performance Benchmarker, and Reality Lock Guard.
-  - Zero-Leak security policy enforcement on every synthesized agent prompt.
+
+- **Bidirectional Reverse Polyglot Type Transpiler (`tzero_bridge.py` / `tzero --bridge-reverse`):**
+  - Transpiles TypeScript interfaces/types, Rust structs, and Go structs into clean Python `@dataclass` or Pydantic models.
+  - Converts naming conventions (camelCase -> snake_case) and preserves field optionality with valid default ordering.
+
+- **Semantic 3-Way AST Conflict Healer (`tzero_semantic_merge.py` / `tzero --merge-heal`):**
+  - AST-aware 3-way code merging and automated resolution of git conflict blocks.
+  - Safely unites independent function and class additions, deduplicates polyglot import blocks, and converts broken syntax markers into safe diagnostic comments.
 
 - **Turbo Overdrive Burst Accelerator / Kamçılama Mode (`tzero_turbo.py` / `tzero --turbo` / `tzero --kamcilama`):**
   - Adaptive system latency & load sensing with multi-level acceleration thresholds.
   - Multi-core fast-path cache & AST execution bypass for sub-8ms response times on hot paths.
   - Command-line switch: `tzero --turbo status|benchmark|optimize|purge`.
 
-- **VS Code & Cursor Extension Official Release (`dist/tzero-mcp-10.8.0.vsix`):**
-  - Package renamed to `tzero-mcp` (publisher `siber-akademi`) to resolve Marketplace naming collision and align with PyPI & NPM packages.
+- **VS Code & Cursor Extension Official Release (`dist/tzero-vscode-10.8.0.vsix`):**
+  - Updated manifest and commands matching Marketplace publisher reservation.
   - Packaged with verified SHA-256 integrity checksum for 1-click drag-and-drop or command-line installation.
 
 - **All Automated Unit Tests Green (100% Zero-Leak Certified, $0.00 Budget).**

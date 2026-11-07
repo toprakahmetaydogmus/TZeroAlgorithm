@@ -8,7 +8,7 @@
 3. Anti-Reinvention: Always reuse existing helper functions before writing new utilities.
 4. AST Compression: When ingesting code, prioritize interface signatures and contracts over raw method bodies.
 
-# Key Workspace Classes (791 total)
+# Key Workspace Classes (803 total)
 - ClientTarget (addmcp.py)
 - AddMCPApp (addmcp.py)
 - ASTContextArchitect (app.py)
@@ -20,17 +20,17 @@
 - BenchmarkReport (tzero_benchmark.py)
 - TZeroBenchmarkEngine (tzero_benchmark.py)
 - JarvisBenchmarkOptimizer (tzero_benchmark.py)
+- BlackboardEntry (tzero_blackboard.py)
+- SymbolLock (tzero_blackboard.py)
+- SharedInvariant (tzero_blackboard.py)
+- MultiAgentBlackboard (tzero_blackboard.py)
 - ModelField (tzero_bridge.py)
 - TranspiledModel (tzero_bridge.py)
 - PolyglotTypeBridge (tzero_bridge.py)
 - CIPipelineGenerator (tzero_ci.py)
 - DiffSemantics (tzero_commit.py)
-- LocalSemanticCommitSynthesizer (tzero_commit.py)
-- ModelCostComparison (tzero_cost.py)
-- CostReport (tzero_cost.py)
-- TokenCostCalculator (tzero_cost.py)
 
-# Key Exported Helpers (217 total)
+# Key Exported Helpers (221 total)
 - build_client_targets() (addmcp.py)
 - server_entry() (addmcp.py)
 - merge_server_config() (addmcp.py)
@@ -54,8 +54,8 @@
 - get_logo_photo_image() (siber_akademi_icon.py)
 - apply_window_icon() (siber_akademi_icon.py)
 - main() (tzero_benchmark.py)
+- get_shared_blackboard() (tzero_blackboard.py)
 - main() (tzero_cost.py)
-- start_dashboard_server() (tzero_dashboard.py)
 
 # Verification Command
 Run verification before completing any task:

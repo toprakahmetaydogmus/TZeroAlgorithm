@@ -8711,10 +8711,14 @@ def main():
     parser.add_argument("--fix", metavar="FILE_OR_CODE", default=None, help="Self-healing AST auto-corrector for hallucinated AI methods and phantom imports")
     parser.add_argument("--bridge", metavar="FILE", default=None, help="Polyglot type & schema transpiler: convert Python models to TS, Rust, or Go")
     parser.add_argument("--bridge-lang", choices=["ts", "rust", "go", "kt", "swift", "all"], default="ts", help="Target language for --bridge (ts, rust, go, kt, swift, all)")
+    parser.add_argument("--bridge-reverse", metavar="FILE_OR_CODE", default=None, help="Reverse polyglot transpiler: convert TypeScript/Rust/Go schemas to Python dataclasses")
+    parser.add_argument("--from-lang", choices=["ts", "rust", "go"], default="ts", help="Source language for --bridge-reverse (ts, rust, go)")
+    parser.add_argument("--model-flavor", choices=["dataclass", "pydantic"], default="dataclass", help="Output model flavor for --bridge-reverse (dataclass, pydantic)")
     parser.add_argument("--replay", nargs="?", const=15, type=int, default=None, metavar="COMMITS", help="Historical git token and financial ROI replay (default: 15 commits)")
     parser.add_argument("--pc-fixer", "--fixer", nargs="?", const=".", default=None, metavar="DIR", help="Autonomous self-healing PC & codebase doctor (heal syntax, imports, venv, caches)")
     parser.add_argument("--explain", metavar="FILE", default=None, help="Generate high-density AST architectural passport for file or LLM prompt")
     parser.add_argument("--turbo", "--overdrive", "--kamcilama", nargs="?", const="status", default=None, metavar="CMD", help="Turbo Overdrive Burst Accelerator (Kamçılama): adaptive latency sensing & multi-core fast-path cache")
+    parser.add_argument("--merge-heal", metavar="FILE", default=None, help="Autonomous AST semantic 3-way merge conflict healer")
     parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect v10.8.0 Master Edition (engine v4.1.0)")
 
 
@@ -9052,6 +9056,28 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
         blang = getattr(args, "bridge_lang", "ts")
         PolyglotTypeBridge.render_cli(target, blang)
         sys.exit(0)
+    elif getattr(args, "bridge_reverse", None) is not None:
+        from tzero_bridge import PolyglotTypeBridge
+        target = args.bridge_reverse
+        flang = getattr(args, "from_lang", "ts")
+        flavor = getattr(args, "model_flavor", "dataclass")
+        if os.path.isfile(target):
+            with open(target, "r", encoding="utf-8", errors="replace") as f:
+                content = f.read()
+        else:
+            content = target
+        out = PolyglotTypeBridge.reverse_transpile(content, source_lang=flang, model_flavor=flavor)
+        print(f"\n🌉 \033[1mT-ZERO REVERSE POLYGLOT SCHEMA TRANSPILER ({flang.upper()} -> Python {flavor.capitalize()})\033[0m")
+        print("=" * 70)
+        print(out)
+        print("=" * 70)
+        sys.exit(0)
+    elif getattr(args, "merge_heal", None) is not None:
+        from tzero_semantic_merge import ASTSemanticMerger
+        target = args.merge_heal
+        res = ASTSemanticMerger.heal_file_on_disk(target, write_in_place=not getattr(args, "dry_run", False))
+        ASTSemanticMerger.render_cli(res, file_hint=target)
+        sys.exit(0 if res.success else 1)
     elif getattr(args, "replay", None) is not None:
         from tzero_replay import HistoricalTokenReplay
         max_c = args.replay if isinstance(args.replay, int) else 15

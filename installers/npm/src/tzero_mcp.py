@@ -30,7 +30,7 @@ try:
 except ImportError:
     ToolAnnotations = None
 
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional, Any, Union
 try:
     from typing import Annotated
 except ImportError:
@@ -4253,12 +4253,14 @@ def create_mcp_server():
         action: Annotated[str, Field(default="auto", description="Workflow operation: 'auto' (comprehensive all-in-one pipeline), 'context', 'audit', 'security', 'blueprint', 'dependencies', 'impact', 'search', 'prune', 'heal', 'memory', 'swarm', 'design'.")] = "auto",
         target: Annotated[str, Field(default=".", description="Target repository path, file path, diff string, or code snippet (default: '.').")] = ".",
         query: Annotated[str, Field(default="", description="Search query, focus symbol name, or task goal prompt.")] = "",
-        options: Annotated[str, Field(default="", description="Optional JSON string of additional configuration parameters.")] = ""
+        options: Annotated[Union[str, Dict[str, Any]], Field(default="", description="Optional JSON string or dictionary of additional configuration parameters.")] = ""
     ) -> str:
         """Autonomous all-in-one T-Zero master tool executing any codebase workflow in a single command."""
         act = (action or "auto").lower().strip()
         opts = {}
-        if options:
+        if isinstance(options, dict):
+            opts = options
+        elif isinstance(options, str) and options.strip():
             try:
                 opts = json.loads(options)
             except Exception:
@@ -4399,6 +4401,47 @@ def create_mcp_server():
 
         elif act in ("drift", "drift_analysis", "instruction_drift", "attention_drift"):
             return analyze_instruction_drift(workspace_dir=target if os.path.isdir(target) else ".")
+
+        elif act in ("merge_heal", "semantic_merge", "merge", "conflict_heal"):
+            from tzero_semantic_merge import ASTSemanticMerger
+            target_file = target or query
+            if os.path.isfile(target_file):
+                res = ASTSemanticMerger.heal_file_on_disk(target_file, write_in_place=bool(opts.get("write", True)))
+                return json.dumps({
+                    "success": res.success,
+                    "auto_resolved_conflicts": res.auto_resolved_conflicts,
+                    "unresolved_conflicts": res.unresolved_conflicts,
+                    "details": res.details
+                }, indent=2)
+            else:
+                res = ASTSemanticMerger.heal_conflict_file(query or target)
+                return res.merged_code
+
+        elif act in ("bridge_reverse", "reverse_transpile", "ts_to_py", "rust_to_py", "go_to_py"):
+            from tzero_bridge import PolyglotTypeBridge
+            src_code = query or target
+            if os.path.isfile(src_code):
+                with open(src_code, "r", encoding="utf-8", errors="replace") as f:
+                    src_code = f.read()
+            flang = opts.get("from_lang", "ts")
+            flavor = opts.get("flavor", "dataclass")
+            return PolyglotTypeBridge.reverse_transpile(src_code, source_lang=flang, model_flavor=flavor)
+
+        elif act in ("blackboard", "swarm_memory", "invariants", "locks"):
+            from tzero_blackboard import get_shared_blackboard
+            bb = get_shared_blackboard(workspace_root=target if os.path.isdir(target) else ".")
+            sub_op = opts.get("operation", "status")
+            if sub_op == "post_invariant":
+                inv_id = bb.post_invariant(source_agent=opts.get("agent", "Agent"), description=query or target, severity=opts.get("severity", "HIGH"))
+                return f"✅ Posted invariant: {inv_id}"
+            elif sub_op == "claim_lock":
+                ok = bb.claim_symbol(agent_id=opts.get("agent", "Agent"), file_path=target, symbol_name=query or opts.get("symbol", ""))
+                return f"Lock {'granted' if ok else 'denied'}"
+            elif sub_op == "release_lock":
+                ok = bb.release_symbol(agent_id=opts.get("agent", "Agent"), file_path=target, symbol_name=query or opts.get("symbol", ""))
+                return f"Lock {'released' if ok else 'failed to release'}"
+            else:
+                return bb.export_status_markdown()
 
         # Fallback to general dispatch
         handler = _CANONICAL_DISPATCH.get(act) or _LEGACY_DISPATCH.get(act)

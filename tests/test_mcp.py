@@ -792,7 +792,33 @@ diff --git a/core.py b/core.py
         res_drift = self.run_async(self.server.call_tool("execute_codebase_workflow", {"action": "drift", "target": "."}))
         self.assertIn("Instruction & Architecture Drift Analysis", tool_result_text(res_drift))
 
-        # Test 7: Unknown action error handling
+        # Test 7: Action = 'reverse_transpile'
+        ts_code = "interface UserSession { token: string; expiresAt: number; }"
+        res_rev = self.run_async(self.server.call_tool("execute_codebase_workflow", {
+            "action": "reverse_transpile",
+            "query": ts_code,
+            "options": {"from_lang": "ts", "flavor": "dataclass"}
+        }))
+        self.assertIn("class UserSession:", tool_result_text(res_rev))
+        self.assertIn("token: str", tool_result_text(res_rev))
+
+        # Test 8: Action = 'semantic_merge'
+        conflicted_snippet = "<<<<<<< HEAD\ndef left(): return 1\n=======\ndef right(): return 2\n>>>>>>> feat\n"
+        res_merge = self.run_async(self.server.call_tool("execute_codebase_workflow", {
+            "action": "semantic_merge",
+            "query": conflicted_snippet
+        }))
+        self.assertIn("def left(): return 1", tool_result_text(res_merge))
+        self.assertIn("def right(): return 2", tool_result_text(res_merge))
+
+        # Test 9: Action = 'blackboard'
+        res_bb = self.run_async(self.server.call_tool("execute_codebase_workflow", {
+            "action": "blackboard",
+            "options": {"operation": "status"}
+        }))
+        self.assertIn("T-Zero Multi-Agent Blackboard State", tool_result_text(res_bb))
+
+        # Test 10: Unknown action error handling
         res_err = self.run_async(self.server.call_tool("execute_codebase_workflow", {"action": "invalid_unknown_action"}))
         self.assertIn("Unknown action", tool_result_text(res_err))
 

@@ -5,9 +5,11 @@ All notable changes to the `tzero-mcp` package are documented in this file.
 ## [10.8.0] - 2026-11-07
 
 ### Added
-- Dynamic Multi-Agent Swarm Coordinator (`tzero_subagent_engine.py` / `orchestrate_agent_swarm` MCP tool).
+- Dynamic Multi-Agent Swarm Coordinator & Shared Working Memory (`tzero_subagent_engine.py` / `tzero_blackboard.py`).
+- Bidirectional Reverse Polyglot Type Transpiler (`tzero_bridge.py` / `--bridge-reverse`): TS/Rust/Go -> Python models.
+- Semantic 3-Way AST Conflict Healer (`tzero_semantic_merge.py` / `--merge-heal`): Resolves git conflict markers on disjoint ASTs.
 - Turbo Overdrive Burst Accelerator / Kamçılama Mode (`tzero_turbo.py` / `--turbo` / `--kamcilama`).
-- VS Code & Cursor Extension official release renamed to `tzero-mcp` with pre-built `.vsix`.
+- VS Code & Cursor Extension official release (`tzero-vscode-10.8.0.vsix`).
 - Sub-8ms multi-core AST response caching and adaptive latency sensing.
 
 ## [10.7.4] - 2026-11-07
