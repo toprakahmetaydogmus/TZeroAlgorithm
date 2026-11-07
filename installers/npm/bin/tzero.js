@@ -8,16 +8,20 @@
 
 const { spawn, execSync } = require("child_process");
 const process = require("process");
+const path = require("path");
+const pkg = require("../package.json");
 
 const banner = `\x1b[33m
 ┌──────────────────────────────────────────────────────────────────────────────┐
-│  ⭐ T-ZERO CONTEXT ARCHITECT & MCP ENGINE v10.7.0                            │
+│  ⭐ T-ZERO CONTEXT ARCHITECT & MCP ENGINE v${pkg.version}                            │
 │                                                                              │
 │  Hi! I'm Toprak Ahmet Aydoğmuş, a 15-year-old developer from Siber Akademi. │
 │  I built T-Zero from scratch to eliminate token bloat and AI hallucinations. │
 │                                                                              │
-│  If this tool saves you tokens, please give us a ⭐ on GitHub:              │
+│  If this tool saves you tokens, please give our project a STAR on GitHub:    │
 │  👉 https://github.com/toprakahmetaydogmus/TZeroAlgorithm                    │
+│                                                                              │
+│  Every star means the world to a young open-source creator! 🚀 Thank you!    │
 └──────────────────────────────────────────────────────────────────────────────┘
 \x1b[0m`;
 
@@ -38,7 +42,6 @@ function findPython() {
   return null;
 }
 
-const path = require("path");
 const py = findPython();
 if (!py) {
   console.error("\x1b[31m[ERROR] Python 3.10+ is required to run T-Zero.\x1b[0m");
@@ -59,4 +62,3 @@ const child = spawn(py, args, { stdio: "inherit", env });
 child.on("close", (code) => {
   process.exit(code ?? 0);
 });
-

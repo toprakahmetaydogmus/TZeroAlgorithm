@@ -15,6 +15,7 @@
 [![PyPI Total Downloads](https://img.shields.io/badge/PyPI%20Downloads-17%2C387%2B-38bdf8?style=flat-square&logo=pypi&logoColor=white)](https://pypistats.org/packages/tzero-mcp)
 [![Git Clones](https://img.shields.io/badge/Git%20Clones-1%2C275%20(14d)-10b981?style=flat-square&logo=git&logoColor=white)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)
 [![PyPI Version](https://img.shields.io/pypi/v/tzero-mcp?color=38bdf8&style=flat-square&logo=pypi)](https://pypi.org/project/tzero-mcp/)
+[![npm Version](https://img.shields.io/npm/v/tzero-mcp?color=cb3837&style=flat-square&logo=npm)](https://www.npmjs.com/package/tzero-mcp)
 [![Python Version](https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13-blue?style=flat-square)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions)
 [![Tests](https://img.shields.io/badge/tests-352%20passing-34d399?style=flat-square&logo=githubactions)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions)
 [![GitHub Action](https://img.shields.io/badge/GitHub%20Action-CI%20Review%20Gate-2088FF?style=flat-square&logo=githubactions&logoColor=white)](docs/github_action_guide.md)
@@ -33,6 +34,7 @@
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/toprakahmetaydogmus/TZeroAlgorithm)
 [![Smithery Badge](https://smithery.ai/badge/@toprakahmetaydogmus/TZeroAlgorithm)](https://smithery.ai/server/@toprakahmetaydogmus/TZeroAlgorithm)
 [![Git Clones](https://img.shields.io/badge/%F0%9F%9A%80%20Repository%20Clones-1%2C275%20(14d)-10b981?style=for-the-badge&logo=git&logoColor=white)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)
+[![npm Package](https://img.shields.io/badge/%F0%9F%93%A6%20npm-tzero--mcp-cb3837?style=for-the-badge&logo=npm&logoColor=white)](https://www.npmjs.com/package/tzero-mcp)
 [![Glama Grade A](https://img.shields.io/badge/%E2%9A%A1%20Glama%20MCP-Grade%20A%20Verified-8b5cf6?style=for-the-badge&logo=checkmarx&logoColor=white)](https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm)
 
 </div>
@@ -59,7 +61,14 @@ curl -fsSL https://raw.githubusercontent.com/toprakahmetaydogmus/TZeroAlgorithm/
 # Windows (PowerShell):
 irm https://raw.githubusercontent.com/toprakahmetaydogmus/TZeroAlgorithm/main/install.ps1 | iex
 
-# 📦 Option B: Standard Python package:
+# 📦 Option B: Node.js / npm (Zero-Config Global & NPX Runner):
+# Instant 1-line execution (Claude Desktop, Cursor, Antigravity, Copilot):
+npx -y tzero-mcp@latest
+
+# Global CLI installation via npm:
+npm install -g tzero-mcp
+
+# 📦 Option C: Standard Python package:
 pip install tzero-mcp --upgrade
 
 # ⚡ Instant Live Interactive Demo (See AST pruning & Reality-Lock in 0.5s):
@@ -77,7 +86,7 @@ tzero --watch
 # 🔍 Autonomous Pre-Commit & PR Reality-Lock Gate:
 tzero review
 
-# 🧩 Option C: Official Global Package Managers
+# 🧩 Option D: Official Global Package Managers
 # Windows (WinGet):
 winget install SiberAkademi.TZero
 

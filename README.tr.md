@@ -27,7 +27,14 @@ Yapay zeka modellerine tüm kaynak kodlar metin olarak verildiğinde, fonksiyon 
 
 ### 30 Saniyede Hızlı Kurulum:
 ```bash
-# Kurulum:
+# 📦 Node.js / npm ile Anında Çalıştırma (Kurulumsuz, Sıfır Ayar):
+# Claude Desktop, Cursor, Antigravity, Copilot için:
+npx -y tzero-mcp@latest
+
+# Global NPM Kurulumu:
+npm install -g tzero-mcp
+
+# 📦 Python pip ile Kurulum:
 pip install tzero-mcp --upgrade
 
 # ⚡ Canlı İnteraktif Demo (AST sıkıştırma ve Reality-Lock'u 0.5 saniyede görün):
