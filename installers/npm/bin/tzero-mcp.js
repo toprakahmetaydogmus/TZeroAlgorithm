@@ -2,7 +2,7 @@
 
 /**
  * T-Zero Model Context Protocol (MCP) Server Launcher
- * Author: Toprak Ahmet Aydoğmuş (15-Year-Old Solo Developer @ Siber Akademi)
+ * Author: Toprak Ahmet Aydoğmuş (Siber Akademi)
  * Repository: https://github.com/toprakahmetaydogmus/TZeroAlgorithm
  */
 
@@ -12,17 +12,13 @@ const path = require("path");
 const pkg = require("../package.json");
 
 // In MCP mode, banner is printed to stderr to keep stdout strictly for JSON-RPC
-const banner = `\x1b[33m
+const banner = `\x1b[36m
 ┌──────────────────────────────────────────────────────────────────────────────┐
-│  ⭐ T-ZERO MCP SERVER v${pkg.version} (Model Context Protocol)                       │
+│  ⚡ T-ZERO MCP SERVER v${pkg.version} (Model Context Protocol)                       │
+│  Enterprise AST Context Compressor, Zero-Leak Guard & 20 Canonical Tools     │
 │                                                                              │
-│  Hi! I'm Toprak Ahmet Aydoğmuş, a 15-year-old developer from Siber Akademi. │
-│  I created T-Zero to eliminate token limits & hallucinations.                │
-│                                                                              │
-│  If T-Zero helps your workflows, please give our project a STAR on GitHub:   │
-│  👉 https://github.com/toprakahmetaydogmus/TZeroAlgorithm                    │
-│                                                                              │
-│  Every star means the world to a young open-source creator! 🚀 Thank you!    │
+│  ⭐ Star on GitHub: https://github.com/toprakahmetaydogmus/TZeroAlgorithm    │
+│  🔌 Connected to:   Cursor, Claude Desktop, Antigravity, Windsurf & Cline    │
 └──────────────────────────────────────────────────────────────────────────────┘
 \x1b[0m`;
 

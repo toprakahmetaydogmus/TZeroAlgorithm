@@ -2,7 +2,7 @@
 
 /**
  * T-Zero Context Architect CLI Launcher
- * Author: Toprak Ahmet Aydoğmuş (15-Year-Old Solo Developer @ Siber Akademi)
+ * Author: Toprak Ahmet Aydoğmuş (Siber Akademi)
  * Repository: https://github.com/toprakahmetaydogmus/TZeroAlgorithm
  */
 
@@ -11,17 +11,13 @@ const process = require("process");
 const path = require("path");
 const pkg = require("../package.json");
 
-const banner = `\x1b[33m
+const banner = `\x1b[36m
 ┌──────────────────────────────────────────────────────────────────────────────┐
-│  ⭐ T-ZERO CONTEXT ARCHITECT & MCP ENGINE v${pkg.version}                            │
+│  ⚡ T-ZERO CONTEXT ARCHITECT & MCP ENGINE v${pkg.version}                            │
+│  Deterministic AST Context Compressor, 95% Token Reducer & Security Guard    │
 │                                                                              │
-│  Hi! I'm Toprak Ahmet Aydoğmuş, a 15-year-old developer from Siber Akademi. │
-│  I built T-Zero from scratch to eliminate token bloat and AI hallucinations. │
-│                                                                              │
-│  If this tool saves you tokens, please give our project a STAR on GitHub:    │
-│  👉 https://github.com/toprakahmetaydogmus/TZeroAlgorithm                    │
-│                                                                              │
-│  Every star means the world to a young open-source creator! 🚀 Thank you!    │
+│  ⭐ Star on GitHub: https://github.com/toprakahmetaydogmus/TZeroAlgorithm    │
+│  💡 1-Click Init:   tzero init (Cursor, Claude, Windsurf, Antigravity)       │
 └──────────────────────────────────────────────────────────────────────────────┘
 \x1b[0m`;
 

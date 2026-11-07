@@ -450,11 +450,11 @@ curl -fsSL https://raw.githubusercontent.com/toprakahmetaydogmus/tzero-pc-fixer/
 
 ---
 
-## ⭐ Support a 15-Year-Old Open-Source Developer!
+## ⭐ Support Open-Source Innovation!
 
-Hi! I'm **Toprak Ahmet Aydoğmuş**, a 15-year-old self-taught developer from Siber Akademi. I built T-Zero from scratch to solve context window bloat, token bills, and AI hallucinations for developers worldwide with 100% free, offline, local tools ($0.00 cloud cost).
+Hi! I'm **Toprak Ahmet Aydoğmuş** from Siber Akademi. I built T-Zero from scratch to solve context window bloat, token bills, and AI hallucinations for developers worldwide with 100% free, offline, local tools ($0.00 cloud cost).
 
-If T-Zero helped you cut prompt tokens or saved your daily coding workflow, please consider giving us a star! Every star means the world to a young open-source developer. 🚀
+If T-Zero helped you cut prompt tokens or saved your daily coding workflow, please consider giving us a star! Every star helps open-source developers worldwide. 🚀
 
 <div align="center">
 
@@ -462,7 +462,7 @@ If T-Zero helped you cut prompt tokens or saved your daily coding workflow, plea
 [![GitHub forks](https://img.shields.io/github/forks/toprakahmetaydogmus/TZeroAlgorithm?style=social)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)
 
 **T-Zero is 100% Free, Open-Source & Offline Forever.**  
-*Built with passion by Toprak Ahmet Aydoğmuş (15-year-old developer) for developers worldwide.*
+*Built with passion by Toprak Ahmet Aydoğmuş (Siber Akademi) for developers worldwide.*
 
 </div>
 
@@ -484,7 +484,7 @@ Join the revolution in context engineering and deterministic token pruning!
 
 ## 📜 License & Siberian Academy
 
-- **Author & Architect:** Toprak Ahmet Aydoğmuş (15-Year-Old Solo Developer, Siber Akademi)
+- **Author & Architect:** Toprak Ahmet Aydoğmuş (Lead Software Engineer & Architect, Siber Akademi)
 - **LinkedIn:** [Toprak Ahmet Aydoğmuş](https://linkedin.com/in/toprak-ahmet-aydo%C4%9Fmu%C5%9F-60462534b/)
 - **Bio & Hub:** [hopp.bio/siberegitim](https://hopp.bio/siberegitim)
 - **License:** [MIT Open Source License](LICENSE)

@@ -51,11 +51,11 @@ code --install-extension dist/tzero-vscode-10.7.4.vsix
 
 ---
 
-## ⭐ 15 Yaşındaki Genç Bir Açık Kaynak Geliştiriciyi Destekleyin!
+## ⭐ Açık Kaynak İnovasyonu Destekleyin!
 
-Merhaba! Ben **Toprak Ahmet Aydoğmuş**, Siber Akademi'den 15 yaşında genç bir yazılımcıyım. T-Zero'yu sıfırdan, yapay zeka kodlama araçlarındaki token israfını ve halüsinasyonları çözmek için %100 yerel ve ücretsiz ($0 maliyet) olarak geliştirdim.
+Merhaba! Ben **Toprak Ahmet Aydoğmuş**, Siber Akademi'den. T-Zero'yu sıfırdan, yapay zeka kodlama araçlarındaki token israfını ve halüsinasyonları çözmek için %100 yerel ve ücretsiz ($0 maliyet) olarak geliştirdim.
 
-Eğer T-Zero işinize yaradıysa lütfen GitHub üzerinden bir ⭐ vermeyi unutmayın! Her yıldız genç bir açık kaynak geliştirici için dünyalara bedel. 🚀
+Eğer T-Zero işinize yaradıysa lütfen GitHub üzerinden bir ⭐ vermeyi unutmayın! Her yıldız açık kaynak ekosistemini güçlendirir. 🚀
 
 <div align="center">
 

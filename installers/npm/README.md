@@ -9,14 +9,14 @@
 
 ---
 
-### ⭐ Built by a 15-Year-Old Solo Developer (Please Star Our Repo!)
+### ⭐ Open-Source Engineering (Please Star Our Repo!)
 
-Hi! I'm **Toprak Ahmet Aydoğmuş**, a 15-year-old solo open-source developer from **Siber Akademi**. I created T-Zero from scratch to eliminate token limits, reduce prompt costs by up to 95%, and stop AI coding hallucinations using deterministic Abstract Syntax Tree (AST) analysis.
+Hi! I'm **Toprak Ahmet Aydoğmuş** from **Siber Akademi**. I created T-Zero from scratch to eliminate token limits, reduce prompt costs by up to 95%, and stop AI coding hallucinations using deterministic Abstract Syntax Tree (AST) analysis.
 
 If this package helps your engineering team or AI workflows:  
 ⭐ **Please give our repository a STAR on GitHub:**  
 👉 **[https://github.com/toprakahmetaydogmus/TZeroAlgorithm](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)**  
-*Every single star means the world to a young open-source creator! 🚀*
+*100% Free & Open-Source under MIT License. Thank you! 🚀*
 
 ---
 
