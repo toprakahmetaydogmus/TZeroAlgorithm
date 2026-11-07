@@ -25,3 +25,4 @@ jobs:
         run: |
           cd installers/npm
           npm publish --access public
+

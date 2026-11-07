@@ -38,6 +38,7 @@ function findPython() {
   return null;
 }
 
+const path = require("path");
 const py = findPython();
 if (!py) {
   console.error("\x1b[31m[ERROR] Python 3.10+ is required to run T-Zero.\x1b[0m");
@@ -45,23 +46,15 @@ if (!py) {
   process.exit(1);
 }
 
-// Ensure tzero_v3 module is installed in this python environment
-try {
-  execSync(`${py} -c "import tzero_v3"`, { stdio: "ignore" });
-} catch (e) {
-  if (process.stdout.isTTY) {
-    console.log("\x1b[36m[T-Zero] First-time setup: installing tzero-mcp from PyPI...\x1b[0m");
-  }
-  try {
-    execSync(`${py} -m pip install -U tzero-mcp`, { stdio: "inherit" });
-  } catch (err) {
-    console.error("\x1b[31m[ERROR] Failed to auto-install tzero-mcp. Please run: pip install -U tzero-mcp\x1b[0m");
-    process.exit(1);
-  }
-}
+const srcDir = path.resolve(__dirname, "..", "src");
+const scriptPath = path.join(srcDir, "tzero_v3.py");
 
-const args = ["-m", "tzero_v3", ...process.argv.slice(2)];
-const child = spawn(py, args, { stdio: "inherit" });
+const env = Object.assign({}, process.env, {
+  PYTHONPATH: srcDir + (process.env.PYTHONPATH ? path.delimiter + process.env.PYTHONPATH : "")
+});
+
+const args = [scriptPath, ...process.argv.slice(2)];
+const child = spawn(py, args, { stdio: "inherit", env });
 
 child.on("close", (code) => {
   process.exit(code ?? 0);

@@ -1,10 +1,11 @@
 {
   "name": "tzero-mcp",
-  "version": "10.7.0",
+  "version": "10.7.1",
   "description": "Deterministic AST Context Compressor, 95% Token Reducer & 20-Tool MCP Server for Cursor, Claude Desktop & Copilot.",
   "main": "index.js",
   "files": [
     "bin",
+    "src",
     "index.js",
     "README.md",
     "LICENSE",
