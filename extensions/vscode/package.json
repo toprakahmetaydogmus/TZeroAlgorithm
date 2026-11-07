@@ -38,6 +38,10 @@
     "onStartupFinished"
   ],
   "main": "./src/extension.js",
+  "scripts": {
+    "package": "vsce package --no-dependencies",
+    "publish": "vsce publish --no-dependencies"
+  },
   "files": [
     "src",
     "README.md",
