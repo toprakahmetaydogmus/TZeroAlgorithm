@@ -48,7 +48,7 @@ pip install --upgrade tzero-mcp
 tzero init
 
 # 🧩 VS Code / Cursor Eklentisini (.vsix) Yükle:
-code --install-extension dist/tzero-mcp-10.8.0.vsix
+code --install-extension dist/tzero-vscode-10.8.0.vsix
 ```
 
 ---
