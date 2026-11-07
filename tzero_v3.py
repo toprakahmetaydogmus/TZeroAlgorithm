@@ -8697,7 +8697,7 @@ def main():
     parser.add_argument("--guard-install", action="store_true", help="Install local git pre-commit zero-leak and token security hook")
     parser.add_argument("--tui", "--monitor", "--cockpit", action="store_true", help="Launch live ANSI terminal cockpit and interactive executive dashboard")
     parser.add_argument("--neural", "--cortex", action="store_true", help="Launch T-Zero Neural Cortex & Autonomous Multi-Agent OS")
-    parser.add_argument("--swarm", nargs="?", const=".", default=None, metavar="MISSION", help="Run 12-agent autonomous neural swarm evaluation on workspace")
+    parser.add_argument("--swarm", "--subagent", "--subagents", nargs="?", const=".", default=None, metavar="MISSION", help="Autonomous dynamic subagent decomposition & multi-agent swarm execution")
     parser.add_argument("--forge", nargs=2, metavar=("ROLE", "TASK"), help="Synthesize domain-specific subagent persona (e.g. --forge SecurityAuditor 'Audit API routes')")
     parser.add_argument("--matrix", action="store_true", help="Display full 105 T-Zero Enterprise AI Capability Matrix")
     parser.add_argument("--pillar", type=int, choices=range(1, 8), default=None, help="Filter --matrix by Pillar number (1 to 7)")
@@ -8914,6 +8914,8 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
             "neural": "--neural",
             "cortex": "--neural",
             "swarm": "--swarm",
+            "subagent": "--swarm",
+            "subagents": "--swarm",
             "forge": "--forge",
             "matrix": "--matrix",
             "tutorial": "--tutorial",
@@ -9183,20 +9185,20 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
             print(f"  \033[32m[{cap.id}]\033[0m \033[1m{cap.name}\033[0m ({cap.tier}) - {cap.description}")
         sys.exit(0)
     elif getattr(args, "swarm", None) is not None:
-        from tzero_neural_cortex import NeuralSwarmCoordinator
-        coordinator = NeuralSwarmCoordinator()
+        from tzero_subagent_engine import get_autonomous_swarm_coordinator
         mission_text = args.swarm if args.swarm != "." else "Full Workspace AST & Security Audit"
-        plan = coordinator.create_mission_plan(
-            mission_title=mission_text,
-            tasks=[{"agent": a["name"], "scope": [args.dir]} for a in coordinator.fleet.list_agents()]
-        )
-        report = coordinator.execute_mission(plan)
-        print(f"\n\033[36m🐝 T-ZERO NEURAL SWARM MISSION: {mission_text}\033[0m")
-        print(f"Conflict-Free Isolation: {'✅ Active' if report['conflict_free'] else '⚠️ Overlapping'}")
+        coordinator = get_autonomous_swarm_coordinator(workspace_root=args.dir)
+        dossier = coordinator.execute_mission(mission_goal=mission_text)
+        print(f"\n\033[36m🐝 T-ZERO DYNAMIC SUBAGENT SWARM: {mission_text}\033[0m")
+        status_color = "\033[32m" if dossier.consensus == "APPROVED" else "\033[33m"
+        print(f"Executive Consensus: {status_color}{dossier.consensus} ({dossier.consensus_score:.1f}%)\033[0m")
+        print(f"Subagents Dispatched: {dossier.subagents_engaged} ({dossier.dynamic_subagents_created} dynamic on-the-fly) in {dossier.total_execution_ms:.1f}ms")
         print("================================================================================")
-        for res in report["agent_results"]:
-            status_color = "\033[32m" if res.get("verdict") == "APPROVED" else "\033[33m"
-            print(f"  {status_color}[{res.get('verdict')}]\033[0m \033[1m{res.get('agent_name')}\033[0m: {res.get('findings', [''])[0]}")
+        for res in dossier.subagent_reports:
+            r_color = "\033[32m" if res.verdict in ("APPROVED", "COMPLETED") else "\033[33m"
+            dyn_tag = " \033[35m[DYNAMIC SYNTHESIS]\033[0m" if res.is_dynamic else ""
+            finding_text = res.findings[0] if res.findings else ""
+            print(f"  {r_color}[{res.verdict}]\033[0m \033[1m{res.agent_name}\033[0m{dyn_tag}: {finding_text}")
         sys.exit(0)
     elif getattr(args, "forge", None) is not None:
         from tzero_neural_cortex import AgentForge

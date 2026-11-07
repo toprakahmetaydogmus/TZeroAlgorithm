@@ -303,6 +303,25 @@ tzero turbo clear
 
 ---
 
+<a id="autonomous-dynamic-subagent-swarm"></a>
+## 🐝 Autonomous Dynamic Subagent Decomposer & Swarm
+
+When given a complex mission (e.g. *"Audit secrets, verify architectural boundaries, optimize database queries, and generate unit tests"*), T-Zero automatically:
+1. **Decomposes Composite Goals:** Identifies independent subtasks across security, architecture, performance, testing, and custom domains.
+2. **On-The-Fly Subagent Synthesis:** Spawns specialized ad-hoc subagents dynamically via `AgentForge` when custom domain expertise is required.
+3. **Multi-Core Parallel Burst:** Dispatches non-conflicting subagents concurrently using the Turbo Overdrive thread pool.
+4. **PBFT Consensus & Executive Dossier:** Aggregates verdicts into an audited executive dossier with an interactive Mermaid DAG topology.
+
+```bash
+# Decompose and execute composite mission across dynamic subagents:
+tzero subagent "Audit security, check AST architecture, and run test coverage"
+
+# Run swarm with custom domain requirements (auto-synthesizes ad-hoc agents):
+tzero swarm "Migrate database schema and optimize websocket streaming"
+```
+
+---
+
 <a id="tdqs-certification"></a>
 ## 🏆 100% TDQS 5.0 / 5.0 Anchor Certification Standard
 

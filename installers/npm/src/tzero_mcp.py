@@ -3593,18 +3593,32 @@ def create_mcp_server():
     )
     def orchestrate_agent_swarm(
         goal: Annotated[str, Field(description="High-level goal description, swarm proposal, or failing test traceback to heal.")],
-        orchestration_mode: Annotated[str, Field(default="goal_execute", description="Orchestration mode: 'goal_execute' for autonomous goal planning and execution, 'swarm_consensus' for Byzantine fault-tolerant voting, 'self_healing' for AST error diagnosis and automated patching.")] = "goal_execute",
+        orchestration_mode: Annotated[str, Field(default="goal_execute", description="Orchestration mode: 'goal_execute' for autonomous goal planning and execution, 'swarm_consensus' for Byzantine fault-tolerant voting, 'self_healing' for AST error diagnosis and automated patching, 'dynamic_subagents' for dynamic task decomposition and on-the-fly subagent synthesis.")] = "goal_execute",
         agents: Annotated[str, Field(default="", description="Comma-separated list of agent roles participating in swarm execution (e.g. 'architect,coder,tester').")] = "",
         project_root: Annotated[str, Field(default=".", description="Workspace root for swarm execution (default: current directory).")] = "."
     ) -> str:
         """Coordinates autonomous multi-agent swarms, goal execution, PBFT consensus, and self-healing."""
         o_mode = (orchestration_mode or "goal_execute").lower().strip()
-        if o_mode == "swarm_consensus":
+        if o_mode in ("dynamic_subagents", "dynamic", "subagents", "swarm_dynamic"):
+            from tzero_subagent_engine import get_autonomous_swarm_coordinator
+            coord = get_autonomous_swarm_coordinator(workspace_root=project_root)
+            dossier = coord.execute_mission(mission_goal=goal, workspace_context=agents)
+            return dossier.summary_markdown
+        elif o_mode == "swarm_consensus":
             return _legacy_jarvis_bft_swarm_consensus(mission_goal=goal, context=agents)
         elif o_mode == "self_healing":
             return _legacy_jarvis_self_healing_execute(command=goal, max_retries=3)
         else:
-            return _legacy_jarvis_orchestrate_goal(goal=goal, project_root=project_root, mode="auto")
+            goal_lower = (goal or "").strip().lower()
+            if goal_lower in ("", "help", "plan", "ne yapabilirsin", "menu", "capabilities"):
+                return _legacy_jarvis_orchestrate_goal(goal=goal, project_root=project_root, mode="plan")
+            try:
+                from tzero_subagent_engine import get_autonomous_swarm_coordinator
+                coord = get_autonomous_swarm_coordinator(workspace_root=project_root)
+                dossier = coord.execute_mission(mission_goal=goal, workspace_context=agents)
+                return dossier.summary_markdown
+            except Exception:
+                return _legacy_jarvis_orchestrate_goal(goal=goal, project_root=project_root, mode="auto")
 
     # -------------------------------------------------------------------------
     # SUPERDESIGN ORCHESTRATOR TOOLS (Anchor-5 TDQS Certified)
@@ -4345,8 +4359,8 @@ def create_mcp_server():
         elif act in ("consensus", "bft"):
             return orchestrate_agent_swarm(goal=query or target, orchestration_mode="swarm_consensus", agents=opts.get("agents", ""))
 
-        elif act in ("swarm", "goal", "orchestrate"):
-            return orchestrate_agent_swarm(goal=query or target, orchestration_mode="goal_execute", project_root=target if os.path.isdir(target) else ".")
+        elif act in ("swarm", "goal", "orchestrate", "subagents", "subagent", "decompose"):
+            return orchestrate_agent_swarm(goal=query or target, orchestration_mode="dynamic_subagents", project_root=target if os.path.isdir(target) else ".")
 
         elif act in ("design", "ui", "superdesign"):
             dtype = opts.get("design_type", "ui")
