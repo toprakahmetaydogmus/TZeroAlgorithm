@@ -62,6 +62,7 @@ jobs:
       - name: Package VS Code & Cursor Extension (.vsix)
         shell: pwsh
         run: |
+          if (-not (Test-Path dist)) { New-Item -ItemType Directory -Path dist -Force }
           cd extensions\vscode
           npx --yes @vscode/vsce package --no-dependencies -o ..\..\dist\
           cd ..\..

@@ -30,10 +30,11 @@ jobs:
 
       - name: Package VSIX
         run: |
+          mkdir -p dist
+          cp LICENSE extensions/vscode/ 2>/dev/null || true
           cd extensions/vscode
           npx --yes @vscode/vsce package --no-dependencies -o ../../dist/
           cd ../..
-          mkdir -p dist
           ls -la dist/
 
       - name: Upload VSIX Artifact
