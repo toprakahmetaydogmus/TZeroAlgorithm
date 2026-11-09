@@ -458,3 +458,4 @@ class CodeHealthAnalyzer:
         lines.append("3. ⚡ **Run AST Mutation Tests:** Validate that your test suite actively detects logical mutations (`tzero mutate <file>`).")
 
         return "\n".join(lines).strip()
+

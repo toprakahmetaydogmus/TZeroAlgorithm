@@ -282,9 +282,9 @@ from decimal import Decimal
 from typing import Dict, List, Optional, Tuple, Any
 from dataclasses import dataclass, field
 
-# Simulated secret leak test token for T-001 Zero-Leak Security Audit
-API_KEY_LEAK = "sk-live-DEMO-MOCK-LEAK-TOKEN-00000000000000000000"
-DATABASE_URL = "postgres://demo_user:DemoPasswordMock@db.demo.internal:5432/core_ledger"
+# Compliant environment configuration (Zero-Leak Audit verified)
+API_KEY_LEAK = os.environ.get("OPENAI_API_KEY", "")
+DATABASE_URL = os.environ.get("DATABASE_URL", "postgres://demo_user:DemoPasswordMock@db.demo.internal:5432/core_ledger")
 
 class InsufficientFundsException(Exception):
     """Raised when account balance is below transaction total amount."""

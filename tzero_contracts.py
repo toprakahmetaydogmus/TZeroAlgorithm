@@ -419,3 +419,4 @@ class ASTContractComparator:
             lines.append("")
 
         return "\n".join(lines).strip()
+

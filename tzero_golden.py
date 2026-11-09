@@ -316,3 +316,4 @@ class ASTGoldenRegressionEngine:
             lines.append("💡 **To update the golden baseline deliberately:** run `tzero golden --update`.")
 
         return "\n".join(lines).strip()
+
