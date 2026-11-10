@@ -144,3 +144,21 @@
    - Correct the MCP tool count heading (`21 Canonical MCP Tools` + `search_tools` discovery) and add a concise **v11 Frontier Architecture & Capabilities** section documenting `--lsp`, `--hook` / `--hook-install`, `--federation` (`export/import/verify/impact`), `--scip-import`, `--snapshot`, `--cache-aligned`, `--contracts-sarif`, `--agent-kernel`, and `--doctor --deep`.
 3. Update `tzero_v3.py` help/quickstart epilog cleanly to surface `--lsp`, `--hook-install`, `--federation impact`, `--contracts-sarif`, and `--doctor --deep`.
 4. Create `tests/test_v11_e2e_integration.py` verifying the complete offline v11 pipeline end-to-end (`scan --format json` -> `snapshot` incremental -> `pack --cache-aligned` KV prefix -> polyglot `contracts` + SARIF -> `hooks` block/prune/install -> `lsp` hover+codeAction -> `scip` protobuf + `federation` impact -> `doctor --deep` subprocess exit 0) and confirm `sync_release_metadata.py --version 10.9.0 --check` passes cleanly.
+
+---
+
+### Task 7: M8ven 100% Directory Compliance (All 4 Tool Hints, `PRIVACY.md`, 100% Tool Test Coverage) & Non-Slop Badge-First `README.md` / `README.tr.md` Overhaul
+
+**Files:**
+- Modify: `app.py` (`MCP_TOOLS_CATALOG` 4-hint annotations & accurate 21/58 tool counts)
+- Modify: `tzero_fixer/mcp_server.py` (`PCFixerMcpServer.TOOLS` 4-hint annotations)
+- Create: `PRIVACY.md`
+- Create: `tests/test_m8ven_compliance.py`
+- Modify: `README.md`, `README.tr.md`
+
+**Specification:**
+1. **`app.py`**: Add `"annotations": {"readOnlyHint": ..., "destructiveHint": False, "idempotentHint": True, "openWorldHint": False}` (exact booleans: `True` for 9 read-only tools, `False` for `export_agent_rules`) to every dict in `MCP_TOOLS_CATALOG`, and update stale `"20-Tool"` / `"20 production-grade"` strings cleanly to match `21 Canonical / 58 Runtime MCP Tools`.
+2. **`tzero_fixer/mcp_server.py`**: Add matching `"annotations"` dicts (`readOnlyHint`, `destructiveHint`, `idempotentHint`, `openWorldHint`) across all 7 tools in `PCFixerMcpServer.TOOLS` matching `tzero_pc_fixer.py`.
+3. **`PRIVACY.md`**: Author concise, transparent MCP Registry privacy policy detailing 100% local offline execution, zero remote telemetry, OS-native secret keyring storage, and optional user-initiated local benchmark variables.
+4. **`tests/test_m8ven_compliance.py`**: Add AST + runtime validation asserting 100% of tools in `tzero_mcp.py`, `app.py`, `tzero_pc_fixer.py`, and `tzero_fixer/mcp_server.py` declare all 4 boolean hints, reference every single tool name in tests for 100% static coverage, verify `PRIVACY.md` exists, and confirm single M8ven Verified badge presence in `README.md`.
+5. **`README.md` & `README.tr.md`**: Remove duplicated badges, contradictory numbers (`14 Canonical`, `20 MCP Tools`, `52 full tools`, `10.8.0`/`10.0.0`), broken double-escaped math, and AI-slop hype copy; establish a crisp, scannable badge strip (PyPI, npm, VS Code Marketplace, M8ven Verified Publisher, Glama, Smithery, GitHub Actions CI, TDQS 5.0/5.0, Python 3.11+, License, Privacy Policy link), clean v10.9.0 / v11 Frontier CLI & 21 Canonical MCP Tool documentation. (Replaces redundant `README.md` docs step in Task 6 so edits don't collide.)
