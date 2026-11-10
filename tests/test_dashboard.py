@@ -26,15 +26,32 @@ class TestTZeroDashboard(unittest.TestCase):
             self.assertEqual(resp.status, 200)
             body = resp.read().decode("utf-8")
             self.assertIn("T-Zero Developer Console", body)
-            self.assertIn("48 MCP TOOLS OPERATIONAL", body)
+            self.assertIn("10.9.0", body)
+            self.assertIn("MCP TOOLS OPERATIONAL", body)
+            for endpoint in (
+                "/api/stats",
+                "/api/debt/analyze",
+                "/api/budget/optimize",
+                "/api/golden/verify",
+                "/api/contracts/compare",
+                "/api/mutation/test",
+                "/api/bridge/reverse",
+                "/api/merge/heal",
+                "/api/blackboard",
+            ):
+                self.assertIn(endpoint, body, f"Dashboard UI missing panel wiring for {endpoint}")
 
     def test_get_api_stats(self):
         url = f"http://localhost:{self.test_port}/api/stats"
         with urllib.request.urlopen(url) as resp:
             self.assertEqual(resp.status, 200)
             data = json.loads(resp.read().decode("utf-8"))
-            self.assertEqual(data["version"], "10.0.0")
-            self.assertEqual(data["tools_count"], 49)
+            self.assertEqual(data["version"], "10.9.0")
+            self.assertGreaterEqual(data["tools_count"], 57)
+            self.assertGreater(data["raw_tokens"], 0)
+            self.assertGreaterEqual(data["pruned_tokens"], 0)
+            self.assertIn("savings_pct", data)
+            self.assertIn("%", data["token_savings"])
 
     def test_post_api_reduce(self):
         url = f"http://localhost:{self.test_port}/api/reduce"

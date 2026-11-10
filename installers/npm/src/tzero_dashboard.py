@@ -15,6 +15,7 @@ from __future__ import annotations
 import http.server
 import json
 import os
+import re
 import sys
 import threading
 import time
@@ -456,7 +457,7 @@ HTML_PAGE = """<!DOCTYPE html>
       <div class="brand-logo">T0</div>
       <div>
         <div class="brand-title">T-Zero Developer Console</div>
-        <div class="brand-sub">Enterprise AST Context Architect &bull; v10.0.0</div>
+        <div class="brand-sub" id="headerBrandSub">Enterprise AST Context Architect &bull; v10.9.0</div>
       </div>
     </div>
     <div class="header-actions">
@@ -468,7 +469,7 @@ HTML_PAGE = """<!DOCTYPE html>
       </a>
       <div class="status-badge">
         <div class="status-pulse"></div>
-        48 MCP TOOLS OPERATIONAL
+        <span id="headerMcpBadge">57 MCP TOOLS OPERATIONAL</span>
       </div>
     </div>
   </header>
@@ -477,11 +478,11 @@ HTML_PAGE = """<!DOCTYPE html>
     <div class="kpi-grid">
       <div class="kpi-card">
         <div class="kpi-label">Active MCP Tools</div>
-        <div class="kpi-val sky">49</div>
+        <div class="kpi-val sky" id="kpiTools">57</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-label">Token Pruning Rate</div>
-        <div class="kpi-val indigo">94.9%</div>
+        <div class="kpi-val indigo" id="kpiSavings">Live</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-label">PBFT Swarm Quorum</div>
@@ -674,12 +675,12 @@ impl SwarmCluster {
     <div class="panel">
       <div class="panel-header">
         <div class="panel-title">MCP Tools Explorer &bull; Interactive Sandbox</div>
-        <span class="panel-badge">49 Tools &bull; TDQS 5.0 Anchor Certified</span>
+        <span class="panel-badge" id="toolsBadge">57 Tools &bull; TDQS 5.0 Anchor Certified</span>
       </div>
       <div class="sandbox-container">
         <!-- Category Filter Pills -->
         <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px;">
-          <button class="cat-pill active" onclick="filterCategory('all', this)">All (49)</button>
+          <button class="cat-pill active" onclick="filterCategory('all', this)">All (Tools)</button>
           <button class="cat-pill" onclick="filterCategory('context', this)">Context & Tree</button>
           <button class="cat-pill" onclick="filterCategory('polyglot', this)">Polyglot AST</button>
           <button class="cat-pill" onclick="filterCategory('security', this)">Zero-Leak Security</button>
@@ -748,10 +749,86 @@ impl SwarmCluster {
         </div>
       </div>
     </div>
+    <section class="panel" id="enterpriseSuitePanel">
+      <div class="panel-header">
+        <div>
+          <div class="panel-title">Enterprise Engineering Suite (Live API Workbench)</div>
+          <div class="panel-sub">Execute local AST diagnostics, budget certificates, SemVer contract diffs, mutation scoring, polyglot bridge, merge healing &amp; blackboard graph</div>
+        </div>
+        <span class="panel-badge">8 Live Endpoints</span>
+      </div>
+      <div style="padding: 20px;">
+        <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px;" id="suiteTabs">
+          <button class="btn-superdesign suite-tab-btn" style="border-color:var(--sky);color:var(--sky);" onclick="switchSuiteTab('debt', this)">Tech Debt</button>
+          <button class="btn-superdesign suite-tab-btn" onclick="switchSuiteTab('budget', this)">Token Budget</button>
+          <button class="btn-superdesign suite-tab-btn" onclick="switchSuiteTab('golden', this)">Golden Verify</button>
+          <button class="btn-superdesign suite-tab-btn" onclick="switchSuiteTab('contracts', this)">API Contracts</button>
+          <button class="btn-superdesign suite-tab-btn" onclick="switchSuiteTab('mutation', this)">Mutation Test</button>
+          <button class="btn-superdesign suite-tab-btn" onclick="switchSuiteTab('bridge', this)">Polyglot Bridge</button>
+          <button class="btn-superdesign suite-tab-btn" onclick="switchSuiteTab('merge', this)">Merge Healer</button>
+          <button class="btn-superdesign suite-tab-btn" onclick="switchSuiteTab('blackboard', this)">Blackboard</button>
+        </div>
+        <div id="tab-debt" class="suite-pane" style="display:block;">
+          <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+            <input id="debtPath" value="." style="flex:1; min-width:200px; padding:8px 12px; background:var(--bg-canvas); color:var(--text-main); border:1px solid var(--border); border-radius:6px; font-family:var(--font-code);" />
+            <button class="btn-run" onclick="runSuiteApi('/api/debt/analyze', 'POST', {path: document.getElementById('debtPath').value})">Analyze Technical Debt</button>
+          </div>
+        </div>
+        <div id="tab-budget" class="suite-pane" style="display:none;">
+          <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+            <input id="budgetPath" value="." style="flex:1; min-width:160px; padding:8px 12px; background:var(--bg-canvas); color:var(--text-main); border:1px solid var(--border); border-radius:6px; font-family:var(--font-code);" />
+            <input id="budgetTokens" type="number" value="8000" style="width:120px; padding:8px 12px; background:var(--bg-canvas); color:var(--text-main); border:1px solid var(--border); border-radius:6px; font-family:var(--font-code);" />
+            <select id="budgetModel" style="padding:8px 12px; background:var(--bg-canvas); color:var(--text-main); border:1px solid var(--border); border-radius:6px; font-family:var(--font-code);"><option value="claude-3-7">claude-3-7</option><option value="gpt-4o">gpt-4o</option><option value="gemini-2.5-pro">gemini-2.5-pro</option></select>
+            <button class="btn-run" onclick="runSuiteApi('/api/budget/optimize', 'POST', {path: document.getElementById('budgetPath').value, target_tokens: parseInt(document.getElementById('budgetTokens').value, 10), model: document.getElementById('budgetModel').value})">Issue Budget Certificate</button>
+          </div>
+        </div>
+        <div id="tab-golden" class="suite-pane" style="display:none;">
+          <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+            <input id="goldenPath" value="." style="flex:1; min-width:200px; padding:8px 12px; background:var(--bg-canvas); color:var(--text-main); border:1px solid var(--border); border-radius:6px; font-family:var(--font-code);" />
+            <button class="btn-run" onclick="runSuiteApi('/api/golden/verify', 'POST', {path: document.getElementById('goldenPath').value})">Verify Golden Signatures</button>
+          </div>
+        </div>
+        <div id="tab-contracts" class="suite-pane" style="display:none;">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
+            <textarea id="contractOld" rows="4" style="width:100%; padding:8px; background:var(--bg-canvas); color:var(--text-main); border:1px solid var(--border); border-radius:6px; font-family:var(--font-code);">def compute(x: int) -> int:
+    return x</textarea>
+            <textarea id="contractNew" rows="4" style="width:100%; padding:8px; background:var(--bg-canvas); color:var(--text-main); border:1px solid var(--border); border-radius:6px; font-family:var(--font-code);">def compute(x: int, y: int) -> int:
+    return x + y</textarea>
+          </div>
+          <button class="btn-run" onclick="runSuiteApi('/api/contracts/compare', 'POST', {old_code: document.getElementById('contractOld').value, new_code: document.getElementById('contractNew').value, file_path: 'module.py'})">Compare SemVer Contracts</button>
+        </div>
+        <div id="tab-mutation" class="suite-pane" style="display:none;">
+          <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+            <input id="mutFile" value="tzero_explain.py" style="flex:1; min-width:200px; padding:8px 12px; background:var(--bg-canvas); color:var(--text-main); border:1px solid var(--border); border-radius:6px; font-family:var(--font-code);" />
+            <input id="mutMax" type="number" value="3" style="width:90px; padding:8px 12px; background:var(--bg-canvas); color:var(--text-main); border:1px solid var(--border); border-radius:6px; font-family:var(--font-code);" />
+            <button class="btn-run" onclick="runSuiteApi('/api/mutation/test', 'POST', {file: document.getElementById('mutFile').value, max_mutants: parseInt(document.getElementById('mutMax').value, 10)})">Run AST Mutation Test</button>
+          </div>
+        </div>
+        <div id="tab-bridge" class="suite-pane" style="display:none;">
+          <textarea id="bridgeCode" rows="4" style="width:100%; padding:8px; margin-bottom:10px; background:var(--bg-canvas); color:var(--text-main); border:1px solid var(--border); border-radius:6px; font-family:var(--font-code);">export interface SessionToken { id: string; expiresAt: number; }</textarea>
+          <div style="display:flex; gap:10px; align-items:center;">
+            <select id="bridgeLang" style="padding:8px 12px; background:var(--bg-canvas); color:var(--text-main); border:1px solid var(--border); border-radius:6px;"><option value="ts">TypeScript</option><option value="rust">Rust</option><option value="go">Go</option></select>
+            <button class="btn-run" onclick="runSuiteApi('/api/bridge/reverse', 'POST', {code: document.getElementById('bridgeCode').value, lang: document.getElementById('bridgeLang').value, flavor: 'dataclass'})">Reverse Transpile to Python</button>
+          </div>
+        </div>
+        <div id="tab-merge" class="suite-pane" style="display:none;">
+          <textarea id="mergeCode" rows="4" style="width:100%; padding:8px; margin-bottom:10px; background:var(--bg-canvas); color:var(--text-main); border:1px solid var(--border); border-radius:6px; font-family:var(--font-code);"><<<<<<< HEAD
+x = 1
+=======
+x = 2
+>>>>>>> branch</textarea>
+          <button class="btn-run" onclick="runSuiteApi('/api/merge/heal', 'POST', {code: document.getElementById('mergeCode').value})">Heal Semantic Conflict</button>
+        </div>
+        <div id="tab-blackboard" class="suite-pane" style="display:none;">
+          <button class="btn-run" onclick="runSuiteApi('/api/blackboard', 'GET')">Inspect Causal Blackboard Graph</button>
+        </div>
+        <pre id="suiteResult" style="margin-top:14px; padding:14px; background:var(--bg-canvas); border:1px solid var(--border); border-radius:8px; font-family:var(--font-code); font-size:12px; color:var(--sky); max-height:260px; overflow:auto;">Select an Enterprise Suite tab and execute a local AST operation.</pre>
+      </div>
+    </section>
   </main>
 
   <footer>
-    T-Zero Context Architect v10.0.0 &bull; Developer: Toprak Ahmet Aydoğmuş &bull; Siber Akademi
+    <span id="footerBrand">T-Zero Context Architect v10.9.0</span> &bull; Developer: Toprak Ahmet Aydoğmuş &bull; Siber Akademi
   </footer>
 
   <script>
@@ -1308,13 +1385,127 @@ contract TokenVault {
       document.getElementById('annualSavings').textContent = `$${annualSavings.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} / yr`;
     }
 
+    async function loadLiveStats() {
+      try {
+        const res = await fetch('/api/stats');
+        if (!res.ok) return;
+        const stats = await res.json();
+        const verEl = document.getElementById('headerBrandSub');
+        if (verEl && stats.version) verEl.textContent = `Enterprise AST Context Architect • v${stats.version}`;
+        const footEl = document.getElementById('footerBrand');
+        if (footEl && stats.version) footEl.textContent = `T-Zero Context Architect v${stats.version}`;
+        const badgeEl = document.getElementById('headerMcpBadge');
+        if (badgeEl && stats.tools_count) badgeEl.textContent = `${stats.tools_count} MCP TOOLS OPERATIONAL`;
+        const kpiTools = document.getElementById('kpiTools');
+        if (kpiTools && stats.tools_count) kpiTools.textContent = String(stats.tools_count);
+        const toolsBadge = document.getElementById('toolsBadge');
+        if (toolsBadge && stats.tools_count) toolsBadge.textContent = `${stats.tools_count} Tools • TDQS 5.0 Anchor Certified`;
+        const kpiSavings = document.getElementById('kpiSavings');
+        if (kpiSavings && stats.token_savings) {
+          kpiSavings.textContent = stats.token_savings;
+          kpiSavings.title = `Raw: ${(stats.raw_tokens || 0).toLocaleString()} tok | Pruned: ${(stats.pruned_tokens || 0).toLocaleString()} tok (${stats.total_files || 0} files)`;
+        }
+      } catch (_) {}
+    }
+
+    function switchSuiteTab(tabId, btn) {
+      document.querySelectorAll('#suiteTabs .suite-tab-btn').forEach(b => {
+        b.style.borderColor = '';
+        b.style.color = '';
+      });
+      if (btn) {
+        btn.style.borderColor = 'var(--sky)';
+        btn.style.color = 'var(--sky)';
+      }
+      document.querySelectorAll('.suite-pane').forEach(p => { p.style.display = 'none'; });
+      const pane = document.getElementById('tab-' + tabId);
+      if (pane) pane.style.display = 'block';
+    }
+
+    async function runSuiteApi(endpoint, method, payload) {
+      const out = document.getElementById('suiteResult');
+      out.textContent = `Running ${method} ${endpoint}...`;
+      try {
+        const opts = { method };
+        if (method !== 'GET') {
+          opts.headers = { 'Content-Type': 'application/json' };
+          opts.body = JSON.stringify(payload || {});
+        }
+        const res = await fetch(endpoint, opts);
+        const data = await res.json();
+        out.textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        out.textContent = `Request failed: ${err.message}`;
+      }
+    }
+
     // Initialize on load
+    loadLiveStats();
     filterCategory('all', document.querySelector('.cat-pill'));
     calculateROI();
   </script>
 </body>
 </html>
 """
+
+
+_DASHBOARD_STATS_CACHE: Dict[str, Any] = {"ts": 0.0, "data": None}
+
+
+def compute_live_dashboard_stats(workspace_dir: str = ".") -> Dict[str, Any]:
+    """Computes cached live workspace and MCP telemetry for /api/stats."""
+    now = time.time()
+    cached = _DASHBOARD_STATS_CACHE.get("data")
+    if cached is not None and (now - _DASHBOARD_STATS_CACHE["ts"]) < 60.0:
+        return cached
+
+    version = "10.9.0"
+    tools_count = 57
+    try:
+        import tzero_mcp
+        version = getattr(tzero_mcp, "SERVER_VERSION", version)
+    except Exception:
+        pass
+    try:
+        mcp_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tzero_mcp.py")
+        if os.path.isfile(mcp_path):
+            with open(mcp_path, "r", encoding="utf-8", errors="ignore") as fp:
+                mcp_src = fp.read()
+            reg_count = len(re.findall(r"^\s*@(?:server\.tool|_maybe_tool)\b", mcp_src, re.M))
+            if reg_count > 0:
+                tools_count = reg_count
+    except Exception:
+        pass
+
+    total_files = 0
+    raw_tokens = 0
+    pruned_tokens = 0
+    savings_pct = 0.0
+    try:
+        from tzero_tui import TZeroTerminalCockpit
+        metrics = TZeroTerminalCockpit.gather_workspace_metrics(workspace_dir)
+        total_files = int(metrics.get("total_files", 0))
+        raw_tokens = int(metrics.get("raw_tokens", 0))
+        pruned_tokens = int(metrics.get("pruned_tokens", 0))
+        savings_pct = float(metrics.get("savings_pct", 0.0))
+    except Exception:
+        pass
+
+    stats = {
+        "version": version,
+        "tools_count": tools_count,
+        "total_files": total_files,
+        "raw_tokens": raw_tokens,
+        "pruned_tokens": pruned_tokens,
+        "savings_pct": round(savings_pct, 1),
+        "token_savings": f"{round(savings_pct, 1)}%",
+        "security": "100% Zero-Leak Guard",
+        "superdesign": "Enabled (5 Orchestrator Tools)",
+        "active_agents": 5,
+    }
+    _DASHBOARD_STATS_CACHE["ts"] = now
+    _DASHBOARD_STATS_CACHE["data"] = stats
+    return stats
 
 
 class DashboardRequestHandler(http.server.BaseHTTPRequestHandler):
@@ -1335,14 +1526,7 @@ class DashboardRequestHandler(http.server.BaseHTTPRequestHandler):
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
             self.end_headers()
-            stats = {
-                "version": "10.0.0",
-                "tools_count": 49,
-                "token_savings": "94.9%",
-                "security": "100% Zero-Leak Guard",
-                "superdesign": "Enabled (5 Orchestrator Tools)",
-                "active_agents": 5
-            }
+            stats = compute_live_dashboard_stats(".")
             self.wfile.write(json.dumps(stats).encode("utf-8"))
         elif parsed.path == "/superdesign/gallery.html":
             # Serve Superdesign gallery if available
