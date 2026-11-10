@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm"><img src="https://img.shields.io/badge/Version-10.8.0-0284c7?style=flat-square&logo=visualstudiocode" alt="Version 10.8.0" /></a>
+  <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm"><img src="https://img.shields.io/badge/Version-10.9.0-0284c7?style=flat-square&logo=visualstudiocode" alt="Version 10.9.0" /></a>
   <a href="https://www.npmjs.com/package/tzero-mcp"><img src="https://img.shields.io/npm/v/tzero-mcp?color=cb3837&logo=npm&style=flat-square" alt="NPM Version" /></a>
   <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-green.svg?style=flat-square" alt="License" /></a>
 </p>
@@ -42,6 +42,9 @@ Open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`):
 - `T-Zero: Show AST Context Tree`: Generates compact workspace architecture skeleton.
 - `T-Zero: Run 100% Zero-Leak Security & AST Audit`: Scans for code smells and leaked credentials.
 - `T-Zero: Launch Local Developer Dashboard`: Opens interactive UI on `localhost:8421`.
+- `T-Zero: Refresh Live AST Telemetry`: Scans the workspace (`--scan --format json`) and updates the Status Bar & Activity Bar Sidebar Cockpit.
+- `T-Zero: Generate AST Architectural Passport (--explain)`: Produces structured AST symbol passports for Python & polyglot files.
+- `T-Zero: Analyze Code Health & Technical Debt (--debt)`, `T-Zero: Optimize Token Budget (--budget)`, `T-Zero: Audit Public API Contracts (--contracts)`, `T-Zero: Golden AST Baseline (--golden)`, `T-Zero: AST Mutation Test (--mutate)`, `T-Zero: Polyglot Type Bridge (--bridge)`, and `T-Zero: Semantic 3-Way Merge Healer (--merge-heal)`.
 
 ---
 
