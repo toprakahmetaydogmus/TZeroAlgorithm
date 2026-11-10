@@ -44,6 +44,42 @@ def complex_algorithm(a: int, b: int) -> int:
         self.assertIn("PASS (0 Halluc)", summary)
         self.assertIn("OVERALL TASK SUCCESS RATE: 100.0%", summary)
 
+    def test_adversarial_8_task_suite(self):
+        report = TaskCompletionBenchmark.evaluate_suite(suite="adversarial")
+        self.assertEqual(report.total_tasks, 8)
+        self.assertEqual(report.passed_tasks, 8)
+        self.assertEqual(report.success_rate_pct, 100.0)
+        self.assertGreater(report.average_token_reduction_pct, 30.0)
+
+    def test_ollama_live_mode_mocked(self):
+        import io
+        import json
+        from unittest import mock
+
+        class _FakeResp(io.BytesIO):
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *args):
+                return False
+
+        def fake_urlopen(req, timeout=15):
+            del req, timeout
+            # Return valid Python snippet using declared method on BillingClient
+            body = json.dumps({
+                "response": "```python\ndef handle_quota(store, client_id: str) -> int:\n    return store.get_token_quota(client_id)\n```"
+            }).encode("utf-8")
+            return _FakeResp(body)
+
+        with mock.patch("urllib.request.urlopen", side_effect=fake_urlopen):
+            rep = TaskCompletionBenchmark.evaluate_suite(
+                suite="core",
+                ollama_model="qwen2.5-coder:7b",
+                limit_tasks=1,
+            )
+            self.assertEqual(rep.total_tasks, 1)
+            self.assertEqual(rep.passed_tasks, 1)
+
 
 if __name__ == "__main__":
     unittest.main()

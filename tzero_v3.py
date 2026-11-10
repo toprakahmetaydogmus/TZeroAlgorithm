@@ -8791,6 +8791,10 @@ def main():
     parser.add_argument("--benchmark", nargs="?", const=".", default=None, metavar="PATH", help="Run multi-model token reduction, latency & ROI benchmark (Claude, GPT-4o, Gemini, DeepSeek)")
     parser.add_argument("--benchmark-svg", action="store_true", help="Generate animated macOS terminal SVG recording of benchmark for README")
     parser.add_argument("--task-benchmark", action="store_true", help="Run empirical task-completion & BPE tokenizer benchmark (tiktoken)")
+    parser.add_argument("--benchmark-suite", choices=["core", "adversarial"], default="core", help="Task benchmark suite selection (core or 8-task adversarial)")
+    parser.add_argument("--ollama-model", default=None, metavar="MODEL", help="Optional local Ollama model tag for live prompt/completion accuracy benchmark")
+    parser.add_argument("--scip-import", default=None, metavar="FILE", help="Import SCIP JSON or LSIF NDJSON cross-language index")
+    parser.add_argument("--scip-symbol", default=None, metavar="SYMBOL", help="Optional symbol filter when querying --scip-import")
     parser.add_argument("--huggingface", "--hf", action="store_true", help="Launch local Hugging Face Space Gradio app or display deployment guide")
     parser.add_argument("--snapshot", nargs="?", const=".", default=None, metavar="DIR", help="Pre-compute sub-8ms AST context snapshot cache (.tzero/snapshot.json)")
     parser.add_argument("--hook", action="store_true", help="Run lifecycle hook guard for Claude Code, Gemini CLI, or Cursor (stdin JSON)")
@@ -9670,9 +9674,14 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
             TZeroBenchmarkEngine.render_cli(rep)
             out_p = TZeroBenchmarkEngine.generate_animated_svg(rep)
             print(f"\033[32m[SUCCESS] Vector-animated macOS terminal recording saved to: {out_p}\033[0m")
+    elif getattr(args, "scip_import", None) is not None:
+        from tzero_scip import run_scip_import_cli
+        sys.exit(run_scip_import_cli(args.scip_import, symbol=getattr(args, "scip_symbol", None)))
     elif getattr(args, "task_benchmark", False):
         from tzero_task_benchmark import TaskCompletionBenchmark
-        rep = TaskCompletionBenchmark.evaluate_all()
+        suite_name = getattr(args, "benchmark_suite", "core")
+        ollama_m = getattr(args, "ollama_model", None)
+        rep = TaskCompletionBenchmark.evaluate_suite(suite=suite_name, ollama_model=ollama_m)
         print(TaskCompletionBenchmark.format_terminal_summary(rep))
     elif getattr(args, "huggingface", False):
         app_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "huggingface-space", "app.py")
