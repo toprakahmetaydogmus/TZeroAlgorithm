@@ -8673,18 +8673,21 @@ def run_watch_mode(target_dir: str = ".", interval: float = 1.0, once_test: bool
                         pass
         return mtimes
 
-    def reindex():
-        scanner = CodebaseScanner()
-        files, sizes, snippets = scanner.scan_directory(target_dir)
-        raw_chars = sum(sizes.values())
-        raw_tokens = max(1, raw_chars // 4)
-        reduced_text = "\n\n".join(f"# --- {rel} ---\n{snip}" for rel, snip in snippets.items())
-        reduced_tokens = max(1, count_tokens_precise(reduced_text))
+    def reindex(changed_paths: Optional[List[str]] = None):
+        from tzero_snapshot import SnapshotEngine
+        snap, _ = SnapshotEngine.update_incremental(target_dir, changed_files=changed_paths)
+        reduced_text = "\n\n".join(
+            f"# --- {rel} ---\n{fs.skeleton}"
+            for rel, fs in sorted(snap.files.items())
+            if fs.skeleton
+        )
+        raw_tokens = max(1, snap.total_raw_tokens)
+        reduced_tokens = max(1, snap.total_pruned_tokens)
         sav = ((raw_tokens - reduced_tokens) / raw_tokens) * 100.0 if raw_tokens > 0 else 0.0
         with open(out_file, "w", encoding="utf-8") as out_f:
             out_f.write(reduced_text)
         now = datetime.now().strftime("%H:%M:%S")
-        print(f"\033[32m[{now}] ⚡ Re-indexed {len(snippets)} AST modules (~{reduced_tokens:,} tokens vs {raw_tokens:,} raw, -{sav:.1f}% savings)\033[0m")
+        print(f"\033[32m[{now}] ⚡ Re-indexed {snap.file_count} AST modules (~{reduced_tokens:,} tokens vs {raw_tokens:,} raw, -{sav:.1f}% savings)\033[0m")
 
     reindex()
     if once_test:
@@ -8698,16 +8701,16 @@ def run_watch_mode(target_dir: str = ".", interval: float = 1.0, once_test: bool
             changes = []
             for fp, mt in current_mtimes.items():
                 if fp not in last_mtimes or mt > last_mtimes[fp]:
-                    changes.append(os.path.relpath(fp, target_dir))
+                    changes.append(os.path.relpath(fp, target_dir).replace("\\", "/"))
             for fp in last_mtimes:
                 if fp not in current_mtimes:
-                    changes.append(f"deleted:{os.path.relpath(fp, target_dir)}")
+                    changes.append(f"deleted:{os.path.relpath(fp, target_dir).replace('\\', '/')}")
 
             if changes:
                 now = datetime.now().strftime("%H:%M:%S")
                 rel_disp = ", ".join(changes[:3]) + (f" (+{len(changes)-3} more)" if len(changes) > 3 else "")
                 print(f"\033[33m[{now}] 🔄 File change detected: {rel_disp}\033[0m")
-                reindex()
+                reindex([c.replace("deleted:", "") for c in changes])
                 last_mtimes = current_mtimes
     except KeyboardInterrupt:
         print("\n\033[36m[🛑 T-ZERO WATCHER STOPPED] Goodbye!\033[0m")
