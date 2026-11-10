@@ -1086,60 +1086,120 @@ class ROIEstimator:
 MCP_TOOLS_CATALOG = [
     {
         "name": "get_project_context_tree",
+        "annotations": {
+            "readOnlyHint": True,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
         "tier": "T-1 / T-2",
         "description": "Scans workspace directory and outputs an enterprise hierarchical context tree with 95% token savings.",
         "input_schema": {"target_dir": "string", "tier": "T-1 to T-4", "max_depth": "integer"},
     },
     {
         "name": "audit_codebase_quality",
+        "annotations": {
+            "readOnlyHint": True,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
         "tier": "T-001..T-004",
         "description": "Runs AST static code smell audit and 100% Zero-Leak security scan for exposed API keys and passwords.",
         "input_schema": {"path": "string", "strict_mode": "boolean"},
     },
     {
         "name": "query_module_dependencies",
+        "annotations": {
+            "readOnlyHint": True,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
         "tier": "T-2",
         "description": "Extracts import/export dependency graph, circular import warnings, and internal vs external modules.",
         "input_schema": {"file_path": "string"},
     },
     {
         "name": "estimate_token_cost",
+        "annotations": {
+            "readOnlyHint": True,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
         "tier": "Financial ROI",
         "description": "Compares prompt token billing across OpenAI, Anthropic, Gemini, and DeepSeek models.",
         "input_schema": {"prompt_text": "string", "models": "array"},
     },
     {
         "name": "generate_architecture_blueprint",
+        "annotations": {
+            "readOnlyHint": True,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
         "tier": "T-1 Blueprint",
         "description": "Synthesizes ARCHITECTURE.md containing auto-generated live Mermaid component diagrams.",
         "input_schema": {"format": "mermaid", "output_file": "string"},
     },
     {
         "name": "search_codebase_semantic",
+        "annotations": {
+            "readOnlyHint": True,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
         "tier": "AST BM25",
         "description": "Performs 100% private local BM25 hybrid semantic search without external cloud embedding fees.",
         "input_schema": {"query": "string", "top_k": "integer"},
     },
     {
         "name": "analyze_change_impact",
+        "annotations": {
+            "readOnlyHint": True,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
         "tier": "Blast Radius",
         "description": "Calculates downstream blast radius score (0-100) before modifying a critical class or function.",
         "input_schema": {"symbol": "string", "file": "string"},
     },
     {
         "name": "enforce_architecture_boundaries",
+        "annotations": {
+            "readOnlyHint": True,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
         "tier": "T-002",
         "description": "Validates project structure against tzero.rules.json to stop architectural erosion.",
         "input_schema": {"rules_file": "string"},
     },
     {
         "name": "find_code_duplicity",
+        "annotations": {
+            "readOnlyHint": True,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
         "tier": "T-004",
         "description": "Scans AST hash trees for duplicated or copy-pasted blocks of 6+ lines.",
         "input_schema": {"min_lines": "integer"},
     },
     {
         "name": "export_agent_rules",
+        "annotations": {
+            "readOnlyHint": False,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
         "tier": "IDE Specs",
         "description": "Exports optimized system instructions (.cursorrules, .clinerules, .windsurfrules).",
         "input_schema": {"target_ide": "cursor | cline | claude"},
@@ -1622,12 +1682,12 @@ def build_tzero_gradio_app() -> gr.Blocks:
             # ======================================================================================
             # TAB 4: MCP (MODEL CONTEXT PROTOCOL) 20-TOOL REGISTRY
             # ======================================================================================
-            with gr.TabItem("🔌 MCP 20-Tool Showcase", id="tab_mcp"):
+            with gr.TabItem("🔌 MCP Tool Showcase", id="tab_mcp"):
                 gr.HTML("""
                 <div style="margin-bottom: 16px;">
                     <h3 style="margin: 0; color: #f8fafc;">Model Context Protocol (MCP) Official Specification</h3>
                     <p style="color: #94a3b8; font-size: 13.5px; margin: 4px 0 0 0;">
-                        T-Zero ships with 20 production-grade MCP tools. Connect Claude Desktop, Cursor IDE, or Windsurf directly to local AST indexers.
+                        T-Zero ships with 21 canonical MCP tools and 58 tools in full mode. Connect Claude Desktop, Cursor IDE, or Windsurf directly to local AST indexers.
                     </p>
                 </div>
                 """)

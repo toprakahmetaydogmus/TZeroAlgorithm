@@ -47,6 +47,12 @@ class PCFixerMcpServer:
     TOOLS = [
         {
             "name": "pc_fixer_diagnose",
+            "annotations": {
+                "readOnlyHint": True,
+                "destructiveHint": False,
+                "idempotentHint": True,
+                "openWorldHint": False,
+            },
             "description": (
                 "Run deep multi-tier diagnostics across workspace code, operating system environment, "
                 "virtual environments, Git repository locks, PEP 517 build configs, AST syntax, and CWE vulnerabilities."
@@ -69,6 +75,12 @@ class PCFixerMcpServer:
         },
         {
             "name": "pc_fixer_auto_heal",
+            "annotations": {
+                "readOnlyHint": False,
+                "destructiveHint": False,
+                "idempotentHint": True,
+                "openWorldHint": False,
+            },
             "description": (
                 "Autonomously heal detected codebase and environment defects with automatic backup "
                 "and atomic rollback manifest. Safe with dry-run verification mode."
@@ -95,6 +107,12 @@ class PCFixerMcpServer:
         },
         {
             "name": "pc_fixer_rollback",
+            "annotations": {
+                "readOnlyHint": False,
+                "destructiveHint": False,
+                "idempotentHint": True,
+                "openWorldHint": False,
+            },
             "description": (
                 "Roll back a previously executed healing transaction using its unique transaction ID, "
                 "restoring modified files to their exact pre-fix state."
@@ -117,6 +135,12 @@ class PCFixerMcpServer:
         },
         {
             "name": "pc_fixer_check_system",
+            "annotations": {
+                "readOnlyHint": True,
+                "destructiveHint": False,
+                "idempotentHint": True,
+                "openWorldHint": False,
+            },
             "description": (
                 "Check physical hardware health, disk partitions space, WSL2 vhdx growth, "
                 "high-memory consumer processes, and active developer port conflicts (3000, 5000, 8000, etc.)."
@@ -134,6 +158,12 @@ class PCFixerMcpServer:
         },
         {
             "name": "pc_fixer_cwe_audit",
+            "annotations": {
+                "readOnlyHint": True,
+                "destructiveHint": False,
+                "idempotentHint": True,
+                "openWorldHint": False,
+            },
             "description": (
                 "Execute local AST static security vulnerability scan against OWASP Top 10 and CWE catalog "
                 "(CWE-78 Command Injection, CWE-89 SQL Injection, CWE-22 Path Traversal, CWE-798 Hardcoded Secrets)."
@@ -151,6 +181,12 @@ class PCFixerMcpServer:
         },
         {
             "name": "pc_fixer_kill_port_process",
+            "annotations": {
+                "readOnlyHint": False,
+                "destructiveHint": True,
+                "idempotentHint": True,
+                "openWorldHint": False,
+            },
             "description": (
                 "Find and terminate the process locking a specific developer port (e.g. 3000, 5000, 8000, 8080) "
                 "to unblock dev servers without rebooting."
@@ -168,6 +204,12 @@ class PCFixerMcpServer:
         },
         {
             "name": "pc_fixer_clean_git_locks",
+            "annotations": {
+                "readOnlyHint": False,
+                "destructiveHint": False,
+                "idempotentHint": True,
+                "openWorldHint": False,
+            },
             "description": (
                 "Find and remove stale Git lock files (.git/index.lock, .git/HEAD.lock, refs locks) "
                 "that block git operations after crashes or aborted commands."
