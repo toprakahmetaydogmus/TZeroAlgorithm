@@ -8803,6 +8803,7 @@ def main():
     parser.add_argument("--huggingface", "--hf", action="store_true", help="Launch local Hugging Face Space Gradio app or display deployment guide")
     parser.add_argument("--snapshot", nargs="?", const=".", default=None, metavar="DIR", help="Pre-compute sub-8ms AST context snapshot cache (.tzero/snapshot.json)")
     parser.add_argument("--hook", action="store_true", help="Run lifecycle hook guard for Claude Code, Gemini CLI, or Cursor (stdin JSON)")
+    parser.add_argument("--hook-install", "--install", nargs="?", const="all", choices=["all", "claude", "cursor", "gemini"], default=None, dest="hook_install", help="Install T-Zero PreToolUse/PostToolUse hooks for Claude Code, Cursor, or Gemini CLI")
     parser.add_argument("--event", default="PreToolUse", help="Lifecycle hook event (PreToolUse or PostToolUse)")
     parser.add_argument("--lsp", action="store_true", help="Run T-Zero stdio JSON-RPC Language Server (Zero-Leak, boundaries, CodeLens)")
     parser.add_argument("--agent-kernel", action="store_true", help="Validate Agent Kernel WASM/FFI capability sandbox and Rust bridge status")
@@ -9106,9 +9107,13 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
             print("[ERROR] tzero_deps.py is missing; reinstall T-Zero to use --doctor.")
             sys.exit(1)
         sys.exit(tzero_deps.run_doctor())
-    elif getattr(args, "hook", False):
+    elif getattr(args, "hook", False) or getattr(args, "hook_install", None) is not None:
         import tzero_hooks
-        sys.exit(tzero_hooks.run_hook_cli(event=getattr(args, "event", "PreToolUse"), workspace_dir=args.dir))
+        sys.exit(tzero_hooks.run_hook_cli(
+            event=getattr(args, "event", "PreToolUse"),
+            workspace_dir=args.dir,
+            install_client=getattr(args, "hook_install", None),
+        ))
     elif getattr(args, "lsp", False):
         import tzero_lsp
         sys.exit(tzero_lsp.main(workspace_dir=args.dir))
