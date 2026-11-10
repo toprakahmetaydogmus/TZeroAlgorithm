@@ -25,7 +25,19 @@ test("tzero package exports correct properties", () => {
 test("tzero core python files exist in srcDir", () => {
   assert.strictEqual(fs.existsSync(tzero.mcpServer), true);
   assert.strictEqual(fs.existsSync(tzero.cli), true);
-  const coreFiles = ["tzero_v3.py", "tzero_mcp.py", "tzero_security.py", "tzero_deps.py", "tzero_polyglot.py"];
+  const coreFiles = [
+    "tzero_v3.py",
+    "tzero_mcp.py",
+    "tzero_security.py",
+    "tzero_deps.py",
+    "tzero_polyglot.py",
+    "tzero_arch_test.py",
+    "tzero_budget.py",
+    "tzero_contracts.py",
+    "tzero_debt.py",
+    "tzero_golden.py",
+    "tzero_mutation.py"
+  ];
   for (const f of coreFiles) {
     assert.strictEqual(fs.existsSync(path.join(tzero.srcDir, f)), true, `Expected ${f} to exist`);
   }

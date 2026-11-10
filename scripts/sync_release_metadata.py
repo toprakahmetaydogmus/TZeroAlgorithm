@@ -5,6 +5,8 @@ import argparse
 import json
 import pathlib
 import re
+import shutil
+import tomllib
 from typing import Dict, List
 
 ROOT_DIR = pathlib.Path(__file__).resolve().parent.parent
@@ -95,11 +97,40 @@ def sync_release_metadata(target_version: str, check_only: bool = False) -> Dict
     return results
 
 
+def sync_npm_sources() -> int:
+    """Synchronizes non-private Python modules and packages into installers/npm/src/."""
+    npm_src = ROOT_DIR / "installers" / "npm" / "src"
+    npm_src.mkdir(parents=True, exist_ok=True)
+    pyproject = tomllib.loads((ROOT_DIR / "pyproject.toml").read_text(encoding="utf-8"))
+    modules = pyproject["tool"]["setuptools"]["py-modules"]
+    copied = 0
+    for mod in modules:
+        src_file = ROOT_DIR / f"{mod}.py"
+        if src_file.is_file():
+            shutil.copy2(src_file, npm_src / src_file.name)
+            copied += 1
+    for pkg in ("tzero_jarvis", "tzero_fixer"):
+        src_pkg = ROOT_DIR / pkg
+        dst_pkg = npm_src / pkg
+        dst_pkg.mkdir(parents=True, exist_ok=True)
+        for py_file in src_pkg.glob("*.py"):
+            shutil.copy2(py_file, dst_pkg / py_file.name)
+            copied += 1
+    return copied
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Synchronize T-Zero release metadata.")
     parser.add_argument("--version", default="10.9.0", help="Canonical target version")
     parser.add_argument("--check", action="store_true", help="Exit non-zero if any manifest drifts")
+    parser.add_argument("--sync-npm", action="store_true", help="Copy root modules into installers/npm/src/")
     args = parser.parse_args()
+
+    if args.sync_npm:
+        count = sync_npm_sources()
+        print(f"[SYNC-NPM] Synchronized {count} Python files into installers/npm/src/")
+        if args.check:
+            return 0
 
     res = sync_release_metadata(args.version, check_only=args.check)
     drifted = [k for k, v in res.items() if v]

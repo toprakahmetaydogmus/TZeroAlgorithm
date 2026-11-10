@@ -72,20 +72,28 @@ class TZeroTerminalCockpit:
                         with open(full_p, "r", encoding="utf-8", errors="replace") as fp:
                             raw_code = fp.read()
                         raw_t = max(1, len(raw_code) // 4)
-                        pruned_code, _ = reducer.reduce_code(raw_code, lang=lang, mode="ultra")
+                        pruned_code = reducer.reduce_code(raw_code, filename=full_p, mode="ultra")
                         pruned_t = max(1, len(pruned_code) // 4)
                         raw_tokens_total += raw_t
                         pruned_tokens_total += pruned_t
-                    except Exception:
+                    except OSError:
                         pass
 
-        # Estimate savings if sample available, or default to standard 94.8%
+        # Estimate savings if sample available, or zero for empty workspace
         if raw_tokens_total > 0:
             savings_pct = max(0.0, (1.0 - (pruned_tokens_total / raw_tokens_total)) * 100.0)
         else:
-            savings_pct = 94.8
-            raw_tokens_total = file_count * 450
-            pruned_tokens_total = int(raw_tokens_total * 0.052)
+            savings_pct = 0.0
+
+        # Real Zero-Leak security status check
+        zero_leak_status = "UNVERIFIED"
+        try:
+            from tzero_security import ZeroLeakEngine
+            sec_res = ZeroLeakEngine.scan_workspace(abs_ws)
+            v_count = int(sec_res.get("violation_count", 0))
+            zero_leak_status = "100% SECURE (VERIFIED)" if v_count == 0 else f"WARNING: {v_count} SECRET(S)"
+        except Exception:
+            pass
 
         # Monthly ROI savings calculation (assuming 50 queries/day at Claude 3.7 $3/1M input)
         daily_saved_tokens = (raw_tokens_total - pruned_tokens_total) * 50
@@ -100,7 +108,7 @@ class TZeroTerminalCockpit:
             "savings_pct": round(savings_pct, 1),
             "monthly_roi_saved": round(monthly_cost_saved, 2),
             "languages": files_by_lang,
-            "zero_leak_status": "100% SECURE (VERIFIED)",
+            "zero_leak_status": zero_leak_status,
         }
 
     @classmethod
@@ -122,7 +130,7 @@ class TZeroTerminalCockpit:
         box_bottom = f"{c.CYAN}╚══════════════════════════════════════════════════════════════════════════════╝{c.RESET}"
 
         lines.append(box_top)
-        lines.append(f"{c.CYAN}║{c.RESET}  {c.BOLD}{c.BRIGHT_CYAN}⚡ SİBER AKADEMİ — T-ZERO CONTEXT ARCHITECT & LIVE COCKPIT v10.0.0{c.RESET}    {c.CYAN}║{c.RESET}")
+        lines.append(f"{c.CYAN}║{c.RESET}  {c.BOLD}{c.BRIGHT_CYAN}⚡ SİBER AKADEMİ — T-ZERO CONTEXT ARCHITECT & LIVE COCKPIT v10.9.0{c.RESET}    {c.CYAN}║{c.RESET}")
         lines.append(f"{c.CYAN}║{c.RESET}  {c.DIM}Zero-Leak AST Intelligence | 100% Offline | $0 Cloud Cost Guarantee{c.RESET}       {c.CYAN}║{c.RESET}")
         lines.append(box_mid)
 
@@ -160,6 +168,10 @@ class TZeroTerminalCockpit:
         lines.append(f"{c.CYAN}║{c.RESET}    [5] 🛠️  Apply AST-Tolerant Patch (`tzero --patch <diff>`)                 {c.CYAN}║{c.RESET}")
         lines.append(f"{c.CYAN}║{c.RESET}    [6] 🌐 Launch Web Comparison Dashboard (`tzero --web`)                   {c.CYAN}║{c.RESET}")
         lines.append(f"{c.CYAN}║{c.RESET}    [7] 🛡️  Install Git Zero-Leak Guard & CI (`tzero --guard-install`)        {c.CYAN}║{c.RESET}")
+        lines.append(f"{c.CYAN}║{c.RESET}    [8] 🏛️  Verify Architecture & 0 Cycles (`tzero --check-arch`)            {c.CYAN}║{c.RESET}")
+        lines.append(f"{c.CYAN}║{c.RESET}    [9] 🧬 Run AST Mutation Test Suite (`tzero --mutate <file>`)             {c.CYAN}║{c.RESET}")
+        lines.append(f"{c.CYAN}║{c.RESET}    [10] 🏥 Code Health & Technical Debt Index (`tzero --debt`)             {c.CYAN}║{c.RESET}")
+        lines.append(f"{c.CYAN}║{c.RESET}    [11] 📜 Context Budget Optimizer & Certificate (`tzero --budget`)       {c.CYAN}║{c.RESET}")
         lines.append(f"{c.CYAN}║{c.RESET}    [0] 🚪 Exit TUI                                                          {c.CYAN}║{c.RESET}")
         lines.append(box_bottom)
 
@@ -175,7 +187,7 @@ class TZeroTerminalCockpit:
             print(screen)
 
             try:
-                choice = input(f"\n{cls.BOLD}Select an action [0-7] (or press Enter to refresh): {cls.RESET}").strip()
+                choice = input(f"\n{cls.BOLD}Select an action [0-11] (or press Enter to refresh): {cls.RESET}").strip()
             except (KeyboardInterrupt, EOFError):
                 print(f"\n{cls.CYAN}Goodbye! T-Zero Context Engine active.{cls.RESET}")
                 break
@@ -204,7 +216,7 @@ class TZeroTerminalCockpit:
             elif choice == "4":
                 from tzero_commit import LocalSemanticCommitSynthesizer
                 print(f"\n{cls.YELLOW}[Synthesizing Release CHANGELOG]...{cls.RESET}")
-                entry = LocalSemanticCommitSynthesizer.generate_changelog_entry(version="v10.0.0", repo_dir=workspace_dir)
+                entry = LocalSemanticCommitSynthesizer.generate_changelog_entry(version="v10.9.0", repo_dir=workspace_dir)
                 print(f"\n{cls.BRIGHT_CYAN}{entry}{cls.RESET}\n")
                 input("Press Enter to return to cockpit...")
             elif choice == "5":
@@ -218,7 +230,22 @@ class TZeroTerminalCockpit:
                 input("Press Enter to return to cockpit...")
             elif choice == "6":
                 print(f"\n{cls.GREEN}[Launching Web Dashboard on http://localhost:8421]...{cls.RESET}")
+                import socket
+                import threading
                 import webbrowser
+                is_up = False
+                try:
+                    with socket.create_connection(("127.0.0.1", 8421), timeout=0.3):
+                        is_up = True
+                except OSError:
+                    is_up = False
+                if not is_up:
+                    try:
+                        from tzero_dashboard import start_dashboard_server
+                        srv = start_dashboard_server(port=8421, open_browser=False)
+                        threading.Thread(target=srv.serve_forever, daemon=True).start()
+                    except Exception:
+                        pass
                 webbrowser.open("http://localhost:8421")
                 time.sleep(1)
             elif choice == "7":
@@ -227,6 +254,42 @@ class TZeroTerminalCockpit:
                 res = GitSecurityGuard.install_hook(workspace_dir)
                 CIPipelineGenerator.install_github_workflow(workspace_dir)
                 print(f"{cls.GREEN}[SUCCESS] Pre-commit hook & GitHub Actions CI installed!{cls.RESET}")
+                input("Press Enter to return to cockpit...")
+            elif choice == "8":
+                from tzero_arch_test import ArchitectureTestSuiteGenerator
+                print(f"\n{cls.YELLOW}[Verifying Layer Boundaries, Cycles & Zero-Leak Security]...{cls.RESET}")
+                gen = ArchitectureTestSuiteGenerator(workspace_dir)
+                rep = gen.run_live_audit()
+                if rep["success"]:
+                    print(f"\n{cls.GREEN}✅ [ARCH-AUDIT PASS] All {rep['scanned_files']} files conform to rules! Zero violations.{cls.RESET}\n")
+                else:
+                    print(f"\n{cls.RED}❌ [ARCH-AUDIT FAILED] Violations detected:{cls.RESET}")
+                    for v in rep["layer_violations"]:
+                        print(f"   • {v['file']} (layer: {v['layer']}) imports forbidden '{v['imported']}'")
+                input("Press Enter to return to cockpit...")
+            elif choice == "9":
+                target_f = input("Enter path to file for mutation test (default: tzero_arch_test.py): ").strip() or "tzero_arch_test.py"
+                if os.path.exists(target_f):
+                    from tzero_mutation import ASTMutationEngine
+                    print(f"\n{cls.YELLOW}[Running AST Mutation Analysis on {target_f}]...{cls.RESET}")
+                    m_rep = ASTMutationEngine.run_mutation_analysis(target_file=target_f, max_mutants=5)
+                    print(f"{cls.GREEN}[RESULT] Mutation Score: {m_rep.mutation_score}% ({m_rep.killed}/{m_rep.total_mutants} killed).{cls.RESET}")
+                else:
+                    print(f"{cls.RED}Target file not found.{cls.RESET}")
+                input("Press Enter to return to cockpit...")
+            elif choice == "10":
+                from tzero_debt import CodeHealthAnalyzer
+                print(f"\n{cls.YELLOW}[Analyzing Code Health & Technical Debt Index for {workspace_dir}]...{cls.RESET}")
+                rep = CodeHealthAnalyzer.analyze_workspace(workspace_dir)
+                print(f"\n{cls.BRIGHT_CYAN}{CodeHealthAnalyzer.format_markdown_report(rep)}{cls.RESET}\n")
+                input("Press Enter to return to cockpit...")
+            elif choice == "11":
+                from tzero_budget import ASTTokenBudgetOptimizer
+                print(f"\n{cls.YELLOW}[Sizing Context Payload & Issuing Compression Certificate for {workspace_dir}]...{cls.RESET}")
+                cert = ASTTokenBudgetOptimizer.optimize_budget(workspace_dir)
+                saved_p = ASTTokenBudgetOptimizer.save_certificate(cert)
+                print(f"\n{cls.BRIGHT_CYAN}{ASTTokenBudgetOptimizer.format_markdown_certificate(cert)}{cls.RESET}\n")
+                print(f"{cls.GREEN}[SUCCESS] Certificate saved to: {saved_p}{cls.RESET}")
                 input("Press Enter to return to cockpit...")
 
 

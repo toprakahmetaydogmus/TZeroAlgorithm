@@ -252,7 +252,7 @@ class PolyglotTokenReducer:
                 if "{" in stripped:
                     pruned.append(re.sub(r'\{.*$', '{ ... }', line))
                 elif not stripped.endswith(";") and not stripped.startswith("package") and not stripped.startswith("import"):
-                    pruned.append(f"{line} { ... }")
+                    pruned.append(f"{line} {{ ... }}")
                 else:
                     pruned.append(line)
         return "\n".join(pruned) if pruned else content

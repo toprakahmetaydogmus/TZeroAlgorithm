@@ -22,7 +22,7 @@ from pathlib import Path
 from typing import Callable, Dict, List, Optional, Tuple
 
 
-APP_VERSION = "10.2.0"
+APP_VERSION = "10.9.0"
 SERVER_NAME = "tzero"
 SERVER_FILENAME = "TZeroMCP.exe"
 
@@ -1111,7 +1111,7 @@ def run_init(argv: Optional[List[str]] = None) -> int:
     # Print banner
     print("""
 \033[1;36m================================================================================
-⚡ SİBER AKADEMİ — T-ZERO 1-CLICK MCP INITIALIZATION (v10.0.0)
+⚡ SİBER AKADEMİ — T-ZERO 1-CLICK MCP INITIALIZATION (v10.9.0)
 ================================================================================\033[0m
 \033[32m🎯 Zero-Config AST Codebase Context & 100% Zero-Leak Security Guard\033[0m
 """)

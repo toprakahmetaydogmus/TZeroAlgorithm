@@ -468,7 +468,7 @@ def calculate_token_cost(token_count: int, provider_name: str) -> float:
 # i18n Translations
 TRANSLATIONS: Dict[str, Dict[str, str]] = {
     "en": {
-        "title": "T-Zero Developer Console & Context Architect v10.2.0",
+        "title": "T-Zero Developer Console & Context Architect v10.9.0",
         "subtitle": f"Developer: {DEV_NAME} | {DEV_URL_MAIN} | {DEV_URL_BIO}",
         "overview_tab": "🏠 Overview Dashboard",
         "setup_tab": "⚡ Setup & AI Models",
@@ -505,7 +505,7 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "audit_btn": "🛡️ SECURITY AUDIT"
     },
     "tr": {
-        "title": "T-Zero Geliştirici Konsolu & Bağlam Mimarı v10.2.0",
+        "title": "T-Zero Geliştirici Konsolu & Bağlam Mimarı v10.9.0",
         "subtitle": f"Geliştirici: {DEV_NAME} | {DEV_URL_MAIN} | {DEV_URL_BIO}",
         "overview_tab": "🏠 Genel Bakış",
         "setup_tab": "⚡ Kurulum & Model",
@@ -8549,6 +8549,10 @@ def run_export_cli(project_dir: str, export_type: str, out_file: str):
     else:
         return
         
+    if out_file == "-":
+        print(content)
+        return
+
     out_path = os.path.join(project_dir, out_file) if not os.path.isabs(out_file) else out_file
     with open(out_path, "w", encoding="utf-8") as f:
         f.write(content)
@@ -8690,7 +8694,7 @@ def main():
     parser.add_argument("--focus", default="", metavar="TARGET", help="Focus file or semantic search query for context budget packing")
     parser.add_argument("--pack-out", default=None, metavar="FILE", help="Output file for packed context bundle (default: stdout)")
     parser.add_argument("--commit-msg", action="store_true", help="Generate Conventional Commit message from local AST git diff ($0 local engine)")
-    parser.add_argument("--changelog", nargs="?", const="v10.2.0", default=None, metavar="VERSION", help="Generate release CHANGELOG markdown from git history")
+    parser.add_argument("--changelog", nargs="?", const="v10.9.0", default=None, metavar="VERSION", help="Generate release CHANGELOG markdown from git history")
     parser.add_argument("--ci", choices=["github", "gitlab", "pre-commit", "all"], default=None, help="Install turnkey CI/CD security and verification workflow")
     parser.add_argument("--stubs", nargs="?", const=".", default=None, metavar="PATH", help="Generate PEP-484 AST type stubs (.pyi) for target file or workspace")
     parser.add_argument("--stubs-out", default=None, metavar="DIR", help="Output directory for generated type stubs (default: alongside .py files)")
@@ -8719,7 +8723,19 @@ def main():
     parser.add_argument("--explain", metavar="FILE", default=None, help="Generate high-density AST architectural passport for file or LLM prompt")
     parser.add_argument("--turbo", "--overdrive", "--kamcilama", nargs="?", const="status", default=None, metavar="CMD", help="Turbo Overdrive Burst Accelerator (Kamçılama): adaptive latency sensing & multi-core fast-path cache")
     parser.add_argument("--merge-heal", metavar="FILE", default=None, help="Autonomous AST semantic 3-way merge conflict healer")
-    parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect v10.8.0 Master Edition (engine v4.1.0)")
+    parser.add_argument("--generate-arch-tests", nargs="?", const="tests/test_architecture_guard.py", default=None, metavar="OUT_PATH", help="Generate zero-dependency standalone unittest architecture guard test suite from tzero.rules.json")
+    parser.add_argument("--check-arch", "--arch-audit", action="store_true", help="Run live in-memory validation of layer boundaries, circular imports, and zero-leak security")
+    parser.add_argument("--mutate", "--mutation-test", metavar="FILE", default=None, help="Autonomous AST mutation testing & test suite quality score (0-100%%)")
+    parser.add_argument("--test-cmd", metavar="CMD", default=None, help="Target test command for --mutate (default: auto-detected unittest)")
+    parser.add_argument("--max-mutants", type=int, default=10, metavar="N", help="Maximum AST mutants to generate and evaluate (default: 10)")
+    parser.add_argument("--contracts", "--check-contracts", nargs="?", const="HEAD~1", default=None, metavar="BASE_REF", help="Audit public AST API contracts and SemVer compatibility against git base ref")
+    parser.add_argument("--breaking-changes", nargs="?", const="HEAD~1", default=None, metavar="BASE_REF", help="Enforce zero-breaking-changes gate against git base ref (fails if breaking changes detected)")
+    parser.add_argument("--debt", "--code-health", nargs="?", const=".", default=None, metavar="DIR", help="Autonomous AST technical debt, cognitive complexity & maintainability index")
+    parser.add_argument("--budget", "--token-budget", nargs="?", const=".", default=None, metavar="DIR", help="Optimize codebase context payload to fit AI model token budget and issue SHA-256 certificate")
+    parser.add_argument("--target-tokens", type=int, default=None, metavar="N", help="Target token budget for --budget (e.g. 16000, 64000)")
+    parser.add_argument("--target-model", default="claude-3-7", metavar="MODEL", help="Target LLM model for --budget context sizing")
+    parser.add_argument("--golden", "--goldens", nargs="?", const="generate", default=None, metavar="ACTION", help="Generate or verify golden AST public signature baseline (generate, verify, update)")
+    parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect v10.9.0 Master Edition (engine v4.1.0)")
 
 
     def print_master_tutorial():
@@ -8827,7 +8843,7 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
     def print_quickstart_guide():
         print("""
 ================================================================================
-⚡ SİBER AKADEMİ — T-ZERO CONTEXT ARCHITECT & MCP v10.2.0 MASTER (engine v4.1.0)
+⚡ SİBER AKADEMİ — T-ZERO CONTEXT ARCHITECT & MCP v10.9.0 MASTER (engine v4.1.0)
 ================================================================================
 🎯 %95'e Varan Token Tasarrufu & Otonom Yapay Zeka Mimari Bağlam Motoru
 
@@ -8944,6 +8960,22 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
             "turbo": "--turbo",
             "overdrive": "--turbo",
             "kamcilama": "--turbo",
+            "generate-arch-tests": "--generate-arch-tests",
+            "check-arch": "--check-arch",
+            "arch-audit": "--check-arch",
+            "mutate": "--mutate",
+            "mutation-test": "--mutate",
+            "contracts": "--contracts",
+            "check-contracts": "--contracts",
+            "breaking-changes": "--breaking-changes",
+            "debt": "--debt",
+            "health": "--debt",
+            "code-health": "--debt",
+            "budget": "--budget",
+            "cert": "--budget",
+            "certificate": "--budget",
+            "golden": "--golden",
+            "goldens": "--golden",
         }
         if sub in sub_map:
             sys.argv[1] = sub_map[sub]
@@ -9078,6 +9110,93 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
         res = ASTSemanticMerger.heal_file_on_disk(target, write_in_place=not getattr(args, "dry_run", False))
         ASTSemanticMerger.render_cli(res, file_hint=target)
         sys.exit(0 if res.success else 1)
+    elif getattr(args, "generate_arch_tests", None) is not None:
+        from tzero_arch_test import ArchitectureTestSuiteGenerator
+        gen = ArchitectureTestSuiteGenerator(args.dir)
+        target_p = os.path.join(args.dir, args.generate_arch_tests) if not os.path.isabs(args.generate_arch_tests) else args.generate_arch_tests
+        out_p = gen.write_test_file(target_p)
+        print(f"\n[⚡ T-ZERO ARCH-GUARD] Generated standalone architecture test suite at: {out_p}")
+        print("[⚡ T-ZERO ARCH-GUARD] Run in CI/CD with: python -m unittest " + os.path.relpath(out_p, args.dir).replace("\\", "/"))
+        sys.exit(0)
+    elif getattr(args, "check_arch", False):
+        from tzero_arch_test import ArchitectureTestSuiteGenerator
+        gen = ArchitectureTestSuiteGenerator(args.dir)
+        report = gen.run_live_audit()
+        if report["success"]:
+            print(f"\n✅ [T-ZERO ARCH-AUDIT PASS] All {report['scanned_files']} modules satisfy declared layer boundaries.")
+            print(f"   - Layers Configured : {report['layers_count']}")
+            print("   - Circular Imports  : 0 cycles detected")
+            print("   - Zero-Leak Guard   : 100% clean (0 secret leaks)\n")
+            sys.exit(0)
+        else:
+            print("\n❌ [T-ZERO ARCH-AUDIT FAILED] Detected architectural infractions:")
+            for v in report["layer_violations"]:
+                print(f"   [LAYER VIOLATION] {v['file']}:{v['line']} (layer: {v['layer']}) imports forbidden '{v['imported']}' - {v['reason']}")
+            for c in report["circular_cycles"]:
+                print(f"   [CIRCULAR IMPORT] Cycle detected: {c}")
+            for s in report["secret_leaks"]:
+                print(f"   [SECRET LEAK] {s['file']}: {s['pattern']}")
+            print()
+            sys.exit(1)
+    elif getattr(args, "mutate", None) is not None:
+        from tzero_mutation import ASTMutationEngine
+        target = args.mutate
+        print(f"\n🧬 [T-ZERO MUTATION ENGINE] Analyzing test robustness for '{target}'...")
+        report = ASTMutationEngine.run_mutation_analysis(
+            target_file=target,
+            test_command=getattr(args, "test_cmd", None),
+            max_mutants=getattr(args, "max_mutants", 10)
+        )
+        print(ASTMutationEngine.format_markdown_report(report))
+        sys.exit(0 if report.mutation_score >= 70.0 else 1)
+    elif getattr(args, "contracts", None) is not None or getattr(args, "breaking_changes", None) is not None:
+        from tzero_contracts import ASTContractComparator
+        base_ref = args.contracts or args.breaking_changes or "HEAD~1"
+        is_gate = getattr(args, "breaking_changes", None) is not None
+        print(f"\n🛡️ [T-ZERO CONTRACT GUARDIAN] Evaluating AST public API changes against '{base_ref}'...")
+        reports = ASTContractComparator.compare_git_revision(repo_dir=args.dir, base_ref=base_ref)
+        md = ASTContractComparator.format_markdown_report(reports)
+        print("\n" + md + "\n")
+        has_breaking = any(r.is_breaking for r in reports)
+        if is_gate and has_breaking:
+            print("❌ [T-ZERO CONTRACT GATE FAILED] Incompatible breaking changes detected in public API.\n")
+            sys.exit(1)
+        sys.exit(0)
+    elif getattr(args, "debt", None) is not None:
+        from tzero_debt import CodeHealthAnalyzer
+        target = args.debt or args.dir
+        print(f"\n🏥 [T-ZERO HEALTH] Computing AST technical debt & maintainability index for '{target}'...")
+        rep = CodeHealthAnalyzer.analyze_workspace(target)
+        md = CodeHealthAnalyzer.format_markdown_report(rep)
+        print("\n" + md + "\n")
+        sys.exit(0)
+    elif getattr(args, "budget", None) is not None:
+        from tzero_budget import ASTTokenBudgetOptimizer
+        target = args.budget or args.dir
+        m_name = getattr(args, "target_model", "claude-3-7")
+        b_tok = getattr(args, "target_tokens", None)
+        print(f"\n📜 [T-ZERO BUDGET] Sizing context payload for '{target}' ({m_name})...")
+        cert = ASTTokenBudgetOptimizer.optimize_budget(target, target_tokens=b_tok, model_name=m_name)
+        saved_path = ASTTokenBudgetOptimizer.save_certificate(cert)
+        md = ASTTokenBudgetOptimizer.format_markdown_certificate(cert)
+        print("\n" + md + "\n")
+        print(f"✅ Certificate issued & cryptographically signed at: {saved_path}\n")
+        sys.exit(0)
+    elif getattr(args, "golden", None) is not None:
+        from tzero_golden import ASTGoldenRegressionEngine
+        act = (args.golden or "generate").lower()
+        if act in ("verify", "check", "audit"):
+            print(f"\n🔍 [T-ZERO GOLDEN GUARD] Verifying AST signatures against baseline for '{args.dir}'...")
+            rep = ASTGoldenRegressionEngine.verify_against_golden(args.dir)
+            print("\n" + ASTGoldenRegressionEngine.format_markdown_report(rep) + "\n")
+            sys.exit(0 if rep.get("clean", False) else 1)
+        else:
+            print(f"\n🏆 [T-ZERO GOLDEN ENGINE] Capturing golden AST signature baseline for '{args.dir}'...")
+            baseline = ASTGoldenRegressionEngine.generate_baseline(args.dir)
+            out_path = ASTGoldenRegressionEngine.save_baseline(baseline)
+            print(f"✅ Captured {baseline.total_symbols} golden public AST signatures.")
+            print(f"📁 Baseline stored & cryptographically signed at: {out_path}\n")
+            sys.exit(0)
     elif getattr(args, "replay", None) is not None:
         from tzero_replay import HistoricalTokenReplay
         max_c = args.replay if isinstance(args.replay, int) else 15
@@ -9462,7 +9581,7 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
         if not os.path.exists(app_path):
             app_path = os.path.join(os.getcwd(), "huggingface-space", "app.py")
         print("\033[36m" + "=" * 80)
-        print("🤗 SİBER AKADEMİ — T-ZERO HUGGING FACE SPACE & GRADIO COCKPIT (v10.2.0)")
+        print("🤗 SİBER AKADEMİ — T-ZERO HUGGING FACE SPACE & GRADIO COCKPIT (v10.9.0)")
         print("=" * 80 + "\033[0m")
         print("🌐 Official Live Space : https://huggingface.co/spaces/toprakke4/tzero-token-reducer")
         print(f"📁 Local Application   : {app_path}")
@@ -9518,7 +9637,8 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
                     print(f"  - [{v['provider']}] {v['file']}:{v['line']} -> {v['preview']}")
                 if args.migrate:
                     total_migrated = 0
-                    for vf in findings.get("files_with_violations", []):
+                    violating_files = sorted({v.get("file", "") for v in violations if v.get("file")})
+                    for vf in violating_files:
                         if os.path.isfile(vf):
                             with open(vf, "r", encoding="utf-8", errors="ignore") as f:
                                 sc = f.read()

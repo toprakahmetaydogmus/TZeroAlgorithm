@@ -254,3 +254,4 @@ class MultiAgentBlackboard:
 def get_shared_blackboard(workspace_root: str = ".") -> MultiAgentBlackboard:
     """Convenience accessor for the singleton MultiAgentBlackboard."""
     return MultiAgentBlackboard.get_instance(workspace_root=workspace_root)
+

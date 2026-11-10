@@ -1364,6 +1364,18 @@ class DashboardRequestHandler(http.server.BaseHTTPRequestHandler):
             else:
                 self.send_response(404)
                 self.end_headers()
+        elif parsed.path == "/api/blackboard":
+            try:
+                from tzero_blackboard import get_shared_blackboard
+                bb = get_shared_blackboard(".")
+                resp = {"success": True, "markdown": bb.export_status_markdown()}
+            except Exception as e:
+                resp = {"success": False, "error": str(e)}
+
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps(resp, ensure_ascii=False).encode("utf-8"))
         else:
             self.send_response(404)
             self.end_headers()
@@ -1407,6 +1419,187 @@ class DashboardRequestHandler(http.server.BaseHTTPRequestHandler):
                 import tzero_superdesign
                 res = tzero_superdesign.superdesign_generate(prompt=prompt, design_type=design_type, workspace_path=".")
                 resp = {"success": True, "data": res}
+            except Exception as e:
+                resp = {"success": False, "error": str(e)}
+
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps(resp, ensure_ascii=False).encode("utf-8"))
+        elif parsed.path == "/api/bridge/reverse":
+            content_length = int(self.headers.get("Content-Length", 0))
+            body = self.rfile.read(content_length).decode("utf-8")
+            try:
+                payload = json.loads(body)
+                src_code = payload.get("code", "")
+                src_lang = payload.get("lang", "ts")
+                flavor = payload.get("flavor", "dataclass")
+                from tzero_bridge import PolyglotTypeBridge
+                py_out = PolyglotTypeBridge.reverse_transpile(src_code, source_lang=src_lang, model_flavor=flavor)
+                resp = {"success": True, "python_code": py_out}
+            except Exception as e:
+                resp = {"success": False, "error": str(e)}
+
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps(resp, ensure_ascii=False).encode("utf-8"))
+
+        elif parsed.path == "/api/merge/heal":
+            content_length = int(self.headers.get("Content-Length", 0))
+            body = self.rfile.read(content_length).decode("utf-8")
+            try:
+                payload = json.loads(body)
+                code = payload.get("code", "")
+                from tzero_semantic_merge import ASTSemanticMerger
+                res = ASTSemanticMerger.heal_conflict_file(code)
+                resp = {
+                    "success": res.success,
+                    "merged_code": res.merged_code,
+                    "auto_resolved_conflicts": res.auto_resolved_conflicts,
+                    "unresolved_conflicts": res.unresolved_conflicts,
+                    "details": res.details
+                }
+            except Exception as e:
+                resp = {"success": False, "error": str(e)}
+
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps(resp, ensure_ascii=False).encode("utf-8"))
+
+        elif parsed.path == "/api/mutation/test":
+            content_length = int(self.headers.get("Content-Length", 0))
+            body = self.rfile.read(content_length).decode("utf-8")
+            try:
+                payload = json.loads(body)
+                tgt_file = payload.get("file", "tzero_arch_test.py")
+                max_m = int(payload.get("max_mutants", 5))
+                from tzero_mutation import ASTMutationEngine
+                rep = ASTMutationEngine.run_mutation_analysis(target_file=tgt_file, max_mutants=max_m)
+                resp = {
+                    "success": True,
+                    "score": rep.mutation_score,
+                    "killed": rep.killed,
+                    "survived": rep.survived,
+                    "total": rep.total_mutants,
+                    "markdown": ASTMutationEngine.format_markdown_report(rep)
+                }
+            except Exception as e:
+                resp = {"success": False, "error": str(e)}
+
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps(resp, ensure_ascii=False).encode("utf-8"))
+        elif parsed.path == "/api/contracts/compare":
+            content_length = int(self.headers.get("Content-Length", 0))
+            body = self.rfile.read(content_length).decode("utf-8")
+            try:
+                payload = json.loads(body)
+                old_code = payload.get("old_code", "")
+                new_code = payload.get("new_code", "")
+                file_path = payload.get("file_path", "module.py")
+                from tzero_contracts import ASTContractComparator
+                rep = ASTContractComparator.compare_code(old_code, new_code, file_path=file_path)
+                resp = {
+                    "success": True,
+                    "semver_bump": rep.semver_bump.value,
+                    "is_breaking": rep.is_breaking,
+                    "breaking_count": len(rep.breaking_changes),
+                    "additions_count": len(rep.non_breaking_additions),
+                    "modifications_count": len(rep.modifications),
+                    "markdown": ASTContractComparator.format_markdown_report([rep])
+                }
+            except Exception as e:
+                resp = {"success": False, "error": str(e)}
+
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps(resp, ensure_ascii=False).encode("utf-8"))
+        elif parsed.path == "/api/debt/analyze":
+            content_length = int(self.headers.get("Content-Length", 0))
+            body = self.rfile.read(content_length).decode("utf-8")
+            try:
+                payload = json.loads(body) if body.strip() else {}
+                target_p = payload.get("path", ".")
+                from tzero_debt import CodeHealthAnalyzer
+                if os.path.isfile(target_p):
+                    rep = CodeHealthAnalyzer.analyze_file(target_p)
+                    resp = {
+                        "success": True,
+                        "type": "file",
+                        "maintainability_index": rep.maintainability_index,
+                        "rating": rep.rating,
+                        "debt_hours": rep.debt_hours,
+                        "debt_cost_usd": rep.debt_cost_usd,
+                        "todo_count": rep.todo_count
+                    }
+                else:
+                    rep = CodeHealthAnalyzer.analyze_workspace(target_p)
+                    resp = {
+                        "success": True,
+                        "type": "workspace",
+                        "average_maintainability_index": rep.average_maintainability_index,
+                        "rating": rep.overall_rating,
+                        "total_debt_hours": rep.total_debt_hours,
+                        "total_debt_cost_usd": rep.total_debt_cost_usd,
+                        "total_todo_markers": rep.total_todo_markers,
+                        "markdown": CodeHealthAnalyzer.format_markdown_report(rep)
+                    }
+            except Exception as e:
+                resp = {"success": False, "error": str(e)}
+
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps(resp, ensure_ascii=False).encode("utf-8"))
+        elif parsed.path == "/api/budget/optimize":
+            content_length = int(self.headers.get("Content-Length", 0))
+            body = self.rfile.read(content_length).decode("utf-8")
+            try:
+                payload = json.loads(body) if body.strip() else {}
+                target_p = payload.get("path", ".")
+                target_tokens = payload.get("target_tokens")
+                model_name = payload.get("model", "claude-3-7")
+                from tzero_budget import ASTTokenBudgetOptimizer
+                cert = ASTTokenBudgetOptimizer.optimize_budget(target_p, target_tokens=target_tokens, model_name=model_name)
+                resp = {
+                    "success": True,
+                    "target_model": cert.target_model,
+                    "budget_limit_tokens": cert.budget_limit_tokens,
+                    "raw_tokens": cert.raw_tokens,
+                    "compressed_tokens": cert.compressed_tokens,
+                    "savings_percentage": cert.savings_percentage,
+                    "tier_applied": cert.tier_applied,
+                    "fits_budget": cert.fits_budget,
+                    "sha256_checksum": cert.sha256_checksum,
+                    "markdown": ASTTokenBudgetOptimizer.format_markdown_certificate(cert)
+                }
+            except Exception as e:
+                resp = {"success": False, "error": str(e)}
+
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps(resp, ensure_ascii=False).encode("utf-8"))
+        elif parsed.path == "/api/golden/verify":
+            content_length = int(self.headers.get("Content-Length", 0))
+            body = self.rfile.read(content_length).decode("utf-8")
+            try:
+                payload = json.loads(body) if body.strip() else {}
+                target_p = payload.get("path", ".")
+                from tzero_golden import ASTGoldenRegressionEngine
+                rep = ASTGoldenRegressionEngine.verify_against_golden(target_p)
+                resp = {
+                    "success": rep.get("success", False),
+                    "clean": rep.get("clean", False),
+                    "removed_count": len(rep.get("removed_symbols", [])),
+                    "modified_count": len(rep.get("modified_signatures", [])),
+                    "added_count": len(rep.get("added_symbols", [])),
+                    "markdown": ASTGoldenRegressionEngine.format_markdown_report(rep)
+                }
             except Exception as e:
                 resp = {"success": False, "error": str(e)}
 

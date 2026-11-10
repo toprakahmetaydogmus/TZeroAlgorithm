@@ -42,7 +42,7 @@ except ImportError:
     def Field(default=..., description=""):
         return default
 
-SERVER_VERSION = "10.8.0"
+SERVER_VERSION = "10.9.0"
 
 # Safe UTF-8 reconfiguration for Windows console & piped subprocesses
 if sys.stdout and hasattr(sys.stdout, "reconfigure"):
@@ -4059,6 +4059,7 @@ def create_mcp_server():
             lines.append("```")
         else:
             lines.append("🌟 **Flawless Code:** Zero hallucinated symbols detected. All imports and methods verified against workspace AST.")
+        return "\n".join(lines)
 
     @server.tool(
         name="transpile_model_bridge",
@@ -4104,7 +4105,6 @@ def create_mcp_server():
             f"{out}\n"
             f"```\n"
         )
-        return "\n".join(lines)
 
     # -------------------------------------------------------------------------
     # -------------------------------------------------------------------------
@@ -4349,11 +4349,11 @@ def create_mcp_server():
             return estimate_token_cost(project_root=target, text=query)
 
         elif act in ("memory_query", "memory_search"):
-            return query_memory_store(query=query or target, store_name=opts.get("store_name", "workspace"))
+            return query_memory_store(query=query or target, query_mode=opts.get("query_mode", "semantic"), project_root=opts.get("project_root", "."))
 
         elif act in ("memory", "memory_manage", "compress"):
             op = opts.get("operation", "list")
-            return manage_memory_store(operation=op, store_name=opts.get("store_name", "workspace"), payload=query or target)
+            return manage_memory_store(operation=op, content=query or target, store_name=opts.get("store_name", "default"), project_root=opts.get("project_root", "."))
 
         elif act in ("heal", "self_healing", "fix"):
             return orchestrate_agent_swarm(goal=query or target, orchestration_mode="self_healing", project_root=target if os.path.isdir(target) else ".")
@@ -4442,6 +4442,81 @@ def create_mcp_server():
                 return f"Lock {'released' if ok else 'failed to release'}"
             else:
                 return bb.export_status_markdown()
+
+        elif act in ("generate_architecture_tests", "generate_arch_tests", "arch_tests"):
+            from tzero_arch_test import ArchitectureTestSuiteGenerator
+            target_dir = target if os.path.isdir(target) else "."
+            gen = ArchitectureTestSuiteGenerator(target_dir)
+            out_path = opts.get("out_path") or (query if query and query.endswith(".py") else None)
+            written = gen.write_test_file(out_path)
+            return f"✅ Standalone Architecture Guard test suite generated at: {written}"
+
+        elif act in ("check_architecture", "check_arch", "arch_audit", "validate_architecture"):
+            from tzero_arch_test import ArchitectureTestSuiteGenerator
+            target_dir = target if os.path.isdir(target) else "."
+            gen = ArchitectureTestSuiteGenerator(target_dir)
+            report = gen.run_live_audit()
+            if report["success"]:
+                return (
+                    f"✅ ARCH-AUDIT PASS: All {report['scanned_files']} modules satisfy declared layer boundaries.\n"
+                    f"- Configured Layers: {report['layers_count']}\n"
+                    f"- Circular Import Cycles: 0\n"
+                    f"- Zero-Leak Violations: 0"
+                )
+            else:
+                lines = [f"❌ ARCH-AUDIT FAILED ({len(report['layer_violations'])} boundary violations, {len(report['circular_cycles'])} cycles, {len(report['secret_leaks'])} leaks):"]
+                for v in report["layer_violations"]:
+                    lines.append(f"  - [BOUNDARY] {v['file']}:{v['line']} (layer: {v['layer']}) imports forbidden '{v['imported']}'")
+                for c in report["circular_cycles"]:
+                    lines.append(f"  - [CYCLE] {c}")
+                for s in report["secret_leaks"]:
+                    lines.append(f"  - [LEAK] {s['file']}: {s['pattern']}")
+                return "\n".join(lines)
+
+        elif act in ("mutation_test", "mutate", "test_quality", "mutation"):
+            from tzero_mutation import ASTMutationEngine
+            file_to_mutate = target if (target and os.path.isfile(target)) else (query if query and os.path.isfile(query) else "tzero_v3.py")
+            t_cmd = opts.get("test_cmd")
+            max_m = int(opts.get("max_mutants", 10))
+            rep = ASTMutationEngine.run_mutation_analysis(
+                target_file=file_to_mutate,
+                test_command=t_cmd,
+                max_mutants=max_m
+            )
+            return ASTMutationEngine.format_markdown_report(rep)
+
+        elif act in ("contracts", "check_contracts", "api_contracts", "semver", "breaking_changes"):
+            from tzero_contracts import ASTContractComparator
+            target_dir = target if os.path.isdir(target) else "."
+            base_ref = opts.get("base_ref") or query or "HEAD~1"
+            reports = ASTContractComparator.compare_git_revision(repo_dir=target_dir, base_ref=base_ref)
+            return ASTContractComparator.format_markdown_report(reports)
+
+        elif act in ("debt", "technical_debt", "code_health", "health", "maintainability"):
+            from tzero_debt import CodeHealthAnalyzer
+            target_dir = target if os.path.isdir(target) else "."
+            rep = CodeHealthAnalyzer.analyze_workspace(target_dir)
+            return CodeHealthAnalyzer.format_markdown_report(rep)
+
+        elif act in ("budget", "certificate", "cert", "token_budget", "fit_context"):
+            from tzero_budget import ASTTokenBudgetOptimizer
+            target_dir = target if os.path.isdir(target) else "."
+            t_tok = opts.get("target_tokens") or (int(query) if query.isdigit() else None)
+            m_name = opts.get("model", "claude-3-7")
+            cert = ASTTokenBudgetOptimizer.optimize_budget(target_dir, target_tokens=t_tok, model_name=m_name)
+            return ASTTokenBudgetOptimizer.format_markdown_certificate(cert)
+
+        elif act in ("golden", "goldens", "verify_golden", "check_golden"):
+            from tzero_golden import ASTGoldenRegressionEngine
+            target_dir = target if os.path.isdir(target) else "."
+            sub_op = opts.get("operation") or query or "verify"
+            if sub_op in ("generate", "update", "capture"):
+                baseline = ASTGoldenRegressionEngine.generate_baseline(target_dir)
+                out_p = ASTGoldenRegressionEngine.save_baseline(baseline)
+                return f"✅ Captured {baseline.total_symbols} golden public AST signatures to: {out_p}"
+            else:
+                rep = ASTGoldenRegressionEngine.verify_against_golden(target_dir)
+                return ASTGoldenRegressionEngine.format_markdown_report(rep)
 
         # Fallback to general dispatch
         handler = _CANONICAL_DISPATCH.get(act) or _LEGACY_DISPATCH.get(act)
