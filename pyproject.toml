@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tzero-mcp"
-version = "10.8.0"
+version = "10.9.0"
 description = "Enterprise Codebase Context Builder, AST Signatures Analyzer, & Token Reducer for LLMs"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -64,8 +64,7 @@ dependencies = [
     "darkdetect>=0.8.0",
     "pygments>=2.14.0",
     "Pillow>=9.0.0",
-    "mcp>=1.0.0",
-    "typer>=0.9.0"
+    "mcp>=1.0.0"
 ]
 
 [project.optional-dependencies]
@@ -75,11 +74,16 @@ build = [
 test = [
     "pytest>=7.0.0"
 ]
+space = [
+    "gradio>=4.0.0"
+]
 
 [project.scripts]
 tzero = "tzero_v3:main"
 tzero-gui = "tzero_v3:launch_gui"
+tzero-tui = "tzero_tui:main"
 tzero-mcp = "tzero_mcp:main"
+pc-fixer-mcp = "pc_fixer_mcp:main"
 tzero-add-mcp = "addmcp:main"
 tzero-addmcp = "addmcp:main"
 tzero-guard = "tzero_guard:main"
@@ -102,18 +106,24 @@ py-modules = [
     "siber_akademi_icon",
     "app",
     "pc_fixer_mcp",
+    "tzero_arch_test",
     "tzero_benchmark",
+    "tzero_blackboard",
     "tzero_bridge",
+    "tzero_budget",
     "tzero_ci",
     "tzero_commit",
+    "tzero_contracts",
     "tzero_cost",
     "tzero_dashboard",
+    "tzero_debt",
     "tzero_drift",
     "tzero_explain",
     "tzero_fix",
-    "tzero_gateway",
+    "tzero_golden",
     "tzero_guard",
     "tzero_infra",
+    "tzero_mutation",
     "tzero_neural_cortex",
     "tzero_packer",
     "tzero_patch",
@@ -123,12 +133,15 @@ py-modules = [
     "tzero_reachability",
     "tzero_replay",
     "tzero_security",
+    "tzero_semantic_merge",
     "tzero_snapshot",
     "tzero_stubs",
+    "tzero_subagent_engine",
     "tzero_superdesign",
     "tzero_sync",
     "tzero_task_benchmark",
-    "tzero_tui"
+    "tzero_tui",
+    "tzero_turbo"
 ]
 
 [tool.setuptools.package-data]

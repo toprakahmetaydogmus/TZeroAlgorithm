@@ -468,7 +468,7 @@ def calculate_token_cost(token_count: int, provider_name: str) -> float:
 # i18n Translations
 TRANSLATIONS: Dict[str, Dict[str, str]] = {
     "en": {
-        "title": "T-Zero Developer Console & Context Architect v10.2.0",
+        "title": "T-Zero Developer Console & Context Architect v10.9.0",
         "subtitle": f"Developer: {DEV_NAME} | {DEV_URL_MAIN} | {DEV_URL_BIO}",
         "overview_tab": "🏠 Overview Dashboard",
         "setup_tab": "⚡ Setup & AI Models",
@@ -505,7 +505,7 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "audit_btn": "🛡️ SECURITY AUDIT"
     },
     "tr": {
-        "title": "T-Zero Geliştirici Konsolu & Bağlam Mimarı v10.2.0",
+        "title": "T-Zero Geliştirici Konsolu & Bağlam Mimarı v10.9.0",
         "subtitle": f"Geliştirici: {DEV_NAME} | {DEV_URL_MAIN} | {DEV_URL_BIO}",
         "overview_tab": "🏠 Genel Bakış",
         "setup_tab": "⚡ Kurulum & Model",
@@ -8694,7 +8694,7 @@ def main():
     parser.add_argument("--focus", default="", metavar="TARGET", help="Focus file or semantic search query for context budget packing")
     parser.add_argument("--pack-out", default=None, metavar="FILE", help="Output file for packed context bundle (default: stdout)")
     parser.add_argument("--commit-msg", action="store_true", help="Generate Conventional Commit message from local AST git diff ($0 local engine)")
-    parser.add_argument("--changelog", nargs="?", const="v10.2.0", default=None, metavar="VERSION", help="Generate release CHANGELOG markdown from git history")
+    parser.add_argument("--changelog", nargs="?", const="v10.9.0", default=None, metavar="VERSION", help="Generate release CHANGELOG markdown from git history")
     parser.add_argument("--ci", choices=["github", "gitlab", "pre-commit", "all"], default=None, help="Install turnkey CI/CD security and verification workflow")
     parser.add_argument("--stubs", nargs="?", const=".", default=None, metavar="PATH", help="Generate PEP-484 AST type stubs (.pyi) for target file or workspace")
     parser.add_argument("--stubs-out", default=None, metavar="DIR", help="Output directory for generated type stubs (default: alongside .py files)")
@@ -9581,7 +9581,7 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
         if not os.path.exists(app_path):
             app_path = os.path.join(os.getcwd(), "huggingface-space", "app.py")
         print("\033[36m" + "=" * 80)
-        print("🤗 SİBER AKADEMİ — T-ZERO HUGGING FACE SPACE & GRADIO COCKPIT (v10.2.0)")
+        print("🤗 SİBER AKADEMİ — T-ZERO HUGGING FACE SPACE & GRADIO COCKPIT (v10.9.0)")
         print("=" * 80 + "\033[0m")
         print("🌐 Official Live Space : https://huggingface.co/spaces/toprakke4/tzero-token-reducer")
         print(f"📁 Local Application   : {app_path}")

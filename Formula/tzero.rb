@@ -3,8 +3,8 @@ class Tzero < Formula
 
   desc "Deterministic AST Context Compressor, 95% Token Reducer & 20-Tool MCP Server"
   homepage "https://github.com/toprakahmetaydogmus/TZeroAlgorithm"
-  url "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/archive/refs/tags/v10.8.0.tar.gz"
-  version "10.8.0"
+  url "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/archive/refs/tags/v10.9.0.tar.gz"
+  version "10.9.0"
   license "MIT"
 
   depends_on "python@3.12"

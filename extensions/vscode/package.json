@@ -2,7 +2,7 @@
   "name": "tzero-vscode",
   "displayName": "T-Zero Context Architect & MCP",
   "description": "Cut AI token costs by up to 95% with local AST pruning, Zero-Leak security audit, and 1-click MCP initialization for Cursor, Windsurf, and VS Code Copilot.",
-  "version": "10.8.0",
+  "version": "10.9.0",
   "publisher": "siber-akademi",
   "icon": "icon.png",
   "author": {
