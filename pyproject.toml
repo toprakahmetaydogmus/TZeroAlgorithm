@@ -94,7 +94,7 @@ tzero-fixer = "tzero_v3:main"
 tzero-explain = "tzero_v3:main"
 
 [tool.setuptools]
-packages = ["tzero_jarvis", "tzero_fixer", "tzero", "tzero.jarvis"]
+packages = ["tzero_jarvis", "tzero_fixer"]
 py-modules = [
     "main",
     "tzero",

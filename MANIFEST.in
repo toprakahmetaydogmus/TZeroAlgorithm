@@ -13,4 +13,3 @@ include README.md
 include README.tr.md
 recursive-include tzero_jarvis *.py
 recursive-include tzero_fixer *.py
-recursive-include tzero *.py

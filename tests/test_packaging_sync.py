@@ -66,6 +66,23 @@ class TestPackagingAndVersionSync(unittest.TestCase):
         self.assertEqual(addmcp.APP_VERSION, canonical)
         self.assertEqual(tzero_task_benchmark.TaskBenchmarkReport().version, canonical)
 
+    def test_dockerignore_excludes_bloat_and_private_artifacts(self):
+        lines = {
+            line.strip()
+            for line in (ROOT_DIR / ".dockerignore").read_text(encoding="utf-8").splitlines()
+            if line.strip() and not line.strip().startswith("#")
+        }
+        for pat in ("tzero-showcase/", "extensions/", ".tzero/", ".tzero_cache.db", "scratch/"):
+            self.assertIn(pat, lines, f"Missing {pat} from .dockerignore")
+
+    def test_no_dead_duplicate_packages_and_sorted_vsix_publisher(self):
+        self.assertFalse((ROOT_DIR / "tzero").exists(), "Dead duplicate package tzero/ should be removed")
+        self.assertFalse((ROOT_DIR / "vscode-extension").exists(), "Legacy vscode-extension/ should be removed")
+        pyproject = tomllib.loads((ROOT_DIR / "pyproject.toml").read_text(encoding="utf-8"))
+        self.assertEqual(pyproject["tool"]["setuptools"]["packages"], ["tzero_jarvis", "tzero_fixer"])
+        ps_text = (ROOT_DIR / "scripts" / "publish_vscode.ps1").read_text(encoding="utf-8")
+        self.assertIn("LastWriteTime", ps_text)
+
 
 if __name__ == "__main__":
     unittest.main()

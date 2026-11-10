@@ -1,4 +1,4 @@
-# T-Zero VS Code Extension Automated Publisher
+﻿# T-Zero VS Code Extension Automated Publisher
 # Siber Akademi - 100% Free & Zero-Leak Tooling
 
 param(
@@ -20,7 +20,7 @@ Write-Host "[1/3] Packaging fresh VSIX..." -ForegroundColor Green
 Set-Location $ExtensionDir
 npx --yes @vscode/vsce package --no-dependencies
 
-$vsixFiles = Get-ChildItem -Path $ExtensionDir -Filter "*.vsix"
+$vsixFiles = Get-ChildItem -Path $ExtensionDir -Filter "*.vsix" | Sort-Object LastWriteTime -Descending
 if ($vsixFiles.Count -eq 0) {
     Write-Error "No VSIX file was produced!"
 }

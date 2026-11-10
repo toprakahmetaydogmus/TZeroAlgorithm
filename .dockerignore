@@ -14,6 +14,17 @@ dist/
 *.egg-info/
 benchmark-site/
 brag-output/
+tzero-showcase/
+extensions/
+huggingface-space/
+tools/
+scratch/
+enterprise_onprem/
+tzero_gateway.py
+.tzero/
+.tzero_cache.db
+.superpowers/
+*.vsix
 *.spec
 *.bat
 *.ps1
