@@ -1104,39 +1104,10 @@ class PolyglotSignatureExtractor:
 
     @classmethod
     def extract(cls, file_path: str, code: str, mode: str = "ultra") -> str:
-        ext = os.path.splitext(file_path.lower())[1]
-        if ext in (".js", ".ts", ".jsx", ".tsx", ".cjs", ".mjs"):
-            return cls.reduce_typescript_javascript(code, mode)
-        elif ext == ".go":
-            return cls.reduce_go(code, mode)
-        elif ext == ".rs":
-            return cls.reduce_rust(code, mode)
-        elif ext in (".java", ".cs"):
-            return cls.reduce_java_csharp(code, mode)
-        elif ext in (".cpp", ".c", ".h", ".hpp", ".cc", ".cxx"):
-            return cls.reduce_c_cpp(code, mode)
-        elif ext in (".kt", ".kts"):
-            return cls.reduce_kotlin(code, mode)
-        elif ext == ".swift":
-            return cls.reduce_swift(code, mode)
-        elif ext in (".rb", ".rake", ".gemspec"):
-            from tzero_polyglot import PolyglotTokenReducer
-            return PolyglotTokenReducer.reduce_ruby(code, mode)
-        elif ext in (".php", ".phtml"):
-            from tzero_polyglot import PolyglotTokenReducer
-            return PolyglotTokenReducer.reduce_php(code, mode)
-        elif ext in (".dart",):
-            from tzero_polyglot import PolyglotTokenReducer
-            return PolyglotTokenReducer.reduce_dart(code, mode)
-        elif ext in (".sol",):
-            from tzero_polyglot import PolyglotTokenReducer
-            return PolyglotTokenReducer.reduce_solidity(code, mode)
-        elif ext in (".scala", ".sc"):
-            from tzero_polyglot import PolyglotTokenReducer
-            return PolyglotTokenReducer.reduce_scala(code, mode)
-        elif ext in (".ex", ".exs"):
-            from tzero_polyglot import PolyglotTokenReducer
-            return PolyglotTokenReducer.reduce_elixir(code, mode)
+        from tzero_polyglot import PolyglotTokenReducer
+        norm_mode = "light" if str(mode).lower() in ("light", "balanced") else mode
+        if PolyglotTokenReducer.detect_language(file_path):
+            return PolyglotTokenReducer.reduce_code(code, filename=file_path, mode=norm_mode)
         return code
 
     @staticmethod

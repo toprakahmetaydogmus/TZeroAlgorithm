@@ -10,8 +10,9 @@ Developer: Toprak Ahmet Aydoğmuş (Siber Akademi)
 License: MIT
 """
 
+import ast
 import re
-from typing import Any, Dict, List, Tuple, Optional
+from typing import Any, Callable, Dict, List, Tuple, Optional
 
 
 _BPE_ENCODING_CACHE: Dict[str, Any] = {}
@@ -59,6 +60,167 @@ class PolyglotTokenReducer:
         "scala": [".scala", ".sc"],
         "elixir": [".ex", ".exs"]
     }
+
+    _TREE_SITTER_ADAPTERS: Dict[str, Callable[[str, str, str], str]] = {}
+
+    @classmethod
+    def has_tree_sitter(cls) -> bool:
+        """Returns True if optional tree-sitter library or any custom adapter is registered."""
+        if cls._TREE_SITTER_ADAPTERS:
+            return True
+        try:
+            import importlib.util
+            return importlib.util.find_spec("tree_sitter") is not None
+        except Exception:
+            return False
+
+    @classmethod
+    def register_tree_sitter_adapter(
+        cls,
+        lang: str,
+        adapter: Optional[Callable[[str, str, str], str]],
+    ) -> None:
+        """Registers or clears an optional tree-sitter reducer adapter for a language."""
+        key = (lang or "").lower()
+        if adapter is None:
+            cls._TREE_SITTER_ADAPTERS.pop(key, None)
+        else:
+            cls._TREE_SITTER_ADAPTERS[key] = adapter
+
+    @staticmethod
+    def _lexical_scan_lines(content: str) -> List[Tuple[str, int, int, int, int, bool]]:
+        """Scans lines ignoring strings (' \" `) and comments (// /* */) for brace/paren counts."""
+        lines = content.splitlines()
+        results: List[Tuple[str, int, int, int, int, bool]] = []
+        in_block_comment = False
+
+        for line in lines:
+            open_b = 0
+            close_b = 0
+            open_p = 0
+            close_p = 0
+            has_code_token = False
+            quote_char: Optional[str] = None
+            i = 0
+            n = len(line)
+
+            while i < n:
+                ch = line[i]
+                nxt = line[i + 1] if i + 1 < n else ""
+
+                if in_block_comment:
+                    if ch == "*" and nxt == "/":
+                        in_block_comment = False
+                        i += 2
+                        continue
+                    i += 1
+                    continue
+
+                if quote_char:
+                    has_code_token = True
+                    if ch == "\\":
+                        i += 2
+                        continue
+                    if ch == quote_char:
+                        quote_char = None
+                    i += 1
+                    continue
+
+                if ch == "/" and nxt == "/":
+                    break
+                if ch == "/" and nxt == "*":
+                    in_block_comment = True
+                    i += 2
+                    continue
+                if ch in ('"', "'", "`"):
+                    has_code_token = True
+                    quote_char = ch
+                    i += 1
+                    continue
+
+                if not ch.isspace():
+                    has_code_token = True
+                if ch == "{":
+                    open_b += 1
+                elif ch == "}":
+                    close_b += 1
+                elif ch == "(":
+                    open_p += 1
+                elif ch == ")":
+                    close_p += 1
+                i += 1
+
+            results.append((line, open_b, close_b, open_p, close_p, not has_code_token))
+        return results
+
+    @classmethod
+    def chunk_code(
+        cls,
+        content: str,
+        filename: str = "",
+        max_chunk_tokens: int = 400,
+    ) -> List[str]:
+        """cAST-style semantic boundary chunker splitting only along AST/block boundaries."""
+        if not content or not content.strip():
+            return []
+        lang = cls.detect_language(filename) or ""
+        blocks: List[str] = []
+
+        if lang == "python":
+            try:
+                tree = ast.parse(content)
+                lines = content.splitlines()
+                prev_end = 0
+                for node in tree.body:
+                    start = max(prev_end, getattr(node, "lineno", 1) - 1)
+                    end = getattr(node, "end_lineno", start + 1)
+                    if start > prev_end:
+                        gap = "\n".join(lines[prev_end:start]).strip()
+                        if gap:
+                            blocks.append(gap)
+                    blocks.append("\n".join(lines[start:end]))
+                    prev_end = end
+                if prev_end < len(lines):
+                    tail = "\n".join(lines[prev_end:]).strip()
+                    if tail:
+                        blocks.append(tail)
+            except SyntaxError:
+                blocks = []
+
+        if not blocks:
+            scanned = cls._lexical_scan_lines(content)
+            cur_lines: List[str] = []
+            depth = 0
+            for raw_line, ob, cb, _, _, _ in scanned:
+                cur_lines.append(raw_line)
+                depth = max(0, depth + ob - cb)
+                if depth == 0 and raw_line.strip():
+                    if ob > 0 or cb > 0 or raw_line.strip().endswith(";"):
+                        blocks.append("\n".join(cur_lines))
+                        cur_lines = []
+            if cur_lines:
+                tail_blk = "\n".join(cur_lines).strip()
+                if tail_blk:
+                    blocks.append(tail_blk)
+
+        if not blocks:
+            return [content]
+
+        chunks: List[str] = []
+        active: List[str] = []
+        active_tokens = 0
+        for blk in blocks:
+            blk_tok = count_bpe_tokens(blk)
+            if active and active_tokens + blk_tok > max_chunk_tokens:
+                chunks.append("\n\n".join(active))
+                active = [blk]
+                active_tokens = blk_tok
+            else:
+                active.append(blk)
+                active_tokens += blk_tok
+        if active:
+            chunks.append("\n\n".join(active))
+        return chunks
 
     @classmethod
     def detect_language(cls, filename: str) -> Optional[str]:
@@ -127,6 +289,15 @@ class PolyglotTokenReducer:
         if not lang or mode == "none":
             return content
 
+        adapter = cls._TREE_SITTER_ADAPTERS.get(lang)
+        if adapter is not None:
+            try:
+                return adapter(content, filename, mode)
+            except Exception:
+                pass
+
+        norm_mode = "light" if str(mode).lower() in ("light", "balanced") else "ultra"
+
         dispatch = {
             "python": cls.reduce_python,
             "javascript": cls.reduce_javascript,
@@ -147,8 +318,8 @@ class PolyglotTokenReducer:
         reducer = dispatch.get(lang)
         if not reducer:
             return content
-        reduced = reducer(content, mode)
-        if mode == "light" and lang != "python":
+        reduced = reducer(content, norm_mode)
+        if norm_mode == "light" and lang != "python":
             return cls._attach_light_doc_comments(content, reduced)
         return reduced
 
@@ -190,82 +361,126 @@ class PolyglotTokenReducer:
 
     @staticmethod
     def reduce_javascript(content: str, mode: str = "ultra") -> str:
-        """Reduces JavaScript/TypeScript source to imports, interfaces, types, and function signatures."""
-        lines = content.splitlines()
+        """Reduces JavaScript/TypeScript source with string/comment-aware brace & multiline signature tracking."""
+        scanned = PolyglotTokenReducer._lexical_scan_lines(content)
         pruned: List[str] = []
         in_multiline_import = False
-        in_interface_or_type = False
-        in_block_comment = False
+        keep_block_until_depth: Optional[int] = None
+        skip_body_until_depth: Optional[int] = None
+        pending_sig: List[str] = []
+        pending_paren = 0
+        brace_depth = 0
 
-        for line in lines:
-            stripped = line.strip()
-            if not stripped:
+        ctrl_re = re.compile(r'^(?:else\s+)?(?:if|for|while|switch|catch|try|finally|return|throw|break|continue)\b')
+        iface_re = re.compile(r'^(?:export\s+)?(?:declare\s+)?(?:interface|type|enum)\s+[A-Za-z0-9_]+')
+        class_re = re.compile(r'^(?:export\s+)?(?:abstract\s+)?(?:default\s+)?class\s+[A-Za-z0-9_]+')
+        func_re = re.compile(
+            r'^(?:export\s+(?:default\s+)?)?(?:async\s+)?function\b'
+            r'|^(?:export\s+)?(?:const|let|var)\s+[A-Za-z0-9_$]+\s*(?::[^=]+)?=\s*(?:async\s+)?(?:\([^)]*\)|[A-Za-z0-9_$]+)\s*=>'
+            r'|^(?:(?:public|private|protected|static|async|get|set|override|readonly)\s+)*(?:constructor|[A-Za-z0-9_$]+)\s*(?:<[^>]+>)?\s*\('
+        )
+
+        for raw_line, ob, cb, op, cp, is_comment_only in scanned:
+            stripped = raw_line.strip()
+            if not stripped or is_comment_only:
                 continue
 
-            # Multi-line comment tracking
-            if in_block_comment:
-                if "*/" in stripped:
-                    in_block_comment = False
-                continue
-            if stripped.startswith("/*") and not stripped.endswith("*/"):
-                in_block_comment = True
-                continue
-            if stripped.startswith("//"):
-                continue
-
-            # Multi-line imports
             if in_multiline_import:
-                pruned.append(line)
+                pruned.append(raw_line)
+                brace_depth = max(0, brace_depth + ob - cb)
                 if "}" in stripped or ";" in stripped:
                     in_multiline_import = False
                 continue
 
-            if stripped.startswith("import ") and "{" in stripped and "}" not in stripped:
+            if keep_block_until_depth is not None:
+                pruned.append(raw_line)
+                brace_depth = max(0, brace_depth + ob - cb)
+                if brace_depth < keep_block_until_depth:
+                    keep_block_until_depth = None
+                continue
+
+            if skip_body_until_depth is not None:
+                brace_depth = max(0, brace_depth + ob - cb)
+                if brace_depth < skip_body_until_depth:
+                    skip_body_until_depth = None
+                continue
+
+            if pending_sig:
+                pending_sig.append(raw_line)
+                pending_paren += op - cp
+                prev_depth = brace_depth
+                brace_depth = max(0, brace_depth + ob - cb)
+                if pending_paren <= 0 and (ob > 0 or stripped.endswith(";") or stripped.endswith(")")):
+                    if ob > cb:
+                        for sline in pending_sig[:-1]:
+                            pruned.append(sline)
+                        pruned.append(re.sub(r'\{.*$', '{ ... }', pending_sig[-1]))
+                        skip_body_until_depth = prev_depth + 1
+                    else:
+                        pruned.extend(pending_sig)
+                    pending_sig = []
+                    pending_paren = 0
+                continue
+
+            prev_depth = brace_depth
+            brace_depth = max(0, brace_depth + ob - cb)
+
+            if stripped.startswith("import ") and ob > cb:
                 in_multiline_import = True
-                pruned.append(line)
+                pruned.append(raw_line)
                 continue
 
-            # Interfaces and Type declarations (keep interface definitions and fields)
-            if re.match(r"^(export\s+)?(interface|type)\s+[A-Za-z0-9_]+", stripped):
-                pruned.append(line)
-                if "{" in stripped and "}" not in stripped:
-                    in_interface_or_type = True
+            if stripped.startswith(("import ", "require(")) or stripped.startswith("@"):
+                pruned.append(raw_line)
                 continue
 
-            if in_interface_or_type:
-                pruned.append(line)
-                if "}" in stripped:
-                    in_interface_or_type = False
+            if iface_re.match(stripped):
+                pruned.append(raw_line)
+                if ob > cb:
+                    keep_block_until_depth = prev_depth + 1
                 continue
 
-            # Function declarations, arrow functions, classes
-            if (stripped.startswith("import ") or stripped.startswith("export ") or
-                stripped.startswith("class ") or stripped.startswith("function ") or
-                stripped.startswith("async function ") or
-                (stripped.startswith("const ") and "=>" in stripped) or
-                (stripped.startswith("let ") and "=>" in stripped)):
-                if "{" in stripped and "}" not in stripped:
-                    pruned.append(re.sub(r'\{.*$', '{ ... }', line))
+            if class_re.match(stripped):
+                pruned.append(raw_line)
+                continue
+
+            if ctrl_re.match(stripped):
+                if ob > cb:
+                    skip_body_until_depth = prev_depth + 1
+                continue
+
+            is_export_const_or_decl = stripped.startswith(("export ", "declare "))
+            if func_re.match(stripped) or is_export_const_or_decl:
+                if op > cp and ob == 0:
+                    pending_sig = [raw_line]
+                    pending_paren = op - cp
+                    continue
+                if ob > cb:
+                    pruned.append(re.sub(r'\{.*$', '{ ... }', raw_line))
+                    skip_body_until_depth = prev_depth + 1
                 elif stripped.endswith("{"):
-                    pruned.append(f"{line[:-1]}{{ ... }}")
+                    pruned.append(f"{raw_line[:-1]}{{ ... }}")
+                    skip_body_until_depth = prev_depth + 1
                 else:
-                    pruned.append(line)
+                    pruned.append(raw_line)
+
         return "\n".join(pruned) if pruned else content
 
     @staticmethod
     def reduce_rust(content: str, mode: str = "ultra") -> str:
-        """Reduces Rust source code to use statements, traits, structs, enums, and fn signatures."""
+        """Reduces Rust source code to use statements, traits, structs, enums, impls, and fn signatures."""
         lines = content.splitlines()
         pruned: List[str] = []
         for line in lines:
             stripped = line.strip()
             is_fn = bool(re.match(r'^(pub(\([^)]+\))?\s+)?(async\s+)?(unsafe\s+)?fn\s+', stripped))
+            is_impl = bool(re.match(r'^impl\b', stripped))
             if (stripped.startswith("use ") or stripped.startswith("pub use ") or
-                is_fn or
+                is_fn or is_impl or
                 stripped.startswith("pub struct ") or stripped.startswith("struct ") or
                 stripped.startswith("pub enum ") or stripped.startswith("enum ") or
                 stripped.startswith("pub trait ") or stripped.startswith("trait ") or
-                stripped.startswith("impl ") or stripped.startswith("#[") or
+                stripped.startswith("#[") or
                 stripped.startswith("pub const ") or stripped.startswith("pub type ") or
                 stripped.startswith("const ") or stripped.startswith("type ")):
                 if "{" in stripped and not stripped.endswith("}"):
@@ -297,21 +512,47 @@ class PolyglotTokenReducer:
     @staticmethod
     def reduce_cpp(content: str, mode: str = "ultra") -> str:
         """Reduces C/C++ source code to headers, classes, structs, templates, and prototypes."""
-        lines = content.splitlines()
+        scanned = PolyglotTokenReducer._lexical_scan_lines(content)
         pruned: List[str] = []
-        for line in lines:
-            stripped = line.strip()
-            if (stripped.startswith("#include") or stripped.startswith("#define") or
-                stripped.startswith("template") or stripped.startswith("class ") or
-                stripped.startswith("struct ") or stripped.startswith("namespace ") or
-                stripped.startswith("using ") or stripped.startswith("typedef ") or
-                re.match(r'^(?:virtual\s+|static\s+|inline\s+)?[\w:<>]+\s+[\w:]+\s*\([^;]*\)\s*(?:const)?\s*\{?$', stripped)):
+        brace_depth = 0
+        skip_body_until_depth: Optional[int] = None
+        fn_re = re.compile(
+            r'^(?:(?:virtual|static|inline|explicit|constexpr)\s+)?'
+            r'(?:[\w:<>&*\s]+\s+)?~?[\w:]+\s*\([^;]*\)\s*(?:const)?\s*(?:override|noexcept|final)?\s*(?:\{|;)?$'
+        )
+        ctrl_re = re.compile(r'^(?:if|for|while|switch|catch|return|else)\b')
+
+        for raw_line, ob, cb, _, _, is_comment_only in scanned:
+            stripped = raw_line.strip()
+            if not stripped or is_comment_only:
+                continue
+
+            if skip_body_until_depth is not None:
+                brace_depth = max(0, brace_depth + ob - cb)
+                if brace_depth < skip_body_until_depth:
+                    skip_body_until_depth = None
+                continue
+
+            prev_depth = brace_depth
+            brace_depth = max(0, brace_depth + ob - cb)
+            if ctrl_re.match(stripped):
+                if ob > cb:
+                    skip_body_until_depth = prev_depth + 1
+                continue
+
+            is_container = stripped.startswith((
+                "#include", "#define", "template", "class ", "struct ", "namespace ", "using ", "typedef "
+            ))
+            is_fn = bool(fn_re.match(stripped))
+            if is_container or is_fn:
                 if "{" in stripped:
-                    pruned.append(re.sub(r'\{.*$', '{ ... }', line))
+                    pruned.append(re.sub(r'\{.*$', '{ ... }', raw_line))
+                    if is_fn and ob > cb:
+                        skip_body_until_depth = prev_depth + 1
                 elif not stripped.endswith(";") and not stripped.startswith("#") and not stripped.startswith("namespace"):
-                    pruned.append(f"{line};")
+                    pruned.append(f"{raw_line};")
                 else:
-                    pruned.append(line)
+                    pruned.append(raw_line)
         return "\n".join(pruned) if pruned else content
 
     @staticmethod

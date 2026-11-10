@@ -234,6 +234,65 @@ end
         self.assertIn("def process(amount)", res)
         self.assertNotIn("do_heavy_crypto(amount)", res)
 
+    def test_multiline_signature_and_braces_in_strings(self):
+        ts_code = (
+            "export function formatTemplate(\n"
+            "    prefix: string,\n"
+            "    suffix: string\n"
+            "): string {\n"
+            "    const braceTrap = \"} } } } // fake\";\n"
+            "    /* block } } trap */\n"
+            "    return prefix + braceTrap + suffix;\n"
+            "}\n\n"
+            "export function nextFunction(): number {\n"
+            "    return 42;\n"
+            "}\n"
+        )
+        res = PolyglotTokenReducer.reduce_code(ts_code, "template.ts")
+        self.assertIn("prefix: string", res)
+        self.assertIn("suffix: string", res)
+        self.assertIn("export function nextFunction(): number", res)
+        self.assertNotIn("braceTrap", res)
+        self.assertNotIn("return 42;", res)
+
+    def test_cast_chunk_code_splits_on_ast_boundaries(self):
+        code = "\n\n".join(
+            f"export function worker{i}(input: string): string {{\n"
+            f"    const step1 = input.trim();\n"
+            f"    const step2 = step1.toUpperCase();\n"
+            f"    return step2 + '_{i}';\n"
+            f"}}"
+            for i in range(4)
+        )
+        chunks = PolyglotTokenReducer.chunk_code(code, "workers.ts", max_chunk_tokens=45)
+        self.assertGreaterEqual(len(chunks), 2)
+        for ch in chunks:
+            self.assertEqual(ch.count("{"), ch.count("}"), f"Mid-block split detected in chunk:\n{ch}")
+
+    def test_optional_tree_sitter_hook_and_unified_extractor(self):
+        from tzero_v3 import PolyglotSignatureExtractor
+        self.assertIsInstance(PolyglotTokenReducer.has_tree_sitter(), bool)
+
+        called = []
+
+        def fake_ts_adapter(content: str, filename: str, mode: str) -> str:
+            called.append((filename, mode))
+            return "// tree-sitter pruned"
+
+        PolyglotTokenReducer.register_tree_sitter_adapter("typescript", fake_ts_adapter)
+        try:
+            out = PolyglotTokenReducer.reduce_code("export function a() {}", "mod.ts", mode="ultra")
+            self.assertEqual(out, "// tree-sitter pruned")
+            self.assertEqual(called, [("mod.ts", "ultra")])
+        finally:
+            PolyglotTokenReducer.register_tree_sitter_adapter("typescript", None)
+
+        ts_sample = "export class UnifiedDemo {\n    run(x: number): number {\n        return x * 2;\n    }\n}\n"
+        self.assertEqual(
+            PolyglotSignatureExtractor.extract("demo.ts", ts_sample),
+            PolyglotTokenReducer.reduce_code(ts_sample, "demo.ts"),
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
