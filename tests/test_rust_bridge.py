@@ -56,6 +56,11 @@ class TestRustBridgeAndAgentKernel(unittest.TestCase):
             )
             self.assertFalse(unsafe_path["allowed"])
 
+            unsafe_write = kernel.validate_execution_plan(
+                {"action": "write", "allow_network": False, "write_paths": ["/etc/cron.d/pwn"]}
+            )
+            self.assertFalse(unsafe_write["allowed"])
+
     def test_cli_agent_kernel_dry_run(self):
         proc = subprocess.run(
             [sys.executable, "tzero_v3.py", "agent-kernel", "--dir", "."],
@@ -70,3 +75,4 @@ class TestRustBridgeAndAgentKernel(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+

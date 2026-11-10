@@ -73,6 +73,11 @@ class TestFederationSyncEngine(unittest.TestCase):
             self.assertEqual(len(peers), 1)
             self.assertEqual(peers[0]["repo_name"], "auth-svc")
 
+            # Missing target file for import/verify must fail cleanly (exit 1)
+            self.assertEqual(tzero_federation.run_federation_cli("import", workspace_dir=host_ws, target_file=None), 1)
+            self.assertEqual(tzero_federation.run_federation_cli("verify", workspace_dir=host_ws, target_file=None), 1)
+
 
 if __name__ == "__main__":
     unittest.main()
+

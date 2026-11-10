@@ -16,6 +16,7 @@ import os
 import re
 import sys
 import time
+import urllib.error
 import urllib.request
 from dataclasses import dataclass, field, asdict
 from typing import Dict, List, Any, Optional
@@ -361,22 +362,28 @@ def analyze_symbol_impact(symbol_path: str, table: SymbolTable, dag: CallGraphDA
             tzero_tokens = count_bpe_tokens(tzero_context)
 
             if ollama_model:
-                target_impl = cls._query_ollama_implementation(
-                    pruned_dep=pruned_dep,
-                    task_title=task["title"],
-                    ollama_model=ollama_model,
-                    ollama_url=ollama_url,
-                )
+                try:
+                    target_impl = cls._query_ollama_implementation(
+                        pruned_dep=pruned_dep,
+                        task_title=task["title"],
+                        ollama_model=ollama_model,
+                        ollama_url=ollama_url,
+                    )
+                except (urllib.error.URLError, OSError, ValueError) as exc:
+                    print(f"[WARN] Ollama benchmark query failed for {task['id']}: {exc}", file=sys.stderr)
+                    target_impl = ""
 
             saved = raw_tokens - tzero_tokens
             savings_pct = (saved / raw_tokens * 100.0) if raw_tokens else 0.0
 
             target_ast = None
-            try:
-                target_ast = ast.parse(target_impl)
-                syntax_valid = True
-            except SyntaxError:
-                syntax_valid = False
+            syntax_valid = False
+            if target_impl.strip():
+                try:
+                    target_ast = ast.parse(target_impl)
+                    syntax_valid = True
+                except SyntaxError:
+                    syntax_valid = False
 
             dep_ast = ast.parse(pruned_dep)
             declared_methods = {

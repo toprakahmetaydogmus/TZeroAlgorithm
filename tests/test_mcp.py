@@ -1033,6 +1033,16 @@ diff --git a/core.py b/core.py
         parsed_json = _json.loads(tool_result_text(res_search))
         self.assertEqual(parsed_json["query"], "secret security")
 
+        # Verify Tool.description takes precedence over class Tool.__doc__ for canonical tools
+        res_prog = self.run_async(self.server.call_tool(
+            "search_tools",
+            {"query": "progressive", "limit": 5}
+        ))
+        prog_names = [t["name"] for t in _json.loads(tool_result_text(res_prog))["tools"]]
+        self.assertIn("search_tools", prog_names)
+        prog_summary = next(t["summary"] for t in _json.loads(tool_result_text(res_prog))["tools"] if t["name"] == "search_tools")
+        self.assertNotIn("Information about a tool", prog_summary)
+
         tmpls = self.run_async(self.server.list_resource_templates())
         tmpl_uris = [t.uri_template for t in tmpls]
         self.assertIn("tzero://file/{path}/skeleton", tmpl_uris)

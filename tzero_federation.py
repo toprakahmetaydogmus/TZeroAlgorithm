@@ -14,6 +14,7 @@ import hmac
 import json
 import os
 import re
+import sys
 import time
 from typing import Any, Dict, List, Optional
 
@@ -156,6 +157,12 @@ def run_federation_cli(
     repo_name: Optional[str] = None,
 ) -> int:
     act = (action or "list").strip().lower()
+    if act in ("import", "verify") and not target_file:
+        print(
+            json.dumps({"error": f"Target manifest file required for '{act}' (pass --federation-out <file>)"}, indent=2),
+            file=sys.stderr,
+        )
+        return 1
     if act == "export":
         out_p = target_file or os.path.join(workspace_dir, FEDERATION_DIR, f"{repo_name or 'self'}.json")
         res = FederationSyncEngine.export_manifest(workspace_dir=workspace_dir, repo_name=repo_name, out_file=out_p)
@@ -175,3 +182,4 @@ def run_federation_cli(
     peers = FederationSyncEngine.list_peers(workspace_dir=workspace_dir)
     print(json.dumps({"peers": peers}, indent=2))
     return 0
+

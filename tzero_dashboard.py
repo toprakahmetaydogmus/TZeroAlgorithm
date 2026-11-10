@@ -1482,14 +1482,46 @@ def compute_live_dashboard_stats(workspace_dir: str = ".") -> Dict[str, Any]:
     pruned_tokens = 0
     savings_pct = 0.0
     try:
-        from tzero_tui import TZeroTerminalCockpit
-        metrics = TZeroTerminalCockpit.gather_workspace_metrics(workspace_dir)
-        total_files = int(metrics.get("total_files", 0))
-        raw_tokens = int(metrics.get("raw_tokens", 0))
-        pruned_tokens = int(metrics.get("pruned_tokens", 0))
-        savings_pct = float(metrics.get("savings_pct", 0.0))
+        from tzero_snapshot import SnapshotEngine
+        snap = SnapshotEngine.load_snapshot(workspace_dir)
+        if snap and snap.total_raw_tokens > 0:
+            total_files = snap.file_count
+            raw_tokens = snap.total_raw_tokens
+            pruned_tokens = snap.total_pruned_tokens
+            savings_pct = snap.reduction_pct
     except Exception:
         pass
+
+    if raw_tokens == 0:
+        try:
+            from tzero_polyglot import PolyglotTokenReducer, count_bpe_tokens
+            abs_ws = os.path.abspath(workspace_dir)
+            sampled = 0
+            for root, dirs, files in os.walk(abs_ws):
+                dirs[:] = sorted(
+                    d for d in dirs
+                    if not d.startswith(".") and d not in (
+                        "__pycache__", "node_modules", "dist", "build", "venv", ".venv",
+                        "installers", "crates", "tzero-showcase", "huggingface-space", "docs",
+                    )
+                )
+                for fname in sorted(files):
+                    total_files += 1
+                    if sampled < 40 and PolyglotTokenReducer.detect_language(fname):
+                        fp = os.path.join(root, fname)
+                        try:
+                            with open(fp, "r", encoding="utf-8", errors="replace") as rf:
+                                raw_code = rf.read(24000)
+                            pruned_code = PolyglotTokenReducer.reduce_code(raw_code, filename=fname, mode="ultra")
+                            raw_tokens += count_bpe_tokens(raw_code)
+                            pruned_tokens += count_bpe_tokens(pruned_code)
+                            sampled += 1
+                        except OSError:
+                            pass
+            if raw_tokens > 0:
+                savings_pct = max(0.0, (1.0 - pruned_tokens / raw_tokens) * 100.0)
+        except Exception:
+            pass
 
     stats = {
         "version": version,

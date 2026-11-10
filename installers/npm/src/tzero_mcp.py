@@ -4607,9 +4607,21 @@ def create_mcp_server():
 
     @server.tool(
         name="search_tools",
+        title="Progressive T-Zero MCP Tool Discovery Catalog",
         description=(
-            "Progressively search all T-Zero AST, security, memory, swarm, and design tools by keyword or category "
-            "without inflating prompt context with 50+ full tool schemas."
+            "Progressively discover and search registered T-Zero tools by keyword or domain category rather than loading all 58 schemas at once "
+            "(unlike codebase searches; use 'search_codebase_semantic' for searching repository source files instead).\n\n"
+            "Parameters:\n"
+            "- `query`: Optional keyword query (e.g., 'secret audit', 'pagerank', 'diff', 'merge').\n"
+            "- `category`: Domain filter (`all`, `context`, `security`, `ast`, `memory`, `swarm`, `design`).\n"
+            "- `limit`: Maximum tool entries returned (integer 1-30; defaults to 10).\n\n"
+            "Behavior:\n"
+            "- Mutability & Speed: Read-only, idempotent catalog lookup executing in <5ms.\n"
+            "- Auth & Boundaries: Zero authentication, external credentials, or network access required.\n\n"
+            "Usage Guidelines:\n"
+            "- When to use: Use when running in canonical mode (21 tools) and discovering specialized AST, Jarvis, or security tools by keyword.\n"
+            "- When NOT to use: Do not use when searching source files or symbols inside the workspace repository — use 'search_codebase_semantic' instead.\n\n"
+            "Returns: Structured dictionary with `query`, `total_available`, and ranked `tools` (`name`, `category`, `summary`)."
         ),
         structured_output=True,
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False),
@@ -4647,7 +4659,7 @@ def create_mcp_server():
 
         scored: List[Tuple[int, ToolSearchMatch]] = []
         for t_name, item in sorted(catalog_funcs.items()):
-            raw_doc = getattr(item, "__doc__", None) or getattr(item, "description", None) or ""
+            raw_doc = getattr(item, "description", None) or getattr(item, "__doc__", None) or ""
             summary_line = raw_doc.strip().splitlines()[0][:180] if raw_doc.strip() else t_name.replace("_", " ")
             t_cat = _classify(t_name, summary_line)
             if cat_filter != "all" and t_cat != cat_filter:

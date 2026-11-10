@@ -61,6 +61,16 @@ class TestTZeroHooks(unittest.TestCase):
         self.assertGreater(verdict["savings_pct"], 30.0)
         self.assertIn("def compute_0", verdict["additionalContext"])
 
+        # List of MCP content blocks must extract text rather than repr()
+        verdict_list = tzero_hooks.evaluate_post_tool_use({
+            "tool_name": "Read",
+            "tool_input": {"file_path": "heavy_module.py"},
+            "tool_response": [{"type": "text", "text": large_py}],
+        }, max_chars=800)
+        self.assertEqual(verdict_list["decision"], "prune")
+        self.assertIn("def compute_0", verdict_list["additionalContext"])
+        self.assertNotIn("'type': 'text'", verdict_list["additionalContext"])
+
     def test_run_hook_cli_returns_exit_2_on_block(self):
         fake_key = "ghp_" + "9z8y7x6w5v4u3t2s1r0q9p8o7n6m5l4k3j2i"
         raw_in = json.dumps({

@@ -23,7 +23,7 @@ class TestAnchor5TDQS(unittest.TestCase):
             server = tzero_mcp.create_mcp_server()
             manager = getattr(server, "_tool_manager", server)
             tools = manager.list_tools() if hasattr(manager, "list_tools") else []
-            self.assertEqual(len(tools), 20, f"Expected 20 canonical tools for TDQS 5/5 coherence, found {len(tools)}")
+            self.assertEqual(len(tools), 21, f"Expected 21 canonical tools for TDQS 5/5 coherence, found {len(tools)}")
             self._audit_tools(tools)
         finally:
             if old_mode is not None:
@@ -40,7 +40,7 @@ class TestAnchor5TDQS(unittest.TestCase):
             server = tzero_mcp.create_mcp_server()
             manager = getattr(server, "_tool_manager", server)
             tools = manager.list_tools() if hasattr(manager, "list_tools") else []
-            self.assertEqual(len(tools), 57, f"Expected 57 registered tools in full mode, found {len(tools)}")
+            self.assertEqual(len(tools), 58, f"Expected 58 registered tools in full mode, found {len(tools)}")
             self._audit_tools(tools)
         finally:
             if old_mode is not None:

@@ -29,7 +29,7 @@ READ_TOOL_NAMES = {"read", "read_file", "view_file", "view_file_outline"}
 
 def _extract_write_blobs(tool_input: Dict[str, Any]) -> List[str]:
     blobs: List[str] = []
-    for key in ("content", "Content", "new_string", "Replacement", "CodeContent"):
+    for key in ("content", "Content", "text", "Text", "new_string", "Replacement", "CodeContent"):
         val = tool_input.get(key)
         if isinstance(val, str) and val:
             blobs.append(val)
@@ -117,6 +117,11 @@ def evaluate_post_tool_use(
     raw_resp = payload.get("tool_response") or payload.get("output") or ""
     if isinstance(raw_resp, dict):
         raw_text = str(raw_resp.get("content") or raw_resp.get("text") or "")
+    elif isinstance(raw_resp, list):
+        raw_text = "".join(
+            str(item.get("text") or item.get("content") or "") if isinstance(item, dict) else str(item)
+            for item in raw_resp
+        )
     else:
         raw_text = str(raw_resp or "")
 

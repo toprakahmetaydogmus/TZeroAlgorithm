@@ -14,7 +14,7 @@ import ctypes
 import json
 import os
 import shutil
-from typing import Any, Dict, Optional, Set
+from typing import Any, Dict, List, Optional, Set
 
 
 def _repo_crate_dir() -> str:
@@ -154,7 +154,11 @@ class AgentKernelSandbox:
                 "backend": self.bridge.backend(),
             }
 
-        for p in plan.get("read_paths") or []:
+        all_paths: List[Any] = []
+        for path_key in ("read_paths", "write_paths", "target_paths", "paths"):
+            all_paths.extend(plan.get(path_key) or [])
+
+        for p in all_paths:
             abs_p = os.path.abspath(str(p))
             try:
                 if os.path.commonpath([self.workspace_dir, abs_p]) != self.workspace_dir:

@@ -80,6 +80,17 @@ def complex_algorithm(a: int, b: int) -> int:
             self.assertEqual(rep.total_tasks, 1)
             self.assertEqual(rep.passed_tasks, 1)
 
+        import urllib.error
+        with mock.patch("urllib.request.urlopen", side_effect=urllib.error.URLError("Connection refused")):
+            rep_err = TaskCompletionBenchmark.evaluate_suite(
+                suite="core",
+                ollama_model="qwen2.5-coder:7b",
+                limit_tasks=1,
+            )
+            self.assertEqual(rep_err.total_tasks, 1)
+            self.assertEqual(rep_err.passed_tasks, 0)
+            self.assertFalse(rep_err.results[0].syntax_valid)
+
 
 if __name__ == "__main__":
     unittest.main()

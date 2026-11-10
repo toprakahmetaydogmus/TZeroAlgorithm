@@ -68,9 +68,9 @@ class TestDashboardServerLive(unittest.TestCase):
         with urllib.request.urlopen(url, timeout=3) as res:
             self.assertEqual(res.status, 200)
             data = json.loads(res.read().decode("utf-8"))
-            self.assertEqual(data["version"], "10.0.0")
-            self.assertEqual(data["tools_count"], 49)
-            self.assertIn("94.9", data["token_savings"])
+            self.assertEqual(data["version"], "10.9.0")
+            self.assertGreaterEqual(data["tools_count"], 58)
+            self.assertIn("%", data["token_savings"])
             self.assertIn("Zero-Leak", data["security"])
             self.assertEqual(data["active_agents"], 5)
 
