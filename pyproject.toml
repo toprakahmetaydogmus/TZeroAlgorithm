@@ -139,6 +139,7 @@ py-modules = [
     "tzero_subagent_engine",
     "tzero_superdesign",
     "tzero_sync",
+    "tzero_hooks",
     "tzero_task_benchmark",
     "tzero_tui",
     "tzero_turbo"

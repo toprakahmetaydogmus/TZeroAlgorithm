@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 """Unit tests for prompt template engine and context tree generation."""
 
+import importlib.util
 import unittest
+
+_HAS_TIKTOKEN = importlib.util.find_spec("tiktoken") is not None
 from tzero_v3 import (
     TemplateEngine,
     count_tokens_precise,
@@ -22,6 +25,7 @@ class TestGenerator(unittest.TestCase):
         self.assertIn("### Core Modules", rendered)
         self.assertIn("Do not fabricate code.", rendered)
 
+    @unittest.skipUnless(_HAS_TIKTOKEN, "tiktoken not installed")
     def test_count_tokens_precise(self):
         import tiktoken
         text = "Hello world! This is a test for token estimation across programming interfaces and type hints."

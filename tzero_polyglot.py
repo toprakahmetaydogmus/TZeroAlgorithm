@@ -325,39 +325,95 @@ class PolyglotTokenReducer:
 
     @staticmethod
     def reduce_python(content: str, mode: str = "ultra") -> str:
-        """Reduces Python source to imports, class/func headers, and ellipses."""
+        """Reduces Python source via ast.parse (multiline-safe) with line fallback on SyntaxError."""
         lines = content.splitlines()
-        pruned: List[str] = []
-        in_docstring = False
         keep_docstrings = mode == "light"
+        try:
+            tree = ast.parse(content)
+            pruned: List[str] = []
 
-        for line in lines:
-            stripped = line.strip()
-            # Handle multiline docstrings
-            if stripped.startswith('"""') or stripped.startswith("'''"):
-                delim = '"""' if stripped.startswith('"""') else "'''"
-                if stripped.count(delim) == 1:
-                    in_docstring = not in_docstring
-                if keep_docstrings:
-                    pruned.append(line)
-                continue
-            if in_docstring:
-                if keep_docstrings:
-                    pruned.append(line)
-                continue
-
-            if (stripped.startswith("import ") or stripped.startswith("from ") or
-                stripped.startswith("def ") or stripped.startswith("async def ") or
-                stripped.startswith("class ") or stripped.startswith("@")):
-                if (stripped.startswith("def ") or stripped.startswith("async def ")) and not stripped.endswith("..."):
-                    if stripped.endswith(":"):
-                        pruned.append(f"{line[:-1]}: ...")
-                    else:
-                        pruned.append(f"{line} ...")
+            def _emit_func(fn_node: ast.AST, indent_prefix: str = "") -> None:
+                for dec in getattr(fn_node, "decorator_list", []):
+                    d_end = getattr(dec, "end_lineno", dec.lineno)
+                    for ln in range(dec.lineno, d_end + 1):
+                        pruned.append(lines[ln - 1])
+                body = getattr(fn_node, "body", [])
+                sig_start = fn_node.lineno
+                if body:
+                    first_stmt = body[0]
+                    if first_stmt.lineno == sig_start:
+                        hdr = lines[sig_start - 1].split(":", 1)[0]
+                        pruned.append(f"{hdr}: ...")
+                        return
+                    sig_end = max(sig_start, first_stmt.lineno - 1)
+                    while sig_end > sig_start and not lines[sig_end - 1].strip():
+                        sig_end -= 1
                 else:
-                    pruned.append(line)
+                    sig_end = getattr(fn_node, "end_lineno", sig_start)
+                for ln in range(sig_start, sig_end):
+                    pruned.append(lines[ln - 1])
+                last_hdr = lines[sig_end - 1].rstrip()
+                if not last_hdr.endswith("..."):
+                    pruned.append(f"{last_hdr} ..." if last_hdr.endswith(":") else f"{last_hdr}: ...")
+                if keep_docstrings and body:
+                    doc = ast.get_docstring(fn_node)
+                    if doc:
+                        pruned.append(f'{indent_prefix}    """{doc.splitlines()[0]}"""')
 
-        return "\n".join(pruned) if pruned else content
+            for node in tree.body:
+                if isinstance(node, (ast.Import, ast.ImportFrom)):
+                    end_l = getattr(node, "end_lineno", node.lineno)
+                    for ln in range(node.lineno, end_l + 1):
+                        pruned.append(lines[ln - 1])
+                elif (
+                    keep_docstrings
+                    and isinstance(node, ast.Expr)
+                    and isinstance(getattr(node, "value", None), ast.Constant)
+                    and isinstance(node.value.value, str)
+                ):
+                    end_l = getattr(node, "end_lineno", node.lineno)
+                    for ln in range(node.lineno, end_l + 1):
+                        pruned.append(lines[ln - 1])
+                elif isinstance(node, ast.ClassDef):
+                    for dec in node.decorator_list:
+                        d_end = getattr(dec, "end_lineno", dec.lineno)
+                        for ln in range(dec.lineno, d_end + 1):
+                            pruned.append(lines[ln - 1])
+                    if node.body and node.body[0].lineno == node.lineno:
+                        pruned.append(lines[node.lineno - 1].split(":", 1)[0] + ":")
+                    else:
+                        cls_end_hdr = max(node.lineno, (node.body[0].lineno - 1) if node.body else node.lineno)
+                        while cls_end_hdr > node.lineno and not lines[cls_end_hdr - 1].strip():
+                            cls_end_hdr -= 1
+                        for ln in range(node.lineno, cls_end_hdr + 1):
+                            pruned.append(lines[ln - 1])
+                    if keep_docstrings:
+                        cdoc = ast.get_docstring(node)
+                        if cdoc:
+                            pruned.append(f'    """{cdoc.splitlines()[0]}"""')
+                    for item in node.body:
+                        if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                            _emit_func(item, indent_prefix="    ")
+                        elif isinstance(item, ast.AnnAssign) and hasattr(ast, "unparse"):
+                            pruned.append(f"    {ast.unparse(item)}")
+                elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                    _emit_func(node, indent_prefix="")
+            return "\n".join(pruned) if pruned else content
+        except SyntaxError:
+            pruned_fallback: List[str] = []
+            for line in lines:
+                stripped = line.strip()
+                if (stripped.startswith("import ") or stripped.startswith("from ") or
+                    stripped.startswith("def ") or stripped.startswith("async def ") or
+                    stripped.startswith("class ") or stripped.startswith("@")):
+                    if (stripped.startswith("def ") or stripped.startswith("async def ")) and not stripped.endswith("..."):
+                        if stripped.endswith(":"):
+                            pruned_fallback.append(f"{line[:-1]}: ...")
+                        else:
+                            pruned_fallback.append(f"{line} ...")
+                    else:
+                        pruned_fallback.append(line)
+            return "\n".join(pruned_fallback) if pruned_fallback else content
 
     @staticmethod
     def reduce_javascript(content: str, mode: str = "ultra") -> str:

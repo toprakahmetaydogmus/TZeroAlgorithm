@@ -32,9 +32,9 @@ except ImportError:
 
 from typing import Dict, List, Optional, Any, Union
 try:
-    from typing import Annotated
+    from typing import Annotated, TypedDict
 except ImportError:
-    from typing_extensions import Annotated
+    from typing_extensions import Annotated, TypedDict
 
 try:
     from pydantic import Field
@@ -91,14 +91,46 @@ except ImportError as e:
 
 # MCP SDK Import with cross-version compatibility (mcp 2.x MCPServer & mcp 1.x FastMCP)
 try:
-    from mcp.server.mcpserver import MCPServer
+    from mcp.server.mcpserver import MCPServer, Context
     ServerClass = MCPServer
 except ImportError:
     try:
         from mcp.server.fastmcp import FastMCP
         ServerClass = FastMCP
+        Context = Any
     except ImportError:
         ServerClass = None
+        Context = Any
+
+
+class ToolSearchMatch(TypedDict):
+    name: str
+    category: str
+    summary: str
+
+
+class SearchToolsResult(TypedDict):
+    query: str
+    total_available: int
+    tools: List[ToolSearchMatch]
+
+
+async def _safe_report_progress(
+    ctx: Any,
+    progress: float,
+    total: float,
+    message: str = "",
+) -> None:
+    """Safely emits MCP progress notifications without raising outside request sessions."""
+    if ctx is None:
+        return
+    reporter = getattr(ctx, "report_progress", None)
+    if reporter is None:
+        return
+    try:
+        await reporter(progress, total, message)
+    except Exception:
+        pass
 
 
 def get_file_imports(file_path: str) -> List[str]:
@@ -4249,14 +4281,16 @@ def create_mcp_server():
         ),
         annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
     )
-    def execute_codebase_workflow(
+    async def execute_codebase_workflow(
         action: Annotated[str, Field(default="auto", description="Workflow operation: 'auto' (comprehensive all-in-one pipeline), 'context', 'audit', 'security', 'blueprint', 'dependencies', 'impact', 'search', 'prune', 'heal', 'memory', 'swarm', 'design'.")] = "auto",
         target: Annotated[str, Field(default=".", description="Target repository path, file path, diff string, or code snippet (default: '.').")] = ".",
         query: Annotated[str, Field(default="", description="Search query, focus symbol name, or task goal prompt.")] = "",
-        options: Annotated[Union[str, Dict[str, Any]], Field(default="", description="Optional JSON string or dictionary of additional configuration parameters.")] = ""
+        options: Annotated[Union[str, Dict[str, Any]], Field(default="", description="Optional JSON string or dictionary of additional configuration parameters.")] = "",
+        ctx: Optional[Context] = None,
     ) -> str:
         """Autonomous all-in-one T-Zero master tool executing any codebase workflow in a single command."""
         act = (action or "auto").lower().strip()
+        await _safe_report_progress(ctx, 1, 2, f"Executing T-Zero workflow action '{act}'...")
         opts = {}
         if isinstance(options, dict):
             opts = options
@@ -4571,6 +4605,69 @@ def create_mcp_server():
     _LEGACY_DISPATCH['calculate_token_cost_roi'] = calculate_token_cost_roi
     _LEGACY_DISPATCH['analyze_instruction_drift'] = analyze_instruction_drift
 
+    @server.tool(
+        name="search_tools",
+        description=(
+            "Progressively search all T-Zero AST, security, memory, swarm, and design tools by keyword or category "
+            "without inflating prompt context with 50+ full tool schemas."
+        ),
+        structured_output=True,
+        annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False),
+    )
+    async def search_tools(
+        query: Annotated[str, Field(default="", description="Keyword query (e.g., 'secret audit', 'pagerank', 'diff', 'merge').")] = "",
+        category: Annotated[str, Field(default="all", description="Optional category filter: 'all', 'context', 'security', 'ast', 'memory', 'swarm', 'design'.")] = "all",
+        limit: Annotated[int, Field(default=10, description="Maximum number of matching tools to return (1-30).")] = 10,
+    ) -> SearchToolsResult:
+        """Progressive tool discovery catalog across all T-Zero MCP tools."""
+        q_terms = [t for t in re.findall(r"[a-z0-9_]+", (query or "").lower()) if len(t) > 1]
+        cat_filter = (category or "all").lower().strip()
+        cap_n = max(1, min(30, int(limit or 10)))
+
+        catalog_funcs: Dict[str, Any] = {}
+        catalog_funcs.update(_LEGACY_DISPATCH)
+        catalog_funcs.update(_CANONICAL_DISPATCH)
+        for t_meta in await server.list_tools():
+            if t_meta.name not in catalog_funcs:
+                catalog_funcs[t_meta.name] = t_meta
+
+        def _classify(t_name: str, summary: str) -> str:
+            blob = f"{t_name} {summary}".lower()
+            if any(k in blob for k in ("secret", "leak", "hallucinat", "guard", "security", "audit", "contract", "arch")):
+                return "security"
+            if any(k in blob for k in ("jarvis", "memory", "graph", "minhash", "latent", "causal")):
+                return "memory"
+            if any(k in blob for k in ("swarm", "bft", "subagent", "workflow", "orchestrat")):
+                return "swarm"
+            if "superdesign" in blob:
+                return "design"
+            if any(k in blob for k in ("prune", "skeleton", "impact", "pagerank", "diff", "duplic", "dead", "patch", "merge", "mutat")):
+                return "ast"
+            return "context"
+
+        scored: List[Tuple[int, ToolSearchMatch]] = []
+        for t_name, item in sorted(catalog_funcs.items()):
+            raw_doc = getattr(item, "__doc__", None) or getattr(item, "description", None) or ""
+            summary_line = raw_doc.strip().splitlines()[0][:180] if raw_doc.strip() else t_name.replace("_", " ")
+            t_cat = _classify(t_name, summary_line)
+            if cat_filter != "all" and t_cat != cat_filter:
+                continue
+            hay = f"{t_name.lower()} {summary_line.lower()} {t_cat}"
+            if q_terms:
+                score = sum((5 if term in t_name.lower() else 0) + (2 if term in hay else 0) for term in q_terms)
+                if score == 0:
+                    continue
+            else:
+                score = 1
+            scored.append((score, {"name": t_name, "category": t_cat, "summary": summary_line}))
+
+        scored.sort(key=lambda pair: (-pair[0], pair[1]["name"]))
+        return {
+            "query": query,
+            "total_available": len(catalog_funcs),
+            "tools": [entry for _, entry in scored[:cap_n]],
+        }
+
 
     # -------------------------------------------------------------------------
     # TRANSPARENT COMPATIBILITY CALL_TOOL WRAPPER
@@ -4589,7 +4686,9 @@ def create_mcp_server():
             sig = inspect.signature(handler)
             valid_args = {}
             for p_name, param in sig.parameters.items():
-                if p_name in arguments:
+                if p_name == "ctx":
+                    valid_args[p_name] = context
+                elif p_name in arguments:
                     valid_args[p_name] = arguments[p_name]
                 elif param.default is not inspect.Parameter.empty:
                     valid_args[p_name] = param.default
@@ -4819,6 +4918,38 @@ def create_mcp_server():
         except Exception as e:
             return f"Error generating changelog: {e}"
 
+    @server.resource(
+        "tzero://file/{path}/skeleton",
+        name="T-Zero Dynamic File AST Skeleton",
+        description="Dynamically reads and AST-prunes a workspace source file with path-traversal and Zero-Leak guards",
+        mime_type="text/plain"
+    )
+    def resource_file_skeleton(path: str) -> str:
+        import urllib.parse
+        ws_root = os.path.abspath(".")
+        rel_clean = urllib.parse.unquote(path or "").lstrip("/\\")
+        if not rel_clean or ".." in rel_clean.replace("\\", "/").split("/"):
+            return f"[BLOCKED] Unsafe relative path blocked: {rel_clean or path}"
+        abs_target = os.path.abspath(os.path.join(ws_root, rel_clean))
+        try:
+            if os.path.commonpath([ws_root, abs_target]) != ws_root:
+                return f"[BLOCKED] Path escapes workspace root: {path}"
+        except ValueError:
+            return f"[BLOCKED] Invalid workspace path: {path}"
+        if not os.path.isfile(abs_target):
+            return f"[ERROR] File not found: {rel_clean}"
+        try:
+            with open(abs_target, "r", encoding="utf-8", errors="replace") as fp:
+                raw_code = fp.read()
+            from tzero_polyglot import PolyglotTokenReducer
+            reduced = PolyglotTokenReducer.reduce_code(raw_code, filename=abs_target, mode="ultra")
+            from tzero_security import ZeroLeakEngine
+            if ZeroLeakEngine.scan_text(reduced):
+                reduced = ZeroLeakEngine.sanitize_text(reduced)
+            return reduced
+        except Exception as e:
+            return f"[ERROR] Failed to extract skeleton for '{rel_clean}': {e}"
+
     # -------------------------------------------------------------------------
     # PROMPTS
     # -------------------------------------------------------------------------
@@ -4930,8 +5061,20 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
 """)
 
 
+def create_http_app(mode: Optional[str] = None, host: str = "127.0.0.1") -> Any:
+    """Builds the MCP 2026 Streamable HTTP Starlette ASGI app (zero paid cloud deps)."""
+    if mode:
+        os.environ["TZERO_MCP_TOOL_MODE"] = mode
+    srv = create_mcp_server()
+    if hasattr(srv, "streamable_http_app"):
+        return srv.streamable_http_app(streamable_http_path="/mcp", stateless_http=True, host=host)
+    if hasattr(srv, "sse_app"):
+        return srv.sse_app()
+    raise RuntimeError("Installed MCP SDK server does not expose streamable_http_app or sse_app.")
+
+
 def main():
-    """Main execution entrypoint for the T-Zero MCP stdio server."""
+    """Main execution entrypoint for the T-Zero MCP stdio / Streamable HTTP server."""
     if "--version" in sys.argv[1:]:
         print(f"T-Zero MCP Server {SERVER_VERSION}")
         return
@@ -4948,7 +5091,7 @@ def main():
             elif arg == "--mode" and i + 1 < len(sys.argv):
                 os.environ["TZERO_MCP_TOOL_MODE"] = sys.argv[i + 1]
 
-    if sys.stdin.isatty() and "--stdio" not in sys.argv[1:] and "--canonical" not in sys.argv[1:]:
+    if sys.stdin.isatty() and "--stdio" not in sys.argv[1:] and "--canonical" not in sys.argv[1:] and "--http" not in sys.argv[1:]:
         print_welcome_guide()
         return
 
@@ -4986,6 +5129,27 @@ def main():
             "    pip install mcp\n\n"
         )
         sys.exit(1)
+
+    if "--http" in sys.argv[1:]:
+        host = "127.0.0.1"
+        port = 8765
+        for i, arg in enumerate(sys.argv):
+            if arg == "--host" and i + 1 < len(sys.argv):
+                host = sys.argv[i + 1]
+            elif arg == "--port" and i + 1 < len(sys.argv):
+                try:
+                    port = int(sys.argv[i + 1])
+                except ValueError:
+                    pass
+        try:
+            import uvicorn
+            app = create_http_app(host=host)
+            uvicorn.run(app, host=host, port=port)
+            return
+        except ImportError:
+            server = create_mcp_server()
+            server.run(transport="streamable-http")
+            return
 
     # stdout is the MCP protocol channel: any stray log line there corrupts the JSON-RPC
     # stream. The core engine logs to stdout by default, so move those handlers to stderr.

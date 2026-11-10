@@ -36,7 +36,8 @@ class TestMCPServer(unittest.TestCase):
         """Verifies that all 47 specialized MCP tools and grounding prompt are properly registered."""
         tools = self.run_async(self.server.list_tools())
         tool_names = [t.name for t in tools]
-        self.assertEqual(len(tool_names), 57)
+        self.assertEqual(len(tool_names), 58)
+        self.assertIn("search_tools", tool_names)
         self.assertIn("execute_codebase_workflow", tool_names)
         expected_tools = [
             "execute_codebase_workflow",
@@ -747,7 +748,8 @@ diff --git a/core.py b/core.py
             default_server = tzero_mcp.create_mcp_server()
             tools_def = self.run_async(default_server.list_tools())
             tool_names = [t.name for t in tools_def]
-            self.assertEqual(len(tool_names), 20)
+            self.assertEqual(len(tool_names), 21)
+            self.assertIn("search_tools", tool_names)
             self.assertIn("execute_codebase_workflow", tool_names)
             self.assertIn("build_project_context", tool_names)
             self.assertIn("manage_memory_store", tool_names)
@@ -755,7 +757,7 @@ diff --git a/core.py b/core.py
             os.environ["TZERO_MCP_TOOL_MODE"] = "all"
             full_server = tzero_mcp.create_mcp_server()
             tools_all = self.run_async(full_server.list_tools())
-            self.assertEqual(len(tools_all), 57)
+            self.assertEqual(len(tools_all), 58)
             self.assertIn("execute_codebase_workflow", [t.name for t in tools_all])
         finally:
             if old_val is not None:
@@ -1002,6 +1004,45 @@ diff --git a/core.py b/core.py
         text_m = tool_result_text(res_m)
         self.assertNotIn("TypeError", text_m)
         self.assertNotIn("unexpected keyword", text_m)
+
+    def test_mcp_2026_streamable_http_and_search_tools(self):
+        """Verifies Streamable HTTP ASGI app, search_tools structuredOutput, progress ctx, and skeleton URI template."""
+        import json as _json
+
+        app = tzero_mcp.create_http_app()
+        self.assertIsNotNone(app)
+        route_paths = {getattr(r, "path", "") for r in getattr(app, "routes", [])}
+        self.assertIn("/mcp", route_paths)
+
+        tools = self.run_async(self.server.list_tools())
+        search_meta = next((t for t in tools if t.name == "search_tools"), None)
+        self.assertIsNotNone(search_meta)
+        self.assertIsNotNone(search_meta.output_schema)
+
+        workflow_meta = next((t for t in tools if t.name == "execute_codebase_workflow"), None)
+        self.assertNotIn("ctx", (workflow_meta.input_schema or {}).get("properties", {}))
+
+        res_search = self.run_async(self.server.call_tool(
+            "search_tools",
+            {"query": "secret security", "limit": 5}
+        ))
+        structured = getattr(res_search, "structured_content", None)
+        self.assertIsInstance(structured, dict)
+        self.assertIn("tools", structured)
+        self.assertGreater(len(structured["tools"]), 0)
+        parsed_json = _json.loads(tool_result_text(res_search))
+        self.assertEqual(parsed_json["query"], "secret security")
+
+        tmpls = self.run_async(self.server.list_resource_templates())
+        tmpl_uris = [t.uri_template for t in tmpls]
+        self.assertIn("tzero://file/{path}/skeleton", tmpl_uris)
+
+        skel_res = self.run_async(self.server.read_resource("tzero://file/tzero_polyglot.py/skeleton"))
+        skel_txt = skel_res[0].content
+        self.assertIn("PolyglotTokenReducer", skel_txt)
+
+        with self.assertRaises(Exception):
+            self.run_async(self.server.read_resource("tzero://file/..%2F..%2Fetc%2Fpasswd/skeleton"))
 
 
 if __name__ == "__main__":

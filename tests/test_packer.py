@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 """Unit tests for T-Zero Dynamic Context Window & Token Budget Packer."""
 
+import importlib.util
 import os
 import tempfile
 import unittest
+
+_HAS_TIKTOKEN = importlib.util.find_spec("tiktoken") is not None
 
 from tzero_packer import TokenBudgetPacker, pack_workspace
 
@@ -56,6 +59,7 @@ class TestTokenBudgetPacker(unittest.TestCase):
     def tearDown(self):
         self.test_dir.cleanup()
 
+    @unittest.skipUnless(_HAS_TIKTOKEN, "tiktoken not installed")
     def test_estimate_tokens(self):
         import tiktoken
         text = "def hello_world(items: list[str], threshold: int = 42) -> dict[str, int]: return {k: len(k) for k in items if len(k) > threshold}"
