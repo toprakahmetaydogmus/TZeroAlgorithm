@@ -59,14 +59,13 @@ class PackResult:
 class TokenBudgetPacker:
     """Dynamically packs codebase AST tiers to fit an exact LLM token budget."""
 
-    TOKEN_DIVISOR = 3.8  # Accurate within 2% for source code tokenization
+    TOKEN_DIVISOR = 3.8  # Fallback ratio when tiktoken is unavailable
 
     @classmethod
-    def estimate_tokens(cls, text: str) -> int:
-        """Fast, deterministic token estimator for source code."""
-        if not text:
-            return 0
-        return max(1, int(len(text) / cls.TOKEN_DIVISOR))
+    def estimate_tokens(cls, text: str, model_name: str = "gpt-4o") -> int:
+        """Exact cached BPE token counter for source code with deterministic char-ratio fallback."""
+        from tzero_polyglot import count_bpe_tokens
+        return count_bpe_tokens(text, model_name=model_name, fallback_divisor=cls.TOKEN_DIVISOR)
 
     @classmethod
     def extract_t4_signatures(cls, code: str, lang: Optional[str]) -> str:

@@ -23,10 +23,26 @@ class TestGenerator(unittest.TestCase):
         self.assertIn("Do not fabricate code.", rendered)
 
     def test_count_tokens_precise(self):
-        text = "Hello world! This is a test for token estimation."
-        toks = count_tokens_precise(text, "deepseek-ai/deepseek-v4.1-flash")
-        self.assertGreater(toks, 0)
-        self.assertEqual(toks, len(text) // 4)
+        import tiktoken
+        text = "Hello world! This is a test for token estimation across programming interfaces and type hints."
+        toks = count_tokens_precise(text, "gpt-4o")
+        expected_o200k = len(tiktoken.get_encoding("o200k_base").encode(text))
+        self.assertEqual(toks, expected_o200k)
+        self.assertNotEqual(toks, len(text) // 4)
+
+        toks_claude = count_tokens_precise(text, "claude-3-7-sonnet")
+        expected_cl100k = len(tiktoken.get_encoding("cl100k_base").encode(text))
+        self.assertEqual(toks_claude, expected_cl100k)
+
+    def test_count_tokens_precise_fallback(self):
+        from unittest import mock
+        import tzero_v3
+        text = "Hello world! Fallback estimation check."
+        with mock.patch.dict("sys.modules", {"tiktoken": None}):
+            if hasattr(tzero_v3, "_BPE_ENCODING_CACHE"):
+                tzero_v3._BPE_ENCODING_CACHE.clear()
+            toks = tzero_v3.count_tokens_precise(text, "gpt-4o")
+            self.assertEqual(toks, max(1, len(text) // 4))
 
     def test_get_budgeted_snippets(self):
         selected = ["main.py", "utils.py"]

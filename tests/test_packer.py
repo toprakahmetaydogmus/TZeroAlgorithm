@@ -57,10 +57,12 @@ class TestTokenBudgetPacker(unittest.TestCase):
         self.test_dir.cleanup()
 
     def test_estimate_tokens(self):
-        text = "def hello_world(): return 42"
+        import tiktoken
+        text = "def hello_world(items: list[str], threshold: int = 42) -> dict[str, int]: return {k: len(k) for k in items if len(k) > threshold}"
         tokens = TokenBudgetPacker.estimate_tokens(text)
-        self.assertGreater(tokens, 0)
-        self.assertLess(tokens, 30)
+        expected = len(tiktoken.get_encoding("o200k_base").encode(text))
+        self.assertEqual(tokens, expected)
+        self.assertEqual(TokenBudgetPacker.estimate_tokens(""), 0)
 
     def test_pack_within_budget(self):
         budget = 5000

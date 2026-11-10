@@ -11,7 +11,32 @@ License: MIT
 """
 
 import re
-from typing import Dict, List, Tuple, Optional
+from typing import Any, Dict, List, Tuple, Optional
+
+
+_BPE_ENCODING_CACHE: Dict[str, Any] = {}
+
+
+def count_bpe_tokens(text: str, model_name: str = "gpt-4o", fallback_divisor: float = 4.0) -> int:
+    """Count tokens using cached local tiktoken BPE encodings with deterministic fallback."""
+    if not text:
+        return 0
+    try:
+        import tiktoken
+        lower_m = (model_name or "gpt-4o").lower()
+        if any(k in lower_m for k in ("gpt-4o", "o1", "o3", "o4", "gpt-5", "gemini", "deepseek")):
+            enc_name = "o200k_base"
+        elif any(k in lower_m for k in ("claude", "gpt-4", "gpt-3.5", "llama", "mistral", "qwen")):
+            enc_name = "cl100k_base"
+        else:
+            enc_name = "o200k_base"
+        enc = _BPE_ENCODING_CACHE.get(enc_name)
+        if enc is None:
+            enc = tiktoken.get_encoding(enc_name)
+            _BPE_ENCODING_CACHE[enc_name] = enc
+        return max(1, len(enc.encode(text, disallowed_special=())))
+    except Exception:
+        return max(1, int(len(text) / fallback_divisor))
 
 
 class PolyglotTokenReducer:

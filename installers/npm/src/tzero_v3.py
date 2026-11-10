@@ -2686,8 +2686,12 @@ Dependencies and inter-module relationships.
         return rendered
 
 
+from tzero_polyglot import _BPE_ENCODING_CACHE, count_bpe_tokens
+
+
 def count_tokens_precise(text: str, model_name: str = "gpt-4o") -> int:
-    return len(text) // 4
+    """Count exact tokens using cached local tiktoken BPE encodings with char//4 fallback."""
+    return count_bpe_tokens(text, model_name=model_name, fallback_divisor=4.0)
 
 
 def get_budgeted_snippets(selected_files: List[str], file_snippets: Dict[str, str]) -> Dict[str, str]:
