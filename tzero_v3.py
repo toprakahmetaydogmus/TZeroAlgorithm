@@ -78,6 +78,13 @@ try:
     import tzero_deps
 except ImportError:  # tzero_v3.py copied on its own without the helper module
     tzero_deps = None
+# The deep doctor reports missing dependencies without attempting to install them.
+if tzero_deps is not None and sys.argv[1:] in (
+    ["--doctor", "--deep"], ["--deep", "--doctor"],
+    ["doctor", "--deep"], ["--deep", "doctor"],
+):
+    sys.exit(tzero_deps.run_doctor(deep=True))
+
 if tzero_deps is not None and not tzero_deps.ensure_dependencies():
     sys.exit(1)
 
@@ -8755,6 +8762,7 @@ def main():
     parser.add_argument("--info", "--quickstart", action="store_true", help="Show quickstart guide and simplest installation/usage steps")
     parser.add_argument("--gui", "-g", action="store_true", help="Launch the GUI Dashboard")
     parser.add_argument("--doctor", action="store_true", help="Check Python, dependencies, tkinter, git and keyring (installs missing packages)")
+    parser.add_argument("--deep", action="store_true", help="Run deep offline subsystem self-check with all 9 v11 subsystems (use with --doctor)")
     parser.add_argument("--pipe", nargs="?", const="", default=None, metavar="FILENAME_HINT", help="Read code/diff/schema from stdin, compress tokens, and output to stdout")
     parser.add_argument("--clip", "--copy", nargs="?", const="", default=None, metavar="FILE", help="Prune file AST signatures and copy directly to system clipboard")
     parser.add_argument("--sync", nargs="?", const=".", default=None, metavar="DIR", help="Synchronize active codebase rules across Cursor, Claude Code, Windsurf & Git hooks")
@@ -8982,6 +8990,14 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
 9️⃣  Hugging Face Space & Canlı Web Paneli:
     $ tzero hf
 
+🔬 v11 FRONTIER CAPABILITIES:
+    $ tzero --lsp                              # Zero-Leak Language Server (stdio JSON-RPC)
+    $ tzero --hook-install all                 # Install AI lifecycle hook guardrails
+    $ tzero --federation impact --federation-symbol SYMBOL       # Cross-repo SCIP impact federation
+    $ tzero --scip-import <FILE>               # Binary SCIP protobuf graph import
+    $ tzero --contracts-sarif report.sarif     # Export contract changes as SARIF 2.1.0
+    $ tzero --doctor --deep                    # Deep offline 9-subsystem self-check
+
 ⭐ PROJEYE BİR YILDIZLA DESTEK OLUN:
     Merhaba! Ben Toprak Ahmet Aydoğmuş. T-Zero'yu sıfırdan geliştirdim.
     İşinize yaradıysa lütfen GitHub'da yıldız vermeyi unutmayın:
@@ -9106,7 +9122,7 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
         if tzero_deps is None:
             print("[ERROR] tzero_deps.py is missing; reinstall T-Zero to use --doctor.")
             sys.exit(1)
-        sys.exit(tzero_deps.run_doctor())
+        sys.exit(tzero_deps.run_doctor(deep=getattr(args, "deep", False)))
     elif getattr(args, "hook", False) or getattr(args, "hook_install", None) is not None:
         import tzero_hooks
         sys.exit(tzero_hooks.run_hook_cli(

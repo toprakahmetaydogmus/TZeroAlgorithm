@@ -12,10 +12,12 @@ License: MIT
 
 import ast
 import re
+from contextvars import ContextVar
 from typing import Any, Callable, Dict, List, Tuple, Optional
 
 
 _BPE_ENCODING_CACHE: Dict[str, Any] = {}
+_ALLOW_BPE_DOWNLOAD = ContextVar("allow_bpe_download", default=True)
 
 
 def count_bpe_tokens(text: str, model_name: str = "gpt-4o", fallback_divisor: float = 4.0) -> int:
@@ -33,6 +35,8 @@ def count_bpe_tokens(text: str, model_name: str = "gpt-4o", fallback_divisor: fl
             enc_name = "o200k_base"
         enc = _BPE_ENCODING_CACHE.get(enc_name)
         if enc is None:
+            if not _ALLOW_BPE_DOWNLOAD.get():
+                return max(1, int(len(text) / fallback_divisor))
             enc = tiktoken.get_encoding(enc_name)
             _BPE_ENCODING_CACHE[enc_name] = enc
         return max(1, len(enc.encode(text, disallowed_special=())))

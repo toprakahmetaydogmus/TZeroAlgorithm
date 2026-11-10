@@ -217,7 +217,171 @@ def _line(level: str, text: str) -> str:
     return f"  [{level:^4}] {text}"
 
 
-def run_doctor() -> int:
+def _run_deep_subsystem_check() -> int:
+    """Exercise all 9 v11 offline subsystems and report pass/fail. Returns failure count."""
+    import tempfile
+    from pathlib import Path
+
+    print("\nDeep Offline Subsystem Self-Check:")
+    checks = []
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        # 1. BPE Tokenizer
+        try:
+            from tzero_polyglot import count_bpe_tokens
+            tok = count_bpe_tokens("def hello(): pass\n")
+            if not (isinstance(tok, int) and tok > 0):
+                raise ValueError("unexpected diagnostic result")
+            checks.append(("BPE Tokenizer", True, ""))
+        except Exception as exc:
+            checks.append(("BPE Tokenizer", False, str(exc)))
+
+        # 2. Polyglot AST Reducer
+        try:
+            from tzero_polyglot import PolyglotTokenReducer
+            r = PolyglotTokenReducer()
+            out = r.reduce_code("def foo(x: int) -> int:\n    return x + 1\n", filename="foo.py")
+            if not ("def foo" in out):
+                raise ValueError("unexpected diagnostic result")
+            ts = r.reduce_code("export function greet(name: string): string { return name; }", filename="sample.ts")
+            if not ("greet" in ts):
+                raise ValueError("unexpected diagnostic result")
+            checks.append(("Polyglot AST Reducer", True, ""))
+        except Exception as exc:
+            checks.append(("Polyglot AST Reducer", False, str(exc)))
+
+        # 3. Zero-Leak Engine
+        try:
+            from tzero_security import ZeroLeakEngine
+            fake_key = "sk" + "-" + "a" * 32
+            result = ZeroLeakEngine.scan_text(fake_key)
+            if not (isinstance(result, list) and len(result) > 0):
+                raise ValueError("unexpected diagnostic result")
+            checks.append(("Zero-Leak Engine", True, ""))
+        except Exception as exc:
+            checks.append(("Zero-Leak Engine", False, str(exc)))
+
+        # 4. LSP Server
+        try:
+            from tzero_lsp import TZeroLSPServer
+            lsp = TZeroLSPServer(workspace_dir=tmpdir)
+            py_path = os.path.join(tmpdir, "sample.py")
+            code = f'SERVICE_KEY = "{fake_key}"\n' + "def greet(name: str) -> str:\n    return name\n"
+            Path(py_path).write_text(code, encoding="utf-8")
+            uri = Path(py_path).as_uri()
+            opened = lsp.handle_message({
+                "jsonrpc": "2.0",
+                "method": "textDocument/didOpen",
+                "params": {"textDocument": {"uri": uri, "text": code}},
+            })
+            hover = lsp.compute_hover(uri, code, line=1, character=4)
+            if hover is None:
+                raise ValueError("unexpected diagnostic result")
+            diagnostics = opened[0]["params"]["diagnostics"]
+            if not (lsp.compute_code_actions(uri, code, diagnostics)):
+                raise ValueError("unexpected diagnostic result")
+            checks.append(("LSP Server", True, ""))
+        except Exception as exc:
+            checks.append(("LSP Server", False, str(exc)))
+
+        # 5. Lifecycle Hooks
+        try:
+            from tzero_hooks import evaluate_pre_tool_use, evaluate_post_tool_use
+            blocked = evaluate_pre_tool_use(
+                {"tool_name": "Read", "tool_input": {"file_path": ".env"}},
+                workspace_dir=tmpdir,
+            )
+            if not (blocked["decision"] == "block"):
+                raise ValueError("unexpected diagnostic result")
+            big = "def x(): pass\n" * 20
+            pruned = evaluate_post_tool_use(
+                {"tool_name": "Read", "tool_input": {"file_path": "f.py"}, "tool_response": big},
+                workspace_dir=tmpdir,
+                max_chars=50,
+            )
+            if not (pruned["decision"] == "prune"):
+                raise ValueError("unexpected diagnostic result")
+            checks.append(("Lifecycle Hooks", True, ""))
+        except Exception as exc:
+            checks.append(("Lifecycle Hooks", False, str(exc)))
+
+        # 6. Federation Sync
+        try:
+            from tzero_federation import FederationSyncEngine
+            peer_ws = os.path.join(tmpdir, "peer")
+            os.mkdir(peer_ws)
+            peer_py = os.path.join(peer_ws, "ledger.py")
+            with open(peer_py, "w", encoding="utf-8") as fh:
+                fh.write("class Ledger:\n    pass\n")
+            manifest_file = os.path.join(peer_ws, "manifest.json")
+            exported = FederationSyncEngine.export_manifest(peer_ws, repo_name="deep-peer", out_file=manifest_file)
+            if not (FederationSyncEngine.verify_manifest(exported)):
+                raise ValueError("unexpected diagnostic result")
+            imp = FederationSyncEngine.import_manifest(tmpdir, manifest_file)
+            if not (imp["verified"]):
+                raise ValueError("unexpected diagnostic result")
+            checks.append(("Federation Sync", True, ""))
+        except Exception as exc:
+            checks.append(("Federation Sync", False, str(exc)))
+
+        # 7. SCIP Importer
+        try:
+            from tzero_scip import ScipIndexImporter
+            sample = {"documents": [{"relative_path": "a.py", "occurrences": [
+                {"range": [0, 0, 0, 5], "symbol": "MyClass", "symbol_roles": 1},
+            ]}]}
+            graph = ScipIndexImporter.from_scip_dict(sample)
+            if not (graph.format_name in ("scip", "scip-dict")):
+                raise ValueError("unexpected diagnostic result")
+            checks.append(("SCIP Importer", True, ""))
+        except Exception as exc:
+            checks.append(("SCIP Importer", False, str(exc)))
+
+        # 8. Contracts & SARIF
+        try:
+            from tzero_contracts import ASTContractComparator
+            old = "def foo(x: int) -> int:\n    return x\n"
+            new = "def foo(x: int, y: int) -> int:\n    return x + y\n"
+            diff_rep = ASTContractComparator.compare_code(old, new, file_path="f.py")
+            if not (diff_rep.is_breaking):
+                raise ValueError("unexpected diagnostic result")
+            sarif = ASTContractComparator.format_sarif_report([diff_rep])
+            if not (sarif.get("version") == "2.1.0"):
+                raise ValueError("unexpected diagnostic result")
+            checks.append(("Contracts & SARIF", True, ""))
+        except Exception as exc:
+            checks.append(("Contracts & SARIF", False, str(exc)))
+
+        # 9. Agent Kernel & Snapshot
+        try:
+            from tzero_rust_bridge import AgentKernelSandbox
+            from tzero_snapshot import SnapshotEngine
+            kernel = AgentKernelSandbox(workspace_dir=tmpdir)
+            if not (kernel.validate_execution_plan({"allow_network": False, "read_paths": [tmpdir]})["allowed"]):
+                raise ValueError("unexpected diagnostic result")
+            if kernel.validate_execution_plan({"allow_network": True, "read_paths": [tmpdir]})["allowed"]:
+                raise ValueError("unexpected diagnostic result")
+            snap_py = os.path.join(tmpdir, "snap_test.py")
+            with open(snap_py, "w", encoding="utf-8") as fh:
+                fh.write("def snap_fn(): pass\n")
+            snap = SnapshotEngine.create_snapshot(tmpdir)
+            if not (snap.file_count >= 1):
+                raise ValueError("unexpected diagnostic result")
+            checks.append(("Agent Kernel & Snapshot", True, ""))
+        except Exception as exc:
+            checks.append(("Agent Kernel & Snapshot", False, str(exc)))
+
+    failures = 0
+    for name, passed, msg in checks:
+        if passed:
+            print(_line("OK", name))
+        else:
+            failures += 1
+            print(_line("FAIL", f"{name}: {msg}"))
+    return failures
+
+
+def run_doctor(deep: bool = False) -> int:
     """Checks the environment, fixing missing packages when allowed. Returns a process exit code."""
     print("T-Zero Doctor: environment check\n")
     failures = 0
@@ -229,7 +393,8 @@ def run_doctor() -> int:
         failures += 1
         print(_line("FAIL", f"Python {py}: version {MIN_PYTHON[0]}.{MIN_PYTHON[1]}+ is required"))
 
-    ensure_dependencies(include_mcp=True)
+    if not deep:
+        ensure_dependencies(include_mcp=True)
     for dep in REQUIRED + [MCP_DEPENDENCY]:
         status, version = check_dependency(dep)
         label = f"{dep.dist_name} {version or ''}".strip()
@@ -272,8 +437,18 @@ def run_doctor() -> int:
     except Exception as exc:
         print(_line("WARN", f"keyring could not be checked: {exc}"))
 
-    ensure_scripts_in_path(quiet=True)
-    print(_line("OK", "Python Scripts PATH verified (tzero, tzero-gui, tzero-mcp accessible)"))
+    if not deep:
+        ensure_scripts_in_path(quiet=True)
+        print(_line("OK", "Python Scripts PATH verified (tzero, tzero-gui, tzero-mcp accessible)"))
+
+    if deep:
+        from tzero_polyglot import _ALLOW_BPE_DOWNLOAD
+
+        token = _ALLOW_BPE_DOWNLOAD.set(False)
+        try:
+            failures += _run_deep_subsystem_check()
+        finally:
+            _ALLOW_BPE_DOWNLOAD.reset(token)
 
     print()
     if failures:
