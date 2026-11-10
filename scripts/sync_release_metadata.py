@@ -94,6 +94,11 @@ def sync_release_metadata(target_version: str, check_only: bool = False) -> Dict
     c_v5 = _regex_replace(v3_p, r'(GRADIO COCKPIT \()v[0-9]+\.[0-9]+\.[0-9]+(\))', rf'\1v{target_version}\2', check_only)
     results["tzero_v3.py"] = any((c_v1, c_v2, c_v3, c_v4, c_v5))
 
+    tui_p = ROOT_DIR / "tzero_tui.py"
+    c_t1 = _regex_replace(tui_p, r'(LIVE COCKPIT )v[0-9]+\.[0-9]+\.[0-9]+', rf'\1v{target_version}', check_only)
+    c_t2 = _regex_replace(tui_p, r'(generate_changelog_entry\(version=)"v[0-9]+\.[0-9]+\.[0-9]+"', rf'\1"v{target_version}"', check_only)
+    results["tzero_tui.py"] = c_t1 or c_t2
+
     return results
 
 
@@ -103,16 +108,29 @@ def sync_npm_sources() -> int:
     npm_src.mkdir(parents=True, exist_ok=True)
     pyproject = tomllib.loads((ROOT_DIR / "pyproject.toml").read_text(encoding="utf-8"))
     modules = pyproject["tool"]["setuptools"]["py-modules"]
+    expected_py = {f"{mod}.py" for mod in modules}
+    allowed_pkgs = ("tzero_jarvis", "tzero_fixer")
+
+    for existing_py in npm_src.glob("*.py"):
+        if existing_py.name not in expected_py:
+            existing_py.unlink()
+    for existing_dir in npm_src.iterdir():
+        if existing_dir.is_dir() and existing_dir.name not in allowed_pkgs:
+            shutil.rmtree(existing_dir)
+
     copied = 0
     for mod in modules:
         src_file = ROOT_DIR / f"{mod}.py"
         if src_file.is_file():
             shutil.copy2(src_file, npm_src / src_file.name)
             copied += 1
-    for pkg in ("tzero_jarvis", "tzero_fixer"):
+    for pkg in allowed_pkgs:
         src_pkg = ROOT_DIR / pkg
         dst_pkg = npm_src / pkg
         dst_pkg.mkdir(parents=True, exist_ok=True)
+        for existing_pkg_py in dst_pkg.glob("*.py"):
+            if not (src_pkg / existing_pkg_py.name).is_file():
+                existing_pkg_py.unlink()
         for py_file in src_pkg.glob("*.py"):
             shutil.copy2(py_file, dst_pkg / py_file.name)
             copied += 1

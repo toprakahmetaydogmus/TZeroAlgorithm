@@ -71,6 +71,36 @@ class TestTZeroTerminalCockpit(unittest.TestCase):
         self.assertIn("Pack Context Window", screen)
         self.assertIn("Generate PEP-484 Type Stubs", screen)
 
+    def test_render_cockpit_displays_dynamic_zero_leak_warning(self):
+        warn_metrics = {
+            "workspace_name": "LeakyWS",
+            "total_files": 5,
+            "raw_tokens": 1000,
+            "pruned_tokens": 200,
+            "savings_pct": 80.0,
+            "monthly_roi_saved": 12.0,
+            "zero_leak_status": "WARNING: 2 SECRET(S)",
+            "languages": {"python": 5},
+        }
+        screen = TZeroTerminalCockpit.render_cockpit(warn_metrics)
+        self.assertIn("WARNING: 2 SECRET(S)", screen)
+        self.assertNotIn("100% ZERO-LEAK PASSED", screen)
+
+    def test_gather_workspace_metrics_samples_code_beyond_250_assets(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            for i in range(260):
+                with open(os.path.join(tmp, f"00_asset_{i:03d}.txt"), "w", encoding="utf-8") as fh:
+                    fh.write("asset\n")
+            code = "\n".join(
+                f"def fn_{i}(a: int, b: int) -> int:\n    res = a + b + {i}\n    return res\n"
+                for i in range(10)
+            )
+            with open(os.path.join(tmp, "zz_module.py"), "w", encoding="utf-8") as fh:
+                fh.write(code)
+            metrics = TZeroTerminalCockpit.gather_workspace_metrics(tmp)
+            self.assertGreater(metrics["raw_tokens"], 0)
+            self.assertGreater(metrics["savings_pct"], 0.0)
+
 
 if __name__ == "__main__":
     unittest.main()

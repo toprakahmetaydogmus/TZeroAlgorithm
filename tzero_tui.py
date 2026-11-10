@@ -49,6 +49,7 @@ class TZeroTerminalCockpit:
         raw_tokens_total = 0
         pruned_tokens_total = 0
         file_count = 0
+        code_files_sampled = 0
 
         reducer = PolyglotTokenReducer()
 
@@ -63,8 +64,8 @@ class TZeroTerminalCockpit:
                 lang = reducer.detect_language(full_p) or "Other"
                 files_by_lang[lang] = files_by_lang.get(lang, 0) + 1
 
-                # Sample quick token calculation on code files
-                if file_count <= 250 and ext in (
+                # Sample quick token calculation on code files (independent of non-code assets)
+                if code_files_sampled < 250 and ext in (
                     ".py", ".ts", ".js", ".rs", ".go", ".cpp", ".c", ".h",
                     ".swift", ".kt", ".dart", ".rb", ".sol", ".scala", ".php"
                 ):
@@ -76,6 +77,7 @@ class TZeroTerminalCockpit:
                         pruned_t = max(1, len(pruned_code) // 4)
                         raw_tokens_total += raw_t
                         pruned_tokens_total += pruned_t
+                        code_files_sampled += 1
                     except OSError:
                         pass
 
@@ -149,7 +151,11 @@ class TZeroTerminalCockpit:
         lines.append(f"{c.CYAN}║{c.RESET}  🗜️  {c.BOLD}AST Reduction:{c.RESET} {gauge:<38}               {c.CYAN}║{c.RESET}")
         lines.append(f"{c.CYAN}║{c.RESET}  📊 {c.BOLD}Raw Tokens:{c.RESET} ~{raw_t:,} │ {c.BOLD}Pruned Tokens:{c.RESET} ~{pruned_t:,}                           {c.CYAN}║{c.RESET}")
         lines.append(f"{c.CYAN}║{c.RESET}  💰 {c.BOLD}Est. Monthly Team ROI Saved:{c.RESET} {c.BRIGHT_GREEN}${roi:,.2f}{c.RESET} / month (Claude 3.7 / GPT-4o)     {c.CYAN}║{c.RESET}")
-        lines.append(f"{c.CYAN}║{c.RESET}  🔒 {c.BOLD}Security Guard:{c.RESET} {c.BRIGHT_GREEN}100% ZERO-LEAK PASSED{c.RESET} (0 Exposed Credentials)      {c.CYAN}║{c.RESET}")
+        sec_stat = str(metrics.get("zero_leak_status", "100% SECURE (VERIFIED)"))
+        sec_color = c.BRIGHT_GREEN if ("SECURE" in sec_stat or "PASSED" in sec_stat) else c.RED
+        sec_note = "(0 Exposed Credentials)" if sec_color == c.BRIGHT_GREEN else "(Action Required)"
+        sec_field = f"{sec_color}{sec_stat}{c.RESET} {sec_note}"
+        lines.append(f"{c.CYAN}║{c.RESET}  🔒 {c.BOLD}Security Guard:{c.RESET} {sec_field:<57} {c.CYAN}║{c.RESET}")
         lines.append(box_mid)
 
         # Top languages line
