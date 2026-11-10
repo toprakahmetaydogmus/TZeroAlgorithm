@@ -4059,6 +4059,7 @@ def create_mcp_server():
             lines.append("```")
         else:
             lines.append("🌟 **Flawless Code:** Zero hallucinated symbols detected. All imports and methods verified against workspace AST.")
+        return "\n".join(lines)
 
     @server.tool(
         name="transpile_model_bridge",
@@ -4104,7 +4105,6 @@ def create_mcp_server():
             f"{out}\n"
             f"```\n"
         )
-        return "\n".join(lines)
 
     # -------------------------------------------------------------------------
     # -------------------------------------------------------------------------
@@ -4349,11 +4349,11 @@ def create_mcp_server():
             return estimate_token_cost(project_root=target, text=query)
 
         elif act in ("memory_query", "memory_search"):
-            return query_memory_store(query=query or target, store_name=opts.get("store_name", "workspace"))
+            return query_memory_store(query=query or target, query_mode=opts.get("query_mode", "semantic"), project_root=opts.get("project_root", "."))
 
         elif act in ("memory", "memory_manage", "compress"):
             op = opts.get("operation", "list")
-            return manage_memory_store(operation=op, store_name=opts.get("store_name", "workspace"), payload=query or target)
+            return manage_memory_store(operation=op, content=query or target, store_name=opts.get("store_name", "default"), project_root=opts.get("project_root", "."))
 
         elif act in ("heal", "self_healing", "fix"):
             return orchestrate_agent_swarm(goal=query or target, orchestration_mode="self_healing", project_root=target if os.path.isdir(target) else ".")

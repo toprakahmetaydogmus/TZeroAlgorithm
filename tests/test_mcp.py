@@ -977,6 +977,32 @@ diff --git a/core.py b/core.py
         sec_text = res_sec[0].content
         self.assertIn("ZERO-LEAK", sec_text)
 
+    def test_heal_hallucinated_code_clean_returns_markdown(self):
+        """Verifies heal_hallucinated_code returns formatted markdown on clean code."""
+        code = "def add(a: int, b: int) -> int:\n    return a + b\n"
+        res = self.run_async(self.server.call_tool("heal_hallucinated_code", {"code": code}))
+        text = tool_result_text(res)
+        self.assertIsInstance(text, str)
+        self.assertIn("Flawless Code", text)
+
+    def test_execute_workflow_memory_actions(self):
+        """Verifies execute_codebase_workflow forwards valid kwargs to memory tools."""
+        res_q = self.run_async(self.server.call_tool(
+            "execute_codebase_workflow",
+            {"action": "memory_query", "query": "AST"}
+        ))
+        text_q = tool_result_text(res_q)
+        self.assertNotIn("TypeError", text_q)
+        self.assertNotIn("unexpected keyword", text_q)
+
+        res_m = self.run_async(self.server.call_tool(
+            "execute_codebase_workflow",
+            {"action": "memory", "target": "test fact", "options": '{"operation": "list"}'}
+        ))
+        text_m = tool_result_text(res_m)
+        self.assertNotIn("TypeError", text_m)
+        self.assertNotIn("unexpected keyword", text_m)
+
 
 if __name__ == "__main__":
     unittest.main()
