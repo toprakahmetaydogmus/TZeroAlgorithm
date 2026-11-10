@@ -8822,6 +8822,7 @@ def main():
     parser.add_argument("--max-mutants", type=int, default=10, metavar="N", help="Maximum AST mutants to generate and evaluate (default: 10)")
     parser.add_argument("--contracts", "--check-contracts", nargs="?", const="HEAD~1", default=None, metavar="BASE_REF", help="Audit public AST API contracts and SemVer compatibility against git base ref")
     parser.add_argument("--breaking-changes", nargs="?", const="HEAD~1", default=None, metavar="BASE_REF", help="Enforce zero-breaking-changes gate against git base ref (fails if breaking changes detected)")
+    parser.add_argument("--contracts-sarif", nargs="?", const="-", default=None, metavar="OUT_PATH", help="Emit SARIF 2.1.0 contract report JSON to file or '-' for stdout")
     parser.add_argument("--debt", "--code-health", nargs="?", const=".", default=None, metavar="DIR", help="Autonomous AST technical debt, cognitive complexity & maintainability index")
     parser.add_argument("--budget", "--token-budget", nargs="?", const=".", default=None, metavar="DIR", help="Optimize codebase context payload to fit AI model token budget and issue SHA-256 certificate")
     parser.add_argument("--target-tokens", type=int, default=None, metavar="N", help="Target token budget for --budget (e.g. 16000, 64000)")
@@ -9263,17 +9264,40 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
         )
         print(ASTMutationEngine.format_markdown_report(report))
         sys.exit(0 if report.mutation_score >= 70.0 else 1)
-    elif getattr(args, "contracts", None) is not None or getattr(args, "breaking_changes", None) is not None:
+    elif (
+        getattr(args, "contracts", None) is not None
+        or getattr(args, "breaking_changes", None) is not None
+        or getattr(args, "contracts_sarif", None) is not None
+    ):
         from tzero_contracts import ASTContractComparator
-        base_ref = args.contracts or args.breaking_changes or "HEAD~1"
+        base_ref = getattr(args, "contracts", None) or getattr(args, "breaking_changes", None) or "HEAD~1"
         is_gate = getattr(args, "breaking_changes", None) is not None
-        print(f"\n🛡️ [T-ZERO CONTRACT GUARDIAN] Evaluating AST public API changes against '{base_ref}'...")
-        reports = ASTContractComparator.compare_git_revision(repo_dir=args.dir, base_ref=base_ref)
-        md = ASTContractComparator.format_markdown_report(reports)
-        print("\n" + md + "\n")
+        sarif_out = getattr(args, "contracts_sarif", None)
+        target_dir = getattr(args, "dir", ".") or "."
+
+        if sarif_out != "-":
+            print(f"\n🛡️ [T-ZERO CONTRACT GUARDIAN] Evaluating AST public API changes against '{base_ref}'...")
+
+        reports = ASTContractComparator.compare_git_revision(repo_dir=target_dir, base_ref=base_ref)
         has_breaking = any(r.is_breaking for r in reports)
+
+        if sarif_out is not None:
+            sarif = ASTContractComparator.format_sarif_report(reports)
+            if sarif_out == "-":
+                print(json.dumps(sarif, indent=2))
+            else:
+                with open(sarif_out, "w", encoding="utf-8") as f:
+                    json.dump(sarif, f, indent=2)
+                md = ASTContractComparator.format_markdown_report(reports)
+                print("\n" + md + "\n")
+                print(f"✅ SARIF 2.1.0 contract report written to: {sarif_out}\n")
+        else:
+            md = ASTContractComparator.format_markdown_report(reports)
+            print("\n" + md + "\n")
+
         if is_gate and has_breaking:
-            print("❌ [T-ZERO CONTRACT GATE FAILED] Incompatible breaking changes detected in public API.\n")
+            if sarif_out != "-":
+                print("❌ [T-ZERO CONTRACT GATE FAILED] Incompatible breaking changes detected in public API.\n")
             sys.exit(1)
         sys.exit(0)
     elif getattr(args, "debt", None) is not None:

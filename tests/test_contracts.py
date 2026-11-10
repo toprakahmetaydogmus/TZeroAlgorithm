@@ -1,10 +1,15 @@
 # -*- coding: utf-8 -*-
 """Unit tests for T-Zero Public API Contract & SemVer Guardian (tzero_contracts.py)."""
 
+import json
+import subprocess
+import sys
 import unittest
 from tzero_contracts import (
     ASTContractExtractor,
     ASTContractComparator,
+    ContractDiffReport,
+    ContractViolation,
     SemVerBump,
 )
 
@@ -114,6 +119,140 @@ class TestASTContractComparator(unittest.TestCase):
         self.assertIn("T-Zero Public API Contract & SemVer Guardian", md)
         self.assertIn("MINOR (FEATURE)", md)
         self.assertIn("search.py", md)
+
+
+class TestPolyglotContracts(unittest.TestCase):
+    def test_typescript_contracts_extraction(self):
+        code = '''
+export function add(a: number, b?: number): number {
+    return a + (b || 0);
+}
+
+export class Calculator {
+    compute(factor: number): number {
+        return factor * 2;
+    }
+}
+'''
+        funcs, classes = ASTContractExtractor.extract_polyglot_contracts(code, "calc.ts")
+        self.assertIn("add", funcs)
+        fc = funcs["add"]
+        self.assertEqual(fc.required_param_count, 1)
+        self.assertEqual(fc.return_annotation, "number")
+        self.assertTrue(fc.parameters[1].has_default)
+
+        self.assertIn("Calculator", classes)
+        self.assertIn("compute", classes["Calculator"].methods)
+
+    def test_typescript_breaking_param_added(self):
+        old_code = "export function processData(input: string): boolean { return true; }"
+        new_code = "export function processData(input: string, options: any): boolean { return true; }"
+        report = ASTContractComparator.compare_code(old_code, new_code, "service.ts")
+        self.assertTrue(report.is_breaking)
+        self.assertEqual(report.semver_bump, SemVerBump.MAJOR)
+        self.assertEqual(report.breaking_changes[0].category, "REQUIRED_PARAMETER_ADDED")
+
+    def test_typescript_breaking_param_removed(self):
+        old_code = "export function processData(input: string, token: string): boolean { return true; }"
+        new_code = "export function processData(input: string): boolean { return true; }"
+        report = ASTContractComparator.compare_code(old_code, new_code, "service.ts")
+        self.assertTrue(report.is_breaking)
+        self.assertEqual(report.semver_bump, SemVerBump.MAJOR)
+        self.assertEqual(report.breaking_changes[0].category, "REMOVED_PARAMETER")
+
+    def test_typescript_optional_param_added(self):
+        old_code = "export function processData(input: string): boolean { return true; }"
+        new_code = "export function processData(input: string, retries?: number): boolean { return true; }"
+        report = ASTContractComparator.compare_code(old_code, new_code, "service.ts")
+        self.assertFalse(report.is_breaking)
+        self.assertEqual(report.semver_bump, SemVerBump.MINOR)
+        self.assertEqual(report.non_breaking_additions[0].category, "OPTIONAL_PARAMETER_ADDED")
+
+    def test_go_exported_and_unexported(self):
+        code = '''
+package server
+
+func Exported(a string, b int) error {
+    return nil
+}
+
+func helper(a string) {
+}
+
+func (s *Server) Handle(req string) bool {
+    return true
+}
+'''
+        funcs, classes = ASTContractExtractor.extract_polyglot_contracts(code, "server.go")
+        self.assertIn("Exported", funcs)
+        self.assertNotIn("helper", funcs)
+        self.assertIn("Server", classes)
+        self.assertIn("Handle", classes["Server"].methods)
+
+    def test_go_return_type_changed(self):
+        old_code = "func Query(id string) string { return id }"
+        new_code = "func Query(id string) (string, error) { return id, nil }"
+        report = ASTContractComparator.compare_code(old_code, new_code, "db.go")
+        self.assertFalse(report.is_breaking)
+        self.assertEqual(report.semver_bump, SemVerBump.PATCH)
+        self.assertEqual(len(report.modifications), 1)
+        self.assertEqual(report.modifications[0].category, "RETURN_TYPE_CHANGED")
+
+
+class TestSARIFContractReport(unittest.TestCase):
+    def test_sarif_210_structure(self):
+        report = ContractDiffReport(
+            file_path="src/api.ts",
+            semver_bump=SemVerBump.MAJOR,
+            breaking_changes=[
+                ContractViolation(
+                    severity="BREAKING",
+                    category="REQUIRED_PARAMETER_ADDED",
+                    symbol="fetchUser",
+                    details="New required parameter 'authKey' added to 'fetchUser' without default value."
+                )
+            ],
+            modifications=[
+                ContractViolation(
+                    severity="MODIFICATION",
+                    category="RETURN_TYPE_CHANGED",
+                    symbol="getUser",
+                    details="Return type changed from 'User' to 'Promise<User>'."
+                )
+            ]
+        )
+        sarif = ASTContractComparator.format_sarif_report([report])
+        self.assertEqual(sarif.get("$schema"), "https://json.schemastore.org/sarif-2.1.0.json")
+        self.assertEqual(sarif.get("version"), "2.1.0")
+        self.assertEqual(len(sarif.get("runs", [])), 1)
+        driver = sarif["runs"][0]["tool"]["driver"]
+        self.assertEqual(driver["name"], "T-Zero Contract Guardian")
+        self.assertEqual(driver["version"], "10.9.0")
+        rule_ids = {r["id"] for r in driver.get("rules", [])}
+        self.assertIn("REQUIRED_PARAMETER_ADDED", rule_ids)
+        self.assertIn("RETURN_TYPE_CHANGED", rule_ids)
+        results = sarif["runs"][0]["results"]
+        self.assertEqual(len(results), 2)
+        err_res = [r for r in results if r["level"] == "error"][0]
+        self.assertEqual(err_res["ruleId"], "REQUIRED_PARAMETER_ADDED")
+        self.assertEqual(err_res["locations"][0]["physicalLocation"]["artifactLocation"]["uri"], "src/api.ts")
+        warn_res = [r for r in results if r["level"] == "warning"][0]
+        self.assertEqual(warn_res["ruleId"], "RETURN_TYPE_CHANGED")
+
+
+class TestCLIContractsSARIF(unittest.TestCase):
+    def test_cli_contracts_sarif_flag(self):
+        res = subprocess.run(
+            [sys.executable, "tzero_v3.py", "--contracts", "HEAD", "--contracts-sarif", "-"],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace"
+        )
+        self.assertEqual(res.returncode, 0)
+        data = json.loads(res.stdout)
+        self.assertEqual(data.get("version"), "2.1.0")
+        self.assertEqual(data.get("$schema"), "https://json.schemastore.org/sarif-2.1.0.json")
 
 
 if __name__ == "__main__":
