@@ -8796,6 +8796,7 @@ def main():
     parser.add_argument("--hook", action="store_true", help="Run lifecycle hook guard for Claude Code, Gemini CLI, or Cursor (stdin JSON)")
     parser.add_argument("--event", default="PreToolUse", help="Lifecycle hook event (PreToolUse or PostToolUse)")
     parser.add_argument("--lsp", action="store_true", help="Run T-Zero stdio JSON-RPC Language Server (Zero-Leak, boundaries, CodeLens)")
+    parser.add_argument("--agent-kernel", action="store_true", help="Validate Agent Kernel WASM/FFI capability sandbox and Rust bridge status")
     parser.add_argument("--fix", metavar="FILE_OR_CODE", default=None, help="Self-healing AST auto-corrector for hallucinated AI methods and phantom imports")
     parser.add_argument("--bridge", metavar="FILE", default=None, help="Polyglot type & schema transpiler: convert Python models to TS, Rust, or Go")
     parser.add_argument("--bridge-lang", choices=["ts", "rust", "go", "kt", "swift", "all"], default="ts", help="Target language for --bridge (ts, rust, go, kt, swift, all)")
@@ -9062,6 +9063,7 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
             "goldens": "--golden",
             "hook": "--hook",
             "lsp": "--lsp",
+            "agent-kernel": "--agent-kernel",
         }
         if sub in sub_map:
             sys.argv[1] = sub_map[sub]
@@ -9098,6 +9100,9 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
     elif getattr(args, "lsp", False):
         import tzero_lsp
         sys.exit(tzero_lsp.main(workspace_dir=args.dir))
+    elif getattr(args, "agent_kernel", False):
+        import tzero_rust_bridge
+        sys.exit(tzero_rust_bridge.run_agent_kernel_cli(workspace_dir=args.dir))
     elif args.init is not None:
         import addmcp
         target_arg = [] if args.init == "auto" else [args.init]

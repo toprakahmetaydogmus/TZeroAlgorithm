@@ -19,3 +19,4 @@ path = "src/main.rs"
 [lib]
 name = "tzero_jarvis_core"
 path = "src/lib.rs"
+crate-type = ["cdylib", "rlib"]
