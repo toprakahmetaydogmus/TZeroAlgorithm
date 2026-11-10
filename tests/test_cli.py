@@ -218,6 +218,24 @@ class TestCLI(unittest.TestCase):
         self.assertEqual(res_golden.returncode, 0)
         self.assertIn("T-ZERO GOLDEN ENGINE", res_golden.stdout)
 
+    def test_export_repomap_stdout_dash(self):
+        import tempfile
+        root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+        with tempfile.TemporaryDirectory() as tmp:
+            with open(os.path.join(tmp, "mod.py"), "w", encoding="utf-8") as fh:
+                fh.write("def hello_world() -> str:\n    return 'ok'\n")
+            res = subprocess.run(
+                [sys.executable, os.path.join(root_dir, "tzero_v3.py"), "--export-repomap", "-", "--dir", tmp],
+                cwd=tmp,
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace"
+            )
+            self.assertEqual(res.returncode, 0)
+            self.assertIn("hello_world", res.stdout)
+            self.assertFalse(os.path.exists(os.path.join(tmp, "-")))
+
 
 if __name__ == "__main__":
     unittest.main()

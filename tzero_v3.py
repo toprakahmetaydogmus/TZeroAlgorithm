@@ -8549,6 +8549,10 @@ def run_export_cli(project_dir: str, export_type: str, out_file: str):
     else:
         return
         
+    if out_file == "-":
+        print(content)
+        return
+
     out_path = os.path.join(project_dir, out_file) if not os.path.isabs(out_file) else out_file
     with open(out_path, "w", encoding="utf-8") as f:
         f.write(content)
@@ -9633,7 +9637,8 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
                     print(f"  - [{v['provider']}] {v['file']}:{v['line']} -> {v['preview']}")
                 if args.migrate:
                     total_migrated = 0
-                    for vf in findings.get("files_with_violations", []):
+                    violating_files = sorted({v.get("file", "") for v in violations if v.get("file")})
+                    for vf in violating_files:
                         if os.path.isfile(vf):
                             with open(vf, "r", encoding="utf-8", errors="ignore") as f:
                                 sc = f.read()

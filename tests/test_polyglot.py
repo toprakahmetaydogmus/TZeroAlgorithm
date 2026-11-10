@@ -428,6 +428,20 @@ end
         self.assertIn("defmodule HeavyElixirWorker do", reduced_elixir)
         self.assertNotIn("dispatch(50)", reduced_elixir)
 
+    def test_java_multiline_method_no_ellipsis_literal(self):
+        from tzero_polyglot import PolyglotTokenReducer
+        java_code = (
+            "public class Service {\n"
+            "    public void execute(int count)\n"
+            "    {\n"
+            "        int x = count + 1;\n"
+            "    }\n"
+            "}\n"
+        )
+        reduced = PolyglotTokenReducer.reduce_java(java_code, mode="ultra")
+        self.assertNotIn("Ellipsis", reduced)
+        self.assertIn("public void execute(int count) { ... }", reduced)
+
 
 if __name__ == '__main__':
     unittest.main()
