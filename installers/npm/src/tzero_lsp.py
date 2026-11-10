@@ -19,7 +19,7 @@ import os
 import re
 import sys
 import urllib.parse
-from typing import Any, BinaryIO, Dict, List, Optional
+from typing import Any, BinaryIO, Dict, List, Optional, Set, Tuple
 
 from tzero_polyglot import count_bpe_tokens
 from tzero_security import ZeroLeakEngine
@@ -209,23 +209,33 @@ class TZeroLSPServer:
         if file_path.endswith(".py"):
             try:
                 tree = ast.parse(text)
+                target_nodes: List[ast.AST] = []
                 for node in tree.body:
-                    if isinstance(node, (ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)):
-                        start_l = max(0, node.lineno - 1)
-                        end_l = getattr(node, "end_lineno", node.lineno)
-                        block = "\n".join(lines[start_l:end_l])
-                        sig = lines[start_l] if start_l < len(lines) else ""
-                        raw_t = count_bpe_tokens(block)
-                        sig_t = count_bpe_tokens(sig)
-                        sav = max(0, int(round((1.0 - sig_t / max(1, raw_t)) * 100)))
-                        lenses.append({
-                            "range": {"start": {"line": start_l, "character": 0}, "end": {"line": start_l, "character": len(sig)}},
-                            "command": {
-                                "title": f"⚡ ~{raw_t} tok → {sig_t} sig ({sav}% saved)",
-                                "command": "tzero.copySymbolContract",
-                                "arguments": [file_path, start_l],
-                            },
-                        })
+                    if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                        target_nodes.append(node)
+                    elif isinstance(node, ast.ClassDef):
+                        target_nodes.append(node)
+                        for item in node.body:
+                            if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                                target_nodes.append(item)
+                target_nodes.sort(key=lambda n: getattr(n, "lineno", 0))
+
+                for node in target_nodes:
+                    start_l = max(0, getattr(node, "lineno", 1) - 1)
+                    end_l = getattr(node, "end_lineno", node.lineno)
+                    block = "\n".join(lines[start_l:end_l])
+                    sig = lines[start_l] if start_l < len(lines) else ""
+                    raw_t = count_bpe_tokens(block)
+                    sig_t = count_bpe_tokens(sig)
+                    sav = max(0, int(round((1.0 - sig_t / max(1, raw_t)) * 100)))
+                    lenses.append({
+                        "range": {"start": {"line": start_l, "character": 0}, "end": {"line": start_l, "character": len(sig)}},
+                        "command": {
+                            "title": f"⚡ ~{raw_t} tok → {sig_t} sig ({sav}% saved)",
+                            "command": "tzero.copySymbolContract",
+                            "arguments": [file_path, start_l],
+                        },
+                    })
                 return lenses
             except SyntaxError:
                 pass
@@ -243,6 +253,237 @@ class TZeroLSPServer:
                     },
                 })
         return lenses
+
+    def compute_hover(
+        self,
+        uri: str,
+        text: str,
+        line: int,
+        character: int = 0,
+    ) -> Optional[Dict[str, Any]]:
+        """Computes hover info with AST metrics, token reduction, and workspace references."""
+        file_path = uri_to_path(uri)
+        lines = text.splitlines()
+        sym_name: Optional[str] = None
+        start_l: int = 0
+        end_l: int = 0
+        block: str = ""
+        sig: str = ""
+        stmt_count: int = 0
+
+        if file_path.endswith(".py"):
+            try:
+                tree = ast.parse(text)
+                candidates: List[Tuple[int, int, int, ast.AST]] = []
+                for node in ast.walk(tree):
+                    if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                        s = max(0, getattr(node, "lineno", 1) - 1)
+                        e = getattr(node, "end_lineno", node.lineno)
+                        if s <= line < e:
+                            span = e - s
+                            candidates.append((span, s, e, node))
+                if candidates:
+                    candidates.sort(key=lambda x: (x[0], -x[1]))
+                    _, start_l, end_l, sym_node = candidates[0]
+                    sym_name = getattr(sym_node, "name", "unknown")
+                    block = "\n".join(lines[start_l:end_l])
+                    sig = lines[start_l] if start_l < len(lines) else ""
+                    stmt_count = sum(
+                        1
+                        for child in getattr(sym_node, "body", [])
+                        for s in ast.walk(child)
+                        if isinstance(s, ast.stmt)
+                    )
+                    if stmt_count == 0:
+                        stmt_count = max(1, len(getattr(sym_node, "body", [])))
+            except SyntaxError:
+                pass
+
+        if sym_name is None:
+            decl_re = re.compile(
+                r'^\s*(?:export\s+)?(?:class|interface|struct|function|func|fn|def)\s+([A-Za-z_][A-Za-z0-9_]*)'
+            )
+            poly_candidates: List[Tuple[int, int, int, str]] = []
+            for idx, l_text in enumerate(lines):
+                m = decl_re.match(l_text)
+                if m:
+                    name = m.group(1)
+                    e_idx = len(lines)
+                    open_braces = l_text.count("{") - l_text.count("}")
+                    if open_braces > 0:
+                        cur_b = open_braces
+                        for j in range(idx + 1, len(lines)):
+                            cur_b += lines[j].count("{") - lines[j].count("}")
+                            if cur_b <= 0:
+                                e_idx = j + 1
+                                break
+                    else:
+                        base_indent = len(l_text) - len(l_text.lstrip())
+                        for j in range(idx + 1, len(lines)):
+                            j_str = lines[j]
+                            if not j_str.strip():
+                                continue
+                            j_indent = len(j_str) - len(j_str.lstrip())
+                            if j_indent <= base_indent and decl_re.match(j_str):
+                                e_idx = j
+                                break
+                    if idx <= line < e_idx:
+                        span = e_idx - idx
+                        poly_candidates.append((span, idx, e_idx, name))
+            if poly_candidates:
+                poly_candidates.sort(key=lambda x: (x[0], -x[1]))
+                _, start_l, end_l, sym_name = poly_candidates[0]
+                block = "\n".join(lines[start_l:end_l])
+                sig = lines[start_l] if start_l < len(lines) else ""
+                stmt_count = max(1, len([l for l in lines[start_l:end_l] if l.strip()]))
+
+        if sym_name is None:
+            return None
+
+        raw_t = count_bpe_tokens(block)
+        sig_t = count_bpe_tokens(sig)
+        sav = max(0, int(round((1.0 - sig_t / max(1, raw_t)) * 100)))
+
+        ref_pat = re.compile(rf"\b{re.escape(sym_name)}\b")
+        ref_count = 0
+        scanned_paths: Set[str] = set()
+
+        for doc_uri, buf_text in self.documents.items():
+            scanned_paths.add(uri_to_path(doc_uri))
+            ref_count += len(ref_pat.findall(buf_text))
+
+        if uri_to_path(uri) not in scanned_paths:
+            scanned_paths.add(uri_to_path(uri))
+            ref_count += len(ref_pat.findall(text))
+
+        disk_count = 0
+        skip_dirs = {
+            ".git",
+            "__pycache__",
+            ".venv",
+            "venv",
+            "node_modules",
+            "dist",
+            "build",
+            ".tzero",
+            ".superpowers",
+            ".gemini",
+        }
+        src_exts = {
+            ".py",
+            ".ts",
+            ".js",
+            ".jsx",
+            ".tsx",
+            ".go",
+            ".rs",
+            ".java",
+            ".c",
+            ".cpp",
+            ".h",
+            ".hpp",
+            ".cs",
+            ".rb",
+            ".php",
+        }
+        if os.path.isdir(self.workspace_dir):
+            for root, dirs, files in os.walk(self.workspace_dir):
+                dirs[:] = [d for d in dirs if d not in skip_dirs and not d.startswith(".")]
+                for fn in files:
+                    if disk_count >= 50:
+                        break
+                    _, ext = os.path.splitext(fn)
+                    if ext.lower() in src_exts:
+                        fp = os.path.normpath(os.path.join(root, fn))
+                        if fp in scanned_paths:
+                            continue
+                        scanned_paths.add(fp)
+                        disk_count += 1
+                        try:
+                            with open(fp, "r", encoding="utf-8", errors="replace") as f:
+                                ref_count += len(ref_pat.findall(f.read()))
+                        except Exception:
+                            pass
+                if disk_count >= 50:
+                    break
+
+        hover_md = (
+            f"### `{sym_name}` (T-Zero AST Contract)\n\n"
+            f"- **Token Footprint:** ~{raw_t} tok → {sig_t} sig ({sav}% saved)\n"
+            f"- **Statements:** {stmt_count}\n"
+            f"- **References:** {ref_count}\n"
+        )
+
+        return {
+            "contents": {
+                "kind": "markdown",
+                "value": hover_md,
+            },
+            "range": {
+                "start": {"line": start_l, "character": 0},
+                "end": {"line": start_l, "character": len(sig)},
+            },
+        }
+
+    def compute_code_actions(
+        self,
+        uri: str,
+        text: str,
+        diagnostics: Optional[List[Dict[str, Any]]] = None,
+    ) -> List[Dict[str, Any]]:
+        """Computes LSP CodeAction quick-fixes for Zero-Leak credential diagnostics."""
+        if diagnostics is None:
+            diagnostics = self.analyze_document(uri, text)
+
+        actions: List[Dict[str, Any]] = []
+        lines = text.splitlines()
+        assign_pat = re.compile(
+            r'^(\s*)([A-Za-z_][A-Za-z0-9_]*)(\s*(?::\s*[^=]+)?\s*=\s*)(?:"""[\s\S]*?"""|\'\'\'[\s\S]*?\'\'\'|"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\')(\s*(?:#.*)?)$'
+        )
+
+        for diag in diagnostics:
+            code_val = str(diag.get("code", ""))
+            if "zero-leak" not in code_val:
+                continue
+            rng = diag.get("range", {})
+            ln = rng.get("start", {}).get("line", 0)
+            if ln < 0 or ln >= len(lines):
+                continue
+            orig_line = lines[ln]
+            m = assign_pat.match(orig_line)
+            if m:
+                indent = m.group(1)
+                lhs = m.group(2)
+                eq_part = m.group(3)
+                comment = m.group(4) or ""
+                env_var = re.sub(r"[^A-Z0-9_]", "_", lhs.upper()) or "TZERO_SECRET"
+                replacement = f'{indent}{lhs}{eq_part}os.environ.get("{env_var}", ""){comment}'
+                title = f"T-Zero Quick-Fix: Replace '{lhs}' with os.environ.get('{env_var}', '')"
+            else:
+                replacement = ZeroLeakEngine.sanitize_text(orig_line)
+                title = "T-Zero Quick-Fix: Sanitize secret literal"
+
+            actions.append({
+                "title": title,
+                "kind": "quickfix",
+                "isPreferred": True,
+                "diagnostics": [diag],
+                "edit": {
+                    "changes": {
+                        uri: [
+                            {
+                                "range": {
+                                    "start": {"line": ln, "character": 0},
+                                    "end": {"line": ln, "character": len(orig_line)},
+                                },
+                                "newText": replacement,
+                            }
+                        ]
+                    }
+                },
+            })
+
+        return actions
 
     def _publish_diagnostics(self, uri: str, text: str) -> Dict[str, Any]:
         return {
@@ -269,6 +510,8 @@ class TZeroLSPServer:
                     "capabilities": {
                         "textDocumentSync": 1,
                         "codeLensProvider": {"resolveProvider": False},
+                        "hoverProvider": True,
+                        "codeActionProvider": True,
                     },
                     "serverInfo": {"name": "tzero-lsp", "version": "10.9.0"},
                 },
@@ -308,8 +551,52 @@ class TZeroLSPServer:
         if method == "textDocument/codeLens":
             td = params.get("textDocument") or {}
             uri = td.get("uri", "")
-            text = self.documents.get(uri, "")
+            text = self.documents.get(uri)
+            if text is None:
+                fpath = uri_to_path(uri)
+                if os.path.isfile(fpath):
+                    with open(fpath, "r", encoding="utf-8", errors="replace") as f:
+                        text = f.read()
+                else:
+                    text = ""
             return [{"jsonrpc": "2.0", "id": msg_id, "result": self.compute_code_lenses(uri, text)}]
+
+        if method == "textDocument/hover":
+            td = params.get("textDocument") or {}
+            uri = td.get("uri", "")
+            text = self.documents.get(uri)
+            if text is None:
+                fpath = uri_to_path(uri)
+                if os.path.isfile(fpath):
+                    try:
+                        with open(fpath, "r", encoding="utf-8", errors="replace") as f:
+                            text = f.read()
+                    except Exception:
+                        text = ""
+                else:
+                    text = ""
+            pos = params.get("position") or {}
+            line = int(pos.get("line", 0))
+            ch = int(pos.get("character", 0))
+            return [{"jsonrpc": "2.0", "id": msg_id, "result": self.compute_hover(uri, text, line, ch)}]
+
+        if method == "textDocument/codeAction":
+            td = params.get("textDocument") or {}
+            uri = td.get("uri", "")
+            text = self.documents.get(uri)
+            if text is None:
+                fpath = uri_to_path(uri)
+                if os.path.isfile(fpath):
+                    try:
+                        with open(fpath, "r", encoding="utf-8", errors="replace") as f:
+                            text = f.read()
+                    except Exception:
+                        text = ""
+                else:
+                    text = ""
+            ctx = params.get("context") or {}
+            diags = ctx.get("diagnostics")
+            return [{"jsonrpc": "2.0", "id": msg_id, "result": self.compute_code_actions(uri, text, diags)}]
 
         if method == "shutdown":
             self.shutdown_requested = True
