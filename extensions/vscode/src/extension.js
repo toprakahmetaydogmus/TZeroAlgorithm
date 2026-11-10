@@ -23,10 +23,10 @@ function getWorkspaceRoot() {
     return undefined;
 }
 
-function runTZeroCli(args, cwd) {
+function runTZeroCli(args, cwd, stdinText) {
     const exe = getExecutablePath();
     return new Promise((resolve, reject) => {
-        execFile(
+        const child = execFile(
             exe,
             args,
             { cwd: cwd || os.tmpdir(), maxBuffer: 8 * 1024 * 1024 },
@@ -38,16 +38,16 @@ function runTZeroCli(args, cwd) {
                 resolve({ stdout: stdout || '', stderr: stderr || '', exitCode: error ? error.code : 0 });
             }
         );
+        if (stdinText !== undefined && stdinText !== null && child.stdin) {
+            child.stdin.write(stdinText);
+            child.stdin.end();
+        }
     });
-}
-
-function quoteTerminalArg(arg) {
-    return `"${String(arg).replace(/"/g, '\\"')}"`;
 }
 
 function runInTerminal(args) {
     const exe = getExecutablePath();
-    const cmdLine = [quoteTerminalArg(exe), ...args.map(quoteTerminalArg)].join(' ');
+    const cmdLine = [core.quoteTerminalArg(exe), ...args.map((a) => core.quoteTerminalArg(a))].join(' ');
     const term = vscode.window.createTerminal('T-Zero Architect');
     term.show();
     term.sendText(cmdLine);
@@ -188,7 +188,7 @@ function activate(context) {
             vscode.window.showErrorMessage('Please open a workspace folder before running T-Zero init.');
             return;
         }
-        await executeOutputCommand('Workspace Init', ['--init', wsRoot], wsRoot);
+        await executeOutputCommand('Workspace Init', ['--init', 'all'], wsRoot);
         await refreshWorkspaceMetrics();
     });
 
@@ -199,7 +199,8 @@ function activate(context) {
             return;
         }
         const filePath = editor.document.fileName;
-        const res = await runTZeroCli([filePath, '--ultra'], path.dirname(filePath)).catch((err) => {
+        const rawText = editor.document.getText();
+        const res = await runTZeroCli(['--pipe', path.basename(filePath)], path.dirname(filePath), rawText).catch((err) => {
             vscode.window.showErrorMessage(`T-Zero compress failed: ${err.message}`);
             return null;
         });
@@ -217,16 +218,12 @@ function activate(context) {
         }
         const selectedText = editor.document.getText(editor.selection);
         const ext = path.extname(editor.document.fileName) || '.py';
-        const tmpFile = path.join(os.tmpdir(), `tzero_sel_${Date.now()}${ext}`);
         try {
-            fs.writeFileSync(tmpFile, selectedText, 'utf8');
-            const res = await runTZeroCli([tmpFile, '--ultra'], os.tmpdir());
+            const res = await runTZeroCli(['--pipe', `selection${ext}`], os.tmpdir(), selectedText);
             await vscode.env.clipboard.writeText(res.stdout);
             vscode.window.showInformationMessage('T-Zero compressed AST selection copied to clipboard.');
         } catch (err) {
             vscode.window.showErrorMessage(`T-Zero selection compress failed: ${err.message}`);
-        } finally {
-            try { fs.unlinkSync(tmpFile); } catch (_) {}
         }
     });
 
@@ -434,7 +431,7 @@ function activate(context) {
     if (getConfig().get('autoInitOnOpen')) {
         const wsRoot = getWorkspaceRoot();
         if (wsRoot && !fs.existsSync(path.join(wsRoot, '.tzero')) && !fs.existsSync(path.join(wsRoot, '.mcp.json'))) {
-            runTZeroCli(['--init', wsRoot], wsRoot).then(() => refreshWorkspaceMetrics()).catch(() => {});
+            runTZeroCli(['--init', 'all'], wsRoot).then(() => refreshWorkspaceMetrics()).catch(() => {});
         }
     }
 }

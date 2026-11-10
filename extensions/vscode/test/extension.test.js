@@ -129,5 +129,36 @@ test('core.js renders offline sidebar HTML with live metrics and command dispatc
     assert.match(html, /tzero\.debt/);
     assert.match(html, /tzero\.golden/);
     assert.match(html, /Debt Score: 92\/100/);
+    assert.match(html, /Content-Security-Policy/);
     assert.doesNotMatch(html, /https?:\/\/cdn\./i);
 });
+
+test('core.js quotes terminal args safely and ignores braces inside strings/comments', () => {
+    const core = require('../src/core');
+    assert.equal(core.quoteTerminalArg("C:\\Users\\a$b\\it's", 'win32'), "'C:\\Users\\a$b\\it''s'");
+    assert.equal(core.quoteTerminalArg("/tmp/a$b/it's", 'linux'), "'/tmp/a$b/it'\\''s'");
+
+    const jsWithBraces = [
+        'export function parseTemplate(name: string): string {',
+        '    const fakeClose = "}"; // ignore } here',
+        '    const tail = `}` + name;',
+        '    return fakeClose + tail;',
+        '}',
+        'export function afterFn(): number {',
+        '    return 1;',
+        '}'
+    ].join('\n');
+    const metrics = core.computeCodeLensMetrics(jsWithBraces, 'typescript');
+    assert.equal(metrics.length, 2);
+    assert.equal(metrics[0].endLine, 4);
+    assert.equal(metrics[1].endLine, 7);
+});
+
+test('extension.js invokes compatible tzero_v3 CLI flags for init and pipe compression', () => {
+    const extSrc = fs.readFileSync(path.join(extRoot, 'src', 'extension.js'), 'utf8');
+    assert.doesNotMatch(extSrc, /'--ultra'/);
+    assert.doesNotMatch(extSrc, /\['--init',\s*wsRoot\]/);
+    assert.match(extSrc, /'--pipe'/);
+    assert.match(extSrc, /\['--init',\s*'all'\]/);
+});
+

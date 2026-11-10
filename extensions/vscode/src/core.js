@@ -11,6 +11,15 @@ function resolveExecutable(configuredPath) {
     return 'tzero';
 }
 
+function quoteTerminalArg(arg, platform) {
+    const plat = platform || process.platform;
+    const raw = String(arg === undefined || arg === null ? '' : arg);
+    if (plat === 'win32') {
+        return `'${raw.replace(/'/g, "''")}'`;
+    }
+    return `'${raw.replace(/'/g, "'\\''")}'`;
+}
+
 function estimateTokenCount(text) {
     if (!text || typeof text !== 'string') {
         return 0;
@@ -104,13 +113,46 @@ function findSymbolEndLine(lines, startLine, useIndent) {
 
     let depth = 0;
     let opened = false;
+    let inBlockComment = false;
     for (let j = startLine; j < lines.length; j++) {
         const line = lines[j];
+        let quoteChar = null;
         for (let k = 0; k < line.length; k++) {
-            if (line[k] === '{') {
+            const ch = line[k];
+            const next = line[k + 1];
+            if (inBlockComment) {
+                if (ch === '*' && next === '/') {
+                    inBlockComment = false;
+                    k++;
+                }
+                continue;
+            }
+            if (quoteChar) {
+                if (ch === '\\') {
+                    k++;
+                    continue;
+                }
+                if (ch === quoteChar) {
+                    quoteChar = null;
+                }
+                continue;
+            }
+            if (ch === '/' && next === '/') {
+                break;
+            }
+            if (ch === '/' && next === '*') {
+                inBlockComment = true;
+                k++;
+                continue;
+            }
+            if (ch === '"' || ch === "'" || ch === '`') {
+                quoteChar = ch;
+                continue;
+            }
+            if (ch === '{') {
                 depth++;
                 opened = true;
-            } else if (line[k] === '}') {
+            } else if (ch === '}') {
                 depth--;
                 if (opened && depth <= 0) {
                     return j;
@@ -229,6 +271,7 @@ function buildSidebarHtml(state) {
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline';" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
         body {
@@ -317,6 +360,7 @@ function buildSidebarHtml(state) {
 
 module.exports = {
     resolveExecutable,
+    quoteTerminalArg,
     estimateTokenCount,
     parseScanJson,
     formatCompactTokens,
@@ -325,3 +369,4 @@ module.exports = {
     buildSymbolContract,
     buildSidebarHtml
 };
+
