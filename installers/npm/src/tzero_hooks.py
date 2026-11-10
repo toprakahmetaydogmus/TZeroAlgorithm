@@ -300,7 +300,9 @@ def evaluate_pre_tool_use(
 
     file_path = str(
         tool_input.get("file_path")
+        or tool_input.get("filepath")
         or tool_input.get("path")
+        or tool_input.get("Path")
         or tool_input.get("AbsolutePath")
         or tool_input.get("TargetFile")
         or "snippet.txt"
@@ -408,8 +410,11 @@ def evaluate_post_tool_use(
 
     file_path = str(
         tool_input.get("file_path")
+        or tool_input.get("filepath")
         or tool_input.get("path")
+        or tool_input.get("Path")
         or tool_input.get("AbsolutePath")
+        or tool_input.get("TargetFile")
         or "module.py"
     )
 
@@ -443,7 +448,7 @@ def build_claude_cursor_hook_config() -> Dict[str, Any]:
         "hooks": {
             "PreToolUse": [
                 {
-                    "matcher": "Write|Edit|MultiEdit|Bash",
+                    "matcher": "Write|Edit|MultiEdit|Bash|Read",
                     "hooks": [{"type": "command", "command": "tzero hook --event PreToolUse"}],
                 }
             ],

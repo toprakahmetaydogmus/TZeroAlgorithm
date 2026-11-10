@@ -378,6 +378,30 @@ class TestTZeroHooks(unittest.TestCase):
             claude_file = os.path.join(tmp_dir, ".claude", "settings.local.json")
             self.assertTrue(os.path.exists(claude_file))
 
+    def test_build_claude_cursor_hook_config_includes_read_in_pre_tool_use(self):
+        cfg = tzero_hooks.build_claude_cursor_hook_config()
+        pre_hooks = cfg.get("hooks", {}).get("PreToolUse", [])
+        self.assertGreaterEqual(len(pre_hooks), 1)
+        matcher = pre_hooks[0].get("matcher", "")
+        matcher_tokens = matcher.split("|")
+        for required_tool in ["Write", "Edit", "MultiEdit", "Bash", "Read"]:
+            self.assertIn(
+                required_tool,
+                matcher_tokens,
+                f"Expected '{required_tool}' in PreToolUse matcher '{matcher}'",
+            )
+
+    def test_pre_tool_use_path_resolution_tolerates_filepath_and_path_keys(self):
+        for key in ["file_path", "filepath", "path", "Path", "AbsolutePath", "TargetFile"]:
+            verdict = tzero_hooks.evaluate_pre_tool_use({
+                "tool_name": "Read",
+                "tool_input": {key: ".env"},
+            })
+            self.assertEqual(
+                verdict.get("decision"), "block",
+                f"Expected block for key '{key}' pointing to .env, got {verdict}",
+            )
+
 
 if __name__ == "__main__":
     unittest.main()
