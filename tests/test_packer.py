@@ -96,6 +96,56 @@ class TestTokenBudgetPacker(unittest.TestCase):
         res = pack_workspace(workspace_dir=self.ws, budget_tokens=600)
         self.assertIsNotNone(res.bundle_text)
 
+    def test_cache_aligned_prefix_stability(self):
+        res_a = pack_workspace(workspace_dir=self.ws, budget_tokens=6000, focus="main", cache_aligned=True)
+        res_b = pack_workspace(workspace_dir=self.ws, budget_tokens=6000, focus="service", cache_aligned=True)
+        marker = "<!-- TZERO_DYNAMIC_SUFFIX -->"
+        self.assertIn(marker, res_a.bundle_text)
+        self.assertIn(marker, res_b.bundle_text)
+        prefix_a, suffix_a = res_a.bundle_text.split(marker, 1)
+        prefix_b, suffix_b = res_b.bundle_text.split(marker, 1)
+        self.assertEqual(prefix_a, prefix_b)
+        self.assertIn("main.py", suffix_a)
+        self.assertIn("service.py", suffix_b)
+
+    def test_scan_workspace_uncapped_and_pagerank_prioritized(self):
+        with tempfile.TemporaryDirectory() as big_ws:
+            hub_path = os.path.join(big_ws, "zz_central_hub.py")
+            with open(hub_path, "w", encoding="utf-8") as f:
+                f.write(
+                    "class CentralHub:\n"
+                    "    def dispatch(self, payload: dict) -> bool:\n"
+                    "        return bool(payload)\n"
+                )
+            for i in range(165):
+                with open(os.path.join(big_ws, f"leaf_{i:03d}.py"), "w", encoding="utf-8") as f:
+                    f.write(
+                        "from zz_central_hub import CentralHub\n\n"
+                        f"def worker_{i}(x: int) -> int:\n"
+                        "    return x + 1\n"
+                    )
+            all_entries = TokenBudgetPacker.scan_workspace(big_ws)
+            self.assertEqual(len(all_entries), 166)
+            capped_entries = TokenBudgetPacker.scan_workspace(big_ws, max_files=25)
+            self.assertEqual(len(capped_entries), 25)
+            self.assertTrue(any(e.rel_path == "zz_central_hub.py" for e in capped_entries))
+
+    def test_t2_light_preserves_docstrings_over_t3_ultra(self):
+        from tzero_polyglot import PolyglotTokenReducer
+        ts_code = (
+            "/** Validates incoming token payload and enforces policy. */\n"
+            "export function verifyToken(raw: string): boolean {\n"
+            "    // internal step comment\n"
+            "    const cleaned = raw.trim();\n"
+            "    return cleaned.length > 0;\n"
+            "}\n"
+        )
+        light = PolyglotTokenReducer.reduce_code(ts_code, "auth.ts", mode="light")
+        ultra = PolyglotTokenReducer.reduce_code(ts_code, "auth.ts", mode="ultra")
+        self.assertIn("Validates incoming token payload", light)
+        self.assertNotIn("Validates incoming token payload", ultra)
+        self.assertGreater(len(light), len(ultra))
+
 
 if __name__ == "__main__":
     unittest.main()

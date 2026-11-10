@@ -78,6 +78,19 @@ class TestGenerator(unittest.TestCase):
         self.assertIn("Rule T-003: AST Interface Contract Fidelity", res)
         self.assertIn("Rule T-004: Anti-Pattern & Maintainability Guard", res)
 
+    def test_generate_offline_context_cache_aligned(self):
+        selected = ["z_mod.py", "a_mod.py"]
+        snippets = {
+            "z_mod.py": "def z_fn(): pass",
+            "a_mod.py": "def a_fn(): pass",
+        }
+        res_a = generate_offline_context("C:/projects/demo", selected, snippets, cache_aligned=True)
+        res_b = generate_offline_context("C:/projects/other_view", selected, snippets, cache_aligned=True)
+        marker = "<!-- TZERO_DYNAMIC_SUFFIX -->"
+        self.assertIn(marker, res_a)
+        self.assertIn(marker, res_b)
+        self.assertEqual(res_a.split(marker, 1)[0], res_b.split(marker, 1)[0])
+
 
 if __name__ == "__main__":
     unittest.main()

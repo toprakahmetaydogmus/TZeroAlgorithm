@@ -2796,7 +2796,12 @@ class ContextGenerator:
             raise e
 
 
-def generate_offline_context(project_dir: str, selected_files: List[str], file_snippets: Dict[str, str]) -> str:
+def generate_offline_context(
+    project_dir: str,
+    selected_files: List[str],
+    file_snippets: Dict[str, str],
+    cache_aligned: bool = False,
+) -> str:
     """Generates an enterprise-grade hierarchical T-Zero context tree offline without API call.
     
     Adheres strictly to the T-Zero 4-Tier Context Architecture (T-1 to T-4)
@@ -2860,6 +2865,64 @@ def generate_offline_context(project_dir: str, selected_files: List[str], file_s
 
     tree_lines = [f"├── {f}" for f in sorted(selected_files)]
     tree_ascii = "\n".join(tree_lines)
+
+    if cache_aligned:
+        static_prefix = f"""# T-Zero Context Tree (KV-Cache Aligned)
+
+> **Engine:** Siber Akademi T-Zero Context Architect V3 (AST Pruning & Zero-Leak Engine)
+> **Security:** 100% Zero-Leak (No secrets, no API keys, client-side offline execution)
+
+---
+
+## 🛡️ Tier T-4: T-Zero Algorithm Rules & Guardrails
+
+The following four canonical T-Zero Algorithm Rules govern this codebase:
+
+### 🔒 Rule T-001: Zero-Leak Isolation
+- **Directive:** NEVER commit, embed, or transmit secrets, passwords, auth tokens, or private API keys.
+- **Enforcement:** Client-side regex & Shannon entropy inspection (`H(S) > 4.5`). Sensitive tokens are masked as `[REDACTED_BY_TZERO_SECURITY_GUARD]`.
+
+### 🏛️ Rule T-002: Architectural Boundary Enforcement
+- **Directive:** Strict architectural layering defined in `tzero.rules.json`. Core domain logic must never import visual UI; data models must decouple from presentation/controllers.
+- **Enforcement:** Enforced via AST import graph analysis and CI boundary gates (`ArchitectureRuleEngine`).
+
+### 📝 Rule T-003: AST Interface Contract Fidelity
+- **Directive:** Class declarations, method signatures, return type annotations, parameter schemas, and docstrings must remain 100% syntactically valid and structurally complete.
+- **Enforcement:** AST compiler preservation ensures AI coding agents understand exact interface boundaries with zero hallucination.
+
+### ⚡ Rule T-004: Anti-Pattern & Maintainability Guard
+- **Directive:** Guard against high cyclomatic complexity, code bloat, and maintainability erosion.
+- **Enforcement:** Flags functions with >30 lines, parameter lists with >6 arguments, missing docstrings, global keyword abuse, and copy-pasted duplicate code blocks (6+ lines).
+
+---
+
+## 🗺️ Tier T-1: Architecture Overview & Physical Topology
+
+```
+{tree_ascii}
+```
+
+---
+
+## 🔗 Tier T-2: Module Dependencies & Import Hierarchy
+
+- **Detected Dependencies / Imports:** {deps_str}
+- **Component Count:** {len(selected_files)} active modules mapped
+
+---
+
+## 📑 Tier T-3: Module Reference & Signatures (AST Contracts)
+
+All internal function and method implementation bodies are pruned using semantic ellipses (`...`),
+preserving 100% syntactically valid type annotations, arguments, classes, and docstrings:
+
+{modules_str}"""
+        dynamic_suffix = f"""\n<!-- TZERO_DYNAMIC_SUFFIX -->
+- **Project:** `{project_name}`
+- **Workspace:** `{project_dir}`
+- **Analyzed Modules:** {len(selected_files)} files | ~{total_lines} lines of code
+"""
+        return static_prefix + dynamic_suffix
 
     return f"""# {project_name} — T-Zero Context Tree
 
@@ -8736,6 +8799,7 @@ def main():
     parser.add_argument("--pack", nargs="?", const=16000, type=int, default=None, metavar="BUDGET", help="Pack codebase into an exact token budget (default: 16000 tokens)")
     parser.add_argument("--focus", default="", metavar="TARGET", help="Focus file or semantic search query for context budget packing")
     parser.add_argument("--pack-out", default=None, metavar="FILE", help="Output file for packed context bundle (default: stdout)")
+    parser.add_argument("--cache-aligned", action="store_true", help="Order context for KV-cache prefix stability (immutable static prefix before dynamic query suffix)")
     parser.add_argument("--commit-msg", action="store_true", help="Generate Conventional Commit message from local AST git diff ($0 local engine)")
     parser.add_argument("--changelog", nargs="?", const="v10.9.0", default=None, metavar="VERSION", help="Generate release CHANGELOG markdown from git history")
     parser.add_argument("--ci", choices=["github", "gitlab", "pre-commit", "all"], default=None, help="Install turnkey CI/CD security and verification workflow")
@@ -9557,7 +9621,8 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
         budget = args.pack
         focus = getattr(args, "focus", "")
         out_f = getattr(args, "pack_out", None)
-        res = pack_workspace(workspace_dir=args.dir, budget_tokens=budget, focus=focus, out_file=out_f)
+        cache_aligned = getattr(args, "cache_aligned", False)
+        res = pack_workspace(workspace_dir=args.dir, budget_tokens=budget, focus=focus, out_file=out_f, cache_aligned=cache_aligned)
         if out_f:
             print(f"\033[32m[SUCCESS] Packed context bundle ({res.total_tokens:,} tokens, {res.utilization_pct}% capacity) saved to: {out_f}\033[0m")
         else:
