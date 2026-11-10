@@ -38,8 +38,15 @@ class TestTZeroDashboard(unittest.TestCase):
                 "/api/bridge/reverse",
                 "/api/merge/heal",
                 "/api/blackboard",
+                "/api/federation/peers",
+                "/api/federation/impact",
+                "/api/hooks/preview",
+                "/api/scip/summary",
             ):
                 self.assertIn(endpoint, body, f"Dashboard UI missing panel wiring for {endpoint}")
+            self.assertIn("12 Live Endpoints", body)
+            for tab_id in ("tab-federation", "tab-hooks", "tab-scip"):
+                self.assertIn(tab_id, body)
 
     def test_get_api_stats(self):
         url = f"http://localhost:{self.test_port}/api/stats"
@@ -176,6 +183,91 @@ class TestTZeroDashboard(unittest.TestCase):
             self.assertEqual(resp.status, 200)
             data = json.loads(resp.read().decode("utf-8"))
             self.assertIn("markdown", data)
+
+    def test_get_api_federation_peers(self):
+        url = f"http://localhost:{self.test_port}/api/federation/peers"
+        with urllib.request.urlopen(url) as resp:
+            self.assertEqual(resp.status, 200)
+            data = json.loads(resp.read().decode("utf-8"))
+            self.assertTrue(data.get("success"))
+            self.assertIsInstance(data.get("peers"), list)
+
+    def test_get_api_hooks_preview(self):
+        url = f"http://localhost:{self.test_port}/api/hooks/preview"
+        with urllib.request.urlopen(url) as resp:
+            self.assertEqual(resp.status, 200)
+            data = json.loads(resp.read().decode("utf-8"))
+            self.assertTrue(data.get("success"))
+            hooks = data.get("config", {}).get("hooks", {})
+            self.assertIn("PreToolUse", hooks)
+            self.assertIn("PostToolUse", hooks)
+
+    def test_post_api_federation_impact(self):
+        url = f"http://localhost:{self.test_port}/api/federation/impact"
+        empty_req = urllib.request.Request(
+            url,
+            data=json.dumps({"symbol": ""}).encode("utf-8"),
+            headers={"Content-Type": "application/json"},
+        )
+        with urllib.request.urlopen(empty_req) as resp:
+            self.assertEqual(resp.status, 200)
+            err_data = json.loads(resp.read().decode("utf-8"))
+            self.assertFalse(err_data.get("success"))
+            self.assertEqual(err_data.get("error"), "symbol required")
+
+        ok_req = urllib.request.Request(
+            url,
+            data=json.dumps({"symbol": "PolyglotTokenReducer"}).encode("utf-8"),
+            headers={"Content-Type": "application/json"},
+        )
+        with urllib.request.urlopen(ok_req) as resp:
+            self.assertEqual(resp.status, 200)
+            data = json.loads(resp.read().decode("utf-8"))
+            self.assertTrue(data.get("success"))
+            self.assertEqual(data.get("symbol"), "PolyglotTokenReducer")
+            self.assertIsInstance(data.get("local_hits"), list)
+            self.assertGreater(len(data["local_hits"]), 0)
+            self.assertIn("total_impacted_files", data)
+
+    def test_post_api_scip_summary(self):
+        import os
+        import tempfile
+
+        url = f"http://localhost:{self.test_port}/api/scip/summary"
+        missing_req = urllib.request.Request(
+            url,
+            data=json.dumps({"path": "nonexistent_scip_index_999.scip"}).encode("utf-8"),
+            headers={"Content-Type": "application/json"},
+        )
+        with urllib.request.urlopen(missing_req) as resp:
+            self.assertEqual(resp.status, 200)
+            err_data = json.loads(resp.read().decode("utf-8"))
+            self.assertFalse(err_data.get("success"))
+            self.assertIn("error", err_data)
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            scip_file = os.path.join(tmpdir, "index.scip.json")
+            with open(scip_file, "w", encoding="utf-8") as f:
+                json.dump({
+                    "documents": [
+                        {"relative_path": "a.py", "occurrences": [{"symbol": "py a.py/foo.", "range": [1, 0], "symbol_roles": 1}]},
+                        {"relative_path": "b.py", "occurrences": [{"symbol": "py a.py/foo.", "range": [3, 4], "symbol_roles": 0}]},
+                    ]
+                }, f)
+
+            ok_req = urllib.request.Request(
+                url,
+                data=json.dumps({"path": scip_file}).encode("utf-8"),
+                headers={"Content-Type": "application/json"},
+            )
+            with urllib.request.urlopen(ok_req) as resp:
+                self.assertEqual(resp.status, 200)
+                data = json.loads(resp.read().decode("utf-8"))
+                self.assertTrue(data.get("success"))
+                self.assertEqual(data.get("format"), "scip")
+                self.assertEqual(data.get("documents"), 2)
+                self.assertGreaterEqual(data.get("symbols_indexed", 0), 1)
+                self.assertEqual(data.get("edges"), {"b.py": ["a.py"]})
 
 if __name__ == "__main__":
     unittest.main()

@@ -753,9 +753,9 @@ impl SwarmCluster {
       <div class="panel-header">
         <div>
           <div class="panel-title">Enterprise Engineering Suite (Live API Workbench)</div>
-          <div class="panel-sub">Execute local AST diagnostics, budget certificates, SemVer contract diffs, mutation scoring, polyglot bridge, merge healing &amp; blackboard graph</div>
+          <div class="panel-sub">Execute local AST diagnostics, budget certificates, SemVer contract diffs, mutation scoring, polyglot bridge, merge healing, blackboard, federation, hooks &amp; SCIP graph</div>
         </div>
-        <span class="panel-badge">8 Live Endpoints</span>
+        <span class="panel-badge">12 Live Endpoints</span>
       </div>
       <div style="padding: 20px;">
         <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px;" id="suiteTabs">
@@ -767,6 +767,9 @@ impl SwarmCluster {
           <button class="btn-superdesign suite-tab-btn" onclick="switchSuiteTab('bridge', this)">Polyglot Bridge</button>
           <button class="btn-superdesign suite-tab-btn" onclick="switchSuiteTab('merge', this)">Merge Healer</button>
           <button class="btn-superdesign suite-tab-btn" onclick="switchSuiteTab('blackboard', this)">Blackboard</button>
+          <button class="btn-superdesign suite-tab-btn" onclick="switchSuiteTab('federation', this)">Federation</button>
+          <button class="btn-superdesign suite-tab-btn" onclick="switchSuiteTab('hooks', this)">Hooks Guard</button>
+          <button class="btn-superdesign suite-tab-btn" onclick="switchSuiteTab('scip', this)">SCIP Graph</button>
         </div>
         <div id="tab-debt" class="suite-pane" style="display:block;">
           <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
@@ -821,6 +824,25 @@ x = 2
         </div>
         <div id="tab-blackboard" class="suite-pane" style="display:none;">
           <button class="btn-run" onclick="runSuiteApi('/api/blackboard', 'GET')">Inspect Causal Blackboard Graph</button>
+        </div>
+        <div id="tab-federation" class="suite-pane" style="display:none;">
+          <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:10px;">
+            <input id="fedSymbol" value="PolyglotTokenReducer" placeholder="Symbol name" style="flex:1; min-width:180px; padding:8px 12px; background:var(--bg-canvas); color:var(--text-main); border:1px solid var(--border); border-radius:6px; font-family:var(--font-code);" />
+            <input id="fedScipPath" value="" placeholder="Optional SCIP/LSIF index path" style="flex:1; min-width:180px; padding:8px 12px; background:var(--bg-canvas); color:var(--text-main); border:1px solid var(--border); border-radius:6px; font-family:var(--font-code);" />
+          </div>
+          <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+            <button class="btn-run" onclick="runSuiteApi('/api/federation/peers', 'GET')">List Federation Peers</button>
+            <button class="btn-run" onclick="runSuiteApi('/api/federation/impact', 'POST', {symbol: document.getElementById('fedSymbol').value, scip_path: document.getElementById('fedScipPath').value})">Analyze Cross-Repo Impact</button>
+          </div>
+        </div>
+        <div id="tab-hooks" class="suite-pane" style="display:none;">
+          <button class="btn-run" onclick="runSuiteApi('/api/hooks/preview', 'GET')">Preview PreToolUse / PostToolUse Hooks</button>
+        </div>
+        <div id="tab-scip" class="suite-pane" style="display:none;">
+          <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+            <input id="scipPath" value="index.scip" placeholder="Path to .scip / .lsif / .json index" style="flex:1; min-width:200px; padding:8px 12px; background:var(--bg-canvas); color:var(--text-main); border:1px solid var(--border); border-radius:6px; font-family:var(--font-code);" />
+            <button class="btn-run" onclick="runSuiteApi('/api/scip/summary', 'POST', {path: document.getElementById('scipPath').value})">Inspect SCIP / LSIF Summary</button>
+          </div>
         </div>
         <pre id="suiteResult" style="margin-top:14px; padding:14px; background:var(--bg-canvas); border:1px solid var(--border); border-radius:8px; font-family:var(--font-code); font-size:12px; color:var(--sky); max-height:260px; overflow:auto;">Select an Enterprise Suite tab and execute a local AST operation.</pre>
       </div>
@@ -1547,6 +1569,22 @@ class DashboardRequestHandler(http.server.BaseHTTPRequestHandler):
         # Silence default HTTP server console logging to avoid noise
         pass
 
+    def _read_json_body(self) -> Dict[str, Any]:
+        """Reads and parses a JSON object request body safely."""
+        content_length = int(self.headers.get("Content-Length", 0) or 0)
+        body = self.rfile.read(content_length).decode("utf-8", errors="replace")
+        if not body.strip():
+            return {}
+        parsed = json.loads(body)
+        return parsed if isinstance(parsed, dict) else {}
+
+    def _send_json(self, payload: Dict[str, Any], status: int = 200) -> None:
+        """Writes a UTF-8 JSON response with standard headers."""
+        self.send_response(status)
+        self.send_header("Content-Type", "application/json")
+        self.end_headers()
+        self.wfile.write(json.dumps(payload, ensure_ascii=False).encode("utf-8"))
+
     def do_GET(self):
         parsed = urllib.parse.urlparse(self.path)
         if parsed.path in ("/", "/index.html"):
@@ -1592,6 +1630,20 @@ class DashboardRequestHandler(http.server.BaseHTTPRequestHandler):
             self.send_header("Content-Type", "application/json")
             self.end_headers()
             self.wfile.write(json.dumps(resp, ensure_ascii=False).encode("utf-8"))
+        elif parsed.path == "/api/federation/peers":
+            try:
+                from tzero_federation import FederationSyncEngine
+                resp = {"success": True, "peers": FederationSyncEngine.list_peers(".")}
+            except Exception as e:
+                resp = {"success": False, "error": str(e)}
+            self._send_json(resp)
+        elif parsed.path == "/api/hooks/preview":
+            try:
+                from tzero_hooks import build_claude_cursor_hook_config
+                resp = {"success": True, "config": build_claude_cursor_hook_config()}
+            except Exception as e:
+                resp = {"success": False, "error": str(e)}
+            self._send_json(resp)
         else:
             self.send_response(404)
             self.end_headers()
@@ -1819,10 +1871,34 @@ class DashboardRequestHandler(http.server.BaseHTTPRequestHandler):
             except Exception as e:
                 resp = {"success": False, "error": str(e)}
 
-            self.send_response(200)
-            self.send_header("Content-Type", "application/json")
-            self.end_headers()
-            self.wfile.write(json.dumps(resp, ensure_ascii=False).encode("utf-8"))
+            self._send_json(resp)
+        elif parsed.path == "/api/federation/impact":
+            try:
+                payload = self._read_json_body()
+                symbol = str(payload.get("symbol") or "").strip()
+                scip_path = str(payload.get("scip_path") or "").strip() or None
+                if not symbol:
+                    resp = {"success": False, "error": "symbol required"}
+                else:
+                    from tzero_federation import FederationSyncEngine
+                    res = FederationSyncEngine.analyze_cross_repo_impact(".", symbol, scip_path=scip_path)
+                    resp = {"success": True, **res}
+            except Exception as e:
+                resp = {"success": False, "error": str(e)}
+            self._send_json(resp)
+        elif parsed.path == "/api/scip/summary":
+            try:
+                payload = self._read_json_body()
+                scip_path = str(payload.get("path") or "").strip()
+                if not scip_path or not os.path.isfile(scip_path):
+                    resp = {"success": False, "error": f"SCIP/LSIF index file not found: {scip_path or '(empty)'}"}
+                else:
+                    from tzero_scip import ScipIndexImporter
+                    graph = ScipIndexImporter.load(scip_path)
+                    resp = {"success": True, **graph.export_tzero_graph()}
+            except Exception as e:
+                resp = {"success": False, "error": str(e)}
+            self._send_json(resp)
         else:
             self.send_response(404)
             self.end_headers()

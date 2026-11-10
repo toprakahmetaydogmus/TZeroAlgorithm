@@ -29,7 +29,10 @@ test('package.json defines 10.9.0 metadata, sidebar viewContainer, and 10.9 comm
         'tzero.mutate',
         'tzero.bridge',
         'tzero.mergeHeal',
-        'tzero.refreshMetrics'
+        'tzero.refreshMetrics',
+        'tzero.lspCheck',
+        'tzero.hookInstall',
+        'tzero.federationImpact'
     ]) {
         assert.ok(commandIds.has(required), `Missing command: ${required}`);
     }
@@ -128,6 +131,9 @@ test('core.js renders offline sidebar HTML with live metrics and command dispatc
     assert.match(html, /85\.0%/);
     assert.match(html, /tzero\.debt/);
     assert.match(html, /tzero\.golden/);
+    assert.match(html, /tzero\.lspCheck/);
+    assert.match(html, /tzero\.hookInstall/);
+    assert.match(html, /tzero\.federationImpact/);
     assert.match(html, /Debt Score: 92\/100/);
     assert.match(html, /Content-Security-Policy/);
     assert.doesNotMatch(html, /https?:\/\/cdn\./i);
@@ -160,5 +166,16 @@ test('extension.js invokes compatible tzero_v3 CLI flags for init and pipe compr
     assert.doesNotMatch(extSrc, /\['--init',\s*wsRoot\]/);
     assert.match(extSrc, /'--pipe'/);
     assert.match(extSrc, /\['--init',\s*'all'\]/);
+});
+
+test('extension.js registers v11 commands (lspCheck, hookInstall, federationImpact)', () => {
+    const extSrc = fs.readFileSync(path.join(extRoot, 'src', 'extension.js'), 'utf8');
+    assert.match(extSrc, /registerCommand\('tzero\.lspCheck'/);
+    assert.match(extSrc, /'--check-arch'/);
+    assert.match(extSrc, /registerCommand\('tzero\.hookInstall'/);
+    assert.match(extSrc, /'--hook-install',\s*'all'/);
+    assert.match(extSrc, /registerCommand\('tzero\.federationImpact'/);
+    assert.match(extSrc, /showInputBox/);
+    assert.match(extSrc, /'--federation',\s*'impact',\s*'--federation-symbol'/);
 });
 

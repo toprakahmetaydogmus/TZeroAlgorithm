@@ -5085,6 +5085,45 @@ def create_http_app(mode: Optional[str] = None, host: str = "127.0.0.1") -> Any:
     raise RuntimeError("Installed MCP SDK server does not expose streamable_http_app or sse_app.")
 
 
+def _run_http_fallback(server: Any, host: str, port: int) -> None:
+    """Runs streamable-http transport when uvicorn is unavailable, honoring host/port."""
+    settings = getattr(server, "settings", None)
+    if settings is not None:
+        if hasattr(settings, "host"):
+            try:
+                settings.host = host
+            except Exception:
+                pass
+        if hasattr(settings, "port"):
+            try:
+                settings.port = port
+            except Exception:
+                pass
+
+    run_kwargs: Dict[str, Any] = {"transport": "streamable-http"}
+    try:
+        run_params = inspect.signature(server.run).parameters
+        has_varkw = any(p.kind == inspect.Parameter.VAR_KEYWORD for p in run_params.values())
+    except (TypeError, ValueError):
+        run_params = {}
+        has_varkw = False
+
+    http_runner = getattr(server, "run_streamable_http_async", None)
+    http_params = {}
+    if http_runner is not None:
+        try:
+            http_params = inspect.signature(http_runner).parameters
+        except (TypeError, ValueError):
+            http_params = {}
+
+    if "host" in run_params or (has_varkw and (not http_params or "host" in http_params)):
+        run_kwargs["host"] = host
+    if "port" in run_params or (has_varkw and (not http_params or "port" in http_params)):
+        run_kwargs["port"] = port
+
+    server.run(**run_kwargs)
+
+
 def main():
     """Main execution entrypoint for the T-Zero MCP stdio / Streamable HTTP server."""
     if "--version" in sys.argv[1:]:
@@ -5160,7 +5199,7 @@ def main():
             return
         except ImportError:
             server = create_mcp_server()
-            server.run(transport="streamable-http")
+            _run_http_fallback(server, host=host, port=port)
             return
 
     # stdout is the MCP protocol channel: any stray log line there corrupts the JSON-RPC

@@ -171,6 +171,9 @@ function activate(context) {
             { label: '$(beaker) AST Mutation Test Suite (--mutate)', command: 'tzero.mutate' },
             { label: '$(arrow-swap) Polyglot Type Bridge (--bridge)', command: 'tzero.bridge' },
             { label: '$(git-merge) Semantic 3-Way Merge Healer (--merge-heal)', command: 'tzero.mergeHeal' },
+            { label: '$(shield) Check Architecture & Zero-Leak Diagnostics (--check-arch)', command: 'tzero.lspCheck' },
+            { label: '$(plug) Install AI Lifecycle Hooks (--hook-install all)', command: 'tzero.hookInstall' },
+            { label: '$(repo-forked) Cross-Repo Federation Impact (--federation impact)', command: 'tzero.federationImpact' },
             { label: '$(eye) Autonomous PR Review (--review)', command: 'tzero.review' },
             { label: '$(watch) Live AST Context Watcher (--watch)', command: 'tzero.watch' },
             { label: '$(tools) System Diagnostics (--doctor)', command: 'tzero.doctor' },
@@ -332,6 +335,31 @@ function activate(context) {
         await executeOutputCommand('Semantic Merge Healer', ['--merge-heal', filePath], path.dirname(filePath));
     });
 
+    const lspCheckCmd = vscode.commands.registerCommand('tzero.lspCheck', async () => {
+        const wsRoot = getWorkspaceRoot() || '.';
+        await executeOutputCommand('Architecture & Zero-Leak Check', ['--check-arch'], wsRoot);
+    });
+
+    const hookInstallCmd = vscode.commands.registerCommand('tzero.hookInstall', async () => {
+        const wsRoot = getWorkspaceRoot() || '.';
+        await executeOutputCommand('Install Lifecycle Hooks', ['--hook-install', 'all'], wsRoot);
+    });
+
+    const federationImpactCmd = vscode.commands.registerCommand('tzero.federationImpact', async () => {
+        const wsRoot = getWorkspaceRoot() || '.';
+        const sym = await vscode.window.showInputBox({
+            prompt: 'Enter symbol name for cross-repo federation impact analysis'
+        });
+        if (!sym || !sym.trim()) {
+            return;
+        }
+        await executeOutputCommand(
+            'Federation Impact',
+            ['--federation', 'impact', '--federation-symbol', sym.trim()],
+            wsRoot
+        );
+    });
+
     const copyContractCmd = vscode.commands.registerCommand('tzero.copySymbolContract', async (filePath, lineNum) => {
         const doc = vscode.workspace.textDocuments.find((d) => d.fileName === filePath)
             || (vscode.window.activeTextEditor && vscode.window.activeTextEditor.document);
@@ -422,6 +450,9 @@ function activate(context) {
         mutateCmd,
         bridgeCmd,
         mergeHealCmd,
+        lspCheckCmd,
+        hookInstallCmd,
+        federationImpactCmd,
         copyContractCmd
     );
 

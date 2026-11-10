@@ -1054,6 +1054,98 @@ diff --git a/core.py b/core.py
         with self.assertRaises(Exception):
             self.run_async(self.server.read_resource("tzero://file/..%2F..%2Fetc%2Fpasswd/skeleton"))
 
+    def test_http_app_initialize_via_starlette_testclient(self):
+        """Verifies create_http_app(mode='canonical') handles JSON-RPC initialize over POST /mcp."""
+        import json as _json
+        from starlette.testclient import TestClient
+
+        old_mode = os.environ.get("TZERO_MCP_TOOL_MODE")
+        try:
+            app = tzero_mcp.create_http_app(mode="canonical")
+            with TestClient(app, base_url="http://127.0.0.1:8765") as client:
+                resp = client.post(
+                    "/mcp",
+                    headers={
+                        "Accept": "application/json, text/event-stream",
+                        "Content-Type": "application/json",
+                    },
+                    json={
+                        "jsonrpc": "2.0",
+                        "id": 1,
+                        "method": "initialize",
+                        "params": {
+                            "protocolVersion": "2025-03-26",
+                            "capabilities": {},
+                            "clientInfo": {"name": "tzero-test", "version": "1.0"},
+                        },
+                    },
+                )
+            self.assertEqual(resp.status_code, 200, resp.text)
+            self.assertIn("serverInfo", resp.text)
+            self.assertIn("capabilities", resp.text)
+
+            payload = None
+            for line in resp.text.splitlines():
+                if line.startswith("data: "):
+                    payload = _json.loads(line[6:])
+                    break
+            if payload is None:
+                payload = resp.json()
+            result = payload.get("result", {})
+            self.assertEqual(result.get("serverInfo", {}).get("name"), "tzero-context-engine")
+            self.assertIn("tools", result.get("capabilities", {}))
+        finally:
+            if old_mode is not None:
+                os.environ["TZERO_MCP_TOOL_MODE"] = old_mode
+            else:
+                os.environ.pop("TZERO_MCP_TOOL_MODE", None)
+
+    def test_http_main_non_uvicorn_fallback_honors_host_and_port(self):
+        """Verifies main() --http fallback passes host/port or configures server.settings cleanly."""
+        import sys
+        import types
+        from unittest import mock
+
+        class StrictSettings:
+            def __setattr__(self, name, value):
+                raise ValueError(f'"Settings" object has no field "{name}"')
+
+        class KwargsHttpServer:
+            def __init__(self):
+                self.settings = StrictSettings()
+                self.calls = []
+
+            async def run_streamable_http_async(self, *, host="127.0.0.1", port=8000, **kwargs):
+                return None
+
+            def run(self, transport="stdio", **kwargs):
+                self.calls.append((transport, kwargs))
+
+        class SettingsOnlyServer:
+            def __init__(self):
+                self.settings = types.SimpleNamespace(host="127.0.0.1", port=8000)
+                self.calls = []
+
+            def run(self, transport="stdio"):
+                self.calls.append((transport, self.settings.host, self.settings.port))
+
+        old_argv = sys.argv[:]
+        try:
+            sys.argv = ["tzero_mcp.py", "--http", "--host", "0.0.0.0", "--port", "9123"]
+            srv1 = KwargsHttpServer()
+            with mock.patch.dict(sys.modules, {"uvicorn": None}), \
+                 mock.patch.object(tzero_mcp, "create_mcp_server", return_value=srv1):
+                tzero_mcp.main()
+            self.assertEqual(srv1.calls, [("streamable-http", {"host": "0.0.0.0", "port": 9123})])
+
+            srv2 = SettingsOnlyServer()
+            with mock.patch.dict(sys.modules, {"uvicorn": None}), \
+                 mock.patch.object(tzero_mcp, "create_mcp_server", return_value=srv2):
+                tzero_mcp.main()
+            self.assertEqual(srv2.calls, [("streamable-http", "0.0.0.0", 9123)])
+        finally:
+            sys.argv = old_argv
+
 
 if __name__ == "__main__":
     unittest.main()

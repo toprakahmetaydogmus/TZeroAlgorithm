@@ -123,6 +123,18 @@
       {
         "command": "tzero.copySymbolContract",
         "title": "T-Zero: Copy Symbol AST Contract"
+      },
+      {
+        "command": "tzero.lspCheck",
+        "title": "T-Zero: Check Architecture & Zero-Leak Diagnostics (--check-arch)"
+      },
+      {
+        "command": "tzero.hookInstall",
+        "title": "T-Zero: Install AI Lifecycle Hooks (--hook-install all)"
+      },
+      {
+        "command": "tzero.federationImpact",
+        "title": "T-Zero: Cross-Repo Federation Impact (--federation impact)"
       }
     ],
     "menus": {
