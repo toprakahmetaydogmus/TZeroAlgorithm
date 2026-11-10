@@ -11,6 +11,7 @@ Version: 10.5.0
 
 import ast
 import os
+import re
 import sys
 
 if sys.platform == "win32":
@@ -101,16 +102,79 @@ class ArchitecturalPassportGenerator:
         raw_lines = len(content.splitlines())
         raw_tokens = cls._estimate_tokens(content)
 
-        try:
-            tree = ast.parse(content, filename=str(p))
-            module_doc = ast.get_docstring(tree)
-        except SyntaxError:
-            module_doc = None
-            tree = None
+        tree = None
+        module_doc = None
+        is_python = p.suffix.lower() in (".py", ".pyi", "")
+        if is_python:
+            try:
+                tree = ast.parse(content, filename=str(p))
+                module_doc = ast.get_docstring(tree)
+            except SyntaxError:
+                module_doc = None
+                tree = None
 
         symbols: List[SymbolPassport] = []
         internal_deps: Set[str] = set()
         external_deps: Set[str] = set()
+        code_lang = "python"
+        if tree is None and not is_python:
+            from tzero_polyglot import PolyglotTokenReducer
+            reducer = PolyglotTokenReducer()
+            code_lang = reducer.detect_language(str(p)) or p.suffix.lstrip(".") or "text"
+            reduced_sig = reducer.reduce_code(content, filename=str(p), mode="ultra")
+            sym_re = re.compile(
+                r'^\s*(?:export\s+(?:default\s+|async\s+)?)?'
+                r'(?:public\s+|private\s+|protected\s+|static\s+|abstract\s+|async\s+|pub(?:\([^)]*\))?\s+)*'
+                r'(?P<kind>class|interface|struct|enum|trait|impl|fn|func|function|def|type|contract)\s+'
+                r'(?P<name>[A-Za-z_][A-Za-z0-9_]*)'
+            )
+            import_re = re.compile(
+                r'^\s*(?:import\b[^"\']*["\']([^"\']+)["\']|import\s+([A-Za-z0-9_.]+)|use\s+([A-Za-z0-9_:]+))'
+            )
+            lines_list = content.splitlines()
+            reduced_lines = set(l.strip() for l in reduced_sig.splitlines() if l.strip())
+            for idx, line in enumerate(lines_list, start=1):
+                stripped = line.strip()
+                if not stripped:
+                    continue
+                im = import_re.match(stripped)
+                if im:
+                    mod = im.group(1) or im.group(2) or im.group(3)
+                    if mod:
+                        if mod.startswith((".", "/")):
+                            internal_deps.add(mod)
+                        else:
+                            external_deps.add(mod.split("/")[0].split(".")[0].split("::")[0])
+                    continue
+                sm = sym_re.match(stripped)
+                if sm:
+                    raw_kind = sm.group("kind")
+                    kind_norm = (
+                        "class" if raw_kind in ("class", "interface", "struct", "enum", "trait", "contract")
+                        else "function"
+                    )
+                    symbols.append(SymbolPassport(
+                        name=sm.group("name"),
+                        kind=kind_norm,
+                        lineno=idx,
+                        docstring=None,
+                        signatures=[stripped],
+                        complexity=1,
+                    ))
+            if not symbols and reduced_lines:
+                for idx, sig_line in enumerate(reduced_sig.splitlines(), start=1):
+                    s_clean = sig_line.strip()
+                    if s_clean and not s_clean.startswith(("//", "#", "/*", "*")):
+                        symbols.append(SymbolPassport(
+                            name=s_clean.split("(")[0].split("{")[0].strip().split()[-1],
+                            kind="symbol",
+                            lineno=idx,
+                            docstring=None,
+                            signatures=[s_clean],
+                            complexity=1,
+                        ))
+                        if len(symbols) >= 25:
+                            break
 
         if tree:
             for node in tree.body:
@@ -184,13 +248,15 @@ class ArchitecturalPassportGenerator:
         if external_deps:
             md_lines.append(f"- **External Dependencies:** `{', '.join(sorted(external_deps)[:6])}`")
 
-        md_lines.append("\n```python")
+        md_lines.append(f"\n```{code_lang}")
         for sym in symbols:
             doc_str = f"  # {sym.docstring}" if sym.docstring else ""
             if sym.kind == "class":
                 md_lines.append(f"{sym.signatures[0]}{doc_str}")
                 for ms in sym.signatures[1:]:
                     md_lines.append(ms)
+            elif code_lang != "python":
+                md_lines.append(f"{sym.signatures[0]}{doc_str}")
             else:
                 md_lines.append(f"{sym.signatures[0]}: ...{doc_str}")
         md_lines.append("```\n")

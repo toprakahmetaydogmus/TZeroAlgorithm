@@ -237,5 +237,40 @@ class TestCLI(unittest.TestCase):
             self.assertFalse(os.path.exists(os.path.join(tmp, "-")))
 
 
+    def test_scan_json_format(self):
+        import json
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as tmp:
+            with open(os.path.join(tmp, "alpha.py"), "w", encoding="utf-8") as fh:
+                fh.write(
+                    "def process_items(items: list) -> int:\n"
+                    "    total = 0\n"
+                    "    for x in items:\n"
+                    "        total += x * 2\n"
+                    "    return total\n"
+                )
+            with open(os.path.join(tmp, "beta.ts"), "w", encoding="utf-8") as fh:
+                fh.write(
+                    "export function formatLabel(name: string): string {\n"
+                    "    const cleaned = name.trim();\n"
+                    "    return cleaned.toUpperCase();\n"
+                    "}\n"
+                )
+            proc = subprocess.run(
+                [sys.executable, "tzero_v3.py", "--scan", tmp, "--format", "json"],
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+            data = json.loads(proc.stdout)
+            self.assertEqual(data["total_files"], 2)
+            self.assertGreater(data["raw_tokens"], 0)
+            self.assertLessEqual(data["pruned_tokens"], data["raw_tokens"])
+            self.assertIn("savings_pct", data)
+            self.assertIsInstance(data["files"], list)
+            self.assertEqual(len(data["files"]), 2)
+
+
 if __name__ == "__main__":
     unittest.main()

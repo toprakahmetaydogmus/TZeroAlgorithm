@@ -67,5 +67,32 @@ def run_service(name: str) -> None:
             ArchitecturalPassportGenerator.explain_file("non_existent_file_xyz.py")
 
 
+    def test_explain_non_python_typescript(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            ts_path = os.path.join(tmp, "service.ts")
+            with open(ts_path, "w", encoding="utf-8") as fh:
+                fh.write(
+                    "export interface UserConfig {\n"
+                    "    id: number;\n"
+                    "    name: string;\n"
+                    "}\n\n"
+                    "export class TokenService {\n"
+                    "    reduce(input: string): string {\n"
+                    "        return input.trim();\n"
+                    "    }\n"
+                    "}\n\n"
+                    "export function computeRatio(raw: number, pruned: number): number {\n"
+                    "    return raw > 0 ? (1 - pruned / raw) * 100 : 0;\n"
+                    "}\n"
+                )
+            passport = ArchitecturalPassportGenerator.explain_file(ts_path)
+            self.assertGreaterEqual(len(passport.symbols), 2)
+            sym_names = [s.name for s in passport.symbols]
+            self.assertIn("TokenService", sym_names)
+            self.assertIn("computeRatio", sym_names)
+            self.assertIn("TokenService", passport.markdown_passport)
+            self.assertIn("```typescript", passport.markdown_passport)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -8025,15 +8025,54 @@ def launch_gui():
     root.mainloop()
 
 
-def run_scan_cli(target_dir: str):
+def run_scan_cli(target_dir: str, output_format: str = "text"):
     target_dir = os.path.abspath(target_dir)
-    print(f"\n\033[1m\033[36m=== T-ZERO CODEBASE SCANNER ===\033[0m")
-    print(f"Directory: {target_dir}\n")
     if not os.path.exists(target_dir):
-        print(f"\033[31m[ERROR] Directory not found: {target_dir}\033[0m")
+        if output_format == "json":
+            print(json.dumps({"error": f"Directory not found: {target_dir}", "workspace_dir": target_dir}))
+        else:
+            print(f"\n\033[1m\033[36m=== T-ZERO CODEBASE SCANNER ===\033[0m")
+            print(f"Directory: {target_dir}\n")
+            print(f"\033[31m[ERROR] Directory not found: {target_dir}\033[0m")
         sys.exit(1)
+
     scanner = CodebaseScanner()
     files, sizes, snippets = scanner.scan_directory(target_dir)
+
+    if output_format == "json":
+        file_entries = []
+        raw_tokens_total = 0
+        pruned_tokens_total = 0
+        for f in files:
+            sz = sizes.get(f, 0)
+            raw_tok = max(1, sz // 4) if sz > 0 else 0
+            snip = snippets.get(f, "")
+            pruned_tok = max(1, len(snip) // 4) if snip else 0
+            raw_tokens_total += raw_tok
+            pruned_tokens_total += pruned_tok
+            file_entries.append({
+                "file": f,
+                "size_bytes": sz,
+                "raw_tokens": raw_tok,
+                "pruned_tokens": pruned_tok,
+            })
+        savings_pct = (
+            round(max(0.0, (1.0 - (pruned_tokens_total / raw_tokens_total)) * 100.0), 1)
+            if raw_tokens_total > 0
+            else 0.0
+        )
+        print(json.dumps({
+            "workspace_dir": target_dir,
+            "total_files": len(files),
+            "raw_tokens": raw_tokens_total,
+            "pruned_tokens": pruned_tokens_total,
+            "savings_pct": savings_pct,
+            "files": file_entries,
+        }, indent=2))
+        return
+
+    print(f"\n\033[1m\033[36m=== T-ZERO CODEBASE SCANNER ===\033[0m")
+    print(f"Directory: {target_dir}\n")
     print(f"{'File':<55} | {'Size':<10} | {'Tokens':<8}")
     print("-" * 78)
     total_size = 0
@@ -9603,7 +9642,7 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
         target = args.watch or args.dir
         run_watch_mode(target)
     elif args.scan is not None:
-        run_scan_cli(args.scan or args.dir)
+        run_scan_cli(args.scan or args.dir, output_format=getattr(args, "format", "text"))
     elif getattr(args, "vault", None) is not None:
         from tzero_security import ZeroLeakEngine
         target = args.vault or args.dir
