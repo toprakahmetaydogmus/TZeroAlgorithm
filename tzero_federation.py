@@ -149,14 +149,128 @@ class FederationSyncEngine:
                 pass
         return peers
 
+    @classmethod
+    def analyze_cross_repo_impact(
+        cls,
+        workspace_dir: str,
+        symbol_name: str,
+        scip_path: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        if not symbol_name or not str(symbol_name).strip():
+            raise ValueError("symbol_name must be a non-empty string")
+
+        sym = str(symbol_name).strip()
+        pattern = re.compile(rf"\b{re.escape(sym)}\b")
+        abs_ws = os.path.abspath(workspace_dir)
+        local_hits: List[Dict[str, Any]] = []
+
+        # 1. Local workspace scan
+        scip_abs = os.path.abspath(scip_path) if scip_path else None
+        for root, dirs, files in os.walk(abs_ws):
+            dirs[:] = sorted(d for d in dirs if not should_skip_dir(os.path.join(root, d), abs_ws))
+            for fname in sorted(files):
+                fpath = os.path.join(root, fname)
+                if should_skip_file(fpath, abs_ws):
+                    continue
+                if scip_abs and os.path.abspath(fpath) == scip_abs:
+                    continue
+                lang = PolyglotTokenReducer.detect_language(fname)
+                if not lang:
+                    continue
+                try:
+                    with open(fpath, "r", encoding="utf-8", errors="replace") as f:
+                        lines = f.readlines()
+                except OSError:
+                    continue
+
+                matched_lines: List[int] = []
+                total_matches = 0
+                for idx, line in enumerate(lines, 1):
+                    m_count = len(pattern.findall(line))
+                    if m_count > 0:
+                        matched_lines.append(idx)
+                        total_matches += m_count
+
+                if total_matches > 0:
+                    rel = os.path.relpath(fpath, abs_ws).replace("\\", "/")
+                    local_hits.append({
+                        "file": rel,
+                        "matches": total_matches,
+                        "lines": matched_lines,
+                    })
+
+        # 2. Peer federations scan
+        store_dir = os.path.join(abs_ws, FEDERATION_DIR)
+        impacted_peers: List[Dict[str, Any]] = []
+        unverified_peers: List[str] = []
+
+        if os.path.isdir(store_dir):
+            for fname in sorted(os.listdir(store_dir)):
+                if not fname.endswith(".json"):
+                    continue
+                peer_p = os.path.join(store_dir, fname)
+                try:
+                    with open(peer_p, "r", encoding="utf-8", errors="replace") as f:
+                        data = json.load(f)
+                except Exception:
+                    unverified_peers.append(fname[:-5])
+                    continue
+
+                if not isinstance(data, dict) or not cls.verify_manifest(data):
+                    peer_id = (data.get("repo_name") if isinstance(data, dict) else None) or fname[:-5]
+                    unverified_peers.append(str(peer_id))
+                    continue
+
+                repo_name = str(data.get("repo_name") or fname[:-5])
+                for mod in data.get("modules", []):
+                    skel = str(mod.get("skeleton") or "")
+                    m_count = len(pattern.findall(skel))
+                    if m_count > 0:
+                        impacted_peers.append({
+                            "repo_name": repo_name,
+                            "rel_path": str(mod.get("rel_path") or ""),
+                            "lang": str(mod.get("lang") or ""),
+                            "matches": m_count,
+                        })
+
+        # 3. Optional SCIP trace
+        scip_trace: Optional[Dict[str, Any]] = None
+        if scip_path and os.path.isfile(scip_path):
+            try:
+                from tzero_scip import ScipIndexImporter
+                scip_trace = ScipIndexImporter.load(scip_path).trace_symbol(sym)
+            except Exception as e:
+                scip_trace = {"error": str(e)}
+
+        return {
+            "symbol": sym,
+            "local_hits": local_hits,
+            "impacted_peers": impacted_peers,
+            "unverified_peers": unverified_peers,
+            "scip_trace": scip_trace,
+            "total_impacted_files": len(local_hits) + len(impacted_peers),
+        }
+
 
 def run_federation_cli(
     action: str = "list",
     workspace_dir: str = ".",
     target_file: Optional[str] = None,
     repo_name: Optional[str] = None,
+    symbol_name: Optional[str] = None,
+    scip_path: Optional[str] = None,
 ) -> int:
     act = (action or "list").strip().lower()
+    if act == "impact":
+        if not symbol_name or not str(symbol_name).strip():
+            print(
+                json.dumps({"error": "Symbol name required for 'impact' (pass --federation-symbol <symbol>)"}, indent=2),
+                file=sys.stderr,
+            )
+            return 1
+        res = FederationSyncEngine.analyze_cross_repo_impact(workspace_dir, str(symbol_name).strip(), scip_path=scip_path)
+        print(json.dumps(res, indent=2))
+        return 0
     if act in ("import", "verify") and not target_file:
         print(
             json.dumps({"error": f"Target manifest file required for '{act}' (pass --federation-out <file>)"}, indent=2),

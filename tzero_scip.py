@@ -13,7 +13,54 @@ import json
 import os
 import urllib.parse
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Set
+from typing import Any, Dict, Iterator, List, Optional, Set, Tuple
+
+
+def _read_varint(raw: bytes, offset: int = 0) -> Tuple[int, int]:
+    """Reads a varint from raw bytes starting at offset. Returns (value, new_offset)."""
+    val = 0
+    shift = 0
+    length = len(raw)
+    while offset < length:
+        b = raw[offset]
+        offset += 1
+        val |= (b & 0x7F) << shift
+        if not (b & 0x80):
+            return val, offset
+        shift += 7
+        if shift > 64:
+            break
+    return val, offset
+
+
+def _iter_wire_fields(raw: bytes) -> Iterator[Tuple[int, int, Any]]:
+    """Iterates (tag, wire_type, value) tuples from protobuf binary wire bytes."""
+    offset = 0
+    length = len(raw)
+    while offset < length:
+        key, offset = _read_varint(raw, offset)
+        wire_type = key & 0x07
+        tag = key >> 3
+        if tag == 0:
+            break
+        if wire_type == 0:
+            val, offset = _read_varint(raw, offset)
+            yield tag, wire_type, val
+        elif wire_type == 1:
+            val = raw[offset:offset + 8]
+            offset += 8
+            yield tag, wire_type, val
+        elif wire_type == 2:
+            length_delim, offset = _read_varint(raw, offset)
+            val = raw[offset:offset + length_delim]
+            offset += length_delim
+            yield tag, wire_type, val
+        elif wire_type == 5:
+            val = raw[offset:offset + 4]
+            offset += 4
+            yield tag, wire_type, val
+        else:
+            break
 
 
 @dataclass
@@ -214,20 +261,104 @@ class ScipIndexImporter:
         )
 
     @classmethod
+    def from_scip_protobuf_bytes(cls, raw: bytes) -> ScipIndexGraph:
+        if not raw:
+            return ScipIndexGraph(format_name="empty", document_count=0)
+
+        defs: Dict[str, List[SymbolLocation]] = {}
+        refs: Dict[str, List[SymbolLocation]] = {}
+        edges: Dict[str, Set[str]] = {}
+        doc_count = 0
+
+        # Top-level Index: tag 2 = Document (wire type 2)
+        for tag, wtype, doc_data in _iter_wire_fields(raw):
+            if tag != 2 or wtype != 2:
+                continue
+            doc_count += 1
+            rel_path = ""
+            raw_occurrences: List[bytes] = []
+
+            # Document fields: tag 1 = relative_path (str), tag 2 = Occurrence
+            for d_tag, d_wtype, d_val in _iter_wire_fields(doc_data):
+                if d_tag == 1 and d_wtype == 2:
+                    rel_path = d_val.decode("utf-8", errors="replace").replace("\\", "/")
+                elif d_tag == 2 and d_wtype == 2:
+                    raw_occurrences.append(d_val)
+
+            for occ_bytes in raw_occurrences:
+                occ_range: List[int] = []
+                sym = ""
+                roles = 0
+                for o_tag, o_wtype, o_val in _iter_wire_fields(occ_bytes):
+                    if o_tag == 1:
+                        if o_wtype == 2:
+                            off = 0
+                            while off < len(o_val):
+                                n, off = _read_varint(o_val, off)
+                                occ_range.append(n)
+                        elif o_wtype == 0:
+                            occ_range.append(int(o_val))
+                    elif o_tag == 2 and o_wtype == 2:
+                        sym = o_val.decode("utf-8", errors="replace")
+                    elif o_tag == 3 and o_wtype == 0:
+                        roles = int(o_val)
+
+                if not sym:
+                    continue
+
+                ln = int(occ_range[0]) if len(occ_range) > 0 else 0
+                col = int(occ_range[1]) if len(occ_range) > 1 else 0
+                is_def = bool(roles & 1)
+                loc = SymbolLocation(
+                    symbol=sym,
+                    file=rel_path,
+                    line=ln,
+                    column=col,
+                    role="definition" if is_def else "reference",
+                )
+                if is_def:
+                    defs.setdefault(sym, []).append(loc)
+                else:
+                    refs.setdefault(sym, []).append(loc)
+
+        for sym, ref_locs in refs.items():
+            def_files = {d.file for d in defs.get(sym, [])}
+            for rloc in ref_locs:
+                for df in def_files:
+                    if df != rloc.file:
+                        edges.setdefault(rloc.file, set()).add(df)
+
+        return ScipIndexGraph(
+            format_name="scip-protobuf",
+            document_count=doc_count,
+            definitions=defs,
+            references=refs,
+            call_edges=edges,
+        )
+
+    @classmethod
     def load(cls, path: str) -> ScipIndexGraph:
         if not os.path.isfile(path):
             raise FileNotFoundError(f"SCIP/LSIF index file not found: {path}")
-        with open(path, "r", encoding="utf-8", errors="replace") as f:
-            text = f.read().strip()
-        if not text:
+        with open(path, "rb") as f:
+            raw = f.read()
+        if not raw.strip():
             return ScipIndexGraph(format_name="empty", document_count=0)
+
+        if path.lower().endswith(".scip") or b"\x00" in raw:
+            return cls.from_scip_protobuf_bytes(raw)
+
         try:
-            data = json.loads(text)
-            if isinstance(data, dict) and "documents" in data:
-                return cls.from_scip_dict(data)
-        except json.JSONDecodeError:
-            pass
-        return cls.from_lsif_lines(text.splitlines())
+            text = raw.decode("utf-8")
+            try:
+                data = json.loads(text)
+                if isinstance(data, dict) and "documents" in data:
+                    return cls.from_scip_dict(data)
+            except json.JSONDecodeError:
+                pass
+            return cls.from_lsif_lines(text.splitlines())
+        except Exception:
+            return cls.from_scip_protobuf_bytes(raw)
 
 
 def run_scip_import_cli(path: str, symbol: Optional[str] = None) -> int:

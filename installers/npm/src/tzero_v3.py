@@ -8795,9 +8795,11 @@ def main():
     parser.add_argument("--ollama-model", default=None, metavar="MODEL", help="Optional local Ollama model tag for live prompt/completion accuracy benchmark")
     parser.add_argument("--scip-import", default=None, metavar="FILE", help="Import SCIP JSON or LSIF NDJSON cross-language index")
     parser.add_argument("--scip-symbol", default=None, metavar="SYMBOL", help="Optional symbol filter when querying --scip-import")
-    parser.add_argument("--federation", nargs="?", const="list", default=None, metavar="ACTION", help="Cryptographic multi-repo AST federation (export, import, verify, list)")
+    parser.add_argument("--federation", nargs="?", const="list", default=None, metavar="ACTION", help="Cryptographic multi-repo AST federation (export, import, verify, list, impact)")
     parser.add_argument("--federation-out", default=None, metavar="FILE", help="Target manifest file for --federation export/import/verify")
     parser.add_argument("--federation-name", default=None, metavar="NAME", help="Repository identifier for --federation export")
+    parser.add_argument("--federation-symbol", default=None, metavar="SYMBOL", help="Target symbol name for --federation impact cross-repo analysis")
+    parser.add_argument("--federation-scip", default=None, metavar="FILE", help="Optional SCIP/LSIF index to augment --federation impact trace")
     parser.add_argument("--huggingface", "--hf", action="store_true", help="Launch local Hugging Face Space Gradio app or display deployment guide")
     parser.add_argument("--snapshot", nargs="?", const=".", default=None, metavar="DIR", help="Pre-compute sub-8ms AST context snapshot cache (.tzero/snapshot.json)")
     parser.add_argument("--hook", action="store_true", help="Run lifecycle hook guard for Claude Code, Gemini CLI, or Cursor (stdin JSON)")
@@ -9120,6 +9122,8 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
             workspace_dir=args.dir,
             target_file=getattr(args, "federation_out", None),
             repo_name=getattr(args, "federation_name", None),
+            symbol_name=getattr(args, "federation_symbol", None) or getattr(args, "scip_symbol", None),
+            scip_path=getattr(args, "federation_scip", None),
         ))
     elif args.init is not None:
         import addmcp
