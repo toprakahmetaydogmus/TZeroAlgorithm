@@ -1,5 +1,10 @@
 # Changelog
 
+## [11.0.0] - 2026-11-11
+
+- Bundle the reorganized `tzero/` package and desktop icon.
+- Include exact token measurement for selected Python definitions and lossless context updates.
+
 All notable changes to the `tzero-mcp` package are documented in this file.
 
 ## [10.9.0] - 2026-11-07

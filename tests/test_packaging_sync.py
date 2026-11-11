@@ -30,7 +30,7 @@ class TestPackagingAndVersionSync(unittest.TestCase):
     def test_all_release_manifests_share_canonical_version(self):
         pyproject = tomllib.loads((ROOT_DIR / "pyproject.toml").read_text(encoding="utf-8"))
         canonical = pyproject["project"]["version"]
-        self.assertEqual(canonical, "10.9.0")
+        self.assertEqual(canonical, "11.0.0")
 
         server = json.loads((ROOT_DIR / "server.json").read_text(encoding="utf-8"))
         self.assertEqual(server["version"], canonical)
@@ -53,7 +53,7 @@ class TestPackagingAndVersionSync(unittest.TestCase):
             m = re.search(r'version\s+"([^"]+)"', rb_text)
             self.assertIsNotNone(m, f"Version missing in {rb_path}")
             self.assertEqual(m.group(1), canonical, f"Version mismatch in {rb_path}")
-            self.assertIn(f"v{canonical}.tar.gz", rb_text)
+            self.assertIn(f"release-{canonical}.tar.gz", rb_text)
 
         import addmcp
         from tzero import tzero_mcp

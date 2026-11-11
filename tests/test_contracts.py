@@ -227,7 +227,7 @@ class TestSARIFContractReport(unittest.TestCase):
         self.assertEqual(len(sarif.get("runs", [])), 1)
         driver = sarif["runs"][0]["tool"]["driver"]
         self.assertEqual(driver["name"], "T-Zero Contract Guardian")
-        self.assertEqual(driver["version"], "10.9.0")
+        self.assertEqual(driver["version"], "11.0.0")
         rule_ids = {r["id"] for r in driver.get("rules", [])}
         self.assertIn("REQUIRED_PARAMETER_ADDED", rule_ids)
         self.assertIn("RETURN_TYPE_CHANGED", rule_ids)

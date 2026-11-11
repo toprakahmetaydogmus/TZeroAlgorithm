@@ -1,5 +1,12 @@
 # Changelog
 
+## [11.0.0] - 2026-11-11
+
+- Group the Python implementation and desktop assets under `tzero/` and the Windows build script under `scripts/build/`.
+- Select complete Python definitions with `--symbol-context` and measure their exact token count with the optional tokenizer.
+- Create and restore lossless context deltas with SHA-256 verification.
+- Package the desktop application, MCP server, and MCP installer for Windows, plus Python, npm, and VS Code downloads.
+
 ## [10.9.0] - 2026-11-07
 
 ### Added (AST Public API Contract Guardian, Golden Baseline Engine & Technical Debt Index)

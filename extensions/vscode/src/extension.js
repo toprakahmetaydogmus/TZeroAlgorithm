@@ -179,7 +179,7 @@ function activate(context) {
             { label: '$(tools) System Diagnostics (--doctor)', command: 'tzero.doctor' },
             { label: '$(globe) Launch Local Web Dashboard', command: 'tzero.openDashboard' }
         ];
-        const picked = await vscode.window.showQuickPick(items, { placeHolder: 'T-Zero Context Architect Command Center (v10.9.0)' });
+        const picked = await vscode.window.showQuickPick(items, { placeHolder: 'T-Zero Context Architect Command Center (v11.0.0)' });
         if (picked) {
             vscode.commands.executeCommand(picked.command);
         }

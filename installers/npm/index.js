@@ -6,7 +6,7 @@ const path = require("path");
  */
 
 module.exports = {
-  version: "10.8.0",
+  version: require("./package.json").version,
   author: "Toprak Ahmet Aydoğmuş (Siber Akademi)",
   repository: "https://github.com/toprakahmetaydogmus/TZeroAlgorithm",
   srcDir: path.resolve(__dirname, "src"),

@@ -6,8 +6,8 @@ const fs = require('node:fs');
 const extRoot = path.resolve(__dirname, '..');
 const pkg = JSON.parse(fs.readFileSync(path.join(extRoot, 'package.json'), 'utf8'));
 
-test('package.json defines 10.9.0 metadata, sidebar viewContainer, and 10.9 commands with zero runtime deps', () => {
-    assert.equal(pkg.version, '10.9.0');
+test('package.json defines 11.0.0 metadata, sidebar viewContainer, and commands with zero runtime deps', () => {
+    assert.equal(pkg.version, '11.0.0');
     assert.equal(pkg.dependencies === undefined || Object.keys(pkg.dependencies).length === 0, true);
     assert.ok(pkg.contributes.viewsContainers && Array.isArray(pkg.contributes.viewsContainers.activitybar));
     assert.ok(pkg.contributes.views && Array.isArray(pkg.contributes.views.tzeroSidebar));

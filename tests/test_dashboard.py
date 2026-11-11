@@ -26,7 +26,7 @@ class TestTZeroDashboard(unittest.TestCase):
             self.assertEqual(resp.status, 200)
             body = resp.read().decode("utf-8")
             self.assertIn("T-Zero Developer Console", body)
-            self.assertIn("10.9.0", body)
+            self.assertIn("11.0.0", body)
             self.assertIn("MCP TOOLS OPERATIONAL", body)
             for endpoint in (
                 "/api/stats",
@@ -53,7 +53,7 @@ class TestTZeroDashboard(unittest.TestCase):
         with urllib.request.urlopen(url) as resp:
             self.assertEqual(resp.status, 200)
             data = json.loads(resp.read().decode("utf-8"))
-            self.assertEqual(data["version"], "10.9.0")
+            self.assertEqual(data["version"], "11.0.0")
             self.assertGreaterEqual(data["tools_count"], 57)
             self.assertGreater(data["raw_tokens"], 0)
             self.assertGreaterEqual(data["pruned_tokens"], 0)

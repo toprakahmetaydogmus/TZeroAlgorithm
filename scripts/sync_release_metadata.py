@@ -65,7 +65,10 @@ def sync_release_metadata(target_version: str, check_only: bool = False) -> Dict
 
     for rel in ("Formula/tzero.rb", "installers/brew/tzero.rb"):
         p = ROOT_DIR / rel
-        c1 = _regex_replace(p, r'refs/tags/v[0-9]+\.[0-9]+\.[0-9]+\.tar\.gz', f"refs/tags/v{target_version}.tar.gz", check_only)
+        c1 = _regex_replace(
+            p, r'(refs/tags/(?:v|release-))[0-9]+\.[0-9]+\.[0-9]+\.tar\.gz',
+            rf'\g<1>{target_version}.tar.gz', check_only,
+        )
         c2 = _regex_replace(p, r'(?m)^(\s*version\s+)"[^"]+"', rf'\1"{target_version}"', check_only)
         results[rel] = c1 or c2
 
@@ -130,7 +133,8 @@ def sync_npm_sources() -> int:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Synchronize T-Zero release metadata.")
-    parser.add_argument("--version", default="10.9.0", help="Canonical target version")
+    metadata = tomllib.loads((ROOT_DIR / "pyproject.toml").read_text(encoding="utf-8"))
+    parser.add_argument("--version", default=metadata["project"]["version"], help="Canonical target version")
     parser.add_argument("--check", action="store_true", help="Exit non-zero if any manifest drifts")
     parser.add_argument("--sync-npm", action="store_true", help="Copy Python package files into installers/npm/src/")
     args = parser.parse_args()
