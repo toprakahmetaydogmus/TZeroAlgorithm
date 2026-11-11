@@ -95,17 +95,28 @@ runs:
           echo "::endgroup::"
         fi
 
-        METRICS=$(python -c "import json,sys; t=sys.argv[1]; s=0.0; f=0; b=0;
-try:
- from tzero_cost import TokenCostCalculator; s=round(float(TokenCostCalculator.calculate_cost(t).reduction_pct),1)
-except Exception: pass
-try:
- from tzero_security import ZeroLeakEngine; f=int(ZeroLeakEngine.scan_workspace(t).get('violation_count',0))
-except Exception: pass
-try:
- from tzero_features import ChangeImpactAnalyzer; top=sorted(ChangeImpactAnalyzer(t).inbound_graph.items(),key=lambda kv:len(kv[1]),reverse=True); b=min(100,len(top[0][1])*10) if top else 0
-except Exception: pass
-print(json.dumps({'savings_pct':s,'secret_findings':f,'blast_score':b}))" "$DIR")
+        METRICS=$(python -c '
+        import json, sys
+        t = sys.argv[1]
+        s, f, b = 0.0, 0, 0
+        try:
+            from tzero_cost import TokenCostCalculator
+            s = round(float(TokenCostCalculator.calculate_cost(t).reduction_pct), 1)
+        except Exception:
+            pass
+        try:
+            from tzero_security import ZeroLeakEngine
+            f = int(ZeroLeakEngine.scan_workspace(t).get("violation_count", 0))
+        except Exception:
+            pass
+        try:
+            from tzero_features import ChangeImpactAnalyzer
+            top = sorted(ChangeImpactAnalyzer(t).inbound_graph.items(), key=lambda kv: len(kv[1]), reverse=True)
+            b = min(100, len(top[0][1]) * 10) if top else 0
+        except Exception:
+            pass
+        print(json.dumps({"savings_pct": s, "secret_findings": f, "blast_score": b}))
+        ' "$DIR")
 
         SAVINGS_PCT=$(python -c "import json,sys; d=json.loads(sys.argv[1]); print(d['savings_pct'])" "$METRICS")
         SECRET_FINDINGS=$(python -c "import json,sys; d=json.loads(sys.argv[1]); print(d['secret_findings'])" "$METRICS")
