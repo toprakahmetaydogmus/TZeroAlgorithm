@@ -45,9 +45,12 @@ class TokenCostCalculator:
 
     # Provider pricing per 1,000,000 input tokens (as of late 2026 standard market rates)
     MODEL_RATES: Dict[str, float] = {
+        "Anthropic Claude 3.7 Sonnet (Thinking)": 3.00,
         "Anthropic Claude 3.5 Sonnet": 3.00,
         "Anthropic Claude 3 Opus": 15.00,
+        "OpenAI GPT-4.5 Preview": 75.00,
         "OpenAI GPT-4o": 2.50,
+        "Google Gemini 2.5 Pro": 1.25,
         "Google Gemini 1.5 Pro": 1.25,
         "DeepSeek V3": 0.14
     }
