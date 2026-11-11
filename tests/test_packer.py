@@ -8,7 +8,49 @@ import unittest
 
 _HAS_TIKTOKEN = importlib.util.find_spec("tiktoken") is not None
 
-from tzero_packer import TokenBudgetPacker, encode_context_delta, pack_workspace, restore_context_delta
+from tzero_packer import (
+    TokenBudgetPacker, encode_context_delta, pack_python_symbols, pack_workspace,
+    restore_context_delta,
+)
+
+
+class TestSymbolContext(unittest.TestCase):
+    @unittest.skipUnless(_HAS_TIKTOKEN, "tiktoken not installed")
+    def test_preserves_definitions_and_enforces_exact_token_limit(self):
+        import tiktoken
+
+        definition = (
+            "    @decorate\r\n"
+            "    async def chosen(self):\r\n"
+            "        # Keep this comment\r\n"
+            "        return 'İstanbul'\r\n"
+        )
+        source = "class Example:\r\n" + definition + "\r\n" + "\r\n".join(
+            f"constant_{index} = {index}" for index in range(400)
+        )
+        packed = pack_python_symbols(source, ["Example.chosen"])
+        tokenizer = tiktoken.get_encoding(packed.encoding)
+        self.assertEqual(packed.text, definition)
+        self.assertEqual(packed.source_tokens, len(tokenizer.encode_ordinary(source)))
+        self.assertEqual(packed.context_tokens, len(tokenizer.encode_ordinary(definition)))
+        self.assertGreaterEqual(packed.reduction_pct, 95)
+        overlapping = pack_python_symbols(source, ["Example", "Example.chosen"])
+        self.assertEqual(overlapping.text, "class Example:\r\n" + definition)
+
+        with self.assertRaisesRegex(ValueError, "target 95%"):
+            pack_python_symbols("def chosen(): return 1\n", ["chosen"])
+
+    def test_rejects_missing_ambiguous_and_sensitive_definitions(self):
+        source = "def chosen(): return 1\ndef chosen(): return 2\n"
+        with self.assertRaisesRegex(ValueError, "not found"):
+            pack_python_symbols(source, ["missing"])
+        with self.assertRaisesRegex(ValueError, "Ambiguous"):
+            pack_python_symbols(source, ["chosen"])
+
+        fake_secret = "sk-" + "abcdefghijklmnopqrstuvwxyz012345"
+        source = f"def chosen():\n    return {fake_secret!r}\n"
+        with self.assertRaisesRegex(ValueError, "potential secret"):
+            pack_python_symbols(source, ["chosen"])
 
 
 class TestContextDelta(unittest.TestCase):
