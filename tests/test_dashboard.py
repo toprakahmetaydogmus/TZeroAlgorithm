@@ -126,7 +126,7 @@ class TestTZeroDashboard(unittest.TestCase):
     def test_post_api_mutation_test(self):
         url = f"http://localhost:{self.test_port}/api/mutation/test"
         # Test on a small file with 0 or 1 mutants
-        payload = json.dumps({"file": "siber_akademi_icon.py", "max_mutants": 1}).encode("utf-8")
+        payload = json.dumps({"file": "tzero/siber_akademi_icon.py", "max_mutants": 1}).encode("utf-8")
         req = urllib.request.Request(url, data=payload, headers={"Content-Type": "application/json"})
         with urllib.request.urlopen(req) as resp:
             self.assertEqual(resp.status, 200)

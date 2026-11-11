@@ -1,5 +1,6 @@
 @echo off
 setlocal
+cd /d "%~dp0..\.."
 title SIBER AKADEMI - T-Zero Windows Executables Builder
 color 0E
 
@@ -27,7 +28,7 @@ if %errorlevel% neq 0 (
 
 echo.
 echo [INFO] Building all Windows executables...
-python compile.py
+python scripts/build/compile.py
 if %errorlevel% neq 0 (
     echo [ERROR] Executable build failed.
     pause

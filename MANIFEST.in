@@ -1,5 +1,4 @@
-include siber_akademi.ico
-include siber_akademi_icon.py
+include scripts/build/compile.py
 include smithery.json
 include smithery.yaml
 include glama.json
@@ -12,4 +11,4 @@ include LICENSE
 include README.md
 include README.tr.md
 include tzero.py
-recursive-include tzero *.py *.html *.json
+recursive-include tzero *.py *.html *.json *.ico

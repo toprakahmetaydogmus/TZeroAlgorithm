@@ -11,9 +11,11 @@ import time
 import shutil
 import subprocess
 import logging
+from pathlib import Path
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger("TZero.Compile")
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 
 def check_and_install_pyinstaller():
@@ -33,7 +35,7 @@ def check_and_install_pyinstaller():
 
 def generate_siber_akademi_icon():
     """Generates a custom Siber Akademi icon dynamically using Pillow if missing."""
-    icon_path = "siber_akademi.ico"
+    icon_path = str(PROJECT_ROOT / "tzero" / "siber_akademi.ico")
 
     if os.path.exists(icon_path):
         logger.info("Siber Akademi icon already resolved in workspace.")
@@ -140,7 +142,6 @@ def build_binary():
         if icon_file:
             abs_icon = os.path.abspath(icon_file)
             build_args.append(f"--icon={abs_icon}")
-            build_args.append(f"--add-data={abs_icon}{os.pathsep}.")
         build_args.append(main_script)
         prepare_target_file("TZeroAlgorithm.exe" if os.name == "nt" else "TZeroAlgorithm")
         subprocess.run(build_args, check=True)
@@ -201,7 +202,7 @@ def build_binary():
         ]
         if icon_file:
             installer_args.append(f"--icon={os.path.abspath(icon_file)}")
-            installer_args.append(f"--add-data={os.path.abspath(icon_file)}{os.pathsep}.")
+            installer_args.append(f"--add-data={os.path.abspath(icon_file)}{os.pathsep}tzero")
         installer_args.append("addmcp.py")
         installer_name = "AddMCP.exe" if os.name == "nt" else "AddMCP"
         prepare_target_file(installer_name)
@@ -237,6 +238,7 @@ def build_binary():
 
 
 def main():
+    os.chdir(PROJECT_ROOT)
     check_and_install_pyinstaller()
     success = build_binary()
     if success:

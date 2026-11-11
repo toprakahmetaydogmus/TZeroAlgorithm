@@ -864,7 +864,9 @@ class AddMCPApp:
         self.root.minsize(600, 540)
         self.root.configure(bg="#11151c")
 
-        icon_path = _resource_path("siber_akademi.ico")
+        icon_path = _resource_path("tzero/siber_akademi.ico")
+        if not icon_path.is_file():
+            icon_path = _resource_path("siber_akademi.ico")
         if icon_path.is_file():
             try:
                 self.root.iconbitmap(str(icon_path))

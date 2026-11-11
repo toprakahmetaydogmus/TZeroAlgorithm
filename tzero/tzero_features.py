@@ -348,7 +348,7 @@ DEFAULT_RULES_JSON = {
     "layers": {
         "core": ["core/*", "engine/*"],
         "api": ["api/*", "tzero_mcp.py", "server/*"],
-        "cli": ["main.py", "compile.py", "cli/*"],
+        "cli": ["main.py", "compile.py", "scripts/build/compile.py", "cli/*"],
         "ui": ["gui/*", "views/*"]
     },
     "forbidden_imports": [

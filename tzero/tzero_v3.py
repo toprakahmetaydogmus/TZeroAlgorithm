@@ -136,7 +136,7 @@ except ImportError:  # pragma: no cover - depends on the host Python build
 from concurrent.futures import ThreadPoolExecutor
 
 try:
-    import siber_akademi_icon
+    from tzero import siber_akademi_icon
 except ImportError:
     siber_akademi_icon = None
 
@@ -4581,7 +4581,7 @@ class AutoReadmeGUI:
                 pass
         if not self.logo_img:
             resource_dir = getattr(sys, "_MEIPASS", os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-            icon_path = os.path.join(resource_dir, "siber_akademi.ico")
+            icon_path = os.path.join(resource_dir, "tzero", "siber_akademi.ico")
             if os.path.isfile(icon_path):
                 try:
                     self.root.iconbitmap(icon_path)

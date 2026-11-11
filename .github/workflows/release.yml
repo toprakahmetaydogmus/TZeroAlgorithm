@@ -40,7 +40,7 @@ jobs:
 
       - name: Build TZeroAlgorithm.exe
         shell: pwsh
-        run: python compile.py
+        run: python scripts/build/compile.py
 
       - name: Smoke-test executables
         shell: pwsh

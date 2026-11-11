@@ -100,7 +100,7 @@ tzero-explain = "tzero.tzero_v3:main"
 
 [tool.setuptools]
 packages = ["tzero", "tzero.tzero_jarvis", "tzero.tzero_fixer"]
-py-modules = ["main", "addmcp", "siber_akademi_icon", "app", "pc_fixer_mcp"]
+py-modules = ["main", "addmcp", "app", "pc_fixer_mcp"]
 
 [tool.setuptools.package-data]
 "*" = ["*.ico", "*.json", "*.html"]

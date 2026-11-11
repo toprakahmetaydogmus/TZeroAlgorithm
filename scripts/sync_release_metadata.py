@@ -114,9 +114,10 @@ def sync_npm_sources() -> int:
         package_dir = ROOT_DIR.joinpath(*package.split("."))
         paths.update(path.relative_to(ROOT_DIR) for path in package_dir.glob("*.py"))
     paths.add(pathlib.Path("tzero/tzero_graph_hud.html"))
+    paths.add(pathlib.Path("tzero/siber_akademi.ico"))
 
     for existing in npm_src.rglob("*"):
-        if existing.is_file() and existing.suffix in {".py", ".html"}:
+        if existing.is_file() and existing.suffix in {".py", ".html", ".ico"}:
             if existing.relative_to(npm_src) not in paths:
                 existing.unlink()
 
