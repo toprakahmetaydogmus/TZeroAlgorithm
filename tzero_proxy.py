@@ -15,7 +15,7 @@ import re
 import socketserver
 import sys
 import threading
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Tuple
 
 logger = logging.getLogger("tzero.proxy")
 

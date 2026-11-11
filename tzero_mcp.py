@@ -30,7 +30,7 @@ try:
 except ImportError:
     ToolAnnotations = None
 
-from typing import Dict, List, Optional, Any, Union
+from typing import Dict, List, Optional, Any, Union, Tuple
 try:
     from typing import Annotated
     from typing_extensions import TypedDict

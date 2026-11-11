@@ -7583,8 +7583,9 @@ Custom Requirements:
                 with open(out_path, "w", encoding="utf-8") as f:
                     f.write(content)
                 self.safe_after(0, lambda: self._on_arch_export_done(out_path, use_ai))
-            except Exception as e:
-                self.safe_after(0, lambda: self._on_arch_export_error(str(e)))
+            except Exception as exc:
+                err_msg = str(exc)
+                self.safe_after(0, lambda: self._on_arch_export_error(err_msg))
 
         threading.Thread(target=worker, daemon=True).start()
 
