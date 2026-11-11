@@ -32,7 +32,8 @@ except ImportError:
 
 from typing import Dict, List, Optional, Any, Union
 try:
-    from typing import Annotated, TypedDict
+    from typing import Annotated
+    from typing_extensions import TypedDict
 except ImportError:
     from typing_extensions import Annotated, TypedDict
 

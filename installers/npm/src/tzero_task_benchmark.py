@@ -282,6 +282,7 @@ def analyze_symbol_impact(symbol_path: str, table: SymbolTable, dag: CallGraphDA
                 f"        step_{i} = len(str({sig_args.split(':')[0].strip()})) + {i * 7}"
                 for i in range(18)
             )
+            return_value = 'True' if ret_type == 'bool' else ('1.0' if ret_type == 'float' else ('[]' if ret_type == 'list' else ('{}' if ret_type == 'dict' else '"ok"')))
             dep_code = (
                 f"class {cls_name}:\n"
                 f'    """{title} domain contract."""\n'
@@ -289,7 +290,7 @@ def analyze_symbol_impact(symbol_path: str, table: SymbolTable, dag: CallGraphDA
                 f"        self.strict = strict\n\n"
                 f"    def {method_name}(self, {sig_args}) -> {ret_type}:\n"
                 f"{body_lines}\n"
-                f"        return { 'True' if ret_type == 'bool' else ('1.0' if ret_type == 'float' else ('[]' if ret_type == 'list' else ('{}' if ret_type == 'dict' else '\"ok\"'))) }\n"
+                f"        return {return_value}\n"
             )
             call_args = ", ".join(
                 '""' if "str" in a else ("[]" if "list" in a else "128")

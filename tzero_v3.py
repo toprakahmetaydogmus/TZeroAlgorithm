@@ -8711,7 +8711,8 @@ def run_watch_mode(target_dir: str = ".", interval: float = 1.0, once_test: bool
                     changes.append(os.path.relpath(fp, target_dir).replace("\\", "/"))
             for fp in last_mtimes:
                 if fp not in current_mtimes:
-                    changes.append(f"deleted:{os.path.relpath(fp, target_dir).replace('\\', '/')}")
+                    rel_path = os.path.relpath(fp, target_dir).replace("\\", "/")
+                    changes.append(f"deleted:{rel_path}")
 
             if changes:
                 now = datetime.now().strftime("%H:%M:%S")
