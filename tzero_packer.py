@@ -21,11 +21,60 @@ if sys.platform == "win32":
 import os
 import re
 import math
+import hashlib
+import struct
 from dataclasses import dataclass, field
 from typing import Dict, List, Tuple, Optional, Any, Set
 
 from tzero_polyglot import PolyglotTokenReducer
 from tzero_features import should_skip_dir, get_ignore_patterns
+
+
+_DELTA_HEADER = struct.Struct(">4s32s32sQQ")
+_DELTA_MAGIC = b"TZD1"
+
+
+def _common_prefix_length(left: bytes, right: bytes) -> int:
+    limit = min(len(left), len(right))
+    block_size = 64 * 1024
+    for start in range(0, limit, block_size):
+        end = min(start + block_size, limit)
+        left_block, right_block = left[start:end], right[start:end]
+        if left_block != right_block:
+            return start + len(os.path.commonprefix((left_block, right_block)))
+    return limit
+
+
+def encode_context_delta(base: bytes, current: bytes) -> bytes:
+    """Store the changed middle of a context relative to a known base."""
+    prefix = _common_prefix_length(base, current)
+    max_suffix = min(len(base), len(current)) - prefix
+    suffix = _common_prefix_length(
+        base[len(base) - max_suffix:][::-1],
+        current[len(current) - max_suffix:][::-1],
+    )
+    end = len(current) - suffix
+    return _DELTA_HEADER.pack(
+        _DELTA_MAGIC, hashlib.sha256(base).digest(),
+        hashlib.sha256(current).digest(), prefix, suffix,
+    ) + current[prefix:end]
+
+
+def restore_context_delta(base: bytes, delta: bytes) -> bytes:
+    """Restore exact context bytes and reject incompatible or corrupt deltas."""
+    if len(delta) < _DELTA_HEADER.size:
+        raise ValueError("Context delta is missing its header")
+    magic, base_digest, current_digest, prefix, suffix = _DELTA_HEADER.unpack_from(delta)
+    if magic != _DELTA_MAGIC:
+        raise ValueError("Unsupported context delta format")
+    if hashlib.sha256(base).digest() != base_digest:
+        raise ValueError("Context delta does not match the base")
+    if prefix + suffix > len(base):
+        raise ValueError("Context delta references bytes outside the base")
+    current = base[:prefix] + delta[_DELTA_HEADER.size:] + base[len(base) - suffix:]
+    if hashlib.sha256(current).digest() != current_digest:
+        raise ValueError("Restored context failed its SHA-256 check")
+    return current
 
 
 @dataclass

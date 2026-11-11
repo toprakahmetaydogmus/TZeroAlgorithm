@@ -109,6 +109,19 @@ tzero --pack 16000 --focus path/to/file.py --cache-aligned --pack-out context.tx
 
 `context.txt` kaynak kodu ve başka proje bilgileri içerebilir. Bir asistana vermeden önce dosyayı inceleyin.
 
+### Mevcut bağlamın kayıpsız güncellenmesi
+
+Her iki tarafta da aynı önceki bağlam dosyası varsa değişen baytları delta olarak aktarabilirsiniz. T-Zero ortak başlangıç ve bitiş bölümlerini bulur, değişen orta bölümü delta dosyasına yazar. SHA-256 kontrolleri hem temel dosyayı hem geri yüklenen baytları doğrular.
+
+```sh
+tzero --context-delta previous.txt current.txt update.tzd
+tzero --restore-context previous.txt update.tzd restored.txt
+```
+
+Her iki komut için yeni çıktı yolları kullanın. Alıcının birebir aynı temel dosyaya ihtiyacı vardır. Örneğin yerel CLI kaynağına 24 baytlık bir yorum eklediğimde **480.538 baytlık** güncel dosya için **108 baytlık** delta oluştu. Bu, **aktarılan baytta %99,98 azalma** demektir. Ortak içeriği az olan dosyalarda delta, kaynak dosyadan daha büyük olabilir. Delta bir ikili aktarım biçimidir. Model bağlamına vermeden önce geri yükleyin. Modelin token sayısı, modele verilen metne bağlıdır.
+
+Proje notları [yol haritasında](main/ROADMAP.md) ve [uygulama rehberinde](main/WALKTHROUGH.md) bulunur.
+
 ## Özellikler
 
 - Kod yapısını ve bağımlılıklarını çıkarma.

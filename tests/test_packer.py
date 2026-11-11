@@ -8,7 +8,29 @@ import unittest
 
 _HAS_TIKTOKEN = importlib.util.find_spec("tiktoken") is not None
 
-from tzero_packer import TokenBudgetPacker, pack_workspace
+from tzero_packer import TokenBudgetPacker, encode_context_delta, pack_workspace, restore_context_delta
+
+
+class TestContextDelta(unittest.TestCase):
+    def test_restores_insertions_deletions_and_binary_bytes(self):
+        for base, current in (
+            (b"", b"\x00\xff\r\n"), (b"previous", b""), (b"same", b"same"),
+            (b"prefix\x00before\r\nsuffix", b"prefix\x00after\r\nsuffix"),
+            (b"abcdefgh", b"abcdxyzefgh"),
+        ):
+            with self.subTest(base=base, current=current):
+                delta = encode_context_delta(base, current)
+                self.assertEqual(restore_context_delta(base, delta), current)
+
+    def test_reuses_shared_bytes_and_rejects_corruption(self):
+        base = b"prefix" * 1000 + b"old" + b"suffix" * 1000
+        current = base.replace(b"old", b"new")
+        delta = encode_context_delta(base, current)
+        self.assertLess(len(delta), len(current) * 0.05)
+        with self.assertRaisesRegex(ValueError, "does not match"):
+            restore_context_delta(b"wrong base", delta)
+        with self.assertRaisesRegex(ValueError, "SHA-256"):
+            restore_context_delta(base, delta[:-1] + b"!")
 
 
 class TestTokenBudgetPacker(unittest.TestCase):

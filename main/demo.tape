@@ -1,6 +1,6 @@
 # VHS Tape for T-Zero Terminal Demo
 # VHS is a 100% free, open-source terminal recording tool (github.com/charmbracelet/vhs)
-# Run with: vhs demo.tape  (Produces demo.gif completely offline & free)
+# Run with: vhs main/demo.tape  (Produces demo.gif completely offline & free)
 
 Output demo.gif
 

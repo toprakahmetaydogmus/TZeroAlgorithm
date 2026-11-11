@@ -120,6 +120,19 @@ tzero --pack 16000 --focus path/to/file.py --cache-aligned --pack-out context.tx
 
 Review `context.txt` before giving it to an assistant. The file can contain source code and other project information.
 
+### Lossless updates to existing context
+
+If both sides already have the same base context file, send the changed bytes as a delta. T-Zero finds the common prefix and suffix and includes the changed middle. SHA-256 checks bind the delta to the base and verify the restored bytes.
+
+```sh
+tzero --context-delta previous.txt current.txt update.tzd
+tzero --restore-context previous.txt update.tzd restored.txt
+```
+
+Use new output paths for both commands. The recipient needs the exact base file. For example, appending a 24-byte comment to the local CLI source produced a **108-byte delta** for a **480,538-byte** updated file, a **99.98% reduction in transferred bytes**. Files with little shared content can produce a delta larger than the original. The delta is a binary transport format. Restore it before using it as model context, where token counts depend on the text supplied to the model.
+
+See the [roadmap](main/ROADMAP.md) and [walkthrough](main/WALKTHROUGH.md) for project notes.
+
 ## Capabilities
 
 - Extract code structure and dependencies for context building.
