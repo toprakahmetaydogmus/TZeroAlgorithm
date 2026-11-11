@@ -7,8 +7,11 @@ import unittest
 import subprocess
 import tempfile
 import shutil
+import tomllib
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+with open(os.path.join(ROOT_DIR, "pyproject.toml"), "rb") as manifest:
+    PACKAGE_VERSION = tomllib.load(manifest)["project"]["version"]
 
 
 class TestComprehensiveCLI(unittest.TestCase):
@@ -33,7 +36,7 @@ class TestComprehensiveCLI(unittest.TestCase):
         res = self._run_cli(["--version"])
         self.assertEqual(res.returncode, 0)
         self.assertIn("4.1.0", res.stdout)
-        self.assertIn("10.", res.stdout)
+        self.assertIn(f"v{PACKAGE_VERSION} ", res.stdout)
 
     def test_cli_info(self):
         res = self._run_cli(["--info"])

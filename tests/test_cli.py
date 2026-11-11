@@ -4,7 +4,13 @@
 import os
 import sys
 import subprocess
+import tomllib
 import unittest
+from pathlib import Path
+
+
+with (Path(__file__).resolve().parents[1] / "pyproject.toml").open("rb") as manifest:
+    PACKAGE_VERSION = tomllib.load(manifest)["project"]["version"]
 
 
 class TestCLI(unittest.TestCase):
@@ -18,7 +24,7 @@ class TestCLI(unittest.TestCase):
         )
         self.assertEqual(res.returncode, 0)
         self.assertIn("4.1.0", res.stdout)
-        self.assertIn("10.", res.stdout)
+        self.assertIn(f"v{PACKAGE_VERSION} ", res.stdout)
 
     def test_mcp_version_flag(self):
         res = subprocess.run(
@@ -76,7 +82,7 @@ class TestCLI(unittest.TestCase):
         )
         self.assertEqual(res.returncode, 0)
         self.assertIn("4.1.0", res.stdout)
-        self.assertIn("10.", res.stdout)
+        self.assertIn(f"v{PACKAGE_VERSION} ", res.stdout)
 
     def test_quickstart_info(self):
         res = subprocess.run(
