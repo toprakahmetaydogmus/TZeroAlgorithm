@@ -5,9 +5,23 @@
 [![PyPI](https://img.shields.io/pypi/v/tzero-mcp)](https://pypi.org/project/tzero-mcp/)
 [![npm](https://img.shields.io/npm/v/tzero-mcp)](https://www.npmjs.com/package/tzero-mcp)
 [![M8ven](https://m8ven.ai/badge/mcp/toprakahmetaydogmus/tzeroalgorithm?variant=verified)](https://m8ven.ai/mcp/toprakahmetaydogmus/tzeroalgorithm)
+[![VS Code](https://img.shields.io/visual-studio-marketplace/v/siber-akademi.tzero-vscode)](https://marketplace.visualstudio.com/items?itemName=siber-akademi.tzero-vscode)
+[![Smithery](https://smithery.ai/badge/@toprakahmetaydogmus/TZeroAlgorithm)](https://smithery.ai/server/@toprakahmetaydogmus/TZeroAlgorithm)
+[![Glama](https://img.shields.io/badge/registry-Glama-635bff)](https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm)
+[![CI](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions/workflows/ci.yml/badge.svg)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions/workflows/ci.yml)
+[![Python](https://img.shields.io/badge/python-3.11%2B-3776ab)](pyproject.toml)
 [![Lisans](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
 T-Zero, kodlama asistanları için yerel kaynak kodundan bağlam oluşturur. Fonksiyon imzalarını, import ifadelerini ve bağımlılıkları çıkarır. CLI ve MCP sunucusu üzerinden kullanılabilir.
+
+## Ne işe yarar?
+
+Bir kodlama asistanının, ilgili modüllerin bütün uygulama ayrıntılarından önce arayüzlerini ve ilişkilerini görmesi gerekebilir. T-Zero bu bağlamı bildirimlere ve ilişkilere indirgemeye yardımcı olur. Ortaya çıkan metne CLI veya MCP araçlarıyla erişebilirsiniz. Hangi dosyayı inceleyeceğinize ve ne zaman tam kaynak isteyeceğinize siz karar verirsiniz.
+
+- **Python AST budama** kodu ayrıştırıp fonksiyon gövdelerini küçültürken yapısal imzaları korur. Desteklenen diğer diller için dile özel küçültücüler ve yapılandırıldığında isteğe bağlı ayrıştırıcı adaptörleri kullanılır.
+- **Bağlam seçimi** odak dosyasını tam tutarken ilişkili dosyaları daha küçük iskeletler olarak sunabilir. Anlık görüntü ve bağımlılık araçları ilgili bağlamı bulmaya yardımcı olur.
+- **Token bütçesine göre paketleme** bağlamı hedef bütçeye göre sıralar. Önbellek uyumlu mod, sabit bağlamı değişen görev ayrıntılarından önce yerleştirir.
+- **Yerel kontroller** arasında olası gizli bilgi taraması, mimari denetimler ve tanı ile kod eylemleri sunan dil sunucusu bulunur. Değişiklikleri uygulamadan önce sonuçları inceleyin.
 
 ## Kurulum
 
@@ -36,6 +50,54 @@ tzero --doctor --deep
 
 `--doctor --deep` yerel alt sistemleri denetler. Desteklenen editörleri yapılandırmak için `tzero init`, tüm seçenekler için `tzero --help` kullanın. Elle MCP kurulumu için [İngilizce kılavuzdaki örneğe](README.md#first-use) bakın.
 
+## Token azaltma ve ölçümler
+
+T-Zero, kodun yararlı yapısını koruyup uygulama ayrıntılarının bir bölümünü çıkararak bağlamı küçültür. Python kodu standart kütüphanedeki `ast` modülüyle ayrıştırılır. Çok dilli küçültücü JavaScript, TypeScript, Rust, Go, C/C++, Java, C#, Solidity, Ruby, PHP, Swift, Kotlin, Dart, Scala ve Elixir dillerini de destekler. Sonuç, kullanılan ayrıştırıcıya veya küçültücüye ve kaynak koda bağlıdır. İskelet, görevi tamamlamak için gereken ayrıntıları çıkarmış olabilir. Çıktıyı inceleyin ve gerektiğinde tam kodu alın.
+
+Örneğin varsayılan Python küçültücüsü şu girdiyi:
+
+```python
+def greet(name: str) -> str:
+    message = "Hello, " + name
+    return message
+```
+
+şu yapısal özete dönüştürür:
+
+```python
+def greet(name: str) -> str: ...
+```
+
+Fonksiyon imzası görünür kalır. Uygulama gövdesi çıkarıldığı için çıktı çalıştırılmak üzere değil, bağlam oluşturmak üzere kullanılır.
+
+Depodaki **temel benchmark** üç sentetik Python görevi kullanır. Her karşılaştırmada hedef uygulama tam tutulur. Bağımlılık için ise tam kaynak veya AST iskeleti kullanılır. Aşağıdaki sonuçlar 11 Kasım 2026'da `tiktoken` ve `cl100k_base` kodlamasıyla yerelde yeniden üretildi.
+
+| Görev | Tam bağlam | Küçültülmüş bağlam | Azalma |
+| --- | ---: | ---: | ---: |
+| TASK-01 | 502 token | 375 token | %25,3 |
+| TASK-02 | 322 token | 239 token | %25,8 |
+| TASK-03 | 332 token | 283 token | %14,8 |
+| **Toplam** | **1.156 token** | **897 token** | **%22,4** |
+
+Benchmark, üç görev yüzdesinin aritmetik ortalamasını **%21,9** olarak bildirir. Toplam satırı `(1.156 − 897) / 1.156` hesabını kullandığı için ağırlıklı azalma %22,4'tür. Bu örnekler tüm depolar için bir tasarruf oranı veya model doğruluğu göstermez. Farklı kod tabanlarında ve tokenizer'larda sonuçlar değişir.
+
+Örneği kaynak kodu kopyasının kök klasöründe yeniden çalıştırabilirsiniz. `tiktoken` isteğe bağlıdır ve PyPI üzerinden edinilebilir. Paket veya kodlama kullanılamıyorsa benchmark kesin BPE sayısı yerine karakter temelli tahmine geçer. Önbellekte olmayan bir kodlamanın ilk yüklemesi indirme gerektirebilir.
+
+```sh
+python -m pip install tiktoken
+python tzero_task_benchmark.py
+```
+
+Benchmark'ın geçiş kontrolleri, sözdizimini ve çağrılan metot adlarını küçültülmüş örnekle karşılaştırır. Bunlar uygulamanızın testlerinin yerini tutmaz. Kendi projenizde `tzero --scan . --format json` ile ham ve azaltılmış sayıları inceleyebilirsiniz. JSON taraması ham token sayısını dosya baytlarını dörde bölerek, küçültülmüş token sayısını ise karakter sayısını dörde bölerek tahmin eder. Bunlar tablodaki BPE ölçümleri değildir.
+
+Hedef token bütçesiyle bir bağlam paketi oluşturmak için proje klasöründe şu komutu kullanın:
+
+```sh
+tzero --pack 16000 --focus path/to/file.py --cache-aligned --pack-out context.txt
+```
+
+`context.txt` kaynak kodu ve başka proje bilgileri içerebilir. Bir asistana vermeden önce dosyayı inceleyin.
+
 ## Özellikler
 
 - Kod yapısını ve bağımlılıklarını çıkarma.
@@ -47,6 +109,21 @@ tzero --doctor --deep
 - SCIP indeksleri ve depolar arası manifest paylaşımı.
 
 Varsayılan MCP kataloğu, `search_tools` dahil 21 araç sunar. Başlangıçta 58 aracın tamamını açmak için `TZERO_MCP_TOOL_MODE=all` ayarlanabilir. Araç açıklamalarından dosyaları okuyup okumadığını veya değiştirdiğini kontrol edin.
+
+### CLI ve entegrasyonlar
+
+| Komut | Amaç |
+| --- | --- |
+| `tzero --scan . --format json` | Çalışma alanını ve bağlam ölçümlerini incelemek. |
+| `tzero --pipe example.py` | Standart girdiden kaynak kodu okumak ve dosya adı ipucuyla küçültmek. |
+| `tzero --snapshot .` | Artımlı çalışma için AST anlık görüntüsü oluşturmak. |
+| `tzero --lsp` | Editör entegrasyonları için stdio dil sunucusunu başlatmak. |
+| `tzero --hook-install all` | Desteklenen yapay zekâ istemcileri için yaşam döngüsü kancalarını kurmak. Yapılandırma dosyaları yazar. |
+| `tzero --contracts HEAD~1 --contracts-sarif report.sarif` | API sözleşmelerini Git referansıyla karşılaştırıp SARIF raporu yazmak. |
+| `tzero --federation impact --federation-symbol SYMBOL` | Bir sembolün depolar arası etkisini incelemek. |
+| `tzero --doctor --deep` | Çevrimdışı alt sistem denetimlerini çalıştırmak. |
+
+VS Code/Cursor eklentisi dil sunucusu, kanca ve federasyon komutlarını ekler. Dashboard yerel bir tarayıcı arayüzü sunar. Ayrı PC-Fixer sunucusunda dosyaları veya sistem durumunu değiştirebilen tanı ve onarım araçları da bulunur.
 
 Kaynak sürümü 10.9.0'dır. Paket kayıtları, yayımlama tamamlanana kadar daha eski bir sürüm sunabilir.
 
