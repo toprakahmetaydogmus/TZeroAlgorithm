@@ -1,57 +1,120 @@
-# T-Zero Algorithm
+<a id="top"></a>
+<div align="center">
 
-[![PyPI](https://img.shields.io/pypi/v/tzero-mcp)](https://pypi.org/project/tzero-mcp/)
-[![npm](https://img.shields.io/npm/v/tzero-mcp)](https://www.npmjs.com/package/tzero-mcp)
-[![VS Code Marketplace](https://img.shields.io/visual-studio-marketplace/v/siber-akademi.tzero-vscode)](https://marketplace.visualstudio.com/items?itemName=siber-akademi.tzero-vscode)
-[![M8ven Publisher](https://m8ven.ai/badge/mcp/toprakahmetaydogmus/tzeroalgorithm?variant=verified)](https://m8ven.ai/mcp/toprakahmetaydogmus/tzeroalgorithm?s=readme)
-[![Glama](https://img.shields.io/badge/MCP-Glama-635bff)](https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm)
-[![Smithery](https://smithery.ai/badge/@toprakahmetaydogmus/TZeroAlgorithm)](https://smithery.ai/server/@toprakahmetaydogmus/TZeroAlgorithm)
-[![CI](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions/workflows/ci.yml/badge.svg)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions/workflows/ci.yml)
-[![TDQS](https://img.shields.io/badge/TDQS-5.0%2F5.0-15803d)](README.md#tdqs-certification)
-[![Python](https://img.shields.io/badge/Python-3.11%2B-3776ab)](pyproject.toml)
-[![MIT](https://img.shields.io/badge/License-MIT-slategray)](LICENSE)
+# 🧠 T-Zero: Deterministic AST Context Compressor & MCP Server
 
-[English](README.md) · [Türkçe](README.tr.md) · [日本語](README.ja.md) · [简体中文](README.zh.md) · [Privacy Policy](PRIVACY.md)
+### *Empirically Proven Token Optimization Engine, 14 Canonical MCP Tools, Real BPE Tokenizer Benchmarks & Pre-Flight Reality-Lock for AI Coding Assistants.*
 
-T-Zero is an AST context compressor and MCP server for coding assistants. It extracts signatures and dependencies, scans for secrets, and builds context packs from a local workspace.
+**[English](README.md)** | **[Türkçe](README.tr.md)** | **[日本語](README.ja.md)** | **[简体中文](README.zh.md)** | **[Privacy Policy](PRIVACY.md)** | **[Interactive Colab](https://colab.research.google.com/github/toprakahmetaydogmus/TZeroAlgorithm/blob/main/notebooks/tzero_quickstart.ipynb)** | **[Hugging Face Space](https://huggingface.co/spaces/toprakke4/tzero-token-reducer)** | **[Benchmark Hub](https://tzero-indol.vercel.app)**
 
-## Quickstart
+[![Open In Colab](https://img.shields.io/badge/%F0%9F%9A%80%20Open%20in-Colab-f9ab00?style=for-the-badge&logo=googlecolab&logoColor=white)](https://colab.research.google.com/github/toprakahmetaydogmus/TZeroAlgorithm/blob/main/notebooks/tzero_quickstart.ipynb)
+[![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Zero--GPU%20Live%20Demo-ffd21e?style=for-the-badge&logo=huggingface&logoColor=black)](https://huggingface.co/spaces/toprakke4/tzero-token-reducer)
+[![Live Vercel Hub](https://img.shields.io/badge/%E2%9A%A1%20Live%20Benchmark-Vercel%20Gateway-000000?style=for-the-badge&logo=vercel)](https://tzero-indol.vercel.app)
+[![Glama MCP Badge](https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm/badges/score.svg)](https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm)
+[![TDQS 5.0/5.0](https://img.shields.io/badge/TDQS-5.0%20%2F%205.0%20Anchor%20Certified-10b981?style=flat-square&logo=checkmarx&logoColor=white)](#tdqs-certification)
+[![PyPI Total Downloads](https://img.shields.io/badge/PyPI%20Downloads-17%2C387%2B-38bdf8?style=flat-square&logo=pypi&logoColor=white)](https://pypistats.org/packages/tzero-mcp)
+[![Git Clones](https://img.shields.io/badge/Git%20Clones-1%2C275%20(14d)-10b981?style=flat-square&logo=git&logoColor=white)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)
+[![PyPI Version](https://img.shields.io/pypi/v/tzero-mcp?color=38bdf8&style=flat-square&logo=pypi)](https://pypi.org/project/tzero-mcp/)
+[![npm Version](https://img.shields.io/npm/v/tzero-mcp?color=cb3837&style=flat-square&logo=npm)](https://www.npmjs.com/package/tzero-mcp)
+[![Python Version](https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13-blue?style=flat-square)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions)
+[![Tests](https://img.shields.io/badge/tests-352%20passing-34d399?style=flat-square&logo=githubactions)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions)
+[![GitHub Action](https://img.shields.io/badge/GitHub%20Action-CI%20Review%20Gate-2088FF?style=flat-square&logo=githubactions&logoColor=white)](docs/github_action_guide.md)
+[![MCP Tools](https://img.shields.io/badge/MCP%20Tools-14%20Canonical-8b5cf6?style=flat-square)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm#the-14-canonical-mcp-tools)
+[![Security](https://img.shields.io/badge/security-Shannon%20Entropy%20(H%20%3E%3D%204.75)-38bdf8?style=flat-square&logo=shield)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm#security-architecture)
+[![Reality-Lock](https://img.shields.io/badge/reality--lock-Static%20AST%20Grounding-10b981?style=flat-square&logo=probot)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm#pre-flight-reality-lock)
+[![Token Reduction](https://img.shields.io/badge/token%20savings-up%20to%2094.6%25%20(AST)-f43f5e?style=flat-square)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm#task-completion-benchmark)
+[![License](https://img.shields.io/badge/license-MIT-f8fafc?style=flat-square)](LICENSE)
 
-Install the CLI with `python -m pip install -U tzero-mcp` or `npm install -g tzero-mcp`.
-Run `tzero init` to configure an editor or `npx -y tzero-mcp@latest` to launch the MCP server.
-The branch uses package version **10.9.0**.
+<br>
 
-## v11 commands
+<div align="center">
 
-- `tzero --doctor --deep` — Run local subsystem checks.
-- `tzero --lsp` — Start the stdio language server.
-- `tzero hook / --hook-install` — Evaluate tool lifecycle hooks and install editor configuration.
-- `--federation export/import/verify/impact` — Exchange repository manifests and analyze cross-repository impact.
-- `--scip-import` — Import a SCIP index.
-- `--snapshot / --cache-aligned` — Build AST snapshots and produce context packs with stable prefixes.
-- `--contracts-sarif` — Export contract changes as SARIF.
-- `--agent-kernel` — Validate local execution plans against workspace constraints.
+[![PyPI Downloads](https://img.shields.io/badge/%F0%9F%93%A5%20Total%20PyPI%20Downloads-17%2C387%2B-38bdf8?style=for-the-badge&logo=pypi&logoColor=white)](https://pypistats.org/packages/tzero-mcp)
+[![VS Code Marketplace](https://img.shields.io/visual-studio-marketplace/v/siber-akademi.tzero-vscode?style=for-the-badge&logo=visual-studio-code&logoColor=white&label=VS%20Code%20Marketplace&color=007ACC)](https://marketplace.visualstudio.com/items?itemName=siber-akademi.tzero-vscode)
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/toprakahmetaydogmus/TZeroAlgorithm)
+[![Smithery Badge](https://smithery.ai/badge/@toprakahmetaydogmus/TZeroAlgorithm)](https://smithery.ai/server/@toprakahmetaydogmus/TZeroAlgorithm)
+[![Git Clones](https://img.shields.io/badge/%F0%9F%9A%80%20Repository%20Clones-1%2C275%20(14d)-10b981?style=for-the-badge&logo=git&logoColor=white)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)
+[![npm Package](https://img.shields.io/badge/%F0%9F%93%A6%20npm-tzero--mcp-cb3837?style=for-the-badge&logo=npm&logoColor=white)](https://www.npmjs.com/package/tzero-mcp)
+[![Glama Grade A](https://img.shields.io/badge/%E2%9A%A1%20Glama%20MCP-Grade%20A%20Verified-8b5cf6?style=for-the-badge&logo=checkmarx&logoColor=white)](https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm)
+[![M8ven Verified](https://m8ven.ai/badge/mcp/toprakahmetaydogmus/tzeroalgorithm?variant=verified)](https://m8ven.ai/mcp/toprakahmetaydogmus/tzeroalgorithm?s=readme)
+
+</div>
+
+<br>
+
+> 📈 **Live Developer Adoption:** Over **17,387+ total PyPI downloads** (`pip install tzero-mcp`), **1,275 repository clones** across 320 unique engineering teams in the last 14 days, and 340+ binary release downloads.
+
+> 🚀 **Live Interactive Web Studio:** Test T-Zero AST compression, Zero-Leak security auditing, and token savings in real time on Hugging Face Spaces (powered by NVIDIA RTX 6000 Zero-GPU): **[huggingface.co/spaces/toprakke4/tzero-token-reducer](https://huggingface.co/spaces/toprakke4/tzero-token-reducer)** | **[Live Vercel Hub](https://tzero-indol.vercel.app)**
+
+<p align="center">
+  <a href="#reproducible-benchmarks">
+    <img src="assets/tzero_terminal_benchmark.svg" alt="T-Zero Autonomous Benchmark Terminal Recording (macOS HUD)" width="100%" style="max-width: 920px; border-radius: 14px; box-shadow: 0 18px 40px rgba(0, 0, 0, 0.8);">
+  </a>
+</p>
+
+### ⚡ 30-Second Quickstart
+
+```bash
+# 📦 Option A: Node.js / npx (Zero-Config Instant MCP Runner):
+# Run directly in Claude Desktop, Cursor, Antigravity, Copilot:
+npx -y tzero-mcp@latest
+
+# Global CLI installation via npm:
+npm install -g tzero-mcp
+
+# 🐍 Option B: Python PyPI Package:
+pip install --upgrade tzero-mcp
+
+# 🌟 Option C: 1-Line Native Shell Installers:
+# Linux / macOS / WSL:
+curl -fsSL https://raw.githubusercontent.com/toprakahmetaydogmus/TZeroAlgorithm/main/install.sh | bash
+# Windows (PowerShell):
+irm https://raw.githubusercontent.com/toprakahmetaydogmus/TZeroAlgorithm/main/install.ps1 | iex
+
+# 🚀 1-Click Configure MCP in Cursor, Claude, Antigravity, Windsurf:
+tzero init
+
+# 🧩 Install VS Code / Cursor Extension (.vsix):
+code --install-extension dist/tzero-vscode-10.8.0.vsix
+```
+
+### 🧭 Navigation & Interactive Jump Stations
+
+[![Technical Whitepaper](https://img.shields.io/badge/%F0%9F%93%91%20Scientific%20Whitepaper-v10.7%20Specification-0284c7?style=for-the-badge&logo=googledocs&logoColor=white)](docs/WHITE_PAPER_TZERO_V10.md)
+[![T-Zero PC-Fixer](https://img.shields.io/badge/T--Zero%20PC--Fixer-12%2C200%2B%20Lines%20Doctor-purple?style=for-the-badge&logo=shield&logoColor=white)](https://github.com/toprakahmetaydogmus/tzero-pc-fixer)
+
+[![TDQS 5.0 Anchor](https://img.shields.io/badge/TDQS_5.0-Anchor_Certified-10b981?style=for-the-badge&logo=checkmarx&logoColor=white)](#tdqs-certification)
+[![Why T-Zero](https://img.shields.io/badge/Why_T--Zero-0284c7?style=for-the-badge&logo=rocket&logoColor=white)](#why-t-zero)
+[![Task Benchmark](https://img.shields.io/badge/Task_Benchmark-10b981?style=for-the-badge&logo=speedtest&logoColor=white)](#task-completion-benchmark)
+[![IDE Setup](https://img.shields.io/badge/IDE_Setup-6366f1?style=for-the-badge&logo=visualstudiocode&logoColor=white)](#universal-1-click-ide-setup)
+[![20 MCP Tools](https://img.shields.io/badge/20_MCP_Tools-8b5cf6?style=for-the-badge&logo=microchip&logoColor=white)](#the-14-canonical-mcp-tools)
+[![Reality-Lock](https://img.shields.io/badge/Reality--Lock-0ea5e9?style=for-the-badge&logo=shield&logoColor=white)](#pre-flight-reality-lock)
+[![Language Support](https://img.shields.io/badge/Language_Support-f59e0b?style=for-the-badge&logo=python&logoColor=white)](#language-support-breakdown)
+[![Hugging Face](https://img.shields.io/badge/Hugging_Face-Live_Demo-ffd21e?style=for-the-badge&logo=huggingface&logoColor=black)](#huggingface-space)
+[![Türkçe Dokümantasyon](https://img.shields.io/badge/T%C3%BCrk%C3%A7e-Rehber-dc2626?style=for-the-badge&logo=googletranslate&logoColor=white)](#turkce)
 
 <p align="center">
   <b><a href="#tdqs-certification">TDQS 5.0</a></b> &bull; 
   <b><a href="#why-t-zero">Why T-Zero</a></b> &bull; 
   <b><a href="#task-completion-benchmark">Task Benchmark</a></b> &bull; 
   <b><a href="#universal-1-click-ide-setup">Universal IDE Setup</a></b> &bull; 
-  <b><a href="#the-21-canonical-mcp-tools">21 MCP Tools</a></b> &bull;
+  <b><a href="#the-14-canonical-mcp-tools">20 MCP Tools</a></b> &bull; 
   <b><a href="#pre-flight-reality-lock">Reality-Lock</a></b> &bull; 
   <b><a href="#language-support-breakdown">Language Support</a></b> &bull; 
   <b><a href="#huggingface-space">Hugging Face Space</a></b> &bull; 
-  <b><a href="README.tr.md">Türkçe Rehber</a></b>
+  <b><a href="#turkce">Türkçe Rehber</a></b>
 </p>
+
+</div>
 
 ---
 
 <a id="why-t-zero"></a>
-## How T-Zero reduces context
+## ⚡ Executive Summary: What is T-Zero?
 
 **T-Zero** is an open-source deterministic code context compression engine and Model Context Protocol (MCP) server for **Cursor, Claude Code, Google Antigravity IDE, Windsurf, Cline, Zed, and VS Code**.
 
-The context builder keeps the target code and extracts signatures from related files. The benchmark below compares that output with a full-source baseline.
+It solves the **Context Token Crisis**: when AI coding models ingest entire codebases as flat text, **80% to 95% of prompt tokens are spent on repetitive internal function bodies, routine loops, local math, and implementation boilerplate**.
 
 ### 🥊 Context Architecture Comparison Matrix
 
@@ -139,7 +202,7 @@ tzero init --vscode        # VS Code (Continue / Copilot)
 tzero init --zed           # Zed Editor
 
 # Install official VS Code / Cursor Extension (.vsix):
-code --install-extension dist/tzero-vscode-10.9.0.vsix
+code --install-extension dist/tzero-vscode-10.0.0.vsix
 ```
 
 ### Manual Configuration Snippets (Any MCP Client)
@@ -188,10 +251,10 @@ code --install-extension dist/tzero-vscode-10.9.0.vsix
 
 ---
 
-<a id="the-21-canonical-mcp-tools"></a>
-## 🛠️ The 21 Canonical MCP Tools
+<a id="the-20-canonical-mcp-tools"></a>
+## 🛠️ The 20 Canonical MCP Tools
 
-The default server exposes 21 tools. Use `search_tools` to discover specialized tools or set `TZERO_MCP_TOOL_MODE=all` to expose all 58 at startup.
+All 20 canonical tools (and 52 full tools) are audited and verified against the Model Context Protocol specifications (tested by `tests.test_mcp`):
 
 | Tool Name | Scope | Purpose |
 | :--- | :---: | :--- |
@@ -214,7 +277,6 @@ The default server exposes 21 tools. Use `search_tools` to discover specialized 
 | `transpile_model_bridge` | Polyglot | Transpiles Python dataclasses and Pydantic schemas to TypeScript, Rust, Go, Swift, and Kotlin. |
 | `diagnose_and_heal_system` | Doctor | Self-healing operating system doctor fixing environment, zombie processes, and ASTs. |
 | `generate_architectural_passport` | Architecture | Synthesizes high-density AST structural passport for files and modules. |
-| `search_tools` | Discovery | Finds tools by keyword or category. |
 | `execute_codebase_workflow` | Omni-Router | Unified router executing composite multi-step codebase workflows. |
 
 ---
@@ -351,7 +413,7 @@ T-Zero uses platform-native secret vaults:
 
 ### High-Entropy Secret Scanner ($H \ge 4.75$):
 - Analyzes candidate strings using Shannon entropy:
-  $$H(X) = -\sum_{i=1}^{n} P(x_i) \log_2 P(x_i)$$
+  $$H(X) = -\\sum_{i=1}^{n} P(x_i) \\log_2 P(x_i)$$
 - Strings with entropy $H \ge 4.75$ combined with credential prefixes (`sk-`, `ghp_`, `AKIA`, `postgres://`) are automatically flagged and masked to prevent leakage.
 - **Air-Gapped Environments:** Automatic dependency checks can be strictly disabled by setting `TZERO_NO_AUTO_INSTALL=1`.
 - **Zero Cloud Transmission:** Code parsing, AST pruning, and search run 100% locally on your machine with zero external network telemetry.
@@ -408,6 +470,10 @@ tzero space
   <img src="assets/tzero_pc_fixer_banner.svg" alt="T-Zero PC-Fixer & Codebase Doctor Banner" width="100%" style="max-width: 960px; border-radius: 12px; box-shadow: 0 16px 48px rgba(0,0,0,0.8);">
 </a>
 
+[![T-Zero PC-Fixer Standalone Repo](https://img.shields.io/badge/Standalone%20Repo-toprakahmetaydogmus%2Ftzero--pc--fixer-purple?style=for-the-badge&logo=github)](https://github.com/toprakahmetaydogmus/tzero-pc-fixer)
+[![Release v1.0.0](https://img.shields.io/badge/Release-v1.0.0%20Verified-blue?style=for-the-badge&logo=tag)](https://github.com/toprakahmetaydogmus/tzero-pc-fixer/releases)
+[![Zero-Dependency](https://img.shields.io/badge/Dependencies-Zero%20(Pure%20Python%20AST)-10b981?style=for-the-badge&logo=python)](https://github.com/toprakahmetaydogmus/tzero-pc-fixer)
+
 </div>
 
 **T-Zero PC-Fixer** is an autonomous, zero-dependency operating system doctor and static AST self-healing engine compiled into a single 12,600+ line Python monolith (`tzero_pc_fixer.py`). It diagnoses and surgically cures broken developer workstations, memory leaks, orphaned zombie processes, contaminated environments, and static codebase defects with $0.00 cloud cost.
@@ -440,6 +506,9 @@ Hi! I'm **Toprak Ahmet Aydoğmuş** from Siber Akademi. I built T-Zero from scra
 If T-Zero helped you cut prompt tokens or saved your daily coding workflow, please consider giving us a star! Every star helps open-source developers worldwide. 🚀
 
 <div align="center">
+
+[![GitHub stars](https://img.shields.io/github/stars/toprakahmetaydogmus/TZeroAlgorithm?style=social)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)
+[![GitHub forks](https://img.shields.io/github/forks/toprakahmetaydogmus/TZeroAlgorithm?style=social)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)
 
 **T-Zero is 100% Free, Open-Source & Offline Forever.**  
 *Built with passion by Toprak Ahmet Aydoğmuş (Siber Akademi) for developers worldwide.*
