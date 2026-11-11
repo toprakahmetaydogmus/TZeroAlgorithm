@@ -8,7 +8,7 @@ import tempfile
 import unittest
 from unittest import mock
 
-import tzero_rust_bridge
+from tzero import tzero_rust_bridge
 
 
 class TestRustBridgeAndAgentKernel(unittest.TestCase):
@@ -63,7 +63,7 @@ class TestRustBridgeAndAgentKernel(unittest.TestCase):
 
     def test_cli_agent_kernel_dry_run(self):
         proc = subprocess.run(
-            [sys.executable, "tzero_v3.py", "agent-kernel", "--dir", "."],
+            [sys.executable, "tzero/tzero_v3.py", "agent-kernel", "--dir", "."],
             capture_output=True,
             text=True,
             check=True,

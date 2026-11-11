@@ -13,15 +13,15 @@ import tempfile
 import unittest
 from unittest import mock
 
-import tzero_deps
-from tzero_contracts import ASTContractComparator, SemVerBump
-from tzero_federation import FederationSyncEngine
-from tzero_hooks import evaluate_post_tool_use, evaluate_pre_tool_use, install_hooks
-from tzero_lsp import TZeroLSPServer
-from tzero_packer import pack_workspace
-from tzero_rust_bridge import AgentKernelSandbox
-from tzero_scip import ScipIndexImporter
-from tzero_snapshot import SnapshotEngine
+from tzero import tzero_deps
+from tzero.tzero_contracts import ASTContractComparator, SemVerBump
+from tzero.tzero_federation import FederationSyncEngine
+from tzero.tzero_hooks import evaluate_post_tool_use, evaluate_pre_tool_use, install_hooks
+from tzero.tzero_lsp import TZeroLSPServer
+from tzero.tzero_packer import pack_workspace
+from tzero.tzero_rust_bridge import AgentKernelSandbox
+from tzero.tzero_scip import ScipIndexImporter
+from tzero.tzero_snapshot import SnapshotEngine
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
@@ -107,7 +107,7 @@ class TestV11EndToEndIntegration(unittest.TestCase):
 
             # 1. --scan --format json real metrics
             scan_proc = subprocess.run(
-                [sys.executable, os.path.join(ROOT_DIR, "tzero_v3.py"), "--scan", host_ws, "--format", "json"],
+                [sys.executable, os.path.join(ROOT_DIR, "tzero", "tzero_v3.py"), "--scan", host_ws, "--format", "json"],
                 cwd=ROOT_DIR,
                 capture_output=True,
                 text=True,
@@ -269,7 +269,7 @@ class TestV11EndToEndIntegration(unittest.TestCase):
         out_deep = io.StringIO()
         tokenizer = mock.Mock()
         with (
-            mock.patch("tzero_polyglot._BPE_ENCODING_CACHE", {}),
+            mock.patch("tzero.tzero_polyglot._BPE_ENCODING_CACHE", {}),
             mock.patch.dict(sys.modules, {"tiktoken": tokenizer}),
             mock.patch.object(tzero_deps, "ensure_dependencies") as install_deps,
             contextlib.redirect_stdout(out_deep),
@@ -296,7 +296,7 @@ class TestV11EndToEndIntegration(unittest.TestCase):
 
         # Ensure failure increments failure count and returns 1
         out_fail = io.StringIO()
-        with mock.patch("tzero_scip.ScipIndexImporter.from_scip_dict", side_effect=RuntimeError("synthetic scip error")), \
+        with mock.patch("tzero.tzero_scip.ScipIndexImporter.from_scip_dict", side_effect=RuntimeError("synthetic scip error")), \
                 contextlib.redirect_stdout(out_fail):
             code_fail = tzero_deps.run_doctor(deep=True)
         fail_text = out_fail.getvalue()
@@ -307,7 +307,7 @@ class TestV11EndToEndIntegration(unittest.TestCase):
     def test_cli_doctor_deep_and_help_discovery(self):
         # 8. Subprocess --doctor --deep returns exit code 0
         proc_deep = subprocess.run(
-            [sys.executable, os.path.join(ROOT_DIR, "tzero_v3.py"), "--doctor", "--deep"],
+            [sys.executable, os.path.join(ROOT_DIR, "tzero", "tzero_v3.py"), "--doctor", "--deep"],
             cwd=ROOT_DIR,
             capture_output=True,
             text=True,
@@ -322,7 +322,7 @@ class TestV11EndToEndIntegration(unittest.TestCase):
 
         # Natural subcommand `tzero doctor --deep` also works
         proc_sub = subprocess.run(
-            [sys.executable, os.path.join(ROOT_DIR, "tzero_v3.py"), "doctor", "--deep"],
+            [sys.executable, os.path.join(ROOT_DIR, "tzero", "tzero_v3.py"), "doctor", "--deep"],
             cwd=ROOT_DIR,
             capture_output=True,
             text=True,
@@ -335,7 +335,7 @@ class TestV11EndToEndIntegration(unittest.TestCase):
 
         # Help and quickstart surface v11 flags
         proc_help = subprocess.run(
-            [sys.executable, os.path.join(ROOT_DIR, "tzero_v3.py"), "--help"],
+            [sys.executable, os.path.join(ROOT_DIR, "tzero", "tzero_v3.py"), "--help"],
             cwd=ROOT_DIR,
             capture_output=True,
             text=True,
@@ -348,7 +348,7 @@ class TestV11EndToEndIntegration(unittest.TestCase):
             self.assertIn(flag, proc_help.stdout)
 
         proc_info = subprocess.run(
-            [sys.executable, os.path.join(ROOT_DIR, "tzero_v3.py"), "--info"],
+            [sys.executable, os.path.join(ROOT_DIR, "tzero", "tzero_v3.py"), "--info"],
             cwd=ROOT_DIR,
             capture_output=True,
             text=True,

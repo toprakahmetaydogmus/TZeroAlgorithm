@@ -2,7 +2,7 @@
 """Unit tests for multi-provider AI adapters."""
 
 import unittest
-from tzero_v3 import (
+from tzero.tzero_v3 import (
     PROVIDERS,
     NvidiaProvider,
     OpenAIProvider,

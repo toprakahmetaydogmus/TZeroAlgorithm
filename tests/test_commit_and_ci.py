@@ -5,8 +5,8 @@ import os
 import tempfile
 import unittest
 
-from tzero_commit import LocalSemanticCommitSynthesizer
-from tzero_ci import CIPipelineGenerator
+from tzero.tzero_commit import LocalSemanticCommitSynthesizer
+from tzero.tzero_ci import CIPipelineGenerator
 
 
 class TestCommitAndCI(unittest.TestCase):

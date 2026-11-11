@@ -2,7 +2,7 @@
 """Unit tests for Universal Polyglot AST Engine (tzero_polyglot.py)."""
 
 import unittest
-from tzero_polyglot import PolyglotTokenReducer
+from tzero.tzero_polyglot import PolyglotTokenReducer
 
 
 class TestPolyglotEngine(unittest.TestCase):
@@ -270,7 +270,7 @@ end
             self.assertEqual(ch.count("{"), ch.count("}"), f"Mid-block split detected in chunk:\n{ch}")
 
     def test_optional_tree_sitter_hook_and_unified_extractor(self):
-        from tzero_v3 import PolyglotSignatureExtractor
+        from tzero.tzero_v3 import PolyglotSignatureExtractor
         self.assertIsInstance(PolyglotTokenReducer.has_tree_sitter(), bool)
 
         called = []

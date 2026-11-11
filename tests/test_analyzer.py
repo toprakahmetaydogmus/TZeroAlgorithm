@@ -4,7 +4,7 @@
 import ast
 import unittest
 
-from tzero_v3 import (
+from tzero.tzero_v3 import (
     StaticCodeAnalyzer,
     PythonASTParser,
     PythonASTRefactorer,

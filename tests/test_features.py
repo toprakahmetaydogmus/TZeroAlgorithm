@@ -20,7 +20,7 @@ import shutil
 # Ensure workspace root is in sys.path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from tzero_features import (
+from tzero.tzero_features import (
     ChangeImpactAnalyzer,
     ArchitectureRuleEngine,
     AgentRulesGenerator,

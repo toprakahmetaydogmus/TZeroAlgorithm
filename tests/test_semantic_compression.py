@@ -7,7 +7,7 @@ Version: 4.2.0
 
 import os
 import unittest
-from tzero_jarvis.semantic_compressor import (
+from tzero.tzero_jarvis.semantic_compressor import (
     SemanticTriplet,
     SemanticTripletExtractor,
     VectorQuantizedCodebook,

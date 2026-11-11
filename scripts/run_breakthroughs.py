@@ -14,10 +14,10 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 if SCRIPT_DIR not in sys.path:
     sys.path.insert(0, SCRIPT_DIR)
 
-from tzero_jarvis.semantic_compressor import SemanticExtractor, get_global_compressor
-from tzero_jarvis.minhash_lsh import MinHashLSHEngine
-from tzero_jarvis.swarm_bft import ByzantineFaultTolerantSwarm
-from tzero_jarvis.latent_press import LatentPressCompressor
+from tzero.tzero_jarvis.semantic_compressor import SemanticExtractor, get_global_compressor
+from tzero.tzero_jarvis.minhash_lsh import MinHashLSHEngine
+from tzero.tzero_jarvis.swarm_bft import ByzantineFaultTolerantSwarm
+from tzero.tzero_jarvis.latent_press import LatentPressCompressor
 
 
 def main():

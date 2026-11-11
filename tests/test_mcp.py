@@ -5,7 +5,7 @@ import os
 import unittest
 import tempfile
 import asyncio
-import tzero_mcp
+from tzero import tzero_mcp
 
 
 def tool_result_text(result):

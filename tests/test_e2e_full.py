@@ -12,9 +12,9 @@ import unittest
 import urllib.request
 import urllib.parse
 
-from tzero_polyglot import PolyglotTokenReducer
-from tzero_dashboard import start_dashboard_server
-import tzero_mcp
+from tzero.tzero_polyglot import PolyglotTokenReducer
+from tzero.tzero_dashboard import start_dashboard_server
+from tzero import tzero_mcp
 
 
 class TestPolyglotDeepFidelity(unittest.TestCase):
@@ -126,7 +126,7 @@ class TestAllMCPToolsExhaustive(unittest.TestCase):
         self.assertTrue(len(res) > 10)
 
         # 6. audit_codebase_quality
-        res = self.call("audit_codebase_quality", {"project_root": ".", "file_path": "tzero_polyglot.py"})
+        res = self.call("audit_codebase_quality", {"project_root": ".", "file_path": "tzero/tzero_polyglot.py"})
         self.assertTrue(len(res) > 10)
 
         # 7. find_code_duplicity
@@ -175,7 +175,7 @@ class TestAllMCPToolsExhaustive(unittest.TestCase):
         self.assertTrue(len(res) > 10)
 
         # 18. get_smart_skeleton_context
-        res = self.call("get_smart_skeleton_context", {"focus_file": "tzero_polyglot.py", "project_root": "."})
+        res = self.call("get_smart_skeleton_context", {"focus_file": "tzero/tzero_polyglot.py", "project_root": "."})
         self.assertTrue(len(res) > 10)
 
         # 19. rank_repository_pagerank

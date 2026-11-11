@@ -2,7 +2,7 @@
 """Unit tests for DevOps and Database Infrastructure AST Schema Compressor."""
 
 import unittest
-from tzero_infra import SchemaInfraReducer
+from tzero.tzero_infra import SchemaInfraReducer
 
 
 class TestSchemaInfraReducer(unittest.TestCase):

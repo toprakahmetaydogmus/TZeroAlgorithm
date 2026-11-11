@@ -4,9 +4,9 @@ from pathlib import Path
 import unittest
 from unittest.mock import patch
 
-import tzero_mcp
-from tzero_fixer.mcp_server import PCFixerMcpServer
-from tzero_pc_fixer import PCFixerMcpServer as BundledPCFixer
+from tzero import tzero_mcp
+from tzero.tzero_fixer.mcp_server import PCFixerMcpServer
+from tzero.tzero_pc_fixer import PCFixerMcpServer as BundledPCFixer
 
 
 ROOT = Path(__file__).resolve().parents[1]

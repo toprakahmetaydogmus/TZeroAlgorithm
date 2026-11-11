@@ -12,7 +12,7 @@ import subprocess
 import sys
 import ast
 
-from tzero_semantic_merge import ASTSemanticMerger, heal_conflicts
+from tzero.tzero_semantic_merge import ASTSemanticMerger, heal_conflicts
 
 
 class TestSemanticMerger(unittest.TestCase):
@@ -112,7 +112,7 @@ def beta(): return 2
 """)
             cmd = [
                 sys.executable,
-                "tzero_v3.py",
+                "tzero/tzero_v3.py",
                 "--merge-heal",
                 file_path
             ]

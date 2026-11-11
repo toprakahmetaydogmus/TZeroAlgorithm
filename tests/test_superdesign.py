@@ -13,7 +13,7 @@ ROOT_DIR = os.path.abspath(os.path.join(SCRIPT_DIR, ".."))
 if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
-import tzero_superdesign as sd
+from tzero import tzero_superdesign as sd
 
 
 class TestSuperdesignOrchestrator(unittest.TestCase):
@@ -139,7 +139,7 @@ class TestSuperdesignOrchestrator(unittest.TestCase):
 
     def test_mcp_tools_registration(self):
         """Verifies that all 5 Superdesign tools are registered in create_mcp_server() when in full mode."""
-        import tzero_mcp
+        from tzero import tzero_mcp
         old_mode = os.environ.get("TZERO_MCP_TOOL_MODE")
         os.environ["TZERO_MCP_TOOL_MODE"] = "all"
         try:

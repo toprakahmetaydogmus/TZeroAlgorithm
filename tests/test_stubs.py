@@ -3,7 +3,7 @@ import os
 import tempfile
 import unittest
 
-from tzero_stubs import TypeStubGenerator
+from tzero.tzero_stubs import TypeStubGenerator
 
 
 class TestTypeStubGenerator(unittest.TestCase):

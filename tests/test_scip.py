@@ -8,7 +8,7 @@ import sys
 import tempfile
 import unittest
 
-import tzero_scip
+from tzero import tzero_scip
 
 
 class TestSCIPImporter(unittest.TestCase):
@@ -92,7 +92,7 @@ class TestSCIPImporter(unittest.TestCase):
             with open(idx, "w", encoding="utf-8") as f:
                 json.dump(payload, f)
             proc = subprocess.run(
-                [sys.executable, "tzero_v3.py", "--scip-import", idx, "--scip-symbol", "Store"],
+                [sys.executable, "tzero/tzero_v3.py", "--scip-import", idx, "--scip-symbol", "Store"],
                 capture_output=True,
                 text=True,
                 check=True,

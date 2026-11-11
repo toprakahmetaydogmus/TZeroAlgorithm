@@ -7,7 +7,7 @@ import shutil
 import sys
 import tempfile
 import unittest
-from tzero_mutation import ASTMutationEngine, ASTMutationTransformer, Mutant, MutationReport
+from tzero.tzero_mutation import ASTMutationEngine, ASTMutationTransformer, Mutant, MutationReport
 
 
 class TestASTMutationEngine(unittest.TestCase):

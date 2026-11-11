@@ -10,7 +10,7 @@ import unittest
 class TestCLI(unittest.TestCase):
     def test_version_flag(self):
         res = subprocess.run(
-            [sys.executable, "tzero_v3.py", "--version"],
+            [sys.executable, "tzero/tzero_v3.py", "--version"],
             capture_output=True,
             text=True,
             encoding="utf-8",
@@ -22,13 +22,13 @@ class TestCLI(unittest.TestCase):
 
     def test_mcp_version_flag(self):
         res = subprocess.run(
-            [sys.executable, "tzero_mcp.py", "--version"],
+            [sys.executable, "tzero/tzero_mcp.py", "--version"],
             capture_output=True,
             text=True,
             encoding="utf-8",
             errors="replace"
         )
-        import tzero_mcp
+        from tzero import tzero_mcp
         self.assertIn(tzero_mcp.SERVER_VERSION, res.stdout)
 
     def test_addmcp_version_flag(self):
@@ -45,7 +45,7 @@ class TestCLI(unittest.TestCase):
 
     def test_scan_flag(self):
         res = subprocess.run(
-            [sys.executable, "tzero_v3.py", "--scan", "."],
+            [sys.executable, "tzero/tzero_v3.py", "--scan", "."],
             capture_output=True,
             text=True,
             encoding="utf-8",
@@ -57,7 +57,7 @@ class TestCLI(unittest.TestCase):
 
     def test_audit_flag(self):
         res = subprocess.run(
-            [sys.executable, "tzero_v3.py", "--audit", "."],
+            [sys.executable, "tzero/tzero_v3.py", "--audit", "."],
             capture_output=True,
             text=True,
             encoding="utf-8",
@@ -80,7 +80,7 @@ class TestCLI(unittest.TestCase):
 
     def test_quickstart_info(self):
         res = subprocess.run(
-            [sys.executable, "tzero_v3.py", "--info"],
+            [sys.executable, "tzero/tzero_v3.py", "--info"],
             capture_output=True,
             text=True,
             encoding="utf-8",
@@ -91,14 +91,14 @@ class TestCLI(unittest.TestCase):
         self.assertIn("tzero-add-mcp", res.stdout)
 
     def test_watch_mode(self):
-        import tzero_v3
+        from tzero import tzero_v3
         res = tzero_v3.run_watch_mode("tests", once_test=True)
         self.assertTrue(res)
 
     def test_natural_subcommands_without_dashes(self):
         # 1. 'tzero audit' should map to '--audit'
         res_audit = subprocess.run(
-            [sys.executable, "tzero_v3.py", "audit", "tests/test_cli.py"],
+            [sys.executable, "tzero/tzero_v3.py", "audit", "tests/test_cli.py"],
             capture_output=True,
             text=True,
             encoding="utf-8",
@@ -109,7 +109,7 @@ class TestCLI(unittest.TestCase):
 
         # 2. 'tzero doctor' should map to '--doctor'
         res_doc = subprocess.run(
-            [sys.executable, "tzero_v3.py", "doctor"],
+            [sys.executable, "tzero/tzero_v3.py", "doctor"],
             capture_output=True,
             text=True,
             encoding="utf-8",
@@ -120,7 +120,7 @@ class TestCLI(unittest.TestCase):
 
         # 3. 'tzero cost' should map to '--cost'
         res_cost = subprocess.run(
-            [sys.executable, "tzero_v3.py", "cost", "tests"],
+            [sys.executable, "tzero/tzero_v3.py", "cost", "tests"],
             capture_output=True,
             text=True,
             encoding="utf-8",
@@ -131,7 +131,7 @@ class TestCLI(unittest.TestCase):
 
         # 4. 'tzero drift' should map to '--drift'
         res_drift = subprocess.run(
-            [sys.executable, "tzero_v3.py", "drift", "tests"],
+            [sys.executable, "tzero/tzero_v3.py", "drift", "tests"],
             capture_output=True,
             text=True,
             encoding="utf-8",
@@ -142,7 +142,7 @@ class TestCLI(unittest.TestCase):
 
         # 5. 'tzero review' should run autonomous code review gate
         res_rev = subprocess.run(
-            [sys.executable, "tzero_v3.py", "review"],
+            [sys.executable, "tzero/tzero_v3.py", "review"],
             capture_output=True,
             text=True,
             encoding="utf-8",
@@ -153,7 +153,7 @@ class TestCLI(unittest.TestCase):
 
         # 6. 'tzero demo' should run live instant demo
         res_demo = subprocess.run(
-            [sys.executable, "tzero_v3.py", "demo"],
+            [sys.executable, "tzero/tzero_v3.py", "demo"],
             capture_output=True,
             text=True,
             encoding="utf-8",
@@ -165,7 +165,7 @@ class TestCLI(unittest.TestCase):
 
         # 7. 'tzero check-arch' should run architecture live audit
         res_arch = subprocess.run(
-            [sys.executable, "tzero_v3.py", "check-arch"],
+            [sys.executable, "tzero/tzero_v3.py", "check-arch"],
             capture_output=True,
             text=True,
             encoding="utf-8",
@@ -176,7 +176,7 @@ class TestCLI(unittest.TestCase):
 
         # 8. 'tzero contracts' should run public API contract guardian
         res_contracts = subprocess.run(
-            [sys.executable, "tzero_v3.py", "contracts", "HEAD"],
+            [sys.executable, "tzero/tzero_v3.py", "contracts", "HEAD"],
             capture_output=True,
             text=True,
             encoding="utf-8",
@@ -187,7 +187,7 @@ class TestCLI(unittest.TestCase):
 
         # 9. 'tzero debt' should run code health and technical debt index
         res_debt = subprocess.run(
-            [sys.executable, "tzero_v3.py", "debt", "tests/test_cli.py"],
+            [sys.executable, "tzero/tzero_v3.py", "debt", "tests/test_cli.py"],
             capture_output=True,
             text=True,
             encoding="utf-8",
@@ -198,7 +198,7 @@ class TestCLI(unittest.TestCase):
 
         # 10. 'tzero budget' should run context budget optimizer and compression certifier
         res_budget = subprocess.run(
-            [sys.executable, "tzero_v3.py", "budget", "tests/test_cli.py", "--target-tokens", "5000"],
+            [sys.executable, "tzero/tzero_v3.py", "budget", "tests/test_cli.py", "--target-tokens", "5000"],
             capture_output=True,
             text=True,
             encoding="utf-8",
@@ -209,7 +209,7 @@ class TestCLI(unittest.TestCase):
 
         # 11. 'tzero golden' should generate golden baseline
         res_golden = subprocess.run(
-            [sys.executable, "tzero_v3.py", "golden", "generate"],
+            [sys.executable, "tzero/tzero_v3.py", "golden", "generate"],
             capture_output=True,
             text=True,
             encoding="utf-8",
@@ -225,7 +225,7 @@ class TestCLI(unittest.TestCase):
             with open(os.path.join(tmp, "mod.py"), "w", encoding="utf-8") as fh:
                 fh.write("def hello_world() -> str:\n    return 'ok'\n")
             res = subprocess.run(
-                [sys.executable, os.path.join(root_dir, "tzero_v3.py"), "--export-repomap", "-", "--dir", tmp],
+                [sys.executable, os.path.join(root_dir, "tzero", "tzero_v3.py"), "--export-repomap", "-", "--dir", tmp],
                 cwd=tmp,
                 capture_output=True,
                 text=True,
@@ -258,7 +258,7 @@ class TestCLI(unittest.TestCase):
                     "}\n"
                 )
             proc = subprocess.run(
-                [sys.executable, "tzero_v3.py", "--scan", tmp, "--format", "json"],
+                [sys.executable, "tzero/tzero_v3.py", "--scan", tmp, "--format", "json"],
                 capture_output=True,
                 text=True,
                 check=True,

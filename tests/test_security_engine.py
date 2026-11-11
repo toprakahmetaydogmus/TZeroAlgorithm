@@ -5,7 +5,7 @@ Tests for T-Zero Unified Zero-Leak & Shannon Entropy Security Engine.
 
 import ast
 import unittest
-from tzero_security import (
+from tzero.tzero_security import (
     calculate_shannon_entropy,
     ZeroLeakEngine,
     SECRET_RULES,

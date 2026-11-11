@@ -922,7 +922,7 @@ class ASTContextArchitect:
     @classmethod
     def sanitize_secrets(cls, text: str) -> str:
         """T-001 Zero-Leak Security Sanitizer. Detects and replaces hardcoded secrets."""
-        from tzero_security import ZeroLeakEngine
+        from tzero.tzero_security import ZeroLeakEngine
         return ZeroLeakEngine.sanitize_text(text)
 
 
@@ -948,7 +948,7 @@ class SecurityQualityAuditor:
         lines = code_str.splitlines()
 
         # 1. T-001 Zero-Leak Checks
-        from tzero_security import ZeroLeakEngine
+        from tzero.tzero_security import ZeroLeakEngine
         for finding in ZeroLeakEngine.scan_text(code_str, check_entropy=True):
             findings.append(AuditFinding(
                 tier="T-001 Zero-Leak",
@@ -1408,7 +1408,7 @@ def generate_mcp_config_controller(ide_type: str) -> str:
             "mcpServers": {
                 "tzero-context-architect": {
                     "command": "python",
-                    "args": ["tzero_mcp.py"]
+                    "args": ["-m", "tzero.tzero_mcp"]
                 }
             }
         }

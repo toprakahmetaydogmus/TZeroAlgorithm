@@ -9,7 +9,7 @@ import sys
 import os
 import subprocess
 
-from tzero_bridge import PolyglotTypeBridge
+from tzero.tzero_bridge import PolyglotTypeBridge
 
 
 class TestReversePolyglotBridge(unittest.TestCase):
@@ -91,7 +91,7 @@ class TestReversePolyglotBridge(unittest.TestCase):
     def test_cli_bridge_reverse_flag(self):
         cmd = [
             sys.executable,
-            "tzero_v3.py",
+            "tzero/tzero_v3.py",
             "--bridge-reverse",
             "interface AuthToken { token: string; exp: number; revoked?: boolean; }",
             "--from-lang",

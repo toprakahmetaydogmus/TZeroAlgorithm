@@ -7,7 +7,7 @@ import os
 import unittest
 from contextlib import redirect_stdout
 
-import tzero_hooks
+from tzero import tzero_hooks
 
 
 class TestTZeroHooks(unittest.TestCase):
@@ -94,7 +94,7 @@ class TestTZeroHooks(unittest.TestCase):
             "tool_input": {"file_path": "cli_leak.py", "content": f"K = '{fake_key}'"},
         })
         proc = subprocess.run(
-            [sys.executable, "tzero_v3.py", "hook", "--event", "PreToolUse"],
+            [sys.executable, "tzero/tzero_v3.py", "hook", "--event", "PreToolUse"],
             input=payload,
             capture_output=True,
             text=True,
@@ -360,7 +360,7 @@ class TestTZeroHooks(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp_dir:
             # 1. --hook-install cursor
             proc1 = subprocess.run(
-                [sys.executable, "tzero_v3.py", "--hook-install", "cursor", "--dir", tmp_dir],
+                [sys.executable, "tzero/tzero_v3.py", "--hook-install", "cursor", "--dir", tmp_dir],
                 capture_output=True,
                 text=True,
             )
@@ -370,7 +370,7 @@ class TestTZeroHooks(unittest.TestCase):
 
             # 2. hook --install claude
             proc2 = subprocess.run(
-                [sys.executable, "tzero_v3.py", "hook", "--install", "claude", "--dir", tmp_dir],
+                [sys.executable, "tzero/tzero_v3.py", "hook", "--install", "claude", "--dir", tmp_dir],
                 capture_output=True,
                 text=True,
             )

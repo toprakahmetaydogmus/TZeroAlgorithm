@@ -5,7 +5,7 @@ import json
 import subprocess
 import sys
 import unittest
-from tzero_contracts import (
+from tzero.tzero_contracts import (
     ASTContractExtractor,
     ASTContractComparator,
     ContractDiffReport,
@@ -243,7 +243,7 @@ class TestSARIFContractReport(unittest.TestCase):
 class TestCLIContractsSARIF(unittest.TestCase):
     def test_cli_contracts_sarif_flag(self):
         res = subprocess.run(
-            [sys.executable, "tzero_v3.py", "--contracts", "HEAD", "--contracts-sarif", "-"],
+            [sys.executable, "tzero/tzero_v3.py", "--contracts", "HEAD", "--contracts-sarif", "-"],
             capture_output=True,
             text=True,
             encoding="utf-8",

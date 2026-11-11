@@ -3,7 +3,7 @@ import os
 import tempfile
 import unittest
 
-from tzero_graph_rag import VectorlessGraphRAG
+from tzero.tzero_graph_rag import VectorlessGraphRAG
 
 
 class TestVectorlessGraphRAG(unittest.TestCase):

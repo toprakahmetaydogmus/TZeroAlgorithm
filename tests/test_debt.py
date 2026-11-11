@@ -3,7 +3,7 @@
 
 import ast
 import unittest
-from tzero_debt import (
+from tzero.tzero_debt import (
     CodeHealthAnalyzer,
     ASTCognitiveComplexityVisitor,
 )

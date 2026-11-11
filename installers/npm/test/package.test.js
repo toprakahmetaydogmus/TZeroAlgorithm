@@ -39,7 +39,7 @@ test("tzero core python files exist in srcDir", () => {
     "tzero_mutation.py"
   ];
   for (const f of coreFiles) {
-    assert.strictEqual(fs.existsSync(path.join(tzero.srcDir, f)), true, `Expected ${f} to exist`);
+    assert.strictEqual(fs.existsSync(path.join(tzero.srcDir, "tzero", f)), true, `Expected ${f} to exist`);
   }
 });
 

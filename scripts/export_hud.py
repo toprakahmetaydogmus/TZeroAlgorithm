@@ -4,11 +4,11 @@ Helper script to export the T-Zero Cyberpunk Graph HUD to HTML.
 Developer: Toprak Ahmet Aydoğmuş (Siber Akademi)
 """
 
-from tzero_jarvis.graph_visualizer import CyberpunkGraphVisualizer
-from tzero_jarvis.causal_graph import CausalTemporalGraph
-from tzero_jarvis.semantic_compressor import get_global_compressor
+from tzero.tzero_jarvis.graph_visualizer import CyberpunkGraphVisualizer
+from tzero.tzero_jarvis.causal_graph import CausalTemporalGraph
+from tzero.tzero_jarvis.semantic_compressor import get_global_compressor
 
-def export_hud(output_path="tzero_graph_hud.html"):
+def export_hud(output_path="tzero/tzero_graph_hud.html"):
     c = get_global_compressor()
     g = CausalTemporalGraph(c.codebook)
     for cid, entry in c.codebook.codes.items():

@@ -70,7 +70,7 @@ def sync_release_metadata(target_version: str, check_only: bool = False) -> Dict
         results[rel] = c1 or c2
 
     results["tzero_mcp.py"] = _regex_replace(
-        ROOT_DIR / "tzero_mcp.py",
+        ROOT_DIR / "tzero" / "tzero_mcp.py",
         r'(?m)^(SERVER_VERSION\s*=\s*)"[^"]+"',
         rf'\1"{target_version}"',
         check_only,
@@ -81,12 +81,12 @@ def sync_release_metadata(target_version: str, check_only: bool = False) -> Dict
     c_ban = _regex_replace(addmcp_p, r'1-CLICK MCP INITIALIZATION \(v[0-9]+\.[0-9]+\.[0-9]+\)', f"1-CLICK MCP INITIALIZATION (v{target_version})", check_only)
     results["addmcp.py"] = c_app or c_ban
 
-    tb_p = ROOT_DIR / "tzero_task_benchmark.py"
+    tb_p = ROOT_DIR / "tzero" / "tzero_task_benchmark.py"
     c_tb1 = _regex_replace(tb_p, r'(?m)^(\s*version:\s*str\s*=\s*)"[^"]+"', rf'\1"{target_version}"', check_only)
     c_tb2 = _regex_replace(tb_p, r'BENCHMARK REPORT \(v[0-9]+\.[0-9]+\.[0-9]+\)', f"BENCHMARK REPORT (v{target_version})", check_only)
     results["tzero_task_benchmark.py"] = c_tb1 or c_tb2
 
-    v3_p = ROOT_DIR / "tzero_v3.py"
+    v3_p = ROOT_DIR / "tzero" / "tzero_v3.py"
     c_v1 = _regex_replace(v3_p, r'(T-Zero (?:Developer Console & Context Architect|Geliştirici Konsolu & Bağlam Mimarı) )v[0-9]+\.[0-9]+\.[0-9]+', rf'\1v{target_version}', check_only)
     c_v2 = _regex_replace(v3_p, r'(parser\.add_argument\("--changelog"[^\n]*const=)"v[^"]+"', rf'\1"v{target_version}"', check_only)
     c_v3 = _regex_replace(v3_p, r'(Context Architect )v[0-9]+\.[0-9]+\.[0-9]+( Master Edition)', rf'\1v{target_version}\2', check_only)
@@ -94,7 +94,7 @@ def sync_release_metadata(target_version: str, check_only: bool = False) -> Dict
     c_v5 = _regex_replace(v3_p, r'(GRADIO COCKPIT \()v[0-9]+\.[0-9]+\.[0-9]+(\))', rf'\1v{target_version}\2', check_only)
     results["tzero_v3.py"] = any((c_v1, c_v2, c_v3, c_v4, c_v5))
 
-    tui_p = ROOT_DIR / "tzero_tui.py"
+    tui_p = ROOT_DIR / "tzero" / "tzero_tui.py"
     c_t1 = _regex_replace(tui_p, r'(LIVE COCKPIT )v[0-9]+\.[0-9]+\.[0-9]+', rf'\1v{target_version}', check_only)
     c_t2 = _regex_replace(tui_p, r'(generate_changelog_entry\(version=)"v[0-9]+\.[0-9]+\.[0-9]+"', rf'\1"v{target_version}"', check_only)
     results["tzero_tui.py"] = c_t1 or c_t2
@@ -107,41 +107,31 @@ def sync_npm_sources() -> int:
     npm_src = ROOT_DIR / "installers" / "npm" / "src"
     npm_src.mkdir(parents=True, exist_ok=True)
     pyproject = tomllib.loads((ROOT_DIR / "pyproject.toml").read_text(encoding="utf-8"))
-    modules = pyproject["tool"]["setuptools"]["py-modules"]
-    expected_py = {f"{mod}.py" for mod in modules}
-    allowed_pkgs = ("tzero_jarvis", "tzero_fixer")
+    config = pyproject["tool"]["setuptools"]
+    paths = {pathlib.Path(f"{name}.py") for name in config["py-modules"]}
+    paths.add(pathlib.Path("tzero.py"))
+    for package in config["packages"]:
+        package_dir = ROOT_DIR.joinpath(*package.split("."))
+        paths.update(path.relative_to(ROOT_DIR) for path in package_dir.glob("*.py"))
+    paths.add(pathlib.Path("tzero/tzero_graph_hud.html"))
 
-    for existing_py in npm_src.glob("*.py"):
-        if existing_py.name not in expected_py:
-            existing_py.unlink()
-    for existing_dir in npm_src.iterdir():
-        if existing_dir.is_dir() and existing_dir.name not in allowed_pkgs:
-            shutil.rmtree(existing_dir)
+    for existing in npm_src.rglob("*"):
+        if existing.is_file() and existing.suffix in {".py", ".html"}:
+            if existing.relative_to(npm_src) not in paths:
+                existing.unlink()
 
-    copied = 0
-    for mod in modules:
-        src_file = ROOT_DIR / f"{mod}.py"
-        if src_file.is_file():
-            shutil.copy2(src_file, npm_src / src_file.name)
-            copied += 1
-    for pkg in allowed_pkgs:
-        src_pkg = ROOT_DIR / pkg
-        dst_pkg = npm_src / pkg
-        dst_pkg.mkdir(parents=True, exist_ok=True)
-        for existing_pkg_py in dst_pkg.glob("*.py"):
-            if not (src_pkg / existing_pkg_py.name).is_file():
-                existing_pkg_py.unlink()
-        for py_file in src_pkg.glob("*.py"):
-            shutil.copy2(py_file, dst_pkg / py_file.name)
-            copied += 1
-    return copied
+    for relative_path in sorted(paths):
+        target = npm_src / relative_path
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(ROOT_DIR / relative_path, target)
+    return len(paths)
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Synchronize T-Zero release metadata.")
     parser.add_argument("--version", default="10.9.0", help="Canonical target version")
     parser.add_argument("--check", action="store_true", help="Exit non-zero if any manifest drifts")
-    parser.add_argument("--sync-npm", action="store_true", help="Copy root modules into installers/npm/src/")
+    parser.add_argument("--sync-npm", action="store_true", help="Copy Python package files into installers/npm/src/")
     args = parser.parse_args()
 
     if args.sync_npm:

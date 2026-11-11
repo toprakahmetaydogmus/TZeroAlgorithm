@@ -7,7 +7,7 @@ import os
 import sys
 import subprocess
 import unittest
-from tzero_subagent_engine import (
+from tzero.tzero_subagent_engine import (
     DynamicSubagentDecomposer,
     AutonomousSwarmCoordinator,
     get_autonomous_swarm_coordinator
@@ -51,7 +51,7 @@ class TestDynamicSubagents(unittest.TestCase):
         self.assertIn("T-Zero Swarm Executive Dossier", dossier.summary_markdown)
 
     def test_mcp_orchestrate_agent_swarm_dynamic_mode(self):
-        import tzero_mcp
+        from tzero import tzero_mcp
         server = tzero_mcp.create_mcp_server()
         import asyncio
         res = asyncio.run(server.call_tool(
@@ -67,7 +67,7 @@ class TestDynamicSubagents(unittest.TestCase):
 
     def test_cli_subagent_invocation(self):
         proc = subprocess.run(
-            [sys.executable, "tzero_v3.py", "subagent", "Audit security and test coverage"],
+            [sys.executable, "tzero/tzero_v3.py", "subagent", "Audit security and test coverage"],
             capture_output=True,
             text=True,
             encoding="utf-8",

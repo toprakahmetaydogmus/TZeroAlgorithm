@@ -9,8 +9,8 @@ import sys
 import unittest
 from unittest import mock
 
-import tzero_deps
-from tzero_deps import Dependency
+from tzero import tzero_deps
+from tzero.tzero_deps import Dependency
 
 FAKE_MISSING = Dependency("definitely_not_a_real_module_xyz", "fake-package", "1.0.0", "test")
 

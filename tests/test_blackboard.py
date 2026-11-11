@@ -9,7 +9,7 @@ import tempfile
 import os
 import shutil
 
-from tzero_blackboard import MultiAgentBlackboard, get_shared_blackboard
+from tzero.tzero_blackboard import MultiAgentBlackboard, get_shared_blackboard
 
 
 class TestMultiAgentBlackboard(unittest.TestCase):

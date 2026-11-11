@@ -1,5 +1,6 @@
 @echo off
 setlocal
+cd /d "%~dp0..\.."
 title SIBER AKADEMI - T-Zero V3 Launcher
 color 0B
 
@@ -33,9 +34,9 @@ if %errorlevel% neq 0 (
 
 echo [OK] Starting application...
 echo.
-start "" pythonw tzero_v3.py
+start "" pythonw -m tzero
 if %errorlevel% neq 0 (
-    python tzero_v3.py
+    python -m tzero
 )
 endlocal
 exit /b 0

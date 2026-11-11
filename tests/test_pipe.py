@@ -2,7 +2,7 @@
 """Unit tests for T-Zero CLI Stdin/Stdout Pipe & Streaming Token Compressor."""
 
 import unittest
-from tzero_pipe import PipeCompressor
+from tzero.tzero_pipe import PipeCompressor
 
 
 class TestPipeCompressor(unittest.TestCase):

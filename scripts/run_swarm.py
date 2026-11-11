@@ -6,7 +6,7 @@ Developer: Toprak Ahmet Aydoğmuş (Siber Akademi)
 
 import sys
 import json
-from tzero_jarvis.swarm import SwarmCoordinator
+from tzero.tzero_jarvis.swarm import SwarmCoordinator
 
 def run_swarm(goal: str = "ESP32 mikrodenetleyici üzerinde nRF24L01 modülünü SPI veriyolu ile güvenli şekilde devreye al"):
     print(f"[*] Hedef Görev: {goal}\n")

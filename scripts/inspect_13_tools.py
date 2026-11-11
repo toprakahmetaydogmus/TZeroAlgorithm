@@ -1,6 +1,6 @@
 import os
 import json
-import tzero_mcp
+from tzero import tzero_mcp
 
 os.environ["TZERO_MCP_TOOL_MODE"] = "all"
 server = tzero_mcp.create_mcp_server()

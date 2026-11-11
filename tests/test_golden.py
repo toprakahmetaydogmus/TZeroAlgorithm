@@ -4,7 +4,7 @@
 import json
 import os
 import unittest
-from tzero_golden import ASTGoldenRegressionEngine, GoldenBaseline
+from tzero.tzero_golden import ASTGoldenRegressionEngine, GoldenBaseline
 
 
 class TestASTGoldenRegressionEngine(unittest.TestCase):

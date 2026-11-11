@@ -20,38 +20,38 @@ import time
 import unittest
 from pathlib import Path
 
-from tzero_pc_fixer import (
+from tzero.tzero_pc_fixer import (
     PCFixerDoctor,
 )
-from tzero_fixer.models import (
+from tzero.tzero_fixer.models import (
     DiagnosticCategory,
     DiagnosticIssue,
     HealAction,
     SeverityLevel,
     SystemPlatform,
 )
-from tzero_fixer.system_repair_recipes import SystemRepairPlaybooks
-from tzero_fixer.security_cwe_database import CWESecurityDatabase
-from tzero_fixer.dependency_vulnerability_auditor import DependencyVulnerabilityAuditor
-from tzero_fixer.polyglot_schema_validator import PureJsonSchemaValidator, OpenApiSpecLinter, EditorConfigHealer
-from tzero_fixer.smart_patch_recommender import SmartPatchRecommender
-from tzero_fixer.code_duplicity_and_refactorer import ASTDuplicityRefactorer
-from tzero_fixer.synthetic_workspace_generator import SyntheticWorkspaceGenerator
-from tzero_fixer.hardware_and_disk_doctor import HardwareAndDiskSurgeon
-from tzero_fixer.packaging_abi_surgeon import PackagingAbiSurgeon
-from tzero_fixer.git_advanced_surgeon import GitAdvancedSurgeon
-from tzero_fixer.polyglot_build_healer import PolyglotBuildHealer
-from tzero_fixer.cwe_remediator import SecurityCweRemediator
-from tzero_fixer.dead_code_eliminator import DeadCodeEliminator
-from tzero_fixer.async_io_modernizer import AsyncIoModernizer
-from tzero_fixer.mcp_server import PCFixerMcpServer
+from tzero.tzero_fixer.system_repair_recipes import SystemRepairPlaybooks
+from tzero.tzero_fixer.security_cwe_database import CWESecurityDatabase
+from tzero.tzero_fixer.dependency_vulnerability_auditor import DependencyVulnerabilityAuditor
+from tzero.tzero_fixer.polyglot_schema_validator import PureJsonSchemaValidator, OpenApiSpecLinter, EditorConfigHealer
+from tzero.tzero_fixer.smart_patch_recommender import SmartPatchRecommender
+from tzero.tzero_fixer.code_duplicity_and_refactorer import ASTDuplicityRefactorer
+from tzero.tzero_fixer.synthetic_workspace_generator import SyntheticWorkspaceGenerator
+from tzero.tzero_fixer.hardware_and_disk_doctor import HardwareAndDiskSurgeon
+from tzero.tzero_fixer.packaging_abi_surgeon import PackagingAbiSurgeon
+from tzero.tzero_fixer.git_advanced_surgeon import GitAdvancedSurgeon
+from tzero.tzero_fixer.polyglot_build_healer import PolyglotBuildHealer
+from tzero.tzero_fixer.cwe_remediator import SecurityCweRemediator
+from tzero.tzero_fixer.dead_code_eliminator import DeadCodeEliminator
+from tzero.tzero_fixer.async_io_modernizer import AsyncIoModernizer
+from tzero.tzero_fixer.mcp_server import PCFixerMcpServer
 
 
 class TestPCFixerMasterEdition(unittest.TestCase):
 
     def test_line_count_milestone_10000(self):
         """Verifies that tzero_pc_fixer.py contains at least 10,000 lines of functional code."""
-        fixer_file = Path("tzero_pc_fixer.py")
+        fixer_file = Path("tzero/tzero_pc_fixer.py")
         self.assertTrue(fixer_file.is_file(), "tzero_pc_fixer.py must exist")
         with open(fixer_file, "r", encoding="utf-8") as f:
             lines = len(f.readlines())

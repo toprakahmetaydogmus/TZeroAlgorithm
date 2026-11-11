@@ -4,7 +4,7 @@ import urllib.request
 import json
 import threading
 import time
-from tzero_dashboard import start_dashboard_server
+from tzero.tzero_dashboard import start_dashboard_server
 
 class TestTZeroDashboard(unittest.TestCase):
     @classmethod

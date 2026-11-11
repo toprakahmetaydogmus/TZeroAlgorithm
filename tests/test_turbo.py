@@ -8,7 +8,7 @@ import sys
 import tempfile
 import unittest
 import subprocess
-from tzero_turbo import get_turbo_accelerator, TurboOverdriveAccelerator
+from tzero.tzero_turbo import get_turbo_accelerator, TurboOverdriveAccelerator
 
 
 class TestTurboAccelerator(unittest.TestCase):
@@ -102,7 +102,7 @@ class TestTurboAccelerator(unittest.TestCase):
     def test_cli_turbo(self):
         # Test CLI --turbo status
         proc = subprocess.run(
-            [sys.executable, "tzero_v3.py", "--turbo"],
+            [sys.executable, "tzero/tzero_v3.py", "--turbo"],
             capture_output=True,
             text=True,
             encoding="utf-8",
@@ -116,7 +116,7 @@ class TestTurboAccelerator(unittest.TestCase):
     def test_cli_kamcilama_alias(self):
         # Test CLI --kamcilama alias
         proc = subprocess.run(
-            [sys.executable, "tzero_v3.py", "--kamcilama"],
+            [sys.executable, "tzero/tzero_v3.py", "--kamcilama"],
             capture_output=True,
             text=True,
             encoding="utf-8",

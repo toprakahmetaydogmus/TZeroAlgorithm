@@ -8,7 +8,7 @@ import sys
 import tempfile
 import unittest
 
-import tzero_federation
+from tzero import tzero_federation
 
 
 class TestFederationSyncEngine(unittest.TestCase):
@@ -58,7 +58,7 @@ class TestFederationSyncEngine(unittest.TestCase):
 
             bundle_p = os.path.join(host_ws, "peer_auth.json")
             proc_exp = subprocess.run(
-                [sys.executable, "tzero_v3.py", "federation", "export", "--dir", peer_ws, "--federation-out", bundle_p, "--federation-name", "auth-svc"],
+                [sys.executable, "tzero/tzero_v3.py", "federation", "export", "--dir", peer_ws, "--federation-out", bundle_p, "--federation-name", "auth-svc"],
                 capture_output=True,
                 text=True,
                 check=True,
@@ -154,7 +154,7 @@ class TestFederationSyncEngine(unittest.TestCase):
                 f.write("def calculate_tax():\n    return 42\n")
 
             proc_err = subprocess.run(
-                [sys.executable, "tzero_v3.py", "federation", "impact", "--dir", ws],
+                [sys.executable, "tzero/tzero_v3.py", "federation", "impact", "--dir", ws],
                 capture_output=True,
                 text=True,
             )
@@ -162,7 +162,7 @@ class TestFederationSyncEngine(unittest.TestCase):
             self.assertIn("Symbol name required", proc_err.stderr)
 
             proc_ok = subprocess.run(
-                [sys.executable, "tzero_v3.py", "federation", "impact", "--dir", ws, "--federation-symbol", "calculate_tax"],
+                [sys.executable, "tzero/tzero_v3.py", "federation", "impact", "--dir", ws, "--federation-symbol", "calculate_tax"],
                 capture_output=True,
                 text=True,
                 check=True,

@@ -1,7 +1,7 @@
 import asyncio
 import re
 import sys
-import tzero_mcp
+from tzero import tzero_mcp
 
 def evaluate():
     server = tzero_mcp.create_mcp_server()

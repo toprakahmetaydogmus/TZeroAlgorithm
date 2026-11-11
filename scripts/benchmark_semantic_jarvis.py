@@ -23,7 +23,7 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 if SCRIPT_DIR not in sys.path:
     sys.path.insert(0, SCRIPT_DIR)
 
-from tzero_jarvis.semantic_compressor import DynamicVirtualMemoryInjector
+from tzero.tzero_jarvis.semantic_compressor import DynamicVirtualMemoryInjector
 
 BENCHMARK_CASES: List[Tuple[str, str]] = [
     (

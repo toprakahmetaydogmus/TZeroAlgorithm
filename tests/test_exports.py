@@ -4,7 +4,7 @@ Test Suite for ContextExportManager and Token Cost Calculator
 import unittest
 import os
 import tempfile
-from tzero_v3 import ContextExportManager, calculate_token_cost, PROVIDER_COST_PER_MILLION
+from tzero.tzero_v3 import ContextExportManager, calculate_token_cost, PROVIDER_COST_PER_MILLION
 
 class TestExportsAndCost(unittest.TestCase):
     def test_token_cost_calculation(self):

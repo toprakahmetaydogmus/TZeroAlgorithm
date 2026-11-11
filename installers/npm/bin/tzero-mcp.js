@@ -48,7 +48,7 @@ if (!py) {
 }
 
 const srcDir = path.resolve(__dirname, "..", "src");
-const scriptPath = path.join(srcDir, "tzero_mcp.py");
+const scriptPath = path.join(srcDir, "tzero", "tzero_mcp.py");
 
 const env = Object.assign({}, process.env, {
   PYTHONPATH: srcDir + (process.env.PYTHONPATH ? path.delimiter + process.env.PYTHONPATH : "")

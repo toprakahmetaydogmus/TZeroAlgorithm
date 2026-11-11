@@ -7,7 +7,7 @@ import tempfile
 import unittest
 from unittest import mock
 
-from tzero_snapshot import SnapshotEngine
+from tzero.tzero_snapshot import SnapshotEngine
 
 
 class TestIncrementalSnapshot(unittest.TestCase):
@@ -88,7 +88,7 @@ class TestIncrementalSnapshot(unittest.TestCase):
             self.assertFalse(SnapshotEngine.is_valid(snap, tmp))
 
     def test_watch_mode_incremental_snapshot_once(self):
-        import tzero_v3
+        from tzero import tzero_v3
         with tempfile.TemporaryDirectory() as tmp:
             with open(os.path.join(tmp, "core.py"), "w", encoding="utf-8") as fh:
                 fh.write("def compute(x: int) -> int:\n    return x * 2\n")

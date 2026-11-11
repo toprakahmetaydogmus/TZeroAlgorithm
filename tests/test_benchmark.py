@@ -8,8 +8,8 @@ import unittest
 import tempfile
 import shutil
 
-from tzero_benchmark import TZeroBenchmarkEngine, JarvisBenchmarkOptimizer, BenchmarkReport
-from tzero_jarvis.orchestrator import JarvisOrchestrator
+from tzero.tzero_benchmark import TZeroBenchmarkEngine, JarvisBenchmarkOptimizer, BenchmarkReport
+from tzero.tzero_jarvis.orchestrator import JarvisOrchestrator
 
 
 class TestTZeroBenchmark(unittest.TestCase):

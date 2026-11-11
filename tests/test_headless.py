@@ -17,7 +17,7 @@ class TestHeadlessSupport(unittest.TestCase):
         code = (
             "import sys\n"
             "sys.modules['tkinter'] = None\n"  # makes `import tkinter` raise ImportError
-            "import tzero_v3, tzero_mcp\n"
+            "from tzero import tzero_v3, tzero_mcp\n"
             "assert tzero_v3.TK_AVAILABLE is False\n"
             "print('ok')\n"
         )
@@ -33,7 +33,7 @@ class TestHeadlessSupport(unittest.TestCase):
             "import sys\n"
             "sys.modules['tkinter'] = None\n"
             "sys.argv = ['main.py', '--gui']\n"
-            "import tzero_v3\n"
+            "from tzero import tzero_v3\n"
             "tzero_v3.main()\n"
         )
         proc = subprocess.run(
@@ -47,7 +47,7 @@ class TestHeadlessSupport(unittest.TestCase):
 class TestMCPOutputQuality(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        import tzero_mcp
+        from tzero import tzero_mcp
         cls.server = tzero_mcp.create_mcp_server()
 
     def call(self, name, args):

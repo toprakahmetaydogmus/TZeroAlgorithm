@@ -7,9 +7,9 @@ import shutil
 import tempfile
 import unittest
 
-from tzero_sync import WorkspaceSyncManager, SyncResult
-from tzero_cost import TokenCostCalculator, CostReport
-from tzero_drift import DriftAnalyzer, DriftReport
+from tzero.tzero_sync import WorkspaceSyncManager, SyncResult
+from tzero.tzero_cost import TokenCostCalculator, CostReport
+from tzero.tzero_drift import DriftAnalyzer, DriftReport
 
 
 class TestSyncCostDrift(unittest.TestCase):

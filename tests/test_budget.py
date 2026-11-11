@@ -3,7 +3,7 @@
 
 import os
 import unittest
-from tzero_budget import ASTTokenBudgetOptimizer, CompressionCertificate
+from tzero.tzero_budget import ASTTokenBudgetOptimizer, CompressionCertificate
 
 
 class TestASTTokenBudgetOptimizer(unittest.TestCase):

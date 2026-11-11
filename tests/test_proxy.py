@@ -3,7 +3,7 @@ import json
 import unittest
 import urllib.request
 
-from tzero_proxy import LiveContextPruner, start_context_proxy
+from tzero.tzero_proxy import LiveContextPruner, start_context_proxy
 
 
 class TestLiveContextProxy(unittest.TestCase):

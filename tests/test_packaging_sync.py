@@ -11,23 +11,19 @@ ROOT_DIR = pathlib.Path(__file__).resolve().parent.parent
 
 
 class TestPackagingAndVersionSync(unittest.TestCase):
-    def test_pyproject_includes_all_non_private_tzero_modules(self):
+    def test_tzero_sources_are_grouped_under_the_package(self):
         data = tomllib.loads((ROOT_DIR / "pyproject.toml").read_text(encoding="utf-8"))
-        py_modules = set(data["tool"]["setuptools"]["py-modules"])
-        expected = {
-            p.stem
-            for p in ROOT_DIR.glob("tzero_*.py")
-            if p.stem != "tzero_gateway"
-        }
-        missing = sorted(expected - py_modules)
-        self.assertEqual(missing, [], f"Missing from pyproject.toml py-modules: {missing}")
+        packages = set(data["tool"]["setuptools"]["packages"])
+        self.assertEqual(packages, {"tzero", "tzero.tzero_fixer", "tzero.tzero_jarvis"})
+        self.assertEqual(list(ROOT_DIR.glob("tzero_*.py")), [])
+        self.assertTrue((ROOT_DIR / "tzero" / "tzero_v3.py").is_file())
 
     def test_pyproject_scripts_and_clean_dependencies(self):
         data = tomllib.loads((ROOT_DIR / "pyproject.toml").read_text(encoding="utf-8"))
         deps = " ".join(data["project"]["dependencies"]).lower()
         self.assertNotIn("typer", deps)
         scripts = data["project"]["scripts"]
-        self.assertEqual(scripts.get("tzero-tui"), "tzero_tui:main")
+        self.assertEqual(scripts.get("tzero-tui"), "tzero.tzero_tui:main")
         self.assertEqual(scripts.get("pc-fixer-mcp"), "pc_fixer_mcp:main")
         self.assertIn("space", data["project"]["optional-dependencies"])
 
@@ -60,8 +56,8 @@ class TestPackagingAndVersionSync(unittest.TestCase):
             self.assertIn(f"v{canonical}.tar.gz", rb_text)
 
         import addmcp
-        import tzero_mcp
-        import tzero_task_benchmark
+        from tzero import tzero_mcp
+        from tzero import tzero_task_benchmark
         self.assertEqual(tzero_mcp.SERVER_VERSION, canonical)
         self.assertEqual(addmcp.APP_VERSION, canonical)
         self.assertEqual(tzero_task_benchmark.TaskBenchmarkReport().version, canonical)
@@ -76,10 +72,7 @@ class TestPackagingAndVersionSync(unittest.TestCase):
             self.assertIn(pat, lines, f"Missing {pat} from .dockerignore")
 
     def test_no_dead_duplicate_packages_and_sorted_vsix_publisher(self):
-        self.assertFalse((ROOT_DIR / "tzero").exists(), "Dead duplicate package tzero/ should be removed")
         self.assertFalse((ROOT_DIR / "vscode-extension").exists(), "Legacy vscode-extension/ should be removed")
-        pyproject = tomllib.loads((ROOT_DIR / "pyproject.toml").read_text(encoding="utf-8"))
-        self.assertEqual(pyproject["tool"]["setuptools"]["packages"], ["tzero_jarvis", "tzero_fixer"])
         ps_text = (ROOT_DIR / "scripts" / "publish_vscode.ps1").read_text(encoding="utf-8")
         self.assertIn("LastWriteTime", ps_text)
 

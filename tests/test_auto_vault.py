@@ -3,7 +3,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
-from tzero_security import ZeroLeakEngine
+from tzero.tzero_security import ZeroLeakEngine
 
 class TestAutoVault(unittest.TestCase):
     def test_auto_migrate_openai_key(self):
@@ -31,7 +31,7 @@ class TestAutoVault(unittest.TestCase):
             with open(cfg_path, "w", encoding="utf-8") as fh:
                 fh.write(f'API_KEY = "{raw_key}"\n')
             res = subprocess.run(
-                [sys.executable, os.path.join(root_dir, "tzero_v3.py"), "--vault", tmp, "--migrate"],
+                [sys.executable, os.path.join(root_dir, "tzero", "tzero_v3.py"), "--vault", tmp, "--migrate"],
                 capture_output=True,
                 text=True,
                 encoding="utf-8",

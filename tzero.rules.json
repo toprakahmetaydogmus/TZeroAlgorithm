@@ -7,20 +7,20 @@
       "tests/**"
     ],
     "core": [
-      "tzero_jarvis/**",
+      "tzero/tzero_jarvis/**",
       "main.py",
-      "tzero_v3.py"
+      "tzero/tzero_v3.py"
     ],
     "cli": [
       "addmcp.py",
-      "tzero_dashboard.py"
+      "tzero/tzero_dashboard.py"
     ],
     "api": [
       "app.py",
-      "tzero_mcp.py"
+      "tzero/tzero_mcp.py"
     ],
     "services": [
-      "tzero_features.py"
+      "tzero/tzero_features.py"
     ]
   },
   "forbidden_imports": [

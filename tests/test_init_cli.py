@@ -7,7 +7,7 @@ import unittest
 from unittest.mock import patch
 
 import addmcp
-from tzero_polyglot import PolyglotTokenReducer
+from tzero.tzero_polyglot import PolyglotTokenReducer
 
 
 class TestInitCLI(unittest.TestCase):

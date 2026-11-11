@@ -52,7 +52,7 @@ def _setup_windows_streams():
 
 _setup_windows_streams()
 
-from tzero_v3 import main
+from tzero.tzero_v3 import main
 
 if __name__ == "__main__":
     multiprocessing.freeze_support()

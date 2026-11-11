@@ -5,7 +5,7 @@ import importlib.util
 import unittest
 
 _HAS_TIKTOKEN = importlib.util.find_spec("tiktoken") is not None
-from tzero_v3 import (
+from tzero.tzero_v3 import (
     TemplateEngine,
     count_tokens_precise,
     get_budgeted_snippets,
@@ -40,7 +40,7 @@ class TestGenerator(unittest.TestCase):
 
     def test_count_tokens_precise_fallback(self):
         from unittest import mock
-        import tzero_v3
+        from tzero import tzero_v3
         text = "Hello world! Fallback estimation check."
         with mock.patch.dict("sys.modules", {"tiktoken": None}):
             if hasattr(tzero_v3, "_BPE_ENCODING_CACHE"):

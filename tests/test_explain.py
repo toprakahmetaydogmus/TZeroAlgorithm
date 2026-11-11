@@ -7,7 +7,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from tzero_explain import ArchitecturalPassportGenerator, ModulePassport, SymbolPassport
+from tzero.tzero_explain import ArchitecturalPassportGenerator, ModulePassport, SymbolPassport
 
 
 class TestArchitecturalPassportGenerator(unittest.TestCase):

@@ -809,7 +809,9 @@ def resolve_and_install_server() -> Path:
 
     # 3. Python script fallback
     for script_cand in [
+        root / "tzero" / "tzero_mcp.py",
         root / "tzero_mcp.py",
+        Path.cwd() / "tzero" / "tzero_mcp.py",
         Path.cwd() / "tzero_mcp.py",
     ]:
         if script_cand.is_file():

@@ -19,7 +19,7 @@ class TestComprehensiveCLI(unittest.TestCase):
         shutil.rmtree(self.temp_dir, ignore_errors=True)
 
     def _run_cli(self, args):
-        cmd = [sys.executable, os.path.join(ROOT_DIR, "tzero_v3.py")] + args
+        cmd = [sys.executable, os.path.join(ROOT_DIR, "tzero", "tzero_v3.py")] + args
         return subprocess.run(
             cmd,
             cwd=ROOT_DIR,

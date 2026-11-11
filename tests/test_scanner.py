@@ -6,7 +6,7 @@ import ast
 import tempfile
 import unittest
 
-from tzero_v3 import (
+from tzero.tzero_v3 import (
     CodebaseScanner,
     DependencyAnalyzer,
     TokenReducer,
@@ -199,7 +199,8 @@ class TestDefaultWorkspace(unittest.TestCase):
             project_root = os.path.join(temp_dir, "project")
             dist_dir = os.path.join(project_root, "dist")
             os.makedirs(dist_dir)
-            for filename in ("tzero_v3.py", "pyproject.toml"):
+            os.makedirs(os.path.join(project_root, "tzero"))
+            for filename in ("tzero/tzero_v3.py", "pyproject.toml"):
                 with open(os.path.join(project_root, filename), "w") as file:
                     file.write("")
 

@@ -4,7 +4,7 @@ Tests for T-Zero Task-Completion & Real Tokenizer Benchmark Engine.
 """
 
 import unittest
-from tzero_task_benchmark import TaskCompletionBenchmark, TaskBenchmarkReport, count_bpe_tokens
+from tzero.tzero_task_benchmark import TaskCompletionBenchmark, TaskBenchmarkReport, count_bpe_tokens
 
 
 class TestTaskBenchmark(unittest.TestCase):

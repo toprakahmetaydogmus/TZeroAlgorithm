@@ -18,14 +18,14 @@ ROOT_DIR = os.path.dirname(SCRIPT_DIR)
 if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
-from tzero_jarvis.workspace_orchestrator import (
+from tzero.tzero_jarvis.workspace_orchestrator import (
     WorkspaceProfiler,
     WorkspaceProfile,
     WorkspaceGovernanceSynthesizer,
     WorkspaceOrchestrator
 )
-from tzero_jarvis.orchestrator import JarvisOrchestrator
-from tzero_features import AgentRulesGenerator
+from tzero.tzero_jarvis.orchestrator import JarvisOrchestrator
+from tzero.tzero_features import AgentRulesGenerator
 
 
 class TestWorkspaceProfiler(unittest.TestCase):
@@ -210,7 +210,7 @@ class TestWorkspaceOrchestrator(unittest.TestCase):
         self.assertIn("get_project_context_tree", plan["markdown"])
 
     def test_mcp_tool_jarvis_orchestrate_goal_planning_mode(self):
-        import tzero_mcp
+        from tzero import tzero_mcp
         import asyncio
         server = tzero_mcp.create_mcp_server()
 

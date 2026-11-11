@@ -2,7 +2,7 @@
 import os
 import tempfile
 import unittest
-from tzero_tui import TZeroTerminalCockpit
+from tzero.tzero_tui import TZeroTerminalCockpit
 
 
 class TestTZeroTerminalCockpit(unittest.TestCase):

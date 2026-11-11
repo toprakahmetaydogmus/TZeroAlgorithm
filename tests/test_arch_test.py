@@ -6,7 +6,7 @@ import os
 import shutil
 import tempfile
 import unittest
-from tzero_arch_test import ArchitectureTestSuiteGenerator, _extract_ast_imports
+from tzero.tzero_arch_test import ArchitectureTestSuiteGenerator, _extract_ast_imports
 
 
 class TestArchitectureTestSuiteGenerator(unittest.TestCase):

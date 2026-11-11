@@ -7,7 +7,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from tzero_pc_fixer import DiagnosticIssue, HealAction, PCFixerDoctor
+from tzero.tzero_pc_fixer import DiagnosticIssue, HealAction, PCFixerDoctor
 
 
 class TestPCFixerDoctor(unittest.TestCase):

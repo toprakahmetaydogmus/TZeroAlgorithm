@@ -84,80 +84,26 @@ space = [
 ]
 
 [project.scripts]
-tzero = "tzero_v3:main"
-tzero-gui = "tzero_v3:launch_gui"
-tzero-tui = "tzero_tui:main"
-tzero-mcp = "tzero_mcp:main"
+tzero = "tzero.tzero_v3:main"
+tzero-gui = "tzero.tzero_v3:launch_gui"
+tzero-tui = "tzero.tzero_tui:main"
+tzero-mcp = "tzero.tzero_mcp:main"
 pc-fixer-mcp = "pc_fixer_mcp:main"
 tzero-add-mcp = "addmcp:main"
 tzero-addmcp = "addmcp:main"
-tzero-guard = "tzero_guard:main"
-tzero-sync = "tzero_sync:main"
-tzero-cost = "tzero_cost:main"
-tzero-drift = "tzero_drift:main"
-tzero-fixer = "tzero_v3:main"
-tzero-explain = "tzero_v3:main"
+tzero-guard = "tzero.tzero_guard:main"
+tzero-sync = "tzero.tzero_sync:main"
+tzero-cost = "tzero.tzero_cost:main"
+tzero-drift = "tzero.tzero_drift:main"
+tzero-fixer = "tzero.tzero_v3:main"
+tzero-explain = "tzero.tzero_v3:main"
 
 [tool.setuptools]
-packages = ["tzero_jarvis", "tzero_fixer"]
-py-modules = [
-    "main",
-    "tzero",
-    "tzero_features",
-    "tzero_mcp",
-    "tzero_v3",
-    "tzero_deps",
-    "addmcp",
-    "siber_akademi_icon",
-    "app",
-    "pc_fixer_mcp",
-    "tzero_arch_test",
-    "tzero_benchmark",
-    "tzero_blackboard",
-    "tzero_bridge",
-    "tzero_budget",
-    "tzero_ci",
-    "tzero_commit",
-    "tzero_contracts",
-    "tzero_cost",
-    "tzero_dashboard",
-    "tzero_debt",
-    "tzero_drift",
-    "tzero_explain",
-    "tzero_fix",
-    "tzero_golden",
-    "tzero_graph_rag",
-    "tzero_guard",
-    "tzero_infra",
-    "tzero_mutation",
-    "tzero_neural_cortex",
-    "tzero_packer",
-    "tzero_patch",
-    "tzero_pc_fixer",
-    "tzero_pipe",
-    "tzero_polyglot",
-    "tzero_proxy",
-    "tzero_reachability",
-    "tzero_replay",
-    "tzero_security",
-    "tzero_semantic_merge",
-    "tzero_snapshot",
-    "tzero_stubs",
-    "tzero_subagent_engine",
-    "tzero_superdesign",
-    "tzero_sync",
-    "tzero_federation",
-    "tzero_hooks",
-    "tzero_lsp",
-    "tzero_rust_bridge",
-    "tzero_scip",
-    "tzero_task_benchmark",
-    "tzero_tui",
-    "tzero_turbo"
-]
+packages = ["tzero", "tzero.tzero_jarvis", "tzero.tzero_fixer"]
+py-modules = ["main", "addmcp", "siber_akademi_icon", "app", "pc_fixer_mcp"]
 
 [tool.setuptools.package-data]
-"*" = ["*.ico", "*.json"]
+"*" = ["*.ico", "*.json", "*.html"]
 
 [project.urls]
 Homepage = "https://github.com/toprakahmetaydogmus/TZeroAlgorithm"

@@ -10,7 +10,7 @@ Verifies all 47 MCP tools against the 6 TDQS dimensions:
 """
 
 import unittest
-import tzero_mcp
+from tzero import tzero_mcp
 
 
 class TestAnchor5TDQS(unittest.TestCase):

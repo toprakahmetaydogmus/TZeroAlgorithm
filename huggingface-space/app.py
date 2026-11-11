@@ -30,19 +30,19 @@ except ImportError:
 
 # Import T-Zero Core Engines
 try:
-    from tzero_features import ZeroHallucinationGuard, ChangeImpactAnalyzer
+    from tzero.tzero_features import ZeroHallucinationGuard, ChangeImpactAnalyzer
 except ImportError:
     ZeroHallucinationGuard = None
     ChangeImpactAnalyzer = None
 
 try:
-    from tzero_security import ZeroLeakEngine, SecurityQualityAuditor
+    from tzero.tzero_security import ZeroLeakEngine, SecurityQualityAuditor
 except ImportError:
     ZeroLeakEngine = None
     SecurityQualityAuditor = None
 
 try:
-    from tzero_pc_fixer import ASTSyntaxHealer, CodeSmellsHealer
+    from tzero.tzero_pc_fixer import ASTSyntaxHealer, CodeSmellsHealer
 except ImportError:
     ASTSyntaxHealer = None
     CodeSmellsHealer = None
@@ -270,7 +270,7 @@ PRESET_GUARD_HALLUCINATED = '''# AI-GENERATED PROPOSAL (CONTAINS CRITICAL HALLUC
 # Notice: Ghost imports, non-existent methods, and parameter mismatch
 
 import quantum_distributed_db  # Ghost package (not installed or in stdlib)
-from tzero_security import non_existent_vault_decrypt  # Phantom symbol
+from tzero.tzero_security import non_existent_vault_decrypt  # Phantom symbol
 from math import calculate_hypot_3d  # Phantom function in math module
 
 def deploy_cluster(cluster_id: str, replica_count: int):
@@ -286,7 +286,7 @@ PRESET_GUARD_VALID = '''# GROUNDED PROPOSAL (VERIFIED AGAINST REAL AST INTERFACE
 
 import os
 import json
-from tzero_security import ZeroLeakEngine
+from tzero.tzero_security import ZeroLeakEngine
 
 def inspect_system_credentials(target_dir: str):
     findings = ZeroLeakEngine.scan_workspace(target_dir)

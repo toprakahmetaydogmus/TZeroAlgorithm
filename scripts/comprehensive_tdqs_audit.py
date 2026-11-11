@@ -2,7 +2,7 @@ import os
 import re
 import sys
 import json
-import tzero_mcp
+from tzero import tzero_mcp
 
 def comprehensive_tdqs_audit():
     os.environ["TZERO_MCP_TOOL_MODE"] = "all"

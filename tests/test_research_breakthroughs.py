@@ -6,10 +6,10 @@ Developer: Toprak Ahmet Aydoğmuş (Siber Akademi)
 
 import unittest
 import time
-from tzero_jarvis.minhash_lsh import MinHashLSHEngine
-from tzero_jarvis.swarm_bft import ByzantineFaultTolerantSwarm
-from tzero_jarvis.latent_press import LatentPressCompressor
-from tzero_jarvis.semantic_compressor import SemanticTriplet, TypedEntity, EntityType, DynamicVirtualMemoryInjector
+from tzero.tzero_jarvis.minhash_lsh import MinHashLSHEngine
+from tzero.tzero_jarvis.swarm_bft import ByzantineFaultTolerantSwarm
+from tzero.tzero_jarvis.latent_press import LatentPressCompressor
+from tzero.tzero_jarvis.semantic_compressor import SemanticTriplet, TypedEntity, EntityType, DynamicVirtualMemoryInjector
 
 
 class TestResearchBreakthroughs(unittest.TestCase):

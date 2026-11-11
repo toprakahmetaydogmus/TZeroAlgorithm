@@ -10,7 +10,7 @@ import sys
 import tempfile
 import unittest
 
-import tzero_lsp
+from tzero import tzero_lsp
 
 
 class TestTZeroLSP(unittest.TestCase):
@@ -184,7 +184,7 @@ class TestTZeroLSP(unittest.TestCase):
                 f.write(src)
             uri = pathlib.Path(p).as_uri()
 
-            cmd = [sys.executable, "tzero_v3.py", "lsp", "--dir", tmp]
+            cmd = [sys.executable, "tzero/tzero_v3.py", "lsp", "--dir", tmp]
             proc = subprocess.Popen(
                 cmd,
                 stdin=subprocess.PIPE,

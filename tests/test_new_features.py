@@ -13,10 +13,10 @@ import unittest
 import tempfile
 import shutil
 
-from tzero_snapshot import SnapshotEngine, SnapshotResult
-from tzero_fix import ASTHallucinationAutoCorrector, HealingReport
-from tzero_bridge import PolyglotTypeBridge, TranspiledModel
-from tzero_replay import HistoricalTokenReplay, ReplaySummary
+from tzero.tzero_snapshot import SnapshotEngine, SnapshotResult
+from tzero.tzero_fix import ASTHallucinationAutoCorrector, HealingReport
+from tzero.tzero_bridge import PolyglotTypeBridge, TranspiledModel
+from tzero.tzero_replay import HistoricalTokenReplay, ReplaySummary
 
 
 class TestNextGenFeatures(unittest.TestCase):
@@ -150,7 +150,7 @@ val = calculate_token_savings(100, 20)
 
     # 5. PCFixerDoctor Tests
     def test_pc_fixer_doctor(self):
-        from tzero_pc_fixer import PCFixerDoctor
+        from tzero.tzero_pc_fixer import PCFixerDoctor
         diag = PCFixerDoctor.diagnose(self.test_dir)
         self.assertGreaterEqual(diag.health_score_pct, 90)
         self.assertEqual(diag.syntax_errors, 0)
@@ -169,7 +169,7 @@ val = calculate_token_savings(100, 20)
 
     # 6. ArchitecturalPassportGenerator Tests
     def test_architectural_passport(self):
-        from tzero_explain import ArchitecturalPassportGenerator, ModulePassport
+        from tzero.tzero_explain import ArchitecturalPassportGenerator, ModulePassport
         passport = ArchitecturalPassportGenerator.explain_file(self.sample_py)
         self.assertIsInstance(passport, ModulePassport)
         self.assertEqual(passport.module_name, "sample_models")

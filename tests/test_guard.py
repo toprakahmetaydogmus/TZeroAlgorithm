@@ -6,7 +6,7 @@ import shutil
 import tempfile
 import unittest
 
-from tzero_guard import GitSecurityGuard
+from tzero.tzero_guard import GitSecurityGuard
 
 
 class TestGitSecurityGuard(unittest.TestCase):

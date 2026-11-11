@@ -116,9 +116,9 @@ echo   SETUP COMPLETE! Application is starting...
 echo ============================================================
 echo.
 
-start "" pythonw tzero_v3.py
+start "" pythonw -m tzero
 if %errorlevel% neq 0 (
-    python tzero_v3.py
+    python -m tzero
 )
 endlocal
 exit /b 0

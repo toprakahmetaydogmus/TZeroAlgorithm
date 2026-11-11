@@ -4,7 +4,7 @@ Validates zero-cost AST/regex signature extraction across TypeScript, Go, Rust, 
 """
 
 import unittest
-from tzero_v3 import PolyglotSignatureExtractor, TokenReducer
+from tzero.tzero_v3 import PolyglotSignatureExtractor, TokenReducer
 
 
 class TestPolyglotSignatureExtractor(unittest.TestCase):
@@ -429,7 +429,7 @@ end
         self.assertNotIn("dispatch(50)", reduced_elixir)
 
     def test_java_multiline_method_no_ellipsis_literal(self):
-        from tzero_polyglot import PolyglotTokenReducer
+        from tzero.tzero_polyglot import PolyglotTokenReducer
         java_code = (
             "public class Service {\n"
             "    public void execute(int count)\n"

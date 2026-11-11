@@ -8,7 +8,7 @@ import unittest
 
 _HAS_TIKTOKEN = importlib.util.find_spec("tiktoken") is not None
 
-from tzero_packer import (
+from tzero.tzero_packer import (
     TokenBudgetPacker, encode_context_delta, pack_python_symbols, pack_workspace,
     restore_context_delta,
 )
@@ -199,7 +199,7 @@ class TestTokenBudgetPacker(unittest.TestCase):
             self.assertTrue(any(e.rel_path == "zz_central_hub.py" for e in capped_entries))
 
     def test_t2_light_preserves_docstrings_over_t3_ultra(self):
-        from tzero_polyglot import PolyglotTokenReducer
+        from tzero.tzero_polyglot import PolyglotTokenReducer
         ts_code = (
             "/** Validates incoming token payload and enforces policy. */\n"
             "export function verifyToken(raw: string): boolean {\n"

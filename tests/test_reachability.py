@@ -7,7 +7,7 @@ import tempfile
 import unittest
 import shutil
 
-from tzero_reachability import CallGraphReachabilityEngine
+from tzero.tzero_reachability import CallGraphReachabilityEngine
 
 
 class TestCallGraphReachability(unittest.TestCase):

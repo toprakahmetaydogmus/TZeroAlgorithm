@@ -6,7 +6,7 @@ import shutil
 import tempfile
 import unittest
 
-from tzero_v3 import ConfigManager, KeyringSecretsBackupManager, DEFAULT_CONFIG_DIR
+from tzero.tzero_v3 import ConfigManager, KeyringSecretsBackupManager, DEFAULT_CONFIG_DIR
 
 
 class TestConfigManager(unittest.TestCase):

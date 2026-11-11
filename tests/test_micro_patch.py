@@ -2,7 +2,7 @@
 """Unit tests for AST Smart Micro-Patch Compressor."""
 
 import unittest
-from tzero_patch import SmartMicroPatcher
+from tzero.tzero_patch import SmartMicroPatcher
 
 
 class TestSmartMicroPatcher(unittest.TestCase):
@@ -50,7 +50,7 @@ class TestASTFuzzyPatcher(unittest.TestCase):
     """Thorough tests for ASTFuzzyPatcher across all 5 tiers of tolerance."""
 
     def test_tier1_exact_patch(self):
-        from tzero_patch import apply_fuzzy_patch
+        from tzero.tzero_patch import apply_fuzzy_patch
         source = (
             "def add(a, b):\n"
             "    # old comment\n"
@@ -70,7 +70,7 @@ class TestASTFuzzyPatcher(unittest.TestCase):
         self.assertIn("# new comment", res)
 
     def test_tier2_line_drift_patch(self):
-        from tzero_patch import apply_fuzzy_patch
+        from tzero.tzero_patch import apply_fuzzy_patch
         # Function has drifted 20 lines down because other functions were added
         source = "\n" * 20 + (
             "def multiply(x, y):\n"
@@ -91,7 +91,7 @@ class TestASTFuzzyPatcher(unittest.TestCase):
         self.assertIn("result = x * y * 1.0", res)
 
     def test_tier3_whitespace_and_indentation_adaptation(self):
-        from tzero_patch import apply_fuzzy_patch
+        from tzero.tzero_patch import apply_fuzzy_patch
         # Source has 8-space indentation
         source = (
             "class Engine:\n"
@@ -113,7 +113,7 @@ class TestASTFuzzyPatcher(unittest.TestCase):
         self.assertIn("        timeout = 60\n", res)
 
     def test_tier4_ast_symbol_boundary(self):
-        from tzero_patch import apply_fuzzy_patch
+        from tzero.tzero_patch import apply_fuzzy_patch
         # Target file has multiple similar lines, but hunk targets specific function
         source = (
             "def worker_a():\n"
@@ -137,7 +137,7 @@ class TestASTFuzzyPatcher(unittest.TestCase):
         self.assertIn("def worker_b():\n    val = 999", res)
 
     def test_tier5_fuzzy_similarity_patch(self):
-        from tzero_patch import apply_fuzzy_patch
+        from tzero.tzero_patch import apply_fuzzy_patch
         # Context line in target differs slightly (comment was tweaked)
         source = (
             "def calculate_total(items):\n"
@@ -160,7 +160,7 @@ class TestASTFuzzyPatcher(unittest.TestCase):
         self.assertIn(meta["hunk_results"][0]["strategy"], ("fuzzy_similarity", "whitespace_normalized"))
 
     def test_multi_hunk_bottom_to_top(self):
-        from tzero_patch import apply_fuzzy_patch
+        from tzero.tzero_patch import apply_fuzzy_patch
         source = (
             "line_one = 1\n"
             "line_two = 2\n"
@@ -184,7 +184,7 @@ class TestASTFuzzyPatcher(unittest.TestCase):
         self.assertIn("line_three = 300", res)
 
     def test_reverse_patch_unapply(self):
-        from tzero_patch import apply_fuzzy_patch
+        from tzero.tzero_patch import apply_fuzzy_patch
         source = "value = 42\n"
         patch = (
             "@@ -1,1 +1,1 @@\n"
@@ -199,7 +199,7 @@ class TestASTFuzzyPatcher(unittest.TestCase):
     def test_patch_file_with_backup(self):
         import tempfile
         import os
-        from tzero_patch import patch_file
+        from tzero.tzero_patch import patch_file
 
         with tempfile.NamedTemporaryFile("w+", delete=False, suffix=".py") as tf:
             tf.write("x = 1\ny = 2\n")

@@ -7,13 +7,13 @@ Developer: Toprak Ahmet Aydoğmuş (Siber Akademi)
 import unittest
 import os
 import tempfile
-from tzero_jarvis.causal_graph import CausalTemporalGraph, CausalRelationType
-from tzero_jarvis.self_healing import SelfHealingExecutionEngine
-from tzero_jarvis.memory_consolidation import ConsolidationEngine, EpisodicMemoryBuffer
-from tzero_jarvis.hybrid_search import ZeroVectorDBSearchEngine
-from tzero_jarvis.swarm import SwarmCoordinator
-from tzero_jarvis.graph_visualizer import CyberpunkGraphVisualizer
-from tzero_jarvis.semantic_compressor import SemanticTriplet, TypedEntity, EntityType, DynamicVirtualMemoryInjector
+from tzero.tzero_jarvis.causal_graph import CausalTemporalGraph, CausalRelationType
+from tzero.tzero_jarvis.self_healing import SelfHealingExecutionEngine
+from tzero.tzero_jarvis.memory_consolidation import ConsolidationEngine, EpisodicMemoryBuffer
+from tzero.tzero_jarvis.hybrid_search import ZeroVectorDBSearchEngine
+from tzero.tzero_jarvis.swarm import SwarmCoordinator
+from tzero.tzero_jarvis.graph_visualizer import CyberpunkGraphVisualizer
+from tzero.tzero_jarvis.semantic_compressor import SemanticTriplet, TypedEntity, EntityType, DynamicVirtualMemoryInjector
 
 
 class TestMasterUpgrades(unittest.TestCase):

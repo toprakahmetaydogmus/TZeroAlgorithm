@@ -1,6 +1,6 @@
 @echo off
 setlocal
-cd /d "%~dp0"
+cd /d "%~dp0.."
 title T-ZERO JARVIS - CYBERPUNK 3D KNOWLEDGE & CAUSAL GRAPH HUD
 
 echo ================================================================================
@@ -10,10 +10,10 @@ echo    Offline HTML5 / SVG / Canvas Force-Directed Engine
 echo ================================================================================
 echo.
 echo [1/2] 4D Nedensellik ve Bilgi Cizgesi HTML Dosyasi Uretiliyor...
-python export_hud.py
+python -m scripts.export_hud
 
 echo [2/2] Varsayilan Tarayicida Goruntuleniyor...
-start tzero_graph_hud.html
+start "" "tzero\tzero_graph_hud.html"
 
 echo.
 echo ================================================================================

@@ -15,7 +15,7 @@ class TestGUIInstantiation(unittest.TestCase):
             raise unittest.SkipTest(f"Tkinter display not available: {e}")
         
         try:
-            from tzero_v3 import AutoReadmeGUI
+            from tzero.tzero_v3 import AutoReadmeGUI
             app = AutoReadmeGUI(root)
             self.assertIsNotNone(app)
             self.assertIsNotNone(app.console_text)
@@ -57,12 +57,12 @@ class TestGUIInstantiation(unittest.TestCase):
             app.file_snippets = {"src/app.py": "def test(): pass"}
             # Mock generator to avoid real network call during test
             from unittest.mock import patch, MagicMock
-            with patch("tzero_v3.ContextGenerator.generate_readme", return_value="# Mock Result"):
+            with patch("tzero.tzero_v3.ContextGenerator.generate_readme", return_value="# Mock Result"):
                 app.async_generate_payload("https://api.openai.com/v1", "test-key", ["src/app.py"])
                 self.assertFalse(app.cancel_event.is_set())
 
             # Verify that an API 403 error triggers seamless offline AST fallback
-            with patch("tzero_v3.ContextGenerator.generate_readme", side_effect=IOError("API Error code HTTP 403: Authorization failed")):
+            with patch("tzero.tzero_v3.ContextGenerator.generate_readme", side_effect=IOError("API Error code HTTP 403: Authorization failed")):
                 app.async_generate_payload("https://integrate.api.nvidia.com/v1", "test-key", ["src/app.py"])
                 root.update()
                 preview = app.preview_text.get("1.0", "end").strip()

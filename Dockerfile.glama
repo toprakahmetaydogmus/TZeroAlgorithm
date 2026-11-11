@@ -19,4 +19,4 @@ COPY . .
 RUN pip install --no-cache-dir --break-system-packages .
 
 # Launch T-Zero MCP Server over stdio
-ENTRYPOINT ["python", "-u", "tzero_mcp.py", "--stdio"]
+ENTRYPOINT ["python", "-u", "tzero/tzero_mcp.py", "--stdio"]

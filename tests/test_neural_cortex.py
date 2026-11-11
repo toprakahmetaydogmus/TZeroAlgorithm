@@ -8,7 +8,7 @@ and HallucinationGuard pre-flight validation.
 import unittest
 import os
 import tempfile
-from tzero_neural_cortex import (
+from tzero.tzero_neural_cortex import (
     CapabilityRegistry,
     TZeroAgentFleet,
     AgentForge,
@@ -46,7 +46,7 @@ class TestTZeroNeuralCortex(unittest.TestCase):
         self.assertEqual(len(p1_caps), 15)
 
     def test_matryoshka_resolution_engine(self):
-        from tzero_neural_cortex import MatryoshkaResolutionEngine
+        from tzero.tzero_neural_cortex import MatryoshkaResolutionEngine
         sample_code = '''"""Core calculator service."""
 import math
 
@@ -67,7 +67,7 @@ def multiply(x, y):
         self.assertIn("def add", layers["L2"])
 
     def test_shadow_workspace_cow_overlay(self):
-        from tzero_neural_cortex import ShadowWorkspaceEngine
+        from tzero.tzero_neural_cortex import ShadowWorkspaceEngine
         with tempfile.TemporaryDirectory() as tmp_dir:
             shadow = ShadowWorkspaceEngine(workspace_root=tmp_dir)
             shadow.stage("hello.py", "print('hello from shadow')\n")
@@ -163,7 +163,7 @@ def calculate(x):
         execution_report = self.coordinator.execute_mission(plan)
         self.assertTrue(execution_report["success"])
     def test_deep_ast_engines(self):
-        from tzero_neural_cortex import (
+        from tzero.tzero_neural_cortex import (
             StaticCallGraphEngine,
             BackwardProgramSlicer,
             BlastRadiusCalculator,
