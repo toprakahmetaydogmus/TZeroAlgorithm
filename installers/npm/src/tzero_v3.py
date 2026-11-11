@@ -8782,6 +8782,17 @@ def main():
     parser.add_argument("--pack", nargs="?", const=16000, type=int, default=None, metavar="BUDGET", help="Pack codebase into an exact token budget (default: 16000 tokens)")
     parser.add_argument("--focus", default="", metavar="TARGET", help="Focus file or semantic search query for context budget packing")
     parser.add_argument("--pack-out", default=None, metavar="FILE", help="Output file for packed context bundle (default: stdout)")
+    context_delta = parser.add_mutually_exclusive_group()
+    context_delta.add_argument("--context-delta", nargs=3, metavar=("BASE", "CURRENT", "OUTPUT"),
+                               help="Write a lossless context delta to a new file")
+    context_delta.add_argument("--restore-context", nargs=3, metavar=("BASE", "DELTA", "OUTPUT"),
+                               help="Restore context bytes from a base and delta to a new file")
+    context_delta.add_argument("--symbol-context", nargs="+", metavar="FILE_OR_SYMBOL",
+                               help="Emit complete Python definitions: FILE SYMBOL [SYMBOL ...]")
+    parser.add_argument("--min-token-reduction", type=int, default=95, metavar="PERCENT",
+                        help="Minimum exact reduction for --symbol-context (default: 95)")
+    parser.add_argument("--context-encoding", choices=("o200k_base", "cl100k_base"),
+                        default="o200k_base", help="BPE encoding for --symbol-context")
     parser.add_argument("--cache-aligned", action="store_true", help="Order context for KV-cache prefix stability (immutable static prefix before dynamic query suffix)")
     parser.add_argument("--commit-msg", action="store_true", help="Generate Conventional Commit message from local AST git diff ($0 local engine)")
     parser.add_argument("--changelog", nargs="?", const="v10.9.0", default=None, metavar="VERSION", help="Generate release CHANGELOG markdown from git history")
@@ -9673,6 +9684,40 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
         else:
             print(f"\033[31m[FAILED] Could not apply patch to {target_path}: {res.get('error', 'Hunk match failed')}\033[0m")
             sys.exit(1)
+    elif args.symbol_context:
+        import tokenize
+        from tzero_packer import pack_python_symbols
+
+        source_path, *symbols = args.symbol_context
+        try:
+            with open(os.path.join(args.dir, source_path), "rb") as source_file:
+                encoding, _ = tokenize.detect_encoding(source_file.readline)
+                source_file.seek(0)
+                source = source_file.read().decode(encoding)
+            context = pack_python_symbols(
+                source, symbols, args.min_token_reduction, args.context_encoding,
+            )
+        except (OSError, SyntaxError, ValueError) as exc:
+            parser.exit(1, f"T-Zero symbol context: {exc}\n")
+        sys.stdout.buffer.write(context.text.encode("utf-8"))
+        print(
+            f"{context.source_tokens:,} -> {context.context_tokens:,} tokens "
+            f"({context.reduction_pct:.2f}% reduction, {context.encoding})",
+            file=sys.stderr,
+        )
+    elif args.context_delta or args.restore_context:
+        from tzero_packer import encode_context_delta, restore_context_delta
+
+        encode = args.context_delta is not None
+        base_path, input_path, output_path = args.context_delta if encode else args.restore_context
+        operation = encode_context_delta if encode else restore_context_delta
+        try:
+            with open(base_path, "rb") as base_file, open(input_path, "rb") as input_file:
+                output = operation(base_file.read(), input_file.read())
+            with open(output_path, "xb") as output_file:
+                output_file.write(output)
+        except (OSError, ValueError) as exc:
+            parser.exit(1, f"T-Zero context delta: {exc}\n")
     elif args.pack is not None:
         from tzero_packer import pack_workspace
         budget = args.pack

@@ -18,14 +18,144 @@ if sys.platform == "win32":
     except Exception:
         pass
 
+import ast
+import io
 import os
 import re
 import math
+import hashlib
+import struct
 from dataclasses import dataclass, field
 from typing import Dict, List, Tuple, Optional, Any, Set
 
 from tzero_polyglot import PolyglotTokenReducer
 from tzero_features import should_skip_dir, get_ignore_patterns
+
+
+@dataclass(frozen=True)
+class SymbolContext:
+    text: str
+    source_tokens: int
+    context_tokens: int
+    encoding: str
+
+    @property
+    def reduction_pct(self) -> float:
+        return 100 * (self.source_tokens - self.context_tokens) / self.source_tokens
+
+
+def pack_python_symbols(
+    source: str, symbols: List[str], min_reduction: int = 95,
+    encoding: str = "o200k_base",
+) -> SymbolContext:
+    """Extract complete Python definitions and enforce an exact BPE reduction floor."""
+    if not symbols:
+        raise ValueError("Select at least one Python definition")
+    if not 0 <= min_reduction <= 100:
+        raise ValueError("Minimum token reduction must be between 0 and 100")
+    if encoding not in ("o200k_base", "cl100k_base"):
+        raise ValueError("Use the o200k_base or cl100k_base encoding")
+
+    requested = set(symbols)
+    scopes = {".".join(name.split(".")[:depth])
+              for name in requested for depth in range(1, name.count(".") + 1)}
+    ranges: Dict[str, Tuple[int, int]] = {}
+    definition_types = (ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)
+
+    def collect(node: ast.AST, scope: str = "") -> None:
+        if isinstance(node, definition_types):
+            scope = f"{scope}.{node.name}" if scope else node.name
+            if scope in requested:
+                if scope in ranges:
+                    raise ValueError(f"Ambiguous Python definition: {scope}")
+                start = min([node.lineno] + [item.lineno for item in node.decorator_list])
+                ranges[scope] = (start - 1, node.end_lineno)
+            if scope not in scopes:
+                return
+        for child in ast.iter_child_nodes(node):
+            collect(child, scope)
+
+    collect(ast.parse(source))
+    missing = requested - ranges.keys()
+    if missing:
+        raise ValueError(f"Python definitions not found: {', '.join(sorted(missing))}")
+
+    # AST line numbers recognize CR, CRLF, and LF. Preserve those original endings.
+    lines = io.StringIO(source, newline="").readlines()
+    segments = []
+    previous_end = 0
+    for start, end in sorted(ranges.values()):
+        segments.extend(lines[max(start, previous_end):end])
+        previous_end = max(previous_end, end)
+    context = "".join(segments)
+
+    from tzero_security import ZeroLeakEngine
+
+    if ZeroLeakEngine.scan_text(context):
+        raise ValueError("Selected source contains a potential secret")
+    try:
+        import tiktoken
+    except ImportError as exc:
+        raise ValueError("Exact token measurement requires tiktoken") from exc
+    tokenizer = tiktoken.get_encoding(encoding)
+    result = SymbolContext(
+        context, len(tokenizer.encode_ordinary(source)),
+        len(tokenizer.encode_ordinary(context)), encoding,
+    )
+    if result.context_tokens * 100 > result.source_tokens * (100 - min_reduction):
+        raise ValueError(
+            f"Selected definitions require {result.context_tokens:,} of "
+            f"{result.source_tokens:,} tokens ({result.reduction_pct:.2f}% reduction, "
+            f"target {min_reduction}%, {encoding})"
+        )
+    return result
+
+
+_DELTA_HEADER = struct.Struct(">4s32s32sQQ")
+_DELTA_MAGIC = b"TZD1"
+
+
+def _common_prefix_length(left: bytes, right: bytes) -> int:
+    limit = min(len(left), len(right))
+    block_size = 64 * 1024
+    for start in range(0, limit, block_size):
+        end = min(start + block_size, limit)
+        left_block, right_block = left[start:end], right[start:end]
+        if left_block != right_block:
+            return start + len(os.path.commonprefix((left_block, right_block)))
+    return limit
+
+
+def encode_context_delta(base: bytes, current: bytes) -> bytes:
+    """Store the changed middle of a context relative to a known base."""
+    prefix = _common_prefix_length(base, current)
+    max_suffix = min(len(base), len(current)) - prefix
+    suffix = _common_prefix_length(
+        base[len(base) - max_suffix:][::-1],
+        current[len(current) - max_suffix:][::-1],
+    )
+    end = len(current) - suffix
+    return _DELTA_HEADER.pack(
+        _DELTA_MAGIC, hashlib.sha256(base).digest(),
+        hashlib.sha256(current).digest(), prefix, suffix,
+    ) + current[prefix:end]
+
+
+def restore_context_delta(base: bytes, delta: bytes) -> bytes:
+    """Restore exact context bytes and reject incompatible or corrupt deltas."""
+    if len(delta) < _DELTA_HEADER.size:
+        raise ValueError("Context delta is missing its header")
+    magic, base_digest, current_digest, prefix, suffix = _DELTA_HEADER.unpack_from(delta)
+    if magic != _DELTA_MAGIC:
+        raise ValueError("Unsupported context delta format")
+    if hashlib.sha256(base).digest() != base_digest:
+        raise ValueError("Context delta does not match the base")
+    if prefix + suffix > len(base):
+        raise ValueError("Context delta references bytes outside the base")
+    current = base[:prefix] + delta[_DELTA_HEADER.size:] + base[len(base) - suffix:]
+    if hashlib.sha256(current).digest() != current_digest:
+        raise ValueError("Restored context failed its SHA-256 check")
+    return current
 
 
 @dataclass
