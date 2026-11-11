@@ -73,7 +73,11 @@ build = [
     "pyinstaller>=6.0.0"
 ]
 test = [
-    "pytest>=7.0.0"
+    "pytest>=7.0.0",
+    "tiktoken>=0.7.0"
+]
+tokenizer = [
+    "tiktoken>=0.7.0"
 ]
 space = [
     "gradio>=4.0.0"

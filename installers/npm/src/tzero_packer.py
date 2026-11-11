@@ -96,7 +96,7 @@ def pack_python_symbols(
     try:
         import tiktoken
     except ImportError as exc:
-        raise ValueError("Exact token measurement requires tiktoken") from exc
+        raise ValueError("Exact token measurement requires the optional tiktoken package") from exc
     tokenizer = tiktoken.get_encoding(encoding)
     result = SymbolContext(
         context, len(tokenizer.encode_ordinary(source)),
