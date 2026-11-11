@@ -443,11 +443,14 @@ class ZeroLeakEngine:
         }
 
     @classmethod
-    def scan_workspace(cls, workspace_dir: str = ".") -> dict:
+    def scan_workspace(cls, workspace_dir: str = ".", exclude_tests: bool = True) -> dict:
         """Scans a workspace directory for any hardcoded secrets and returns violations dict."""
         files_map = {}
+        ignored_dirs = {"__pycache__", "venv", ".venv", "node_modules", "dist", "build", ".git"}
+        if exclude_tests:
+            ignored_dirs.update({"tests", "test", "fixtures"})
         for root, dirs, files in os.walk(workspace_dir):
-            dirs[:] = [d for d in dirs if not d.startswith(".") and d not in ("__pycache__", "venv", ".venv", "node_modules", "dist", "build", ".git")]
+            dirs[:] = [d for d in dirs if not d.startswith(".") and d not in ignored_dirs]
             for f in files:
                 if f.endswith((".py", ".js", ".ts", ".json", ".yaml", ".yml", ".env.example", ".sh", ".toml", ".txt")):
                     fp = os.path.join(root, f)
