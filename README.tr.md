@@ -1,16 +1,27 @@
 # T-Zero Algorithm
 
-[English](README.md) · Türkçe · [Gizlilik politikası](PRIVACY.md)
-
 [![PyPI](https://img.shields.io/pypi/v/tzero-mcp)](https://pypi.org/project/tzero-mcp/)
 [![npm](https://img.shields.io/npm/v/tzero-mcp)](https://www.npmjs.com/package/tzero-mcp)
 [![M8ven](https://m8ven.ai/badge/mcp/toprakahmetaydogmus/tzeroalgorithm?variant=verified)](https://m8ven.ai/mcp/toprakahmetaydogmus/tzeroalgorithm)
 [![VS Code](https://img.shields.io/visual-studio-marketplace/v/siber-akademi.tzero-vscode)](https://marketplace.visualstudio.com/items?itemName=siber-akademi.tzero-vscode)
-[![Smithery](https://smithery.ai/badge/@toprakahmetaydogmus/TZeroAlgorithm)](https://smithery.ai/server/@toprakahmetaydogmus/TZeroAlgorithm)
 [![Glama](https://img.shields.io/badge/registry-Glama-635bff)](https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm)
 [![CI](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions/workflows/ci.yml/badge.svg)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.11%2B-3776ab)](pyproject.toml)
 [![Lisans](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+
+[English](README.md) · Türkçe · [Gizlilik politikası](PRIVACY.md)
+
+**Dizinler ve demolar**
+
+[![MCP Servers](https://mcpservers.org/badge.svg)](https://mcpservers.org/servers/toprakahmetaydogmus/tzeroalgorithm)
+[![AI Agents Listing](https://img.shields.io/badge/AI%20Agents-Listing-6366f1)](https://aiagentslisting.com/mcp/t-zero-algorithm)
+[![MCP Observatory](https://img.shields.io/badge/MCP%20Observatory-Listing-0f766e)](https://mcpobservatory.com/servers/github%3Atoprakahmetaydogmus/TZeroAlgorithm)
+[![Skillful](https://img.shields.io/badge/Skillful-Directory-2d6a4f)](https://skillful.sh/mcp/tzero-mcp)
+[![Hugging Face Space](https://img.shields.io/badge/Hugging%20Face-Space-ffca28?logo=huggingface)](https://huggingface.co/spaces/toprakke4/tzero-token-reducer)
+[![Vercel Hub](https://img.shields.io/badge/Vercel-Project%20Hub-000000?logo=vercel)](https://tzero-indol.vercel.app)
+[![Smithery durumu](https://img.shields.io/badge/Smithery-eski%20kayit%20erisilemiyor-lightgrey)](https://www.smithery.ai/future)
+
+Smithery'nin eski T-Zero kayıt ve rozet bağlantıları şu anda 404 dönüyor. Dizin Ekim 2026'da değişti ve güncel bir T-Zero kaydı doğrulanamadı. Smithery durum rozeti, sağlayıcının duyurusuna yönlendirir.
 
 T-Zero, kodlama asistanları için yerel kaynak kodundan bağlam oluşturur. Fonksiyon imzalarını, import ifadelerini ve bağımlılıkları çıkarır. CLI ve MCP sunucusu üzerinden kullanılabilir.
 

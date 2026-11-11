@@ -4,13 +4,24 @@
 [![npm](https://img.shields.io/npm/v/tzero-mcp)](https://www.npmjs.com/package/tzero-mcp)
 [![VS Code](https://img.shields.io/visual-studio-marketplace/v/siber-akademi.tzero-vscode)](https://marketplace.visualstudio.com/items?itemName=siber-akademi.tzero-vscode)
 [![M8ven](https://m8ven.ai/badge/mcp/toprakahmetaydogmus/tzeroalgorithm?variant=verified)](https://m8ven.ai/mcp/toprakahmetaydogmus/tzeroalgorithm)
-[![Smithery](https://smithery.ai/badge/@toprakahmetaydogmus/TZeroAlgorithm)](https://smithery.ai/server/@toprakahmetaydogmus/TZeroAlgorithm)
 [![Glama](https://img.shields.io/badge/registry-Glama-635bff)](https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm)
 [![Python](https://img.shields.io/badge/python-3.11%2B-3776ab)](pyproject.toml)
 [![CI](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions/workflows/ci.yml/badge.svg)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
 [English](README.md) · [Türkçe](README.tr.md) · [Privacy policy](PRIVACY.md)
+
+**Directories and demos**
+
+[![MCP Servers](https://mcpservers.org/badge.svg)](https://mcpservers.org/servers/toprakahmetaydogmus/tzeroalgorithm)
+[![AI Agents Listing](https://img.shields.io/badge/AI%20Agents-Listing-6366f1)](https://aiagentslisting.com/mcp/t-zero-algorithm)
+[![MCP Observatory](https://img.shields.io/badge/MCP%20Observatory-Listing-0f766e)](https://mcpobservatory.com/servers/github%3Atoprakahmetaydogmus/TZeroAlgorithm)
+[![Skillful](https://img.shields.io/badge/Skillful-Directory-2d6a4f)](https://skillful.sh/mcp/tzero-mcp)
+[![Hugging Face Space](https://img.shields.io/badge/Hugging%20Face-Space-ffca28?logo=huggingface)](https://huggingface.co/spaces/toprakke4/tzero-token-reducer)
+[![Vercel Hub](https://img.shields.io/badge/Vercel-Project%20Hub-000000?logo=vercel)](https://tzero-indol.vercel.app)
+[![Smithery status](https://img.shields.io/badge/Smithery-legacy%20listing%20unavailable-lightgrey)](https://www.smithery.ai/future)
+
+Smithery's former T-Zero listing and badge URLs currently return 404. Its directory changed in October 2026, and a current T-Zero listing has not been verified. The Smithery status badge links to the provider's notice.
 
 T-Zero builds code context for AI coding assistants. It extracts signatures, imports, and dependencies from a local workspace and exposes them through a CLI and an MCP server.
 
