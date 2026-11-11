@@ -821,10 +821,12 @@ diff --git a/core.py b/core.py
         self.assertIn("T-Zero Multi-Agent Blackboard State", tool_result_text(res_bb))
 
         # Test 10: Action = 'generate_architecture_tests'
-        res_arch_gen = self.run_async(self.server.call_tool("execute_codebase_workflow", {
-            "action": "generate_architecture_tests",
-            "target": "."
-        }))
+        import tempfile
+        with tempfile.TemporaryDirectory() as architecture_dir:
+            res_arch_gen = self.run_async(self.server.call_tool("execute_codebase_workflow", {
+                "action": "generate_architecture_tests",
+                "target": architecture_dir,
+            }))
         self.assertIn("Standalone Architecture Guard test suite generated", tool_result_text(res_arch_gen))
 
         # Test 11: Action = 'check_architecture'
@@ -1047,7 +1049,9 @@ diff --git a/core.py b/core.py
         tmpl_uris = [t.uri_template for t in tmpls]
         self.assertIn("tzero://file/{path}/skeleton", tmpl_uris)
 
-        skel_res = self.run_async(self.server.read_resource("tzero://file/tzero_polyglot.py/skeleton"))
+        skel_res = self.run_async(
+            self.server.read_resource("tzero://file/tzero%2Ftzero_polyglot.py/skeleton")
+        )
         skel_txt = skel_res[0].content
         self.assertIn("PolyglotTokenReducer", skel_txt)
 

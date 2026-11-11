@@ -141,13 +141,16 @@ class TestCLI(unittest.TestCase):
         self.assertIn("INSTRUCTION & ARCHITECTURAL DRIFT ANALYZER", res_drift.stdout)
 
         # 5. 'tzero review' should run autonomous code review gate
-        res_rev = subprocess.run(
-            [sys.executable, "tzero/tzero_v3.py", "review"],
-            capture_output=True,
-            text=True,
-            encoding="utf-8",
-            errors="replace"
-        )
+        import tempfile
+        with tempfile.TemporaryDirectory() as review_dir:
+            subprocess.run(["git", "init", "-q", review_dir], check=True)
+            res_rev = subprocess.run(
+                [sys.executable, "tzero/tzero_v3.py", "review", "--dir", review_dir],
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+            )
         self.assertEqual(res_rev.returncode, 0)
         self.assertIn("T-ZERO AUTONOMOUS CODE REVIEW & REALITY-LOCK GATE", res_rev.stdout)
 

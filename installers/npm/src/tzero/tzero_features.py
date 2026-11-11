@@ -1813,8 +1813,13 @@ class ZeroHallucinationGuard:
                     rel_p = os.path.relpath(full_p, self.project_dir).replace('\\', '/')
                     mod_path = os.path.splitext(rel_p)[0].replace('/', '.')
                     stem = os.path.splitext(f)[0]
+                    if stem == "__init__" and mod_path.endswith(".__init__"):
+                        mod_path = mod_path.rsplit(".", 1)[0]
                     self.modules[mod_path] = rel_p
                     self.modules[stem] = rel_p
+                    parent, _, name = mod_path.rpartition(".")
+                    if parent:
+                        self.exported_symbols[parent].add(name)
 
                     try:
                         with open(full_p, 'r', encoding='utf-8', errors='ignore') as fp:
