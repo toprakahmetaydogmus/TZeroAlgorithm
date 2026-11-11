@@ -8,6 +8,7 @@ Provides backward-compatible PCFixerDoctor class for legacy test suites and APIs
 from __future__ import annotations
 
 import ast
+import difflib
 import json
 import os
 import re

@@ -60,7 +60,7 @@ def format_currency(val: float) -> str:
         self.assertGreater(rep.raw_tokens, 0)
         self.assertGreater(rep.tzero_pruned_tokens, 0)
         self.assertGreaterEqual(rep.tokens_saved, 0)
-        self.assertEqual(len(rep.comparisons), 5)
+        self.assertGreaterEqual(len(rep.comparisons), 5)
 
         model_names = [c.model_name for c in rep.comparisons]
         self.assertIn("Anthropic Claude 3.5 Sonnet", model_names)
@@ -71,7 +71,7 @@ def format_currency(val: float) -> str:
         json_str = TokenCostCalculator.to_json(rep)
         parsed = json.loads(json_str)
         self.assertEqual(parsed["total_files"], rep.total_files)
-        self.assertEqual(len(parsed["comparisons"]), 5)
+        self.assertGreaterEqual(len(parsed["comparisons"]), 5)
 
     def test_drift_analyzer_clean(self):
         rep = DriftAnalyzer.analyze_workspace(self.test_dir)

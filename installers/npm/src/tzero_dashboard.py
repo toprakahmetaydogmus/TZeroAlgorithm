@@ -1644,6 +1644,33 @@ class DashboardRequestHandler(http.server.BaseHTTPRequestHandler):
             except Exception as e:
                 resp = {"success": False, "error": str(e)}
             self._send_json(resp)
+        elif parsed.path == "/api/cost/cockpit":
+            try:
+                from tzero_cost import TokenCostCalculator
+                report = TokenCostCalculator.calculate_cost(".")
+                resp = {
+                    "success": True,
+                    "workspace_dir": report.workspace_dir,
+                    "total_files": report.total_files,
+                    "raw_tokens": report.raw_tokens,
+                    "tzero_pruned_tokens": report.tzero_pruned_tokens,
+                    "tokens_saved": report.tokens_saved,
+                    "reduction_pct": report.reduction_pct,
+                    "comparisons": [
+                        {
+                            "model": c.model_name,
+                            "rate_per_m": c.price_per_million,
+                            "raw_cost": round(c.raw_cost_per_query, 4),
+                            "tzero_cost": round(c.tzero_cost_per_query, 4),
+                            "savings_per_query": round(c.savings_per_query, 4),
+                            "monthly_team_savings": round(c.monthly_team_savings, 2),
+                        }
+                        for c in report.comparisons
+                    ],
+                }
+            except Exception as e:
+                resp = {"success": False, "error": str(e)}
+            self._send_json(resp)
         else:
             self.send_response(404)
             self.end_headers()
