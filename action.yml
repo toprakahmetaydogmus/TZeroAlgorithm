@@ -26,14 +26,6 @@ inputs:
     description: 'Target directory to analyze'
     required: false
     default: '.'
-  contracts-ref:
-    description: 'Git base ref to check breaking contracts against (e.g. HEAD~1)'
-    required: false
-    default: ''
-  sarif-output:
-    description: 'File path to write SARIF report'
-    required: false
-    default: ''
   export-rules:
     description: 'Auto-generate AI agent rules (.cursorrules, .cursor/rules/*.mdc, Copilot)'
     required: false
@@ -94,18 +86,6 @@ runs:
         if [ "$ENFORCE_BOUNDARIES" = "true" ] && [ -f "$DIR/tzero.rules.json" ]; then
           echo "::group::🏛️ T-Zero Architectural Boundaries"
           tzero --enforce-boundaries "$DIR/tzero.rules.json" --dir "$DIR" || GATE_FAILED=1
-          echo "::endgroup::"
-        fi
-
-        CONTRACTS_REF="${{ inputs.contracts-ref }}"
-        SARIF_OUT="${{ inputs.sarif-output }}"
-        if [ -n "$CONTRACTS_REF" ]; then
-          echo "::group::📜 T-Zero Polyglot SemVer Contracts & Breaking Changes Gate"
-          if [ -n "$SARIF_OUT" ]; then
-            tzero --contracts "$CONTRACTS_REF" --contracts-sarif "$SARIF_OUT" --dir "$DIR" || GATE_FAILED=1
-          else
-            tzero --contracts "$CONTRACTS_REF" --dir "$DIR" || GATE_FAILED=1
-          fi
           echo "::endgroup::"
         fi
 
