@@ -38,6 +38,19 @@ class TestCLI(unittest.TestCase):
         from tzero import tzero_mcp
         self.assertIn(tzero_mcp.SERVER_VERSION, res.stdout)
 
+    def test_legacy_root_mcp_entrypoint(self):
+        res = subprocess.run(
+            [sys.executable, "tzero_mcp.py", "--version"],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            timeout=10,
+        )
+        self.assertEqual(res.returncode, 0, res.stderr)
+        from tzero import tzero_mcp
+        self.assertIn(tzero_mcp.SERVER_VERSION, res.stdout)
+
     def test_addmcp_version_flag(self):
         res = subprocess.run(
             [sys.executable, "addmcp.py", "--version"],

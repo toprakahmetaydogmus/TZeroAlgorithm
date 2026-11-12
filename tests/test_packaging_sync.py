@@ -15,7 +15,10 @@ class TestPackagingAndVersionSync(unittest.TestCase):
         data = tomllib.loads((ROOT_DIR / "pyproject.toml").read_text(encoding="utf-8"))
         packages = set(data["tool"]["setuptools"]["packages"])
         self.assertEqual(packages, {"tzero", "tzero.tzero_fixer", "tzero.tzero_jarvis"})
-        self.assertEqual(list(ROOT_DIR.glob("tzero_*.py")), [])
+        root_modules = {path.name for path in ROOT_DIR.glob("tzero_*.py")}
+        self.assertEqual(root_modules, {"tzero_mcp.py"})
+        wrapper = (ROOT_DIR / "tzero_mcp.py").read_text(encoding="utf-8")
+        self.assertIn("from tzero.tzero_mcp import main", wrapper)
         self.assertTrue((ROOT_DIR / "tzero" / "tzero_v3.py").is_file())
 
     def test_pyproject_scripts_and_clean_dependencies(self):
@@ -41,6 +44,8 @@ class TestPackagingAndVersionSync(unittest.TestCase):
 
         glama = json.loads((ROOT_DIR / "glama.json").read_text(encoding="utf-8"))
         self.assertEqual(glama["version"], canonical)
+        self.assertEqual(glama["command"], "tzero-mcp")
+        self.assertEqual(glama["args"], ["--stdio"])
 
         npm_pkg = json.loads((ROOT_DIR / "installers" / "npm" / "package.json").read_text(encoding="utf-8"))
         self.assertEqual(npm_pkg["version"], canonical)
