@@ -32,7 +32,8 @@ class TestCLI(unittest.TestCase):
             capture_output=True,
             text=True,
             encoding="utf-8",
-            errors="replace"
+            errors="replace",
+            timeout=10,
         )
         from tzero import tzero_mcp
         self.assertIn(tzero_mcp.SERVER_VERSION, res.stdout)
