@@ -32,6 +32,16 @@ import re
 import ast
 import inspect
 import logging
+
+SERVER_VERSION = "11.0.0"
+
+# Version checks must not initialize the MCP SDK or dependency bootstrap. Besides
+# being needlessly expensive, that path may wait on package discovery/network
+# state in a fresh environment and make a simple `--version` call hang.
+if __name__ == "__main__" and "--version" in sys.argv[1:]:
+    print(f"T-Zero MCP Server v{SERVER_VERSION}")
+    raise SystemExit(0)
+
 try:
     from mcp.types import ToolAnnotations
 except ImportError:
@@ -49,8 +59,6 @@ try:
 except ImportError:
     def Field(default=..., description=""):
         return default
-
-SERVER_VERSION = "11.0.0"
 
 # Safe UTF-8 reconfiguration for Windows console & piped subprocesses
 if sys.stdout and hasattr(sys.stdout, "reconfigure"):
