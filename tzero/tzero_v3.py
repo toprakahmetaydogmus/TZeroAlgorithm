@@ -8861,6 +8861,8 @@ def main():
     parser.add_argument("--target-model", default="claude-3-7", metavar="MODEL", help="Target LLM model for --budget context sizing")
     parser.add_argument("--golden", "--goldens", nargs="?", const="generate", default=None, metavar="ACTION", help="Generate or verify golden AST public signature baseline (generate, verify, update)")
     parser.add_argument("--creative", "--storyboard", nargs="?", const="T-Zero Autonomous AI System", default=None, metavar="TOPIC_OR_FILE", help="Generate viral video & photo prompts and 5-scene launch storyboard (Sora, Midjourney, Kling)")
+    parser.add_argument("--card", "--badge", nargs="?", const="assets/tzero_badge_card.svg", default=None, metavar="FILE", help="Generate viral dark-mode SVG banner card and GitHub README badges")
+    parser.add_argument("--showcase", nargs="?", const="tzero_showcase.html", default=None, metavar="FILE", help="Generate interactive split-screen HTML5 comparison showcase slider")
     parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect v11.0.0 Master Edition (engine v4.1.0)")
 
 
@@ -9119,6 +9121,9 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
             "storyboard": "--creative",
             "video": "--creative",
             "photo": "--creative",
+            "card": "--card",
+            "badge": "--card",
+            "showcase": "--showcase",
         }
         if sub in sub_map:
             sys.argv[1] = sub_map[sub]
@@ -9927,6 +9932,24 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
                 print(f"Voiceover: \"{sc.voiceover_script}\"")
                 print(f"On-Screen: {sc.on_screen_text}")
                 print(f"Prompt: {sc.video_prompt}")
+        sys.exit(0)
+    elif getattr(args, "card", None) is not None:
+        from tzero.tzero_card import TZeroShowcaseGenerator
+        target_f = args.card or "assets/tzero_badge_card.svg"
+        out_svg = TZeroShowcaseGenerator.generate_svg_banner_card(output_file=target_f)
+        badges_md = TZeroShowcaseGenerator.generate_readme_markdown_badges()
+        print("\033[32m[SUCCESS] Generated Viral T-Zero GitHub Showcase Card & Badges!\033[0m")
+        print(f"📁 High-DPI SVG Card: {out_svg}\n")
+        print("📋 Ready-to-Paste README.md Badges:")
+        print(badges_md)
+        sys.exit(0)
+    elif getattr(args, "showcase", None) is not None:
+        from tzero.tzero_card import TZeroShowcaseGenerator
+        target_html = args.showcase or "tzero_showcase.html"
+        out_html = TZeroShowcaseGenerator.generate_interactive_showcase_html(output_file=target_html)
+        print("\033[32m[SUCCESS] Generated Interactive Split-Screen Showcase Slider!\033[0m")
+        print(f"🌐 Showcase HTML: {out_html}")
+        print("💡 Open in browser or embed in documentation for viral interactive demos.")
         sys.exit(0)
     elif args.audit is not None:
         run_audit_cli(args.audit or args.dir, output_format=getattr(args, "format", "text"))

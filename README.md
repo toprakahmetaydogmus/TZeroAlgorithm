@@ -69,7 +69,7 @@ irm https://raw.githubusercontent.com/toprakahmetaydogmus/TZeroAlgorithm/main/in
 tzero init
 
 # 🧩 Install VS Code / Cursor Extension (.vsix):
-code --install-extension dist/tzero-vscode-10.9.0.vsix
+code --install-extension dist/tzero-vscode-11.0.0.vsix
 ```
 
 ### 🧭 Navigation & Interactive Jump Stations
@@ -196,7 +196,7 @@ tzero init --vscode        # VS Code (Continue / Copilot)
 tzero init --zed           # Zed Editor
 
 # Install official VS Code / Cursor Extension (.vsix):
-code --install-extension dist/tzero-vscode-10.9.0.vsix
+code --install-extension dist/tzero-vscode-11.0.0.vsix
 ```
 
 ### Manual Configuration Snippets (Any MCP Client)
