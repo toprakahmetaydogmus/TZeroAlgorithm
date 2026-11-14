@@ -110,7 +110,7 @@
     <!-- Bottom Footer Strip -->
     <g transform="translate(32, 212)">
         <text x="0" y="8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="500" fill="#475569">
-            🚀 Run <tspan fill="#38bdf8" font-family="monospace">npx -y tzero-mcp@latest</tspan> or <tspan fill="#38bdf8" font-family="monospace">pip install tzero-mcp</tspan> &bull; MIT Licensed
+            🚀 Run <tspan fill="#38bdf8" font-family="monospace">npx -y tzero-mcp@latest</tspan> or <tspan fill="#38bdf8" font-family="monospace">pip install tzero-mcp</tspan> &bull; By Toprak Ahmet Aydoğmuş (15 y/o dev) &bull; MIT
         </text>
         <text x="736" y="8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="600" fill="#64748b" text-anchor="end">
             Siber Akademi Engine v5.1.0
