@@ -226,8 +226,13 @@ def server_entry(target: ClientTarget, server_path: Path) -> Dict[str, object]:
             "command": sys.executable,
             "args": [str(server_path.resolve())],
         }
+    elif server_path.name.lower() in ("python", "python.exe"):
+        entry = {
+            "command": "python",
+            "args": ["-m", "tzero.tzero_mcp"],
+        }
     else:
-        entry: Dict[str, object] = {
+        entry = {
             "command": str(server_path.resolve()),
             "args": [],
         }
