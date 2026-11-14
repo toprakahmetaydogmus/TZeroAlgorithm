@@ -141,9 +141,9 @@ class TZeroShowcaseGenerator:
         <!-- Metric 4: Star CTA -->
         <g transform="translate(558, 0)">
             <rect x="0" y="0" width="178" height="90" rx="10" fill="#1e1b4b" stroke="#6366f1" stroke-width="1"/>
-            <text x="16" y="26" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#a5b4fc">GITHUB VIRAL GATE</text>
+            <text x="16" y="26" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#a5b4fc">ROAD TO 100 STARS</text>
             <text x="16" y="54" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="900" fill="#ffffff">⭐ STAR ON GITHUB</text>
-            <text x="16" y="76" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="500" fill="#c7d2fe">toprakahmetaydogmus/TZero</text>
+            <text x="16" y="76" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="600" fill="#38bdf8">16 / 100 Milestone</text>
         </g>
     </g>
 
@@ -394,17 +394,26 @@ class TZeroShowcaseGenerator:
         </div>
     </div>
 
-    <div style="margin-top: 28px; padding: 22px 28px; background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.35); border-radius: 14px; max-width: 900px; width: 100%; text-align: center; box-shadow: 0 4px 24px rgba(0,0,0,0.35);">
-        <p style="font-size: 17px; font-weight: 800; color: #38bdf8; margin-bottom: 8px;">
-            ⭐ Lütfen Star Vererek Destekleyin!
+    <div style="margin-top: 32px; padding: 26px 32px; background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.35); border-radius: 16px; max-width: 900px; width: 100%; text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.45);">
+        <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(245, 158, 11, 0.15); border: 1px solid #f59e0b; padding: 4px 16px; border-radius: 20px; color: #fbbf24; font-size: 13px; font-weight: 700; margin-bottom: 12px;">
+            ⭐ ROAD TO 100 STARS MILESTONE (16 / 100)
+        </div>
+        <p style="font-size: 19px; font-weight: 800; color: #f8fafc; margin-bottom: 8px;">
+            Support Open-Source Local AI Tooling &bull; Yıldız Vererek Destekleyin!
         </p>
-        <p style="font-size: 14px; line-height: 1.6; color: #cbd5e1; margin-bottom: 14px;">
-            15 yaşında bağımsız bir yazılım geliştiricisiyim (<strong>Toprak Ahmet Aydoğmuş</strong> — beni Google'da aratabilirsiniz).<br>
-            T-Zero'yu yapay zeka araçlarındaki token israfını ve yüksek API maliyetlerini sıfırlamak için %100 yerel ve ücretsiz olarak geliştirdim.
+        <p style="font-size: 14px; line-height: 1.6; color: #cbd5e1; margin-bottom: 16px;">
+            15-year-old solo open-source developer (<strong>Toprak Ahmet Aydoğmuş</strong>, Siber Akademi).<br>
+            Built 100% free, offline, and zero-leak to eliminate AI prompt token bloat across Cursor, Claude, and local LLMs.<br>
+            <em>15 yaşında bağımsız açık kaynak geliştiricisiyim. Projeyi ücretsiz ve çevrimdışı tutabilmem için bir yıldızınız çok değerli.</em>
         </p>
-        <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm" class="cta-btn" target="_blank">
-            ⭐ Star T-Zero on GitHub
-        </a>
+        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+            <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm" class="cta-btn" target="_blank">
+                ⭐ Star T-Zero on GitHub (1-Click)
+            </a>
+            <button onclick="navigator.clipboard.writeText('npx -y tzero-mcp@latest'); alert('Copied npx command to clipboard!');" class="cta-btn" style="background: rgba(15, 23, 42, 0.8); border: 1px solid #38bdf8; cursor: pointer;">
+                📋 Copy: npx -y tzero-mcp@latest
+            </button>
+        </div>
     </div>
 </body>
 </html>"""
