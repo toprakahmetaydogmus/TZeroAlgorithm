@@ -40,6 +40,24 @@ def count_bpe_tokens(text: str, model_encoding: str = "cl100k_base") -> int:
     return max(1, len(text) // 4)
 
 
+def detect_installed_ollama_model(ollama_url: str = "http://127.0.0.1:11434") -> Optional[str]:
+    """Auto-detects already installed models on local Ollama without triggering any downloads."""
+    try:
+        url = ollama_url.rstrip("/") + "/api/tags"
+        req = urllib.request.Request(url, method="GET")
+        with urllib.request.urlopen(req, timeout=3) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+            models = [m.get("name", "") for m in data.get("models", []) if m.get("name")]
+            for m in models:
+                if "qwen" in m.lower():
+                    return m
+            if models:
+                return models[0]
+    except Exception:
+        pass
+    return None
+
+
 @dataclass
 class TaskEvaluationResult:
     task_id: str
@@ -317,12 +335,22 @@ def analyze_symbol_impact(symbol_path: str, table: SymbolTable, dag: CallGraphDA
         ollama_url: str,
     ) -> str:
         prompt = (
-            f"Write ONLY Python code implementing a helper calling this AST contract for '{task_title}':\n"
-            f"```python\n{pruned_dep}\n```"
+            f"You are an expert Python engineer. You are given these existing classes and method signatures:\n"
+            f"```python\n{pruned_dep}\n```\n\n"
+            f"Task: Write a Python helper function that implements '{task_title}'.\n"
+            f"Requirements:\n"
+            f"1. You MUST use and call the methods on the classes defined above.\n"
+            f"2. Do NOT redefine the classes.\n"
+            f"3. Return executable Python code only enclosed in ```python ``` code block."
         )
         req = urllib.request.Request(
             ollama_url,
-            data=json.dumps({"model": ollama_model, "prompt": prompt, "stream": False}).encode("utf-8"),
+            data=json.dumps({
+                "model": ollama_model,
+                "prompt": prompt,
+                "stream": False,
+                "options": {"temperature": 0.1, "num_predict": 512}
+            }).encode("utf-8"),
             headers={"Content-Type": "application/json"},
             method="POST",
         )
@@ -454,5 +482,25 @@ def analyze_symbol_impact(symbol_path: str, table: SymbolTable, dag: CallGraphDA
 
 
 if __name__ == "__main__":
-    rep = TaskCompletionBenchmark.evaluate_all()
+    import argparse
+    parser = argparse.ArgumentParser(description="T-Zero Task-Completion & Real Tokenizer Benchmark Engine")
+    parser.add_argument("--suite", choices=["core", "adversarial"], default="core", help="Benchmark suite to evaluate")
+    parser.add_argument("--ollama", action="store_true", help="Query local Ollama instance without pulling extra models")
+    parser.add_argument("--model", type=str, default=None, help="Local Ollama model name (auto-detects if omitted)")
+    args = parser.parse_args()
+
+    selected_model = args.model
+    if args.ollama and not selected_model:
+        selected_model = detect_installed_ollama_model()
+        if not selected_model:
+            print("[WARN] No local Ollama model detected. Running offline AST benchmark.", file=sys.stderr)
+
+    if selected_model:
+        print(f"🤖 Running benchmark with local Ollama model: {selected_model}")
+        rep = TaskCompletionBenchmark.evaluate_suite(suite=args.suite, ollama_model=selected_model)
+    elif args.suite == "adversarial":
+        rep = TaskCompletionBenchmark.evaluate_suite(suite="adversarial")
+    else:
+        rep = TaskCompletionBenchmark.evaluate_all()
+
     print(TaskCompletionBenchmark.format_terminal_summary(rep))
