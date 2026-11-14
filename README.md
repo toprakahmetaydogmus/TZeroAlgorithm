@@ -3,6 +3,8 @@
 
 # 🧠 T-Zero: Deterministic AST Context Compressor & MCP Server
 
+**T-Zero is developed independently. If it helps you, please consider [starring the project on GitHub](https://github.com/toprakahmetaydogmus/TZeroAlgorithm). Thank you!**
+
 ### *Empirically Proven Token Optimization Engine, 21 Canonical MCP Tools (58 Runtime Tools), Real BPE Tokenizer Benchmarks & Pre-Flight Reality-Lock for AI Coding Assistants.*
 
 **[English](README.md)** | **[Türkçe](README.tr.md)** | **[日本語](README.ja.md)** | **[简体中文](README.zh.md)** | **[Privacy Policy](PRIVACY.md)** | **[Interactive Colab](https://colab.research.google.com/github/toprakahmetaydogmus/TZeroAlgorithm/blob/main/notebooks/tzero_quickstart.ipynb)** | **[Hugging Face Space](https://huggingface.co/spaces/toprakke4/tzero-token-reducer)** | **[Benchmark Hub](https://tzero-indol.vercel.app)**

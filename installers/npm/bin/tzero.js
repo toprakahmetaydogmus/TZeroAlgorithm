@@ -16,7 +16,8 @@ const banner = `\x1b[36m
 │  ⚡ T-ZERO CONTEXT ARCHITECT & MCP ENGINE v${pkg.version}                            │
 │  Deterministic AST Context Compressor, 95% Token Reducer & Security Guard    │
 │                                                                              │
-│  ⭐ Star on GitHub: https://github.com/toprakahmetaydogmus/TZeroAlgorithm    │
+│  ⭐ Independent project: please consider starring it on GitHub:             │
+│  https://github.com/toprakahmetaydogmus/TZeroAlgorithm                       │
 │  💡 1-Click Init:   tzero init (Cursor, Claude, Windsurf, Antigravity)       │
 └──────────────────────────────────────────────────────────────────────────────┘
 \x1b[0m`;

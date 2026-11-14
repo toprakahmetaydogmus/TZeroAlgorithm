@@ -5603,7 +5603,7 @@ class AutoReadmeGUI:
         lbl_web2.pack(side=tk.LEFT, padx=3)
         lbl_web2.bind("<Button-1>", lambda e: webbrowser.open(DEV_URL_BIO))
 
-        lbl_web3 = tk.Label(b_links, text="⭐ GitHub Repo", font=("Segoe UI", 8, "bold"), fg=PALETTE["accent_green"], bg=PALETTE["card_bg"], padx=6, pady=2, cursor="hand2")
+        lbl_web3 = tk.Label(b_links, text="⭐ Star on GitHub", font=("Segoe UI", 8, "bold"), fg=PALETTE["accent_green"], bg=PALETTE["card_bg"], padx=6, pady=2, cursor="hand2")
         lbl_web3.pack(side=tk.LEFT, padx=3)
         lbl_web3.bind("<Button-1>", lambda e: webbrowser.open(DEV_URL_MAIN))
 
@@ -8739,11 +8739,8 @@ def main():
     parser = argparse.ArgumentParser(
         description="Siber Akademi T-Zero Context Architect V3 - Enterprise Codebase Context Builder & Token Reducer",
         epilog="""
-⭐ PROJEYE BİR YILDIZLA DESTEK OLUN:
-    Merhaba! Ben Toprak Ahmet Aydoğmuş (15 yaşında genç bir geliştiriciyim).
-    T-Zero'yu sıfırdan yapay zeka araçlarındaki token israfını çözmek için geliştirdim.
-    Beni Google'da 'Toprak Ahmet Aydoğmuş' olarak aratabilirsiniz!
-    GitHub: https://github.com/toprakahmetaydogmus/TZeroAlgorithm
+T-Zero is developed independently. If it helps you, please consider
+starring the project: https://github.com/toprakahmetaydogmus/TZeroAlgorithm
 """,
         formatter_class=argparse.RawTextHelpFormatter
     )

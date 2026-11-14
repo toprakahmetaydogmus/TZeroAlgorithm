@@ -54,6 +54,20 @@ function runInTerminal(args) {
 }
 
 function activate(context) {
+    const starPromptKey = 'tzero.starPromptShown';
+    if (!context.globalState.get(starPromptKey)) {
+        void context.globalState.update(starPromptKey, true).then(() => {
+            return vscode.window.showInformationMessage(
+                'T-Zero is developed independently. If it helps you, please consider starring the project on GitHub.',
+                'Open GitHub'
+            );
+        }).then((choice) => {
+            if (choice === 'Open GitHub') {
+                return vscode.env.openExternal(vscode.Uri.parse('https://github.com/toprakahmetaydogmus/TZeroAlgorithm'));
+            }
+            return undefined;
+        }).catch(() => {});
+    }
     const outputChannel = vscode.window.createOutputChannel('T-Zero Architect');
     const codeLensEmitter = new vscode.EventEmitter();
     const explainCache = new Map();

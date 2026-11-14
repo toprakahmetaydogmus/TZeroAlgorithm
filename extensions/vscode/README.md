@@ -1,5 +1,7 @@
 # T-Zero Context Architect & MCP (VS Code & Cursor Extension)
 
+T-Zero is developed independently. If it helps you, please consider [starring the project on GitHub](https://github.com/toprakahmetaydogmus/TZeroAlgorithm). Thank you!
+
 <p align="center">
   <img src="icon.png" width="128" height="128" alt="T-Zero Logo" /><br>
   <b>Enterprise-Grade Codebase Context Builder, AST Signatures Analyzer, & Token Reducer</b><br>

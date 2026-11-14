@@ -11,7 +11,7 @@
 
 ### ⭐ Open-Source Engineering (Please Star Our Repo!)
 
-Hi! I'm **Toprak Ahmet Aydoğmuş** from **Siber Akademi**. I created T-Zero from scratch to eliminate token limits, reduce prompt costs by up to 95%, and stop AI coding hallucinations using deterministic Abstract Syntax Tree (AST) analysis.
+Hi! I'm **Toprak Ahmet Aydoğmuş**, the independent developer behind T-Zero. If the project helps you, a GitHub star helps others discover it and supports my work.
 
 If this package helps your engineering team or AI workflows:  
 ⭐ **Please give our repository a STAR on GitHub:**  
