@@ -261,6 +261,8 @@ function buildSidebarHtml(state) {
         { id: 'tzero.bridge', label: 'Polyglot Bridge (--bridge)' },
         { id: 'tzero.mergeHeal', label: 'Merge Healer (--merge-heal)' },
         { id: 'tzero.lspCheck', label: 'Arch & Zero-Leak Check (--check-arch)' },
+        { id: 'tzero.grounding', label: 'Copy Grounding Contract (--grounding)' },
+        { id: 'tzero.pack', label: 'Pack Repo to Budget (--pack)' },
         { id: 'tzero.hookInstall', label: 'Install AI Hooks (--hook-install all)' },
         { id: 'tzero.federationImpact', label: 'Federation Impact (--federation)' },
         { id: 'tzero.openDashboard', label: 'Launch Web Dashboard' }

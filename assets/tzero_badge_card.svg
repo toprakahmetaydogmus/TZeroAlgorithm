@@ -1,0 +1,119 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 240" width="800" height="240" fill="none">
+    <defs>
+        <linearGradient id="cardBg" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#0a0f1d"/>
+            <stop offset="50%" stop-color="#0f172a"/>
+            <stop offset="100%" stop-color="#020617"/>
+        </linearGradient>
+        <linearGradient id="accentGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#38bdf8"/>
+            <stop offset="50%" stop-color="#818cf8"/>
+            <stop offset="100%" stop-color="#c084fc"/>
+        </linearGradient>
+        <linearGradient id="greenGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#10b981"/>
+            <stop offset="100%" stop-color="#34d399"/>
+        </linearGradient>
+        <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="8" result="blur"/>
+            <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+        </filter>
+        <style>
+            @keyframes pulseBorder {
+                0%, 100% { stroke-opacity: 0.4; }
+                50% { stroke-opacity: 0.9; }
+            }
+            .card-border {
+                animation: pulseBorder 4s ease-in-out infinite;
+            }
+        </style>
+    </defs>
+
+    <!-- Card Background -->
+    <rect x="2" y="2" width="796" height="236" rx="16" fill="url(#cardBg)" stroke="url(#accentGlow)" stroke-width="2" class="card-border"/>
+
+    <!-- Subtle Grid Background Overlay -->
+    <g opacity="0.08" stroke="#38bdf8" stroke-width="1">
+        <line x1="0" y1="40" x2="800" y2="40"/>
+        <line x1="0" y1="80" x2="800" y2="80"/>
+        <line x1="0" y1="120" x2="800" y2="120"/>
+        <line x1="0" y1="160" x2="800" y2="160"/>
+        <line x1="0" y1="200" x2="800" y2="200"/>
+        <line x1="160" y1="0" x2="160" y2="240"/>
+        <line x1="320" y1="0" x2="320" y2="240"/>
+        <line x1="480" y1="0" x2="480" y2="240"/>
+        <line x1="640" y1="0" x2="640" y2="240"/>
+    </g>
+
+    <!-- Header: Logo & Branding -->
+    <g transform="translate(32, 30)">
+        <!-- T-Zero Hexagon Icon -->
+        <polygon points="18,0 36,10 36,30 18,40 0,30 0,10" fill="#0f172a" stroke="url(#accentGlow)" stroke-width="2.5"/>
+        <text x="18" y="26" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="900" fill="#38bdf8" text-anchor="middle">T0</text>
+
+        <text x="48" y="22" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="800" fill="#f8fafc">
+            T-ZERO <tspan fill="#818cf8">CONTEXT ARCHITECT</tspan>
+        </text>
+        <text x="48" y="38" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="500" fill="#64748b">
+            Deterministic AST Context Compressor &amp; Reality-Lock Engine
+        </text>
+    </g>
+
+    <!-- Top Right: Verified Badges -->
+    <g transform="translate(560, 26)">
+        <rect x="0" y="0" width="105" height="26" rx="13" fill="#1e293b" stroke="#10b981" stroke-width="1.2"/>
+        <circle cx="14" cy="13" r="4" fill="#10b981"/>
+        <text x="24" y="17" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="700" fill="#34d399">ZERO-LEAK</text>
+
+        <rect x="114" y="0" width="94" height="26" rx="13" fill="#1e293b" stroke="#38bdf8" stroke-width="1.2"/>
+        <text x="161" y="17" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="700" fill="#38bdf8" text-anchor="middle">REALITY-LOCK</text>
+    </g>
+
+    <!-- Middle Divider -->
+    <line x1="32" y1="80" x2="768" y2="80" stroke="#1e293b" stroke-width="1.5"/>
+
+    <!-- Key Metrics Grid -->
+    <g transform="translate(32, 102)">
+        <!-- Metric 1: Token Reduction -->
+        <g transform="translate(0, 0)">
+            <rect x="0" y="0" width="170" height="90" rx="10" fill="#0f172a" stroke="#1e293b" stroke-width="1"/>
+            <text x="16" y="26" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="600" fill="#94a3b8">TOKEN REDUCTION</text>
+            <text x="16" y="62" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="32" font-weight="900" fill="#38bdf8">-94.6%</text>
+            <text x="16" y="78" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="500" fill="#64748b">Pruned AST Signatures</text>
+        </g>
+
+        <!-- Metric 2: Raw vs Pruned -->
+        <g transform="translate(186, 0)">
+            <rect x="0" y="0" width="170" height="90" rx="10" fill="#0f172a" stroke="#1e293b" stroke-width="1"/>
+            <text x="16" y="26" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="600" fill="#94a3b8">CONTEXT INGESTION</text>
+            <text x="16" y="58" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="22" font-weight="800" fill="#f8fafc">1.3M <tspan font-size="14" fill="#64748b">/ 10.8M</tspan></text>
+            <text x="16" y="78" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="500" fill="#10b981">Optimal KV Cache Fit</text>
+        </g>
+
+        <!-- Metric 3: Annual ROI -->
+        <g transform="translate(372, 0)">
+            <rect x="0" y="0" width="170" height="90" rx="10" fill="#0f172a" stroke="#1e293b" stroke-width="1"/>
+            <text x="16" y="26" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="600" fill="#94a3b8">ESTIMATED TEAM ROI</text>
+            <text x="16" y="58" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="24" font-weight="800" fill="#34d399">$14,280/yr</text>
+            <text x="16" y="78" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="500" fill="#64748b">At 50 queries/day/dev</text>
+        </g>
+
+        <!-- Metric 4: Star CTA -->
+        <g transform="translate(558, 0)">
+            <rect x="0" y="0" width="178" height="90" rx="10" fill="#1e1b4b" stroke="#6366f1" stroke-width="1"/>
+            <text x="16" y="26" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#a5b4fc">GITHUB VIRAL GATE</text>
+            <text x="16" y="54" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="900" fill="#ffffff">⭐ STAR ON GITHUB</text>
+            <text x="16" y="76" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="500" fill="#c7d2fe">toprakahmetaydogmus/TZero</text>
+        </g>
+    </g>
+
+    <!-- Bottom Footer Strip -->
+    <g transform="translate(32, 212)">
+        <text x="0" y="8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="500" fill="#475569">
+            🚀 Run <tspan fill="#38bdf8" font-family="monospace">npx -y tzero-mcp@latest</tspan> or <tspan fill="#38bdf8" font-family="monospace">pip install tzero-mcp</tspan> &bull; MIT Licensed
+        </text>
+        <text x="736" y="8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="600" fill="#64748b" text-anchor="end">
+            Siber Akademi Engine v5.1.0
+        </text>
+    </g>
+</svg>

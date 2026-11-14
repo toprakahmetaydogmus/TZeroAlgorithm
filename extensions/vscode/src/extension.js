@@ -172,6 +172,8 @@ function activate(context) {
             { label: '$(arrow-swap) Polyglot Type Bridge (--bridge)', command: 'tzero.bridge' },
             { label: '$(git-merge) Semantic 3-Way Merge Healer (--merge-heal)', command: 'tzero.mergeHeal' },
             { label: '$(shield) Check Architecture & Zero-Leak Diagnostics (--check-arch)', command: 'tzero.lspCheck' },
+            { label: '$(lock) Copy Immutable AST Grounding Contract (--grounding-contract)', command: 'tzero.grounding' },
+            { label: '$(archive) Pack Repository to Token Budget (--pack)', command: 'tzero.pack' },
             { label: '$(plug) Install AI Lifecycle Hooks (--hook-install all)', command: 'tzero.hookInstall' },
             { label: '$(repo-forked) Cross-Repo Federation Impact (--federation impact)', command: 'tzero.federationImpact' },
             { label: '$(eye) Autonomous PR Review (--review)', command: 'tzero.review' },
@@ -360,6 +362,40 @@ function activate(context) {
         );
     });
 
+    const groundingCmd = vscode.commands.registerCommand('tzero.grounding', async () => {
+        const wsRoot = getWorkspaceRoot() || '.';
+        try {
+            const res = await runTZeroCli(['--grounding-contract', '--dir', wsRoot], wsRoot);
+            if (res && res.stdout) {
+                await vscode.env.clipboard.writeText(res.stdout);
+                vscode.window.showInformationMessage('T-Zero: Immutable AST Grounding Contract copied to clipboard! Paste into AI prompt to eliminate hallucinations.');
+            }
+        } catch (err) {
+            vscode.window.showErrorMessage(`T-Zero grounding contract failed: ${err.message}`);
+        }
+    });
+
+    const packCmd = vscode.commands.registerCommand('tzero.pack', async () => {
+        const wsRoot = getWorkspaceRoot() || '.';
+        const editor = vscode.window.activeTextEditor;
+        const currentFile = (editor && editor.document && editor.document.fileName)
+            ? path.relative(wsRoot, editor.document.fileName)
+            : '';
+        const budgetPick = await vscode.window.showQuickPick(
+            ['8000', '16000', '32000', '64000', '128000'],
+            { placeHolder: 'Select Token Budget for Packed Context (default: 16000 tokens)' }
+        );
+        if (!budgetPick) {
+            return;
+        }
+        const budget = parseInt(budgetPick, 10) || 16000;
+        const args = ['--pack', String(budget), '--dir', wsRoot];
+        if (currentFile && !currentFile.startsWith('..')) {
+            args.push('--focus', currentFile);
+        }
+        await executeOutputCommand(`Packed Context (${budget} tokens)`, args, wsRoot, 'markdown');
+    });
+
     const copyContractCmd = vscode.commands.registerCommand('tzero.copySymbolContract', async (filePath, lineNum) => {
         const doc = vscode.workspace.textDocuments.find((d) => d.fileName === filePath)
             || (vscode.window.activeTextEditor && vscode.window.activeTextEditor.document);
@@ -453,6 +489,8 @@ function activate(context) {
         lspCheckCmd,
         hookInstallCmd,
         federationImpactCmd,
+        groundingCmd,
+        packCmd,
         copyContractCmd
     );
 

@@ -6,7 +6,9 @@ name: Release
 
 on:
   push:
-    tags: ["v*"]
+    tags:
+      - "v*"
+      - "release-*"
   workflow_dispatch:
 
 permissions:

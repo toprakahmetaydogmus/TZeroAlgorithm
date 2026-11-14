@@ -2,4 +2,4 @@
 - Maintain 100% Zero-Leak security standards.
 - Prefer existing helper functions in the repository AST before generating new ones.
 - Run tests (`python -m unittest discover tests -v`) before asserting task completion.
-- Key modules in this workspace: addmcp.py, app.py, compile.py, main.py, pc_fixer_mcp.py, siber_akademi_icon.py, tzero.py, tzero_benchmark.py, tzero_blackboard.py, tzero_bridge.py.
+- Key modules in this workspace: addmcp.py, app.py, main.py, pc_fixer_mcp.py, tzero.py, tzero_gateway.py, tzero_mcp.py, benchmark-site/serve.py, huggingface-space/app.py, installers/npm/src/addmcp.py.

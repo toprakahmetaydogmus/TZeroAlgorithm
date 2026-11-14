@@ -842,7 +842,7 @@ diff --git a/core.py b/core.py
             "target": ".",
             "query": "HEAD"
         }))
-        self.assertIn("Public API Contracts", tool_result_text(res_contracts))
+        self.assertIn("Public API Contract", tool_result_text(res_contracts))
 
         # Test 13: Action = 'debt'
         res_debt = self.run_async(self.server.call_tool("execute_codebase_workflow", {
@@ -873,6 +873,15 @@ diff --git a/core.py b/core.py
                 os.remove(test_g)
             except Exception:
                 pass
+
+        # Test 16: Action = 'creative' (Multi-Modal Video/Photo/Storyboard)
+        res_creative = self.run_async(self.server.call_tool("execute_codebase_workflow", {
+            "action": "creative",
+            "target": ".",
+            "query": "Autonomous Zero-Leak Coding Engine"
+        }))
+        self.assertIn("T-Zero Jarvis Creative Director", tool_result_text(res_creative))
+        self.assertIn("Cinematic Video Prompt", tool_result_text(res_creative))
 
         # Test 16: Unknown action error handling
         res_err = self.run_async(self.server.call_tool("execute_codebase_workflow", {"action": "invalid_unknown_action"}))

@@ -1176,8 +1176,9 @@ def run_init(argv: Optional[List[str]] = None) -> int:
 \033[1;36m┌──────────────────────────────────────────────────────────────────────────────┐
 │  ⚡ SIBER AKADEMI T-ZERO CONTEXT ARCHITECT & MCP ENGINE                      │
 │                                                                              │
-│  Engineered by Toprak Ahmet Aydoğmuş & Siber Akademi to eliminate token     │
-│  bloat, token costs, and AI hallucinations for programmers worldwide.        │
+│  Engineered by Toprak Ahmet Aydoğmuş (15-year-old solo dev) & Siber Akademi   │
+│  to eliminate token bloat, costs, and AI hallucinations worldwide.           │
+│  Search "Toprak Ahmet Aydoğmuş" on Google to learn more!                     │
 │                                                                              │
 │  If this open-source tool saved you tokens or improved your coding flow:     │
 │  👉 Please consider giving it a ⭐ on GitHub:                                │
