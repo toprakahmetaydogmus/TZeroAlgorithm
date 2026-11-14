@@ -13,5 +13,6 @@ include README.tr.md
 include tzero.py
 include tzero_mcp.py
 include docs/VIRAL_GROWTH_100_STARS.md
+include docs/REAL_PC_BENCHMARK_REPORT.md
 include assets/tzero_badge_card.svg
 recursive-include tzero *.py *.html *.json *.ico
