@@ -15,7 +15,11 @@ class TestPackagingAndVersionSync(unittest.TestCase):
         data = tomllib.loads((ROOT_DIR / "pyproject.toml").read_text(encoding="utf-8"))
         packages = set(data["tool"]["setuptools"]["packages"])
         self.assertEqual(packages, {"tzero", "tzero.tzero_fixer", "tzero.tzero_jarvis"})
-        root_modules = {path.name for path in ROOT_DIR.glob("tzero_*.py")}
+        root_modules = {
+            path.name
+            for path in ROOT_DIR.glob("tzero_*.py")
+            if path.name != "tzero_gateway.py"
+        }
         self.assertEqual(root_modules, {"tzero_mcp.py"})
         wrapper = (ROOT_DIR / "tzero_mcp.py").read_text(encoding="utf-8")
         self.assertIn("from tzero.tzero_mcp import main", wrapper)

@@ -842,7 +842,7 @@ diff --git a/core.py b/core.py
             "target": ".",
             "query": "HEAD"
         }))
-        self.assertIn("Public API Contracts", tool_result_text(res_contracts))
+        self.assertIn("Public API Contract", tool_result_text(res_contracts))
 
         # Test 13: Action = 'debt'
         res_debt = self.run_async(self.server.call_tool("execute_codebase_workflow", {

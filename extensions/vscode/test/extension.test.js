@@ -32,7 +32,9 @@ test('package.json defines 11.0.0 metadata, sidebar viewContainer, and commands 
         'tzero.refreshMetrics',
         'tzero.lspCheck',
         'tzero.hookInstall',
-        'tzero.federationImpact'
+        'tzero.federationImpact',
+        'tzero.grounding',
+        'tzero.pack'
     ]) {
         assert.ok(commandIds.has(required), `Missing command: ${required}`);
     }
@@ -168,7 +170,7 @@ test('extension.js invokes compatible tzero_v3 CLI flags for init and pipe compr
     assert.match(extSrc, /\['--init',\s*'all'\]/);
 });
 
-test('extension.js registers v11 commands (lspCheck, hookInstall, federationImpact)', () => {
+test('extension.js registers v11 commands (lspCheck, hookInstall, federationImpact, grounding, pack)', () => {
     const extSrc = fs.readFileSync(path.join(extRoot, 'src', 'extension.js'), 'utf8');
     assert.match(extSrc, /registerCommand\('tzero\.lspCheck'/);
     assert.match(extSrc, /'--check-arch'/);
@@ -177,5 +179,9 @@ test('extension.js registers v11 commands (lspCheck, hookInstall, federationImpa
     assert.match(extSrc, /registerCommand\('tzero\.federationImpact'/);
     assert.match(extSrc, /showInputBox/);
     assert.match(extSrc, /'--federation',\s*'impact',\s*'--federation-symbol'/);
+    assert.match(extSrc, /registerCommand\('tzero\.grounding'/);
+    assert.match(extSrc, /'--grounding-contract'/);
+    assert.match(extSrc, /registerCommand\('tzero\.pack'/);
+    assert.match(extSrc, /'--pack'/);
 });
 

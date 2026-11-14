@@ -135,10 +135,22 @@
       {
         "command": "tzero.federationImpact",
         "title": "T-Zero: Cross-Repo Federation Impact (--federation impact)"
+      },
+      {
+        "command": "tzero.grounding",
+        "title": "T-Zero: Copy Immutable AST Grounding Contract (--grounding-contract)"
+      },
+      {
+        "command": "tzero.pack",
+        "title": "T-Zero: Pack Repository Context to Token Budget (--pack)"
       }
     ],
     "menus": {
       "editor/context": [
+        {
+          "command": "tzero.grounding",
+          "group": "tzero@0"
+        },
         {
           "command": "tzero.compressSelection",
           "when": "editorHasSelection",
@@ -149,26 +161,38 @@
           "group": "tzero@2"
         },
         {
-          "command": "tzero.explain",
+          "command": "tzero.pack",
           "group": "tzero@3"
         },
         {
-          "command": "tzero.audit",
+          "command": "tzero.explain",
           "group": "tzero@4"
+        },
+        {
+          "command": "tzero.audit",
+          "group": "tzero@5"
         }
       ],
       "explorer/context": [
         {
-          "command": "tzero.showTree",
+          "command": "tzero.grounding",
+          "group": "tzero@0"
+        },
+        {
+          "command": "tzero.pack",
           "group": "tzero@1"
         },
         {
-          "command": "tzero.audit",
+          "command": "tzero.showTree",
           "group": "tzero@2"
         },
         {
-          "command": "tzero.debt",
+          "command": "tzero.audit",
           "group": "tzero@3"
+        },
+        {
+          "command": "tzero.debt",
+          "group": "tzero@4"
         }
       ]
     },
