@@ -8860,6 +8860,7 @@ def main():
     parser.add_argument("--target-tokens", type=int, default=None, metavar="N", help="Target token budget for --budget (e.g. 16000, 64000)")
     parser.add_argument("--target-model", default="claude-3-7", metavar="MODEL", help="Target LLM model for --budget context sizing")
     parser.add_argument("--golden", "--goldens", nargs="?", const="generate", default=None, metavar="ACTION", help="Generate or verify golden AST public signature baseline (generate, verify, update)")
+    parser.add_argument("--creative", "--storyboard", nargs="?", const="T-Zero Autonomous AI System", default=None, metavar="TOPIC_OR_FILE", help="Generate viral video & photo prompts and 5-scene launch storyboard (Sora, Midjourney, Kling)")
     parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect v11.0.0 Master Edition (engine v4.1.0)")
 
 
@@ -9114,6 +9115,10 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
             "agent-kernel": "--agent-kernel",
             "scip": "--scip-import",
             "federation": "--federation",
+            "creative": "--creative",
+            "storyboard": "--creative",
+            "video": "--creative",
+            "photo": "--creative",
         }
         if sub in sub_map:
             sys.argv[1] = sub_map[sub]
@@ -9877,6 +9882,51 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
                     print(f"[AUTO-VAULT] Successfully secured and migrated {total_migrated} secret(s) into {os.path.join(target, '.env')}.")
                 else:
                     print("\n[TIP] Run with --migrate to automatically extract these secrets into .env and refactor source files.")
+        sys.exit(0)
+    elif getattr(args, "creative", None) is not None:
+        from tzero.tzero_jarvis.creative_director import JarvisCreativeDirector
+        target = args.creative or "T-Zero Autonomous AI Context Architect"
+        if os.path.isfile(target):
+            with open(target, "r", encoding="utf-8", errors="replace") as f:
+                code_text = f.read()
+            res = JarvisCreativeDirector.synthesize_from_code(code_text, file_name=os.path.basename(target))
+            print("\033[36m# 🎬 T-Zero Jarvis Creative Director — Multi-Modal Campaign\033[0m")
+            print(f"**Detected Theme:** `{res['detected_theme']}`")
+            print(f"**Target File:** `{res['file_name']}`\n")
+            print("## 🎥 Cinematic Video Generation Prompt (Sora / Kling / Runway Gen-3)")
+            print(f"```text\n{res['video_spec']['prompt']}\n```")
+            print(f"- Camera: {res['video_spec']['camera_movement']}")
+            print(f"- Audio SFX: {res['video_spec']['audio_cue']}\n")
+            print("## 📸 Photorealistic Image Prompt (Midjourney v6.1 / Flux.1 Pro)")
+            print(f"```text\n{res['photo_spec']['prompt']} {res['photo_spec']['parameters']}\n```\n")
+            print("## 📜 30-Second Product Launch Storyboard (5 Scenes)")
+            for sc in res["storyboard_scenes"]:
+                print(f"\n### Scene {sc['scene']} ({sc['timecode']}): {sc['title']}")
+                print(f"Visual: {sc['visual']}")
+                print(f"Voiceover: \"{sc['voiceover']}\"")
+                print(f"On-Screen: {sc['text']}")
+                print(f"Prompt: {sc['prompt']}")
+        else:
+            v_spec = JarvisCreativeDirector.generate_video_prompt(topic=target)
+            p_spec = JarvisCreativeDirector.generate_photo_prompt(subject=target)
+            sb = JarvisCreativeDirector.generate_launch_storyboard(product_name="T-Zero", core_feature=target)
+            print("\033[36m# 🎬 T-Zero Jarvis Creative Director — Multi-Modal Campaign\033[0m")
+            print(f"**Campaign Topic:** `{target}`\n")
+            print("## 🎥 Cinematic Video Prompt (Sora / Kling 1.5 / Runway Gen-3 / Luma)")
+            print(f"```text\n{v_spec.prompt}\n```")
+            print(f"- Camera: {v_spec.camera_movement}")
+            print(f"- Lighting: {v_spec.lighting}")
+            print(f"- Audio SFX: {v_spec.audio_sfx_cue}\n")
+            print("## 📸 Photorealistic Visual Prompt (Midjourney v6.1 / Flux.1 Pro)")
+            print(f"```text\n{p_spec.prompt} {p_spec.parameters}\n```")
+            print(f"- Lens: {p_spec.camera_lens}\n")
+            print("## 📜 30-Second Viral Launch Storyboard")
+            for sc in sb:
+                print(f"\n### Scene {sc.scene_number} ({sc.timecode}): {sc.scene_title}")
+                print(f"Visual: {sc.visual_description}")
+                print(f"Voiceover: \"{sc.voiceover_script}\"")
+                print(f"On-Screen: {sc.on_screen_text}")
+                print(f"Prompt: {sc.video_prompt}")
         sys.exit(0)
     elif args.audit is not None:
         run_audit_cli(args.audit or args.dir, output_format=getattr(args, "format", "text"))

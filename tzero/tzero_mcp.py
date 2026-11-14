@@ -4569,6 +4569,67 @@ def create_mcp_server():
                 rep = ASTGoldenRegressionEngine.verify_against_golden(target_dir)
                 return ASTGoldenRegressionEngine.format_markdown_report(rep)
 
+        elif act in ("creative", "creative_prompt", "storyboard", "video_prompt", "photo_prompt"):
+            from tzero.tzero_jarvis.creative_director import JarvisCreativeDirector
+            code_content = ""
+            if os.path.isfile(target):
+                try:
+                    with open(target, "r", encoding="utf-8", errors="replace") as f:
+                        code_content = f.read()
+                except Exception:
+                    pass
+            elif query and ("def " in query or "class " in query or len(query) > 100):
+                code_content = query
+
+            if code_content:
+                res = JarvisCreativeDirector.synthesize_from_code(code_content, file_name=os.path.basename(target))
+                md = [
+                    "# 🎬 T-Zero Jarvis Creative Director — Multi-Modal Campaign",
+                    f"**Detected Theme:** `{res['detected_theme']}`",
+                    f"**Target File:** `{res['file_name']}`\n",
+                    "## 🎥 Cinematic Video Generation Prompt (Sora / Kling / Runway Gen-3)",
+                    f"```text\n{res['video_spec']['prompt']}\n```",
+                    f"- **Camera Movement:** {res['video_spec']['camera_movement']}",
+                    f"- **Audio SFX Cue:** {res['video_spec']['audio_cue']}\n",
+                    "## 📸 Photorealistic Image Prompt (Midjourney v6.1 / Flux.1 Pro)",
+                    f"```text\n{res['photo_spec']['prompt']} {res['photo_spec']['parameters']}\n```",
+                    f"- **Optics & Lens:** {res['photo_spec']['camera_lens']}\n",
+                    "## 📜 Viral 30-Second Product Launch Storyboard (5 Scenes)"
+                ]
+                for sc in res["storyboard_scenes"]:
+                    md.append(f"### Scene {sc['scene']} ({sc['timecode']}): {sc['title']}")
+                    md.append(f"- **Visual:** {sc['visual']}")
+                    md.append(f"- **Voiceover:** \"{sc['voiceover']}\"")
+                    md.append(f"- **On-Screen Text:** `{sc['text']}`")
+                    md.append(f"- **Video Prompt:** `{sc['prompt']}`\n")
+                return "\n".join(md)
+            else:
+                topic = query or target
+                video_spec = JarvisCreativeDirector.generate_video_prompt(topic=topic)
+                photo_spec = JarvisCreativeDirector.generate_photo_prompt(subject=topic)
+                sb = JarvisCreativeDirector.generate_launch_storyboard(product_name="T-Zero", core_feature=topic)
+                md = [
+                    "# 🎬 T-Zero Jarvis Creative Director — Multi-Modal Campaign",
+                    f"**Campaign Topic:** `{topic}`\n",
+                    "## 🎥 Cinematic Video Prompt (Sora / Kling 1.5 / Runway Gen-3 / Luma)",
+                    f"```text\n{video_spec.prompt}\n```",
+                    f"- **Camera Movement:** {video_spec.camera_movement}",
+                    f"- **Lighting Setup:** {video_spec.lighting}",
+                    f"- **Audio Cue:** {video_spec.audio_sfx_cue}\n",
+                    "## 📸 Photorealistic Visual Prompt (Midjourney v6.1 / Flux.1 Pro)",
+                    f"```text\n{photo_spec.prompt} {photo_spec.parameters}\n```",
+                    f"- **Optics:** {photo_spec.camera_lens}",
+                    f"- **Color Grade:** {photo_spec.color_grade}\n",
+                    "## 📜 30-Second Viral Launch Video Storyboard"
+                ]
+                for sc in sb:
+                    md.append(f"### Scene {sc.scene_number} ({sc.timecode}): {sc.scene_title}")
+                    md.append(f"- **Visual:** {sc.visual_description}")
+                    md.append(f"- **Voiceover:** \"{sc.voiceover_script}\"")
+                    md.append(f"- **On-Screen Text:** `{sc.on_screen_text}`")
+                    md.append(f"- **Video Prompt:** `{sc.video_prompt}`\n")
+                return "\n".join(md)
+
         # Fallback to general dispatch
         handler = _CANONICAL_DISPATCH.get(act) or _LEGACY_DISPATCH.get(act)
         if handler:
