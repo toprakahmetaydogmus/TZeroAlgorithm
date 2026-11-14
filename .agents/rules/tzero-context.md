@@ -17,7 +17,7 @@ tzero sync
 ```
 
 ## Ground-Truth Architecture Symbols
-- **Active Modules:** 214 core files
+- **Active Modules:** 237 core files
 - **Primary Classes:**
   * `ClientTarget (addmcp.py)`
   * `AddMCPApp (addmcp.py)`
@@ -25,15 +25,15 @@ tzero sync
   * `AuditFinding (app.py)`
   * `SecurityQualityAuditor (app.py)`
   * `ROIEstimator (app.py)`
-  * `TierMetric (tzero_benchmark.py)`
-  * `ModelBenchmarkItem (tzero_benchmark.py)`
-  * `BenchmarkReport (tzero_benchmark.py)`
-  * `TZeroBenchmarkEngine (tzero_benchmark.py)`
-  * `JarvisBenchmarkOptimizer (tzero_benchmark.py)`
-  * `BlackboardEntry (tzero_blackboard.py)`
-  * `SymbolLock (tzero_blackboard.py)`
-  * `SharedInvariant (tzero_blackboard.py)`
-  * `MultiAgentBlackboard (tzero_blackboard.py)`
+  * `ZeroCostSemanticCache (tzero_gateway.py)`
+  * `ZeroLeakShield (tzero_gateway.py)`
+  * `CustomHandler (benchmark-site/serve.py)`
+  * `MockZeroGPU (huggingface-space/app.py)`
+  * `ASTContextArchitect (huggingface-space/app.py)`
+  * `ClientTarget (installers/npm/src/addmcp.py)`
+  * `AddMCPApp (installers/npm/src/addmcp.py)`
+  * `ASTContextArchitect (installers/npm/src/app.py)`
+  * `AuditFinding (installers/npm/src/app.py)`
 - **Primary Public Functions:**
   * `build_client_targets() (addmcp.py)`
   * `server_entry() (addmcp.py)`
@@ -48,13 +48,13 @@ tzero sync
   * `calculate_roi_controller() (app.py)`
   * `generate_mcp_config_controller() (app.py)`
   * `build_tzero_gradio_app() (app.py)`
-  * `check_and_install_pyinstaller() (compile.py)`
-  * `generate_siber_akademi_icon() (compile.py)`
-  * `kill_running_tzero_processes() (compile.py)`
-  * `prepare_target_file() (compile.py)`
-  * `build_binary() (compile.py)`
-  * `main() (compile.py)`
-  * `get_icon_file_path() (siber_akademi_icon.py)`
+  * `load_metrics() (tzero_gateway.py)`
+  * `save_metrics() (tzero_gateway.py)`
+  * `count_approx_tokens() (tzero_gateway.py)`
+  * `prune_message_content() (tzero_gateway.py)`
+  * `root() (tzero_gateway.py)`
+  * `list_models() (tzero_gateway.py)`
+  * `api_compress() (tzero_gateway.py)`
 
 ## Security & Zero-Leak Policy
 - All secrets, API keys, and sensitive database credentials must be kept out of commits.
