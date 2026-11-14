@@ -25,26 +25,26 @@ os.makedirs(OUT_DIR, exist_ok=True)
 
 NARRATION_EN = (
   "POV: You spent months building an algorithm that slashes AI coding bills by up to 95 percent... "
-  "and your GitHub repo is currently sitting at 9 stars. "
+  "and your GitHub repo is on the road to its first 100 stars milestone. "
   "Let me show you why this is actually insane. "
   "Instead of sending 67,000 raw tokens to Claude or Cursor, T-Zero prunes your codebase down to 3,800 tokens with zero semantic loss. "
-  "Packed with 37 autonomous Model Context Protocol tools for deep memory synthesis, architecture mapping, and zero-leak security. "
+  "Packed with 21 canonical Model Context Protocol tools for deep memory synthesis, architecture mapping, and zero-leak security. "
   "Guarded by a 4D causal graph and Byzantine fault-tolerant swarm consensus, guaranteeing zero hallucinations. "
   "Saving an 8-developer engineering team over 400,000 dollars a year on prompt bills. "
-  "Don't let this stay at 9 stars. "
-  "Star the repository on GitHub, run pip install tzero-mcp, and try the live sandbox today."
+  "Help us reach our 100-star milestone. "
+  "Star the repository on GitHub, run npx tzero-mcp or pip install tzero-mcp, and try the live sandbox today."
 )
 
 NARRATION_TR = (
   "Yapay zeka prompt maliyetlerini yüzde 95 düşüren bir algoritma geliştirdiniz... "
-  "ve GitHub reponuz şu anda sadece 9 yıldızda kaldı. "
+  "ve GitHub reponuz 100 yıldız yolculuğunda hızla ilerliyor. "
   "Size bunun neden inanılmaz olduğunu göstereyim. "
   "T-Zero, projenizi Claude veya Cursor'a gönderirken 67 bin tokenlik kodu semantik kayıp olmadan 3 bin 800 tokene indirir. "
-  "Otuz yedi otonom Model Context Protocol aracıyla mimari haritalama, hafıza sentezi ve sıfır sızıntı güvenliği sağlar. "
+  "Yirmi bir kanonik Model Context Protocol aracıyla mimari haritalama, hafıza sentezi ve sıfır sızıntı güvenliği sağlar. "
   "Dört boyutlu nedensellik ağı ve Bizans hata toleranslı konsensüs ile donatılmıştır. "
   "Yazılım ekiplerine yılda dörtyüz bin doların üzerinde net tasarruf sağlar. "
-  "Bunun 9 yıldızda kalmasına izin vermeyin. "
-  "GitHub'da bir yıldız bırakın, pip install tzero-mcp ile tek komutta kurun ve hemen deneyin."
+  "Yüz yıldız hedefimize ulaşmamıza siz de ortak olun. "
+  "GitHub'da bir yıldız bırakın, npx tzero-mcp veya pip install tzero-mcp ile tek komutta kurun ve hemen deneyin."
 )
 
 def run_cmd(cmd, cwd=BASE_DIR):

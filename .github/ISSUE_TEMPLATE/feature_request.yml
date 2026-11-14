@@ -6,6 +6,7 @@ body:
     attributes:
       value: |
         Have an idea for token optimization, new IDE support, or AST pruners? Let us know!
+        ⭐ **Support the Project:** If you like T-Zero, please [leave a star on GitHub](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)! Every star helps an independent 15-year-old developer keep T-Zero 100% free.
   - type: textarea
     id: problem
     attributes:

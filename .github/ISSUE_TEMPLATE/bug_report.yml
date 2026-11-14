@@ -6,12 +6,13 @@ body:
     attributes:
       value: |
         Thanks for filing a bug report! Please provide as much detail as possible.
+        ⭐ **Support the Project:** If T-Zero has helped your development, please consider [leaving a star on GitHub](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)! Every star helps an independent 15-year-old open-source builder reach our 100-star milestone.
   - type: input
     id: version
     attributes:
       label: T-Zero Version
       description: Run `tzero --version`
-      placeholder: e.g. 9.9.0
+      placeholder: e.g. 11.0.0
     validations:
       required: true
   - type: dropdown

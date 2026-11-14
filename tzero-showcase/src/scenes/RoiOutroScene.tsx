@@ -137,7 +137,7 @@ export const RoiOutroScene: React.FC = () => {
       {/* Star Callout & Outro URL */}
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
         <div style={{ fontSize: 22, fontWeight: 800, color: '#f59e0b', letterSpacing: 1 }}>
-          ⭐ Don't let this stay at 9 stars — Star the repo &amp; try it free!
+          ⭐ Help us reach our 100 Stars Milestone — Star the repo &amp; try it free!
         </div>
         <div style={{ fontSize: 18, fontWeight: 600, color: TZERO_COLORS.cyan }}>
           github.com/toprakahmetaydogmus/TZeroAlgorithm • tzero-indol.vercel.app

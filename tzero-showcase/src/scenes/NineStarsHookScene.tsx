@@ -102,7 +102,7 @@ export const NineStarsHookScene: React.FC = () => {
           ...
         </h1>
 
-        {/* 9 Stars Reality Check Box */}
+        {/* 100 Stars Milestone Box */}
         {frame >= 50 && (
           <div
             style={{
@@ -118,13 +118,13 @@ export const NineStarsHookScene: React.FC = () => {
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 8 }}>
               <span style={{ fontSize: 36 }}>⭐</span>
-              <span style={{ fontSize: 40, fontWeight: 900, color: TZERO_COLORS.amber, fontFamily: 'monospace' }}>
-                9 Stars on GitHub
+              <span style={{ fontSize: 36, fontWeight: 900, color: TZERO_COLORS.amber, fontFamily: 'monospace' }}>
+                Road to 100 Stars Milestone
               </span>
-              <span style={{ fontSize: 32 }}>🥲</span>
+              <span style={{ fontSize: 32 }}>🚀</span>
             </div>
             <p style={{ margin: 0, fontSize: 18, color: TZERO_COLORS.textMuted }}>
-              6 months of engineering, 37 MCP tools, 184 passing tests... and 9 stars.
+              Empirical AST engine, 58 MCP tools, 352 passing tests... Help us reach 100 stars!
             </p>
           </div>
         )}
