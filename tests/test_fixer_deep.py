@@ -345,7 +345,7 @@ class TestGodfatherAutoCorrector(unittest.TestCase):
         rep = ASTHallucinationAutoCorrector.heal_code(code)
         self.assertTrue(rep.success)
         self.assertGreaterEqual(rep.total_fixes, 2)
-        self.assertIn("ZeroLeakShield", rep.healed_code)
+        self.assertIn("ZeroLeakEngine", rep.healed_code)
         self.assertIn("estimate_tokens", rep.healed_code)
 
     def test_missing_stdlib_and_typing_auto_injection(self):
@@ -376,8 +376,8 @@ class TestGodfatherAutoCorrector(unittest.TestCase):
             "    return guard\n"
         )
         rep = ASTHallucinationAutoCorrector.heal_code(code)
-        self.assertIn("from tzero.tzero_security import ZeroLeakShield", rep.healed_code)
-        self.assertIn("guard = ZeroLeakShield()", rep.healed_code)
+        self.assertIn("from tzero.tzero_security import ZeroLeakEngine", rep.healed_code)
+        self.assertIn("guard = ZeroLeakEngine()", rep.healed_code)
         self.assertNotIn("ZeroLeakGuard", rep.healed_code)
 
     def test_cli_supervise_file_execution(self):
@@ -404,11 +404,25 @@ class TestGodfatherAutoCorrector(unittest.TestCase):
             with open(fname, "r", encoding="utf-8") as f:
                 content = f.read()
             self.assertIn("import os", content)
-            self.assertIn("ZeroLeakShield", content)
+            self.assertIn("ZeroLeakEngine", content)
             self.assertNotIn("ZeroLeakGuard", content)
         finally:
             if os.path.exists(fname):
                 os.remove(fname)
+
+    def test_heal_workspace_batch(self):
+        from tzero.tzero_fix import ASTHallucinationAutoCorrector
+        with tempfile.TemporaryDirectory() as td:
+            p1 = Path(td) / "mod1.py"
+            p1.write_text("class RealWorker:\n    def execute_job(self): pass\n", encoding="utf-8")
+            p2 = Path(td) / "mod2.py"
+            p2.write_text("from mod1 import RealWorkr\ndef run():\n    w = RealWorkr()\n", encoding="utf-8")
+
+            summary = ASTHallucinationAutoCorrector.heal_workspace(td, apply_write=True)
+            self.assertTrue(summary["success"])
+            self.assertEqual(summary["total_files_scanned"], 2)
+            self.assertEqual(summary["healed_files_count"], 1)
+            self.assertIn("RealWorker", p2.read_text(encoding="utf-8"))
 
 
 if __name__ == "__main__":

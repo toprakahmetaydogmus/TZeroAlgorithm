@@ -76,7 +76,7 @@ def generate_siber_akademi_icon():
 def kill_running_tzero_processes():
     """Kill any running T-Zero binaries to avoid file locking on Windows."""
     if os.name == "nt":
-        for proc_name in ("TZeroAlgorithm.exe", "TZeroMCP.exe", "AddMCP.exe"):
+        for proc_name in ("TZeroAlgorithm.exe", "TZeroCLI.exe", "TZeroMCP.exe", "AddMCP.exe"):
             try:
                 subprocess.run(["taskkill", "/F", "/IM", proc_name, "/T"], capture_output=True, text=True)
             except Exception:
@@ -185,6 +185,36 @@ def build_binary():
             logger.error("MCP server executable was not created.")
             return False
 
+        cli_args = [
+            sys.executable, "-m", "PyInstaller",
+            "--onefile",
+            "--clean",
+            "--noconfirm",
+            "--name=TZeroCLI",
+            "--distpath=dist",
+            "--workpath=build/TZeroCLI",
+            "--specpath=build/specs",
+            "--collect-all=tiktoken",
+            "--collect-submodules=tiktoken_ext",
+            "--hidden-import=win32ctypes.core",
+            "--collect-all=tzero",
+            "--collect-all=keyring",
+            "--collect-all=win32ctypes",
+            "--collect-all=pygments",
+            "--collect-all=requests",
+            "--collect-all=urllib3",
+            "--collect-all=certifi",
+            "--copy-metadata=keyring",
+            "--copy-metadata=requests",
+            "--copy-metadata=pygments",
+        ]
+        if icon_file:
+            cli_args.append(f"--icon={os.path.abspath(icon_file)}")
+        cli_args.extend(["--paths=.", "tzero/tzero_v3.py"])
+        cli_name = "TZeroCLI.exe" if os.name == "nt" else "TZeroCLI"
+        prepare_target_file(cli_name)
+        subprocess.run(cli_args, check=True)
+
         installer_args = [
             sys.executable, "-m", "PyInstaller",
             "--onefile",
@@ -220,6 +250,7 @@ def build_binary():
         suffix = ".exe" if os.name == "nt" else ""
         expected_outputs = [
             os.path.join("dist", f"TZeroAlgorithm{suffix}"),
+            os.path.join("dist", f"TZeroCLI{suffix}"),
             os.path.join("dist", f"TZeroMCP{suffix}"),
             os.path.join("dist", f"AddMCP{suffix}"),
         ]
@@ -237,12 +268,50 @@ def build_binary():
         return False
 
 
+def create_release_bundle():
+    """Packages all compiled binaries and documentation into a single zip archive for release."""
+    import zipfile
+    import tomllib
+    
+    version = "11.11.0"
+    try:
+        with open(PROJECT_ROOT / "pyproject.toml", "rb") as f:
+            version = tomllib.load(f)["project"]["version"]
+    except Exception:
+        pass
+
+    suffix = ".exe" if os.name == "nt" else ""
+    bundle_name = f"TZero-v{version}-Windows-x64.zip" if os.name == "nt" else f"TZero-v{version}-Linux-x64.tar.gz"
+    bundle_path = os.path.join("dist", bundle_name)
+    
+    binaries = [
+        f"TZeroAlgorithm{suffix}",
+        f"TZeroCLI{suffix}",
+        f"TZeroMCP{suffix}",
+        f"AddMCP{suffix}",
+    ]
+    
+    if os.name == "nt":
+        with zipfile.ZipFile(bundle_path, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+            for b in binaries:
+                p = os.path.join("dist", b)
+                if os.path.exists(p):
+                    zf.write(p, arcname=b)
+            for doc in ("README.md", "README.tr.md", "LICENSE"):
+                doc_p = PROJECT_ROOT / doc
+                if doc_p.is_file():
+                    zf.write(str(doc_p), arcname=doc)
+    logger.info("Master release bundle successfully generated at: %s", os.path.abspath(bundle_path))
+    return bundle_path
+
+
 def main():
     os.chdir(PROJECT_ROOT)
     check_and_install_pyinstaller()
     success = build_binary()
     if success:
         logger.info("T-Zero context compiler execution completed successfully.")
+        create_release_bundle()
     else:
         logger.error("Compilation failed.")
         sys.exit(1)
