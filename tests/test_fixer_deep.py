@@ -15,6 +15,7 @@ Tests:
 """
 
 import os
+import sys
 import tempfile
 import time
 import unittest
@@ -328,6 +329,87 @@ class TestPCFixerMasterEdition(unittest.TestCase):
             new_code = f.read_text(encoding="utf-8")
             self.assertIn("await asyncio.sleep(1)", new_code)
             self.assertIn("import asyncio", new_code)
+
+
+class TestGodfatherAutoCorrector(unittest.TestCase):
+    """Verifies T-Zero Godfather AI supervisor and AST auto-healing engine."""
+
+    def test_hallucinated_class_and_method_healing(self):
+        from tzero.tzero_fix import ASTHallucinationAutoCorrector
+        code = (
+            "from tzero.tzero_security import ZeroLeakGuard\n"
+            "def test_run():\n"
+            "    packer = TokenBudgetPacker()\n"
+            "    tokens = packer.estimate_token()\n"
+        )
+        rep = ASTHallucinationAutoCorrector.heal_code(code)
+        self.assertTrue(rep.success)
+        self.assertGreaterEqual(rep.total_fixes, 2)
+        self.assertIn("ZeroLeakShield", rep.healed_code)
+        self.assertIn("estimate_tokens", rep.healed_code)
+
+    def test_missing_stdlib_and_typing_auto_injection(self):
+        from tzero.tzero_fix import ASTHallucinationAutoCorrector
+        code = (
+            "def process_payload(items: List[str]) -> Optional[Dict[str, Any]]:\n"
+            "    timestamp = time.time()\n"
+            "    root = Path('.').resolve()\n"
+            "    data = json.dumps({'time': timestamp})\n"
+            "    return {'status': 'ok'}\n"
+        )
+        rep = ASTHallucinationAutoCorrector.heal_code(code)
+        self.assertTrue(rep.success)
+        self.assertIn("import json", rep.healed_code)
+        self.assertIn("import time", rep.healed_code)
+        self.assertIn("from pathlib import Path", rep.healed_code)
+        self.assertIn("from typing import", rep.healed_code)
+        self.assertIn("Optional", rep.healed_code)
+        self.assertIn("List", rep.healed_code)
+        self.assertIn("Dict", rep.healed_code)
+
+    def test_downstream_name_rewriting(self):
+        from tzero.tzero_fix import ASTHallucinationAutoCorrector
+        code = (
+            "from tzero.tzero_security import ZeroLeakGuard\n"
+            "def verify():\n"
+            "    guard = ZeroLeakGuard()\n"
+            "    return guard\n"
+        )
+        rep = ASTHallucinationAutoCorrector.heal_code(code)
+        self.assertIn("from tzero.tzero_security import ZeroLeakShield", rep.healed_code)
+        self.assertIn("guard = ZeroLeakShield()", rep.healed_code)
+        self.assertNotIn("ZeroLeakGuard", rep.healed_code)
+
+    def test_cli_supervise_file_execution(self):
+        import subprocess
+        code = (
+            "from tzero.tzero_security import ZeroLeakGuard\n"
+            "def check():\n"
+            "    g = ZeroLeakGuard()\n"
+            "    x = os.path.exists('file.txt')\n"
+        )
+        with tempfile.NamedTemporaryFile("w", suffix=".py", delete=False) as f:
+            f.write(code)
+            fname = f.name
+
+        try:
+            res = subprocess.run(
+                [sys.executable, "tzero/tzero_v3.py", "supervise", fname],
+                capture_output=True,
+                text=True,
+                encoding="utf-8"
+            )
+            self.assertEqual(res.returncode, 0)
+            self.assertIn("T-ZERO SELF-HEALING AST AUTO-CORRECTOR", res.stdout)
+            with open(fname, "r", encoding="utf-8") as f:
+                content = f.read()
+            self.assertIn("import os", content)
+            self.assertIn("ZeroLeakShield", content)
+            self.assertNotIn("ZeroLeakGuard", content)
+        finally:
+            if os.path.exists(fname):
+                os.remove(fname)
+
 
 if __name__ == "__main__":
     unittest.main()

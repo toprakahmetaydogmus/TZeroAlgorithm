@@ -8843,7 +8843,7 @@ def main():
     parser.add_argument("--event", default="PreToolUse", help="Lifecycle hook event (PreToolUse or PostToolUse)")
     parser.add_argument("--lsp", action="store_true", help="Run T-Zero stdio JSON-RPC Language Server (Zero-Leak, boundaries, CodeLens)")
     parser.add_argument("--agent-kernel", action="store_true", help="Validate Agent Kernel WASM/FFI capability sandbox and Rust bridge status")
-    parser.add_argument("--fix", metavar="FILE_OR_CODE", default=None, help="Self-healing AST auto-corrector for hallucinated AI methods and phantom imports")
+    parser.add_argument("--fix", "--supervise", metavar="FILE_OR_CODE", default=None, help="Self-healing AST auto-corrector / AI supervisor for hallucinated AI methods, missing imports and phantom classes")
     parser.add_argument("--bridge", metavar="FILE", default=None, help="Polyglot type & schema transpiler: convert Python models to TS, Rust, or Go")
     parser.add_argument("--bridge-lang", choices=["ts", "rust", "go", "kt", "swift", "all"], default="ts", help="Target language for --bridge (ts, rust, go, kt, swift, all)")
     parser.add_argument("--bridge-reverse", metavar="FILE_OR_CODE", default=None, help="Reverse polyglot transpiler: convert TypeScript/Rust/Go schemas to Python dataclasses")
@@ -9095,6 +9095,8 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
             "space": "--huggingface",
             "snapshot": "--snapshot",
             "fix": "--fix",
+            "supervise": "--fix",
+            "supervisor": "--fix",
             "bridge": "--bridge",
             "replay": "--replay",
             "pc-fixer": "--pc-fixer",
