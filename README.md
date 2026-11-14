@@ -21,7 +21,28 @@
 [![Security](https://img.shields.io/badge/security-Shannon%20Entropy%20(H%20%3E%3D%204.75)-38bdf8?style=flat-square&logo=shield)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm#security-architecture)
 [![Reality-Lock](https://img.shields.io/badge/reality--lock-Static%20AST%20Grounding-10b981?style=flat-square&logo=probot)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm#pre-flight-reality-lock)
 [![Token Reduction](https://img.shields.io/badge/token%20savings-up%20to%2094.6%25%20(AST)-f43f5e?style=flat-square)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm#task-completion-benchmark)
+[![GitHub Stars](https://img.shields.io/github/stars/toprakahmetaydogmus/TZeroAlgorithm?style=social)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)
 [![License](https://img.shields.io/badge/license-MIT-f8fafc?style=flat-square)](LICENSE)
+
+<br>
+
+<p align="center">
+  <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm">
+    <img src="assets/tzero_badge_card.svg" alt="T-Zero Context Architect Live Badge Card" width="100%" style="max-width: 800px; border-radius: 14px; box-shadow: 0 18px 40px rgba(0, 0, 0, 0.8);">
+  </a>
+</p>
+
+<div align="center">
+
+### 🌟 Road to 100 GitHub Stars Milestone: Help Us Hit #100!
+[![GitHub Repo Stars](https://img.shields.io/badge/Current%20Stars-16%20%2F%20100%20Milestone-f59e0b?style=for-the-badge&logo=github&logoColor=white)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)
+[![100% Free & Open Source](https://img.shields.io/badge/Price-%240.00%20(100%25%20Free)-10b981?style=for-the-badge&logo=opensourceinitiative&logoColor=white)](LICENSE)
+[![Solo Engineer](https://img.shields.io/badge/Author-Toprak%20(15%20y%2Fo)-8b5cf6?style=for-the-badge&logo=visualstudiocode&logoColor=white)](https://linkedin.com/in/toprak-ahmet-aydo%C4%9Fmu%C5%9F-60462534b/)
+
+> **If T-Zero cuts your LLM prompt tokens or saves you API bills in Cursor / Claude, please give us a star! ⭐**  
+> *Every star supports an independent 15-year-old developer keeping this project 100% free, offline, and zero-leak.*
+
+</div>
 
 <br>
 

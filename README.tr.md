@@ -4,10 +4,31 @@
 
 <div align="center">
 
+[![GitHub Stars](https://img.shields.io/github/stars/toprakahmetaydogmus/TZeroAlgorithm?style=social)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)
 [![M8ven Verified](https://m8ven.ai/badge/mcp/toprakahmetaydogmus/tzeroalgorithm?variant=verified)](https://m8ven.ai/mcp/toprakahmetaydogmus/tzeroalgorithm?s=readme)
 [![PyPI](https://img.shields.io/pypi/v/tzero-mcp?color=38bdf8&style=flat-square&logo=pypi)](https://pypi.org/project/tzero-mcp/)
 [![npm](https://img.shields.io/npm/v/tzero-mcp?color=cb3837&style=flat-square&logo=npm)](https://www.npmjs.com/package/tzero-mcp)
 [![VS Code](https://img.shields.io/visual-studio-marketplace/v/siber-akademi.tzero-vscode?style=flat-square&logo=visual-studio-code&color=007ACC)](https://marketplace.visualstudio.com/items?itemName=siber-akademi.tzero-vscode)
+
+<br>
+
+<p align="center">
+  <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm">
+    <img src="assets/tzero_badge_card.svg" alt="T-Zero Context Architect Canlı Rozet Kartı" width="100%" style="max-width: 800px; border-radius: 14px; box-shadow: 0 18px 40px rgba(0, 0, 0, 0.8);">
+  </a>
+</p>
+
+<div align="center">
+
+### 🌟 100 Yıldız Yolculuğu: T-Zero'nun 100 Yıldız Hedefine Ulaşmasına Destek Olun!
+[![GitHub Yıldızları](https://img.shields.io/badge/Mevcut%20Y%C4%B1ld%C4%B1z-16%20%2F%20100%20Hedefi-f59e0b?style=for-the-badge&logo=github&logoColor=white)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)
+[![%100 Ücretsiz & Açık Kaynak](https://img.shields.io/badge/Fiyat-0%20TL%20(%25100%20%C3%9Ccretsiz)-10b981?style=for-the-badge&logo=opensourceinitiative&logoColor=white)](LICENSE)
+[![Geliştirici](https://img.shields.io/badge/Geli%C5%9Ftirici-Toprak%20(15%20Ya%C5%9F%C4%B1nda)-8b5cf6?style=for-the-badge&logo=visualstudiocode&logoColor=white)](https://linkedin.com/in/toprak-ahmet-aydo%C4%9Fmu%C5%9F-60462534b/)
+
+> **T-Zero LLM bağlam boyutunuzu küçülttüyse veya token faturalarınızı düşürdüyse lütfen GitHub'da bize bir yıldız verin! ⭐**  
+> *Her bir yıldız, 15 yaşındaki bağımsız açık kaynak geliştiricinin bu projeyi %100 ücretsiz, çevrimdışı ve sıfır sızıntılı olarak sürdürmesini destekler.*
+
+</div>
 
 </div>
 

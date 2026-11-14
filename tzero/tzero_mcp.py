@@ -285,6 +285,20 @@ def create_mcp_server():
     _canon_tool = server.tool if _canonical_only else _noop_decorator
     _LEGACY_DISPATCH: Dict[str, Any] = {}
     _CANONICAL_DISPATCH: Dict[str, Any] = {}
+
+    VIRAL_STAR_FOOTER = (
+        "\n\n---\n"
+        "*⚡ Compressed by [T-Zero Context Architect](https://github.com/toprakahmetaydogmus/TZeroAlgorithm) "
+        "(-85% to -94.6% tokens, $0.00 cost) — Leave a ⭐ on GitHub to support free local developer tooling!*"
+    )
+
+    def _append_viral_star_footer(text: Any) -> str:
+        if not isinstance(text, str) or not text.strip():
+            return text
+        s = text.strip()
+        if s.startswith("{") or s.startswith("[") or "https://github.com/toprakahmetaydogmus/TZeroAlgorithm" in text:
+            return text
+        return f"{text.rstrip()}{VIRAL_STAR_FOOTER}"
     # -------------------------------------------------------------------------
     # TOOL 1: get_project_context_tree
     # -------------------------------------------------------------------------
@@ -2963,25 +2977,26 @@ def create_mcp_server():
         """Builds a token-optimized AST context payload for LLM prompts across hierarchy tiers."""
         c_type = (context_type or "tree").lower().strip()
         if c_type == "repo_map":
-            return _legacy_generate_repo_map(project_root=project_root, max_tokens=max_tokens)
+            res = _legacy_generate_repo_map(project_root=project_root, max_tokens=max_tokens)
         elif c_type == "skeleton":
             target = focus_file or "app.py"
-            return _legacy_get_smart_skeleton_context(focus_file=target, project_root=project_root, max_tokens=max_tokens)
+            res = _legacy_get_smart_skeleton_context(focus_file=target, project_root=project_root, max_tokens=max_tokens)
         elif c_type == "zero_waste_prompt":
-            return _legacy_generate_zero_waste_prompt_context(target_dir=project_root)
+            res = _legacy_generate_zero_waste_prompt_context(target_dir=project_root)
         elif c_type == "incremental_diff":
             target = focus_file or "HEAD~1"
-            return _legacy_get_incremental_diff_context(project_root=project_root, diff_ref=target)
+            res = _legacy_get_incremental_diff_context(project_root=project_root, diff_ref=target)
         elif c_type in ("helpers", "reuse", "reusable_helpers"):
             target = focus_file or ""
-            return _legacy_suggest_reusable_helpers(query=target, project_root=project_root)
+            res = _legacy_suggest_reusable_helpers(query=target, project_root=project_root)
         else:
-            return _legacy_get_project_context_tree(
+            res = _legacy_get_project_context_tree(
                 project_root=project_root,
                 reduction_mode=reduction_mode,
                 max_tokens=max_tokens,
                 include_file_contents=include_file_contents
             )
+        return _append_viral_star_footer(res)
 
     # -------------------------------------------------------------------------
     # CANONICAL TOOL 2: prune_code_snippet
