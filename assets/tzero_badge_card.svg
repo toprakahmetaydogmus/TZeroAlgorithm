@@ -101,9 +101,9 @@
         <!-- Metric 4: Star CTA -->
         <g transform="translate(558, 0)">
             <rect x="0" y="0" width="178" height="90" rx="10" fill="#1e1b4b" stroke="#6366f1" stroke-width="1"/>
-            <text x="16" y="26" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#a5b4fc">GITHUB VIRAL GATE</text>
+            <text x="16" y="26" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#a5b4fc">ROAD TO 100 STARS</text>
             <text x="16" y="54" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="900" fill="#ffffff">⭐ STAR ON GITHUB</text>
-            <text x="16" y="76" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="500" fill="#c7d2fe">toprakahmetaydogmus/TZero</text>
+            <text x="16" y="76" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="600" fill="#38bdf8">16 / 100 Milestone</text>
         </g>
     </g>
 

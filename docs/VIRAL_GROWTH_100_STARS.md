@@ -381,3 +381,4 @@ Link: https://github.com/toprakahmetaydogmus/TZeroAlgorithm
 - [ ] Post Twitter/X thread with `#CursorAI #ClaudeAI #Python`
 - [ ] Post Turkish announcement on `r/Turkey` and DonanımHaber/R10
 - [ ] Submit PRs to `awesome-mcp-servers` and `awesome-cursorrules`
+
