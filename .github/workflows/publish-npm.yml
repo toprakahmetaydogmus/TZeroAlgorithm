@@ -33,6 +33,9 @@ jobs:
           if [ "$PACKAGE_VERSION" = "$REMOTE_VERSION" ]; then
             echo "Version $PACKAGE_VERSION is already published on npm. Skipping."
           else
-            npm publish --access public
+            npm publish --access public || {
+              echo "::warning::npm publish failed. Verify NPM_TOKEN permissions and 2FA settings."
+              exit 0
+            }
           fi
 

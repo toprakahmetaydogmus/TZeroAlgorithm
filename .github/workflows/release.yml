@@ -50,7 +50,8 @@ jobs:
           if (-not (Test-Path dist\TZeroAlgorithm.exe)) { throw "dist\TZeroAlgorithm.exe was not built" }
           if (-not (Test-Path dist\TZeroMCP.exe)) { throw "dist\TZeroMCP.exe was not built" }
           if (-not (Test-Path dist\AddMCP.exe)) { throw "dist\AddMCP.exe was not built" }
-          foreach ($name in @("TZeroAlgorithm.exe", "TZeroMCP.exe", "AddMCP.exe")) {
+          if (-not (Test-Path dist\TZeroCLI.exe)) { throw "dist\TZeroCLI.exe was not built" }
+          foreach ($name in @("TZeroAlgorithm.exe", "TZeroMCP.exe", "AddMCP.exe", "TZeroCLI.exe")) {
             $p = Start-Process -FilePath "dist\$name" -ArgumentList "--version" -Wait -PassThru
             if ($p.ExitCode -ne 0) { throw "$name --version exited with code $($p.ExitCode)" }
             Write-Host "$name OK, size: $((Get-Item "dist\$name").Length) bytes"
@@ -78,10 +79,10 @@ jobs:
       - name: Compute SHA-256 checksums
         shell: pwsh
         run: |
-          foreach ($name in @("TZeroAlgorithm.exe", "TZeroMCP.exe", "AddMCP.exe")) {
-            $hash = (Get-FileHash "dist\$name" -Algorithm SHA256).Hash.ToLower()
-            "$hash  $name" | Out-File -Encoding ascii "dist\$name.sha256"
-            Write-Host "$name SHA-256: $hash"
+          Get-ChildItem -Path dist -Include *.exe, *.zip -Recurse | ForEach-Object {
+            $hash = (Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLower()
+            "$hash  $($_.Name)" | Out-File -Encoding ascii "$($_.FullName).sha256"
+            Write-Host "$($_.Name) SHA-256: $hash"
           }
 
       - name: Upload build artifact
@@ -91,10 +92,14 @@ jobs:
           path: |
             dist/TZeroAlgorithm.exe
             dist/TZeroAlgorithm.exe.sha256
+            dist/TZeroCLI.exe
+            dist/TZeroCLI.exe.sha256
             dist/TZeroMCP.exe
             dist/TZeroMCP.exe.sha256
             dist/AddMCP.exe
             dist/AddMCP.exe.sha256
+            dist/TZero-*.zip
+            dist/TZero-*.zip.sha256
             dist/*.vsix
             dist/*.vsix.sha256
             dist/*.whl
@@ -109,10 +114,14 @@ jobs:
           files: |
             dist/TZeroAlgorithm.exe
             dist/TZeroAlgorithm.exe.sha256
+            dist/TZeroCLI.exe
+            dist/TZeroCLI.exe.sha256
             dist/TZeroMCP.exe
             dist/TZeroMCP.exe.sha256
             dist/AddMCP.exe
             dist/AddMCP.exe.sha256
+            dist/TZero-*.zip
+            dist/TZero-*.zip.sha256
             dist/*.vsix
             dist/*.vsix.sha256
             dist/*.whl
