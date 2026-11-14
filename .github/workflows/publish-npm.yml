@@ -5,6 +5,7 @@ on:
   push:
     tags:
       - 'v*'
+      - 'release-*'
 
 jobs:
   npm-publish:

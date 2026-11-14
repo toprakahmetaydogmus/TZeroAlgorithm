@@ -14,6 +14,7 @@ on:
   push:
     tags:
       - 'v*'
+      - 'release-*'
 
 jobs:
   package-and-publish:

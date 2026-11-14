@@ -13,10 +13,8 @@ Designed to create a self-reinforcing viral star loop across GitHub repositories
 from __future__ import annotations
 
 import os
-import sys
-import re
 import html
-from typing import Dict, Any, Optional, Tuple
+from typing import Optional
 
 
 class TZeroShowcaseGenerator:
@@ -152,7 +150,7 @@ class TZeroShowcaseGenerator:
     <!-- Bottom Footer Strip -->
     <g transform="translate(32, 212)">
         <text x="0" y="8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="500" fill="#475569">
-            🚀 Run <tspan fill="#38bdf8" font-family="monospace">npx -y tzero-mcp@latest</tspan> or <tspan fill="#38bdf8" font-family="monospace">pip install tzero-mcp</tspan> &bull; MIT Licensed
+            🚀 Run <tspan fill="#38bdf8" font-family="monospace">npx -y tzero-mcp@latest</tspan> or <tspan fill="#38bdf8" font-family="monospace">pip install tzero-mcp</tspan> &bull; By Toprak Ahmet Aydoğmuş (15 y/o dev) &bull; MIT
         </text>
         <text x="736" y="8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="600" fill="#64748b" text-anchor="end">
             Siber Akademi Engine v5.1.0
@@ -396,9 +394,18 @@ class TZeroShowcaseGenerator:
         </div>
     </div>
 
-    <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm" class="cta-btn" target="_blank">
-        ⭐ Star T-Zero on GitHub
-    </a>
+    <div style="margin-top: 28px; padding: 22px 28px; background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.35); border-radius: 14px; max-width: 900px; width: 100%; text-align: center; box-shadow: 0 4px 24px rgba(0,0,0,0.35);">
+        <p style="font-size: 17px; font-weight: 800; color: #38bdf8; margin-bottom: 8px;">
+            ⭐ Lütfen Star Vererek Destekleyin!
+        </p>
+        <p style="font-size: 14px; line-height: 1.6; color: #cbd5e1; margin-bottom: 14px;">
+            15 yaşında bağımsız bir yazılım geliştiricisiyim (<strong>Toprak Ahmet Aydoğmuş</strong> — beni Google'da aratabilirsiniz).<br>
+            T-Zero'yu yapay zeka araçlarındaki token israfını ve yüksek API maliyetlerini sıfırlamak için %100 yerel ve ücretsiz olarak geliştirdim.
+        </p>
+        <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm" class="cta-btn" target="_blank">
+            ⭐ Star T-Zero on GitHub
+        </a>
+    </div>
 </body>
 </html>"""
 

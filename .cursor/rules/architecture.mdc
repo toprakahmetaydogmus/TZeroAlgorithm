@@ -6,10 +6,10 @@ globs: **/*.py
 
 ## Active Architectural Layers:
 - **Layer `tests`:** `tests/**`
-- **Layer `core`:** `tzero_jarvis/**, main.py, tzero_v3.py`
-- **Layer `cli`:** `addmcp.py, tzero_dashboard.py`
-- **Layer `api`:** `app.py, tzero_mcp.py`
-- **Layer `services`:** `tzero_features.py`
+- **Layer `core`:** `tzero/tzero_jarvis/**, main.py, tzero/tzero_v3.py`
+- **Layer `cli`:** `addmcp.py, tzero/tzero_dashboard.py`
+- **Layer `api`:** `app.py, tzero/tzero_mcp.py`
+- **Layer `services`:** `tzero/tzero_features.py`
 
 ## Enforced Import Boundaries:
 - Layer `core` cannot import `api, cli`: Çekirdek iş mantığı giriş/çıkış arayüzlerinden izole kalmalıdır.

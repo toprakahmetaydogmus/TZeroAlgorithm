@@ -5142,11 +5142,12 @@ def print_welcome_guide():
 ================================================================================
 ⚡ SIBER AKADEMI T-ZERO CONTEXT ARCHITECT & MCP ENGINE
 ================================================================================
-Engineered by Toprak Ahmet Aydoğmuş & Siber Akademi to eliminate token bloat,
-reduce prompt costs by up to 95%, and stop AI hallucinations worldwide.
+Engineered by Toprak Ahmet Aydoğmuş (15-year-old developer) & Siber Akademi
+to eliminate token bloat, reduce prompt costs by up to 95%, and stop AI hallucinations.
+Search 'Toprak Ahmet Aydoğmuş' on Google to learn more!
 If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
 👉 https://github.com/toprakahmetaydogmus/TZeroAlgorithm
-100% Free & Open-Source under MIT License. Thank you! 🚀
+100% Free & Open-Source under MIT License. Thank you for your support! 🚀
 ================================================================================
 """)
 
