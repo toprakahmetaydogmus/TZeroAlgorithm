@@ -4540,3 +4540,98 @@ function initShadowCoW() {
     });
   }
 }
+
+// ============================================================================
+// 8. DYNAMIC GITHUB STARS & VIRAL COMMUNITY SHARING ENGINE
+// ============================================================================
+function initGitHubStars() {
+  const navStar = document.getElementById("nav-star-count");
+  const heroStar = document.getElementById("hero-star-count");
+  const progBar = document.getElementById("viral-progress-bar");
+
+  function updateDisplay(stars) {
+    if (navStar) navStar.textContent = "★ " + stars;
+    if (heroStar) heroStar.textContent = stars;
+    if (progBar) {
+      const pct = Math.min(100, Math.max(5, (stars / 100) * 100));
+      progBar.style.width = pct + "%";
+    }
+  }
+
+  // Initial cached baseline
+  const cached = localStorage.getItem("tzero_cached_stars");
+  if (cached) {
+    updateDisplay(parseInt(cached, 10));
+  }
+
+  // Fetch live star count from GitHub API
+  fetch("https://api.github.com/repos/toprakahmetaydogmus/TZeroAlgorithm", {
+    headers: { "Accept": "application/vnd.github.v3+json" }
+  })
+    .then(r => {
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.json();
+    })
+    .then(data => {
+      if (data && typeof data.stargazers_count === "number") {
+        const count = data.stargazers_count;
+        localStorage.setItem("tzero_cached_stars", count);
+        updateDisplay(count);
+      }
+    })
+    .catch(err => {
+      console.log("[T-Zero] GitHub API live star fetch skipped:", err.message);
+    });
+}
+
+function initViralShare() {
+  const repoUrl = "https://github.com/toprakahmetaydogmus/TZeroAlgorithm";
+  const webUrl = "https://tzero-indol.vercel.app";
+  const shareText = "T-Zero: Cut AI coding context tokens by up to 95% using AST pruning! Open-source local MCP server for Cursor & Claude Desktop. Check it out: " + repoUrl;
+
+  const btnX = document.getElementById("share-x");
+  const btnReddit = document.getElementById("share-reddit");
+  const btnLinkedIn = document.getElementById("share-linkedin");
+  const btnHN = document.getElementById("share-hn");
+  const btnCopy = document.getElementById("share-copy-link");
+
+  if (btnX) {
+    btnX.addEventListener("click", () => {
+      const url = "https://twitter.com/intent/tweet?text=" + encodeURIComponent(shareText) + "&hashtags=CursorAI,ClaudeAI,OpenSource,Python";
+      window.open(url, "_blank", "width=600,height=450");
+    });
+  }
+
+  if (btnReddit) {
+    btnReddit.addEventListener("click", () => {
+      const title = "T-Zero: Open-source local AST context pruning for Cursor & Claude (-88% to -95% tokens, $0, 100% offline)";
+      const url = "https://reddit.com/submit?url=" + encodeURIComponent(repoUrl) + "&title=" + encodeURIComponent(title);
+      window.open(url, "_blank", "width=800,height=600");
+    });
+  }
+
+  if (btnLinkedIn) {
+    btnLinkedIn.addEventListener("click", () => {
+      const url = "https://www.linkedin.com/sharing/share-offsite/?url=" + encodeURIComponent(repoUrl);
+      window.open(url, "_blank", "width=600,height=550");
+    });
+  }
+
+  if (btnHN) {
+    btnHN.addEventListener("click", () => {
+      const t = "Show HN: T-Zero – Local AST context pruning for LLMs with 88-95% token reduction";
+      const url = "https://news.ycombinator.com/submitlink?u=" + encodeURIComponent(repoUrl) + "&t=" + encodeURIComponent(t);
+      window.open(url, "_blank", "width=700,height=500");
+    });
+  }
+
+  if (btnCopy) {
+    btnCopy.addEventListener("click", () => {
+      navigator.clipboard.writeText(repoUrl).then(() => {
+        showToast("Repository link copied! Share with your team or community ⭐", "📋");
+      }).catch(() => {
+        showToast(repoUrl, "🔗");
+      });
+    });
+  }
+}

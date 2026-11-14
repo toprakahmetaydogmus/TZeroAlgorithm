@@ -15,7 +15,7 @@
 [![PyPI Version](https://img.shields.io/pypi/v/tzero-mcp?color=38bdf8&style=flat-square&logo=pypi)](https://pypi.org/project/tzero-mcp/)
 [![npm Version](https://img.shields.io/npm/v/tzero-mcp?color=cb3837&style=flat-square&logo=npm)](https://www.npmjs.com/package/tzero-mcp)
 [![Python Version](https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13-blue?style=flat-square)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions)
-[![Tests](https://img.shields.io/badge/tests-352%20passing-34d399?style=flat-square&logo=githubactions)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions)
+[![Tests](https://img.shields.io/badge/tests-537%20passing-34d399?style=flat-square&logo=githubactions)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions)
 [![GitHub Action](https://img.shields.io/badge/GitHub%20Action-CI%20Review%20Gate-2088FF?style=flat-square&logo=githubactions&logoColor=white)](docs/github_action_guide.md)
 [![MCP Tools](https://img.shields.io/badge/MCP%20Tools-21%20Canonical%20%2F%2058%20Runtime-8b5cf6?style=flat-square)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm#the-21-canonical-mcp-tools)
 [![Security](https://img.shields.io/badge/security-Shannon%20Entropy%20(H%20%3E%3D%204.75)-38bdf8?style=flat-square&logo=shield)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm#security-architecture)
@@ -89,8 +89,12 @@ irm https://raw.githubusercontent.com/toprakahmetaydogmus/TZeroAlgorithm/main/in
 # 🚀 1-Click Configure MCP in Cursor, Claude, Antigravity, Windsurf:
 tzero init
 
+# 🖥️ Option D: Standalone Windows 64-Bit Executable Suite (Zero Dependencies):
+# Download all-in-one suite (.ZIP) with GUI, CLI, MCP Server & 1-Click Configurator:
+# https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/download/v11.11.0/TZero-v11.11.0-Windows-x64.zip
+
 # 🧩 Install VS Code / Cursor Extension (.vsix):
-code --install-extension dist/tzero-vscode-11.0.0.vsix
+code --install-extension dist/tzero-vscode-11.11.0.vsix
 ```
 
 ### 🧭 Navigation & Interactive Jump Stations
@@ -217,7 +221,7 @@ tzero init --vscode        # VS Code (Continue / Copilot)
 tzero init --zed           # Zed Editor
 
 # Install official VS Code / Cursor Extension (.vsix):
-code --install-extension dist/tzero-vscode-11.0.0.vsix
+code --install-extension dist/tzero-vscode-11.11.0.vsix
 ```
 
 ### Manual Configuration Snippets (Any MCP Client)

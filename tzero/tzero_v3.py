@@ -8870,6 +8870,7 @@ def main():
     parser.add_argument("--creative", "--storyboard", nargs="?", const="T-Zero Autonomous AI System", default=None, metavar="TOPIC_OR_FILE", help="Generate viral video & photo prompts and 5-scene launch storyboard (Sora, Midjourney, Kling)")
     parser.add_argument("--card", "--badge", nargs="?", const="assets/tzero_badge_card.svg", default=None, metavar="FILE", help="Generate viral dark-mode SVG banner card and GitHub README badges")
     parser.add_argument("--showcase", nargs="?", const="tzero_showcase.html", default=None, metavar="FILE", help="Generate interactive split-screen HTML5 comparison showcase slider")
+    parser.add_argument("--marketing", "--growth", action="store_true", help="Launch $0-budget viral growth engine and export campaign materials for Reddit, HN, X, and Product Hunt")
     parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect v11.11.0 Master Edition (engine v4.1.0)")
 
 
@@ -9969,6 +9970,10 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
         print("\033[32m[SUCCESS] Generated Interactive Split-Screen Showcase Slider!\033[0m")
         print(f"🌐 Showcase HTML: {out_html}")
         print("💡 Open in browser or embed in documentation for viral interactive demos.")
+        sys.exit(0)
+    elif getattr(args, "marketing", False):
+        from tzero.tzero_growth import main as run_marketing
+        run_marketing()
         sys.exit(0)
     elif args.audit is not None:
         run_audit_cli(args.audit or args.dir, output_format=getattr(args, "format", "text"))
