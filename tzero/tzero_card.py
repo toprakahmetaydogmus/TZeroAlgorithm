@@ -413,3 +413,10 @@ class TZeroShowcaseGenerator:
             f.write(html_content)
 
         return output_file
+
+
+if __name__ == "__main__":
+    svg = TZeroShowcaseGenerator.generate_svg_banner_card()
+    html_out = TZeroShowcaseGenerator.generate_interactive_showcase_html()
+    print(f"Generated {svg} and {html_out}")
+

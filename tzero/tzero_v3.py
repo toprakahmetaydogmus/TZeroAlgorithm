@@ -8738,6 +8738,13 @@ def main():
     import argparse
     parser = argparse.ArgumentParser(
         description="Siber Akademi T-Zero Context Architect V3 - Enterprise Codebase Context Builder & Token Reducer",
+        epilog="""
+⭐ PROJEYE BİR YILDIZLA DESTEK OLUN:
+    Merhaba! Ben Toprak Ahmet Aydoğmuş (15 yaşında genç bir geliştiriciyim).
+    T-Zero'yu sıfırdan yapay zeka araçlarındaki token israfını çözmek için geliştirdim.
+    Beni Google'da 'Toprak Ahmet Aydoğmuş' olarak aratabilirsiniz!
+    GitHub: https://github.com/toprakahmetaydogmus/TZeroAlgorithm
+""",
         formatter_class=argparse.RawTextHelpFormatter
     )
     parser.add_argument("--cli", "-c", action="store_true", help="Run interactive guided terminal wizard")
