@@ -75,6 +75,12 @@ from .workspace_orchestrator import (
     WorkspaceProfile,
     WorkspaceGovernanceSynthesizer
 )
+from .creative_director import (
+    JarvisCreativeDirector,
+    VideoPromptSpec,
+    PhotoPromptSpec,
+    StoryboardScene
+)
 
 ZeroKeyRouter = ZeroKeyAIRouter
 AutonomousGoalOrchestrator = JarvisOrchestrator
@@ -120,5 +126,9 @@ __all__ = [
     "WorkspaceOrchestrator",
     "WorkspaceProfiler",
     "WorkspaceProfile",
-    "WorkspaceGovernanceSynthesizer"
+    "WorkspaceGovernanceSynthesizer",
+    "JarvisCreativeDirector",
+    "VideoPromptSpec",
+    "PhotoPromptSpec",
+    "StoryboardScene"
 ]

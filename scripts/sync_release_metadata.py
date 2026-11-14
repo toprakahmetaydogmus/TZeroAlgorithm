@@ -102,6 +102,56 @@ def sync_release_metadata(target_version: str, check_only: bool = False) -> Dict
     c_t2 = _regex_replace(tui_p, r'(generate_changelog_entry\(version=)"v[0-9]+\.[0-9]+\.[0-9]+"', rf'\1"v{target_version}"', check_only)
     results["tzero_tui.py"] = c_t1 or c_t2
 
+    # Internal sub-engines and tools
+    contracts_p = ROOT_DIR / "tzero" / "tzero_contracts.py"
+    c_ct1 = _regex_replace(contracts_p, r'Context Architect v[0-9]+\.[0-9]+\.[0-9]+ Master Edition', f"Context Architect v{target_version} Master Edition", check_only)
+    c_ct2 = _regex_replace(contracts_p, r'("name":\s*"T-Zero Contract Guardian",\s*\n\s*"version":\s*)"[0-9]+\.[0-9]+\.[0-9]+"', rf'\1"{target_version}"', check_only)
+    results["tzero_contracts.py"] = c_ct1 or c_ct2
+
+    dash_p = ROOT_DIR / "tzero" / "tzero_dashboard.py"
+    c_d1 = _regex_replace(dash_p, r'Context Architect &bull; v[0-9]+\.[0-9]+\.[0-9]+', f"Context Architect &bull; v{target_version}", check_only)
+    c_d2 = _regex_replace(dash_p, r'Context Architect v[0-9]+\.[0-9]+\.[0-9]+', f"Context Architect v{target_version}", check_only)
+    c_d3 = _regex_replace(dash_p, r'(?m)^(\s*version\s*=\s*)"[0-9]+\.[0-9]+\.[0-9]+"', rf'\1"{target_version}"', check_only)
+    results["tzero_dashboard.py"] = any((c_d1, c_d2, c_d3))
+
+    golden_p = ROOT_DIR / "tzero" / "tzero_golden.py"
+    c_g1 = _regex_replace(golden_p, r'Context Architect v[0-9]+\.[0-9]+\.[0-9]+ Master Edition', f"Context Architect v{target_version} Master Edition", check_only)
+    c_g2 = _regex_replace(golden_p, r'(?m)^(\s*version\s*=\s*)"[0-9]+\.[0-9]+\.[0-9]+"', rf'\1"{target_version}"', check_only)
+    results["tzero_golden.py"] = c_g1 or c_g2
+
+    lsp_p = ROOT_DIR / "tzero" / "tzero_lsp.py"
+    results["tzero_lsp.py"] = _regex_replace(lsp_p, r'("serverInfo":\s*\{"name":\s*"tzero-lsp",\s*"version":\s*)"[0-9]+\.[0-9]+\.[0-9]+"', rf'\1"{target_version}"', check_only)
+
+    for doc_mod in ("tzero_budget.py", "tzero_debt.py"):
+        p = ROOT_DIR / "tzero" / doc_mod
+        results[doc_mod] = _regex_replace(p, r'Context Architect v[0-9]+\.[0-9]+\.[0-9]+ Master Edition', f"Context Architect v{target_version} Master Edition", check_only)
+
+    vs_js = ROOT_DIR / "extensions" / "vscode" / "src" / "extension.js"
+    if vs_js.is_file():
+        results["extensions/vscode/src/extension.js"] = _regex_replace(vs_js, r'Command Center \(v[0-9]+\.[0-9]+\.[0-9]+\)', f"Command Center (v{target_version})", check_only)
+
+    vs_test = ROOT_DIR / "extensions" / "vscode" / "test" / "extension.test.js"
+    if vs_test.is_file():
+        results["extensions/vscode/test/extension.test.js"] = _regex_replace(vs_test, r"assert\.equal\(pkg\.version,\s*'[^']+'\);", f"assert.equal(pkg.version, '{target_version}');", check_only)
+
+    # Automated test suites with version assertions
+    t_sync = ROOT_DIR / "tests" / "test_packaging_sync.py"
+    results["tests/test_packaging_sync.py"] = _regex_replace(t_sync, r'self\.assertEqual\(canonical,\s*"[^"]+"\)', f'self.assertEqual(canonical, "{target_version}")', check_only)
+
+    t_gold = ROOT_DIR / "tests" / "test_golden.py"
+    results["tests/test_golden.py"] = _regex_replace(t_gold, r'self\.assertEqual\(data\["version"\],\s*"[^"]+"\)', f'self.assertEqual(data["version"], "{target_version}")', check_only)
+
+    t_e2e = ROOT_DIR / "tests" / "test_e2e_full.py"
+    results["tests/test_e2e_full.py"] = _regex_replace(t_e2e, r'self\.assertEqual\(data\["version"\],\s*"[^"]+"\)', f'self.assertEqual(data["version"], "{target_version}")', check_only)
+
+    t_dash = ROOT_DIR / "tests" / "test_dashboard.py"
+    c_td1 = _regex_replace(t_dash, r'self\.assertIn\("[0-9]+\.[0-9]+\.[0-9]+",\s*body\)', f'self.assertIn("{target_version}", body)', check_only)
+    c_td2 = _regex_replace(t_dash, r'self\.assertEqual\(data\["version"\],\s*"[^"]+"\)', f'self.assertEqual(data["version"], "{target_version}")', check_only)
+    results["tests/test_dashboard.py"] = c_td1 or c_td2
+
+    t_ct = ROOT_DIR / "tests" / "test_contracts.py"
+    results["tests/test_contracts.py"] = _regex_replace(t_ct, r'self\.assertEqual\(driver\["version"\],\s*"[^"]+"\)', f'self.assertEqual(driver["version"], "{target_version}")', check_only)
+
     return results
 
 

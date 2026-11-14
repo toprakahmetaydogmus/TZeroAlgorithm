@@ -1,5 +1,26 @@
 # Changelog
 
+## [11.11.0] - 2026-11-14
+
+### Added (AI Supervisor & Godfather Auto-Corrector, Standalone TZeroCLI.exe & Master Release Bundle)
+
+- **AI Supervisor & Godfather Auto-Corrector Engine (`tzero/tzero_fix.py` / `tzero --supervise`):**
+  - AST Hallucination Auto-Corrector: deep AST static analysis to diagnose and repair hallucinated imports, non-existent methods, and misnamed function calls.
+  - Multi-factor hybrid symbol matcher combining token Jaccard overlap, camel/snake word splitting, prefix boost, and SequenceMatcher similarity.
+  - Downstream AST identifier rewriting via `visit_Name`: rewrites imported aliases and all their invocations throughout the file.
+  - Automated injection of missing standard library modules and typing annotations (`os`, `sys`, `json`, `time`, `re`, `pathlib.Path`, `Optional`, `List`, `Dict`, `Any`).
+  - Workspace-wide Omni-Supervisor: `tzero --supervise <dir> [--apply]` recursively heals hallucinated symbols across all workspace files with unified diff reports.
+  - Comprehensive protections for builtins, Python standard library modules, and workspace submodules.
+
+- **Dedicated Standalone Console Binary (`TZeroCLI.exe`):**
+  - Added dedicated console CLI build target (`TZeroCLI.exe`) alongside `TZeroAlgorithm.exe` (GUI Cockpit), `TZeroMCP.exe` (Fast MCP Server), and `AddMCP.exe` (1-Click Installer).
+  - Integrated `TZero-v11.11.0-Windows-x64.zip` master archive packaging all 4 executables, documentation, and licenses.
+
+- **Local PC Testing Gate & Single-Source Versioning:**
+  - 100% test pass rate across 537 test cases on Windows and Ubuntu.
+  - Flake8 100% clean across all modules.
+  - Single-source atomic version synchronization across 26 project manifests.
+
 ## [11.0.0] - 2026-11-11
 
 - Group the Python implementation and desktop assets under `tzero/` and the Windows build script under `scripts/build/`.

@@ -482,7 +482,7 @@ def calculate_token_cost(token_count: int, provider_name: str) -> float:
 # i18n Translations
 TRANSLATIONS: Dict[str, Dict[str, str]] = {
     "en": {
-        "title": "T-Zero Developer Console & Context Architect v11.0.0",
+        "title": "T-Zero Developer Console & Context Architect v11.11.0",
         "subtitle": f"Developer: {DEV_NAME} | {DEV_URL_MAIN} | {DEV_URL_BIO}",
         "overview_tab": "🏠 Overview Dashboard",
         "setup_tab": "⚡ Setup & AI Models",
@@ -519,7 +519,7 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "audit_btn": "🛡️ SECURITY AUDIT"
     },
     "tr": {
-        "title": "T-Zero Geliştirici Konsolu & Bağlam Mimarı v11.0.0",
+        "title": "T-Zero Geliştirici Konsolu & Bağlam Mimarı v11.11.0",
         "subtitle": f"Geliştirici: {DEV_NAME} | {DEV_URL_MAIN} | {DEV_URL_BIO}",
         "overview_tab": "🏠 Genel Bakış",
         "setup_tab": "⚡ Kurulum & Model",
@@ -8811,7 +8811,7 @@ def main():
                         default="o200k_base", help="BPE encoding for --symbol-context")
     parser.add_argument("--cache-aligned", action="store_true", help="Order context for KV-cache prefix stability (immutable static prefix before dynamic query suffix)")
     parser.add_argument("--commit-msg", action="store_true", help="Generate Conventional Commit message from local AST git diff ($0 local engine)")
-    parser.add_argument("--changelog", nargs="?", const="v11.0.0", default=None, metavar="VERSION", help="Generate release CHANGELOG markdown from git history")
+    parser.add_argument("--changelog", nargs="?", const="v11.11.0", default=None, metavar="VERSION", help="Generate release CHANGELOG markdown from git history")
     parser.add_argument("--ci", choices=["github", "gitlab", "pre-commit", "all"], default=None, help="Install turnkey CI/CD security and verification workflow")
     parser.add_argument("--stubs", nargs="?", const=".", default=None, metavar="PATH", help="Generate PEP-484 AST type stubs (.pyi) for target file or workspace")
     parser.add_argument("--stubs-out", default=None, metavar="DIR", help="Output directory for generated type stubs (default: alongside .py files)")
@@ -8870,7 +8870,7 @@ def main():
     parser.add_argument("--creative", "--storyboard", nargs="?", const="T-Zero Autonomous AI System", default=None, metavar="TOPIC_OR_FILE", help="Generate viral video & photo prompts and 5-scene launch storyboard (Sora, Midjourney, Kling)")
     parser.add_argument("--card", "--badge", nargs="?", const="assets/tzero_badge_card.svg", default=None, metavar="FILE", help="Generate viral dark-mode SVG banner card and GitHub README badges")
     parser.add_argument("--showcase", nargs="?", const="tzero_showcase.html", default=None, metavar="FILE", help="Generate interactive split-screen HTML5 comparison showcase slider")
-    parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect v11.0.0 Master Edition (engine v4.1.0)")
+    parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect v11.11.0 Master Edition (engine v4.1.0)")
 
 
     def print_master_tutorial():
@@ -8979,7 +8979,7 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
     def print_quickstart_guide():
         print("""
 ================================================================================
-⚡ SİBER AKADEMİ — T-ZERO CONTEXT ARCHITECT & MCP v11.0.0 MASTER (engine v4.1.0)
+⚡ SİBER AKADEMİ — T-ZERO CONTEXT ARCHITECT & MCP v11.11.0 MASTER (engine v4.1.0)
 ================================================================================
 🎯 %95'e Varan Token Tasarrufu & Otonom Yapay Zeka Mimari Bağlam Motoru
 
@@ -9258,11 +9258,18 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
     elif getattr(args, "fix", None) is not None:
         from tzero.tzero_fix import ASTHallucinationAutoCorrector
         target = args.fix
-        if os.path.exists(target):
-            rep = ASTHallucinationAutoCorrector.heal_file(target, workspace_dir=args.dir, apply_write=True)
+        if os.path.isdir(target):
+            summary = ASTHallucinationAutoCorrector.heal_workspace(
+                target_dir=target,
+                workspace_dir=getattr(args, "dir", ".") or ".",
+                apply_write=not getattr(args, "dry_run", False)
+            )
+            ASTHallucinationAutoCorrector.render_workspace_cli(summary, target_hint=target)
+        elif os.path.isfile(target):
+            rep = ASTHallucinationAutoCorrector.heal_file(target, workspace_dir=getattr(args, "dir", ".") or ".", apply_write=not getattr(args, "dry_run", False))
             ASTHallucinationAutoCorrector.render_cli(rep, target_hint=target)
         else:
-            rep = ASTHallucinationAutoCorrector.heal_code(target, workspace_dir=args.dir)
+            rep = ASTHallucinationAutoCorrector.heal_code(target, workspace_dir=getattr(args, "dir", ".") or ".")
             ASTHallucinationAutoCorrector.render_cli(rep, target_hint="inline_code")
         sys.exit(0)
     elif getattr(args, "bridge", None) is not None:
@@ -9827,7 +9834,7 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
         if not os.path.exists(app_path):
             app_path = os.path.join(os.getcwd(), "huggingface-space", "app.py")
         print("\033[36m" + "=" * 80)
-        print("🤗 SİBER AKADEMİ — T-ZERO HUGGING FACE SPACE & GRADIO COCKPIT (v11.0.0)")
+        print("🤗 SİBER AKADEMİ — T-ZERO HUGGING FACE SPACE & GRADIO COCKPIT (v11.11.0)")
         print("=" * 80 + "\033[0m")
         print("🌐 Official Live Space : https://huggingface.co/spaces/toprakke4/tzero-token-reducer")
         print(f"📁 Local Application   : {app_path}")
