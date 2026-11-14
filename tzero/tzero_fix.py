@@ -11,10 +11,52 @@ and automatically rewrites the AST to the correct valid local identifier.
 
 import os
 import sys
+import re
 import ast
 import difflib
 from dataclasses import dataclass, field
 from typing import Dict, List, Set, Any, Optional, Tuple
+
+STD_LIB_ROOT_MODULES = {
+    "os", "sys", "json", "time", "re", "math", "hashlib", "uuid", "datetime",
+    "asyncio", "subprocess", "tempfile", "platform", "shutil", "urllib", "random",
+    "logging", "collections", "functools", "itertools", "pathlib", "difflib"
+}
+
+TYPING_NAMES = {
+    "Optional", "List", "Dict", "Tuple", "Set", "Any", "Union", "Callable",
+    "Sequence", "Iterable", "NamedTuple", "TypeVar", "Generic", "Annotated"
+}
+
+PATHLIB_NAMES = {"Path"}
+
+
+def find_best_symbol_match(target: str, candidates: Set[str], cutoff: float = 0.50) -> Tuple[Optional[str], float]:
+    """Hybrid symbol matcher combining token-level Jaccard overlap, prefix boost, and SequenceMatcher."""
+    if not candidates or not target:
+        return None, 0.0
+    t_lower = target.lower()
+    for c in candidates:
+        if c.lower() == t_lower:
+            return c, 0.99
+
+    best_cand: Optional[str] = None
+    best_score: float = 0.0
+    t_words = set(re.findall(r'[A-Z]?[a-z]+|[A-Z]+(?=[A-Z][a-z]|\d|\W|$)|\d+', target))
+    t_words = {w.lower() for w in t_words}
+
+    for c in candidates:
+        c_words = set(re.findall(r'[A-Z]?[a-z]+|[A-Z]+(?=[A-Z][a-z]|\d|\W|$)|\d+', c))
+        c_words = {w.lower() for w in c_words}
+        word_overlap = len(t_words & c_words) / max(1, len(t_words | c_words)) if (t_words or c_words) else 0.0
+        seq_ratio = difflib.SequenceMatcher(None, target, c).ratio()
+        prefix_boost = 0.15 if (c.lower().startswith(target[:4].lower()) and len(target) >= 4) else 0.0
+        score = (0.5 * seq_ratio) + (0.5 * word_overlap) + prefix_boost
+        if score > best_score and score >= cutoff:
+            best_score = score
+            best_cand = c
+
+    return best_cand, round(best_score, 2)
 
 
 @dataclass
@@ -44,6 +86,7 @@ class _ASTHealerTransformer(ast.NodeTransformer):
         self.known_imports = known_imports
         self.known_methods = known_methods
         self.actions: List[HealingAction] = []
+        self.renamed_imports: Dict[str, str] = {}
 
     def visit_ImportFrom(self, node: ast.ImportFrom) -> ast.AST:
         # Check imported names against known symbols
@@ -51,22 +94,26 @@ class _ASTHealerTransformer(ast.NodeTransformer):
         for alias in node.names:
             name = alias.name
             if self.known_imports and name not in self.known_imports:
-                matches = difflib.get_close_matches(name, list(self.known_imports), n=1, cutoff=0.65)
-                if matches:
-                    best = matches[0]
-                    ratio = difflib.SequenceMatcher(None, name, best).ratio()
+                best, score = find_best_symbol_match(name, self.known_imports, cutoff=0.50)
+                if best:
                     self.actions.append(HealingAction(
                         original_symbol=name,
                         healed_symbol=best,
                         symbol_type="import",
                         line_number=getattr(node, "lineno", 1),
-                        confidence=round(ratio, 2),
+                        confidence=score,
                         context_hint=f"Module: {node.module or ''}"
                     ))
+                    self.renamed_imports[name] = best
                     new_names.append(ast.alias(name=best, asname=alias.asname))
                     continue
             new_names.append(alias)
         node.names = new_names
+        return node
+
+    def visit_Name(self, node: ast.Name) -> ast.AST:
+        if node.id in self.renamed_imports:
+            node.id = self.renamed_imports[node.id]
         return node
 
     def visit_Call(self, node: ast.Call) -> ast.AST:
@@ -75,32 +122,28 @@ class _ASTHealerTransformer(ast.NodeTransformer):
         if isinstance(node.func, ast.Attribute):
             attr_name = node.func.attr
             if self.known_methods and attr_name not in self.known_methods:
-                matches = difflib.get_close_matches(attr_name, list(self.known_methods), n=1, cutoff=0.65)
-                if matches:
-                    best = matches[0]
-                    ratio = difflib.SequenceMatcher(None, attr_name, best).ratio()
+                best, score = find_best_symbol_match(attr_name, self.known_methods, cutoff=0.50)
+                if best:
                     self.actions.append(HealingAction(
                         original_symbol=attr_name,
                         healed_symbol=best,
                         symbol_type="method_call",
                         line_number=getattr(node, "lineno", 1),
-                        confidence=round(ratio, 2)
+                        confidence=score
                     ))
                     node.func.attr = best
         # Check standalone function calls (e.g. calculate_tokens())
         elif isinstance(node.func, ast.Name):
             func_name = node.func.id
             if self.known_functions and func_name not in self.known_functions:
-                matches = difflib.get_close_matches(func_name, list(self.known_functions), n=1, cutoff=0.70)
-                if matches:
-                    best = matches[0]
-                    ratio = difflib.SequenceMatcher(None, func_name, best).ratio()
+                best, score = find_best_symbol_match(func_name, self.known_functions, cutoff=0.50)
+                if best:
                     self.actions.append(HealingAction(
                         original_symbol=func_name,
                         healed_symbol=best,
                         symbol_type="function_call",
                         line_number=getattr(node, "lineno", 1),
-                        confidence=round(ratio, 2)
+                        confidence=score
                     ))
                     node.func.id = best
         return node
@@ -132,13 +175,12 @@ class ASTHallucinationAutoCorrector:
                             tree = ast.parse(f.read(), filename=fname)
                         for node in ast.walk(tree):
                             if isinstance(node, ast.ClassDef):
+                                imports.add(node.name)
                                 for item in node.body:
                                     if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef)):
                                         methods.add(item.name)
                             elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
                                 functions.add(node.name)
-                                imports.add(node.name)
-                            elif isinstance(node, ast.ClassDef):
                                 imports.add(node.name)
                     except Exception:
                         pass
@@ -168,6 +210,62 @@ class ASTHallucinationAutoCorrector:
             healed_code = ast.unparse(healed_tree)
         except Exception:
             healed_code = code
+
+        # Check for unimported standard modules & typing names
+        declared_or_imported = set()
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                for a in node.names:
+                    declared_or_imported.add(a.name.split('.')[0])
+            elif isinstance(node, ast.ImportFrom):
+                for a in node.names:
+                    declared_or_imported.add(a.name)
+            elif isinstance(node, ast.FunctionDef):
+                declared_or_imported.add(node.name)
+            elif isinstance(node, ast.ClassDef):
+                declared_or_imported.add(node.name)
+
+        used_names = {node.id for node in ast.walk(tree) if isinstance(node, ast.Name)}
+        missing_root_modules = sorted(list(STD_LIB_ROOT_MODULES & used_names - declared_or_imported))
+        missing_typing = sorted(list(TYPING_NAMES & used_names - declared_or_imported))
+        missing_path = sorted(list(PATHLIB_NAMES & used_names - declared_or_imported))
+
+        injected_headers = []
+        for mod in missing_root_modules:
+            injected_headers.append(f"import {mod}")
+            transformer.actions.append(HealingAction(
+                original_symbol=f"<missing import {mod}>",
+                healed_symbol=f"import {mod}",
+                symbol_type="auto_import",
+                line_number=1,
+                confidence=1.0,
+                context_hint="Auto-injected standard library import"
+            ))
+        if missing_typing:
+            injected_headers.append(f"from typing import {', '.join(missing_typing)}")
+            for t_name in missing_typing:
+                transformer.actions.append(HealingAction(
+                    original_symbol=f"<missing typing {t_name}>",
+                    healed_symbol=f"from typing import {t_name}",
+                    symbol_type="auto_import",
+                    line_number=1,
+                    confidence=1.0,
+                    context_hint="Auto-injected typing annotation import"
+                ))
+        if missing_path:
+            injected_headers.append("from pathlib import Path")
+            transformer.actions.append(HealingAction(
+                original_symbol="<missing pathlib Path>",
+                healed_symbol="from pathlib import Path",
+                symbol_type="auto_import",
+                line_number=1,
+                confidence=1.0,
+                context_hint="Auto-injected pathlib import"
+            ))
+
+        if injected_headers:
+            header_str = "\n".join(injected_headers) + "\n\n"
+            healed_code = header_str + healed_code
 
         # Generate diff
         orig_lines = code.splitlines(keepends=True)
