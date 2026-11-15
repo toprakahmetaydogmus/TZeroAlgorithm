@@ -22,7 +22,8 @@ const banner = `\x1b[36m
 └──────────────────────────────────────────────────────────────────────────────┘
 \x1b[0m`;
 
-if (process.stderr.isTTY) {
+const isQuietStderr = process.env.TZERO_NO_BANNER === "1" || process.env.CI === "true";
+if (!isQuietStderr) {
   process.stderr.write(banner + "\n");
 }
 

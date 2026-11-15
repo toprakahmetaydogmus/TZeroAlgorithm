@@ -5257,13 +5257,31 @@ def main():
             sys.stderr.write(f"[ERROR] Failed to launch T-Zero Dashboard: {e}\n")
             sys.exit(1)
 
-    if "--install" in sys.argv[1:] or "--add-mcp" in sys.argv[1:]:
+    if any(arg in sys.argv[1:] for arg in ("--install", "--add-mcp", "install", "install-ide")):
         try:
-            import addmcp
-            sys.argv = [sys.argv[0]] + [a for a in sys.argv[1:] if a not in ("--install", "--add-mcp")]
-            addmcp.main()
-            return
-        except ImportError as e:
+            try:
+                from tzero.tzero_welcome import print_star_banner
+            except ImportError:
+                from tzero_welcome import print_star_banner
+            print_star_banner()
+        except Exception:
+            pass
+        try:
+            try:
+                import addmcp
+            except ImportError:
+                from tzero import addmcp
+            raw_remaining = [a for a in sys.argv[1:] if a not in ("--install", "--add-mcp", "install", "install-ide")]
+            # In CLI/npx mode without args or with '--all', run automatic 1-click installer across all detected IDEs
+            if not raw_remaining or raw_remaining == ["--all"] or raw_remaining == ["all"]:
+                sys.exit(addmcp.run_init([]))
+            elif "--gui" in raw_remaining:
+                sys.argv = [sys.argv[0]] + [a for a in raw_remaining if a != "--gui"]
+                addmcp.main()
+                return
+            else:
+                sys.exit(addmcp.run_init(raw_remaining))
+        except Exception as e:
             sys.stderr.write(f"[ERROR] addmcp installer failed: {e}\n")
             sys.exit(1)
 

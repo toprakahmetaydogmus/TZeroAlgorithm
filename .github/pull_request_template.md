@@ -10,4 +10,4 @@ Please include a summary of the change and which issue it fixes.
 ### Checklist
 - [ ] My code follows the Siber Akademi T-Zero code style and zero-leak security guardrails.
 - [ ] I have added tests that prove my fix is effective or that my feature works.
-- [ ] All 105 unit tests pass (`python -m unittest discover tests -v`).
+- [ ] All 545 automated tests pass (`python -m unittest discover tests -v`).

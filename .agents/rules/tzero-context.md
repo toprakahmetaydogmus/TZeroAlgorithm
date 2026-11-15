@@ -17,7 +17,7 @@ tzero sync
 ```
 
 ## Ground-Truth Architecture Symbols
-- **Active Modules:** 246 core files
+- **Active Modules:** 253 core files
 - **Primary Classes:**
   * `ClientTarget (addmcp.py)`
   * `AddMCPApp (addmcp.py)`
@@ -25,6 +25,8 @@ tzero sync
   * `AuditFinding (app.py)`
   * `SecurityQualityAuditor (app.py)`
   * `ROIEstimator (app.py)`
+  * `PostDevelopCommand (setup.py)`
+  * `PostInstallCommand (setup.py)`
   * `ZeroCostSemanticCache (tzero_gateway.py)`
   * `ZeroLeakShield (tzero_gateway.py)`
   * `CustomHandler (benchmark-site/serve.py)`
@@ -32,8 +34,6 @@ tzero sync
   * `ASTContextArchitect (huggingface-space/app.py)`
   * `ClientTarget (installers/npm/src/addmcp.py)`
   * `AddMCPApp (installers/npm/src/addmcp.py)`
-  * `ASTContextArchitect (installers/npm/src/app.py)`
-  * `AuditFinding (installers/npm/src/app.py)`
 - **Primary Public Functions:**
   * `build_client_targets() (addmcp.py)`
   * `server_entry() (addmcp.py)`

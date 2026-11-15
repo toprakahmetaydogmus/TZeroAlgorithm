@@ -44,6 +44,30 @@ def compute_sha256(path: pathlib.Path) -> str:
     return h.hexdigest().upper()
 
 
+def sync_all_release_metadata(version: str):
+    log(f"Synchronizing release manifests and metadata to v{version}...")
+    try:
+        from sync_release_metadata import sync_release_metadata
+        sync_release_metadata(version)
+    except Exception:
+        try:
+            from scripts.sync_release_metadata import sync_release_metadata
+            sync_release_metadata(version)
+        except Exception as e:
+            log(f"Warning: metadata sync skipped ({e})")
+
+    # Clean __pycache__ and stale .pyc files from npm src
+    npm_src = ROOT_DIR / "installers" / "npm" / "src"
+    if npm_src.is_dir():
+        for pyc_dir in list(npm_src.glob("**/__pycache__")):
+            shutil.rmtree(pyc_dir, ignore_errors=True)
+        for pyc_file in list(npm_src.glob("**/*.pyc")):
+            try:
+                pyc_file.unlink()
+            except Exception:
+                pass
+
+
 def build_python_packages():
     log("Building Python Wheel and Source Distribution (.whl, .tar.gz)...")
     subprocess.run([sys.executable, "-m", "build"], cwd=ROOT_DIR, check=True)
@@ -111,6 +135,7 @@ def main():
     log(f"Starting local build pipeline for T-Zero v{version}...")
 
     t0 = time.time()
+    sync_all_release_metadata(version)
     if not args.skip_python:
         build_python_packages()
 

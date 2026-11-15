@@ -21,7 +21,14 @@ const banner = `\x1b[36m
 └──────────────────────────────────────────────────────────────────────────────┘
 \x1b[0m`;
 
-if (process.stdout.isTTY && !process.argv.includes("--json") && !process.argv.includes("--pipe")) {
+const isQuiet = process.env.TZERO_NO_BANNER === "1" ||
+  process.env.CI === "true" ||
+  process.argv.includes("--json") ||
+  process.argv.includes("--pipe") ||
+  process.argv.includes("--silent") ||
+  process.argv.includes("-q");
+
+if (!isQuiet) {
   console.log(banner);
 }
 

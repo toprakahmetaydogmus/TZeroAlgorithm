@@ -72,6 +72,12 @@ pip install --upgrade tzero-mcp
 # Linux / macOS: curl -fsSL https://raw.githubusercontent.com/toprakahmetaydogmus/TZeroAlgorithm/main/install.sh | bash
 # Windows:       irm https://raw.githubusercontent.com/toprakahmetaydogmus/TZeroAlgorithm/main/install.ps1 | iex
 
+# 🐙 Seçenek D: Git Clone ile Doğrudan Kaynak Koddan Çalışma:
+git clone https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git
+cd TZeroAlgorithm
+python scripts/welcome.py    # Hoş geldin & otomatik git hook yıldız hatırlatıcı
+pip install -e .             # Geliştirici modu (.githooks otomatik aktifleşir)
+
 # 🚀 Tek Tıkla IDE'leri (Cursor, Claude, Windsurf, VS Code) Bağla:
 tzero init
 

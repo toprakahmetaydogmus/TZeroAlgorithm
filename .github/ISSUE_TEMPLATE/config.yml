@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: "T-Zero Community Discussions & Q&A"
+    url: "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/discussions"
+    about: "Ask questions, share configuration setups, or propose architecture ideas."
+  - name: "Live Interactive Web Benchmark"
+    url: "https://tzero-indol.vercel.app"
+    about: "Test AST compression and token reduction interactively in your browser."
+  - name: "Siber Akademi Security Portal"
+    url: "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/security/advisories/new"
+    about: "Privately disclose security vulnerabilities or secret leaks."

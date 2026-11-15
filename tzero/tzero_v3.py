@@ -8736,6 +8736,37 @@ def run_watch_mode(target_dir: str = ".", interval: float = 1.0, once_test: bool
 
 def main():
     import argparse
+
+    try:
+        try:
+            from tzero.tzero_welcome import print_star_banner
+        except ImportError:
+            from tzero_welcome import print_star_banner
+        print_star_banner()
+    except Exception:
+        pass
+
+    # Fast path for positional subcommands: install-ide, install, init, add-mcp, --install-ide
+    if len(sys.argv) > 1 and (
+        sys.argv[1].lower() in ("install-ide", "install", "add-mcp", "init")
+        or sys.argv[1].lower().startswith("--install-ide")
+    ):
+        try:
+            try:
+                import addmcp
+            except ImportError:
+                from tzero import addmcp
+            if sys.argv[1].lower().startswith("--install-ide"):
+                parts = sys.argv[1].split("=", 1)
+                first_arg = [parts[1]] if len(parts) > 1 else []
+                target_args = first_arg + sys.argv[2:]
+            else:
+                target_args = sys.argv[2:]
+            sys.exit(addmcp.run_init(target_args))
+        except Exception as e:
+            sys.stderr.write(f"[ERROR] Failed to execute T-Zero IDE installer: {e}\n")
+            sys.exit(1)
+
     parser = argparse.ArgumentParser(
         description="Siber Akademi T-Zero Context Architect V3 - Enterprise Codebase Context Builder & Token Reducer",
         epilog="""
@@ -8748,6 +8779,7 @@ def main():
         formatter_class=argparse.RawTextHelpFormatter
     )
     parser.add_argument("--cli", "-c", action="store_true", help="Run interactive guided terminal wizard")
+    parser.add_argument("--install-ide", "--install-mcp", nargs="?", const="all", default=None, metavar="CLIENT", dest="install_ide", help="1-Click MCP installer for Cursor, Claude, Windsurf, Antigravity, VS Code, etc. (e.g. --install-ide cursor, --install-ide all)")
     parser.add_argument("--scan", "-s", nargs="?", const=".", default=None, metavar="DIR", help="Scan codebase directory and print summary metrics")
     parser.add_argument("--watch", "-w", nargs="?", const=".", default=None, metavar="DIR", help="Continuous background AST context watcher (auto-reindexes on file save for Cursor/Claude)")
     parser.add_argument("--audit", "-a", nargs="?", const=".", default=None, metavar="DIR", help="Run AST static code analysis & audit for code smells")
@@ -9049,6 +9081,9 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
     if len(sys.argv) > 1 and not sys.argv[1].startswith("-"):
         sub = sys.argv[1].lower()
         sub_map = {
+            "install-ide": "--install-ide",
+            "install": "--install-ide",
+            "add-mcp": "--install-ide",
             "audit": "--audit",
             "vault": "--vault",
             "auto-vault": "--auto-vault",
@@ -9190,12 +9225,26 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
             symbol_name=getattr(args, "federation_symbol", None) or getattr(args, "scip_symbol", None),
             scip_path=getattr(args, "federation_scip", None),
         ))
+    elif getattr(args, "install_ide", None) is not None:
+        try:
+            import addmcp
+        except ImportError:
+            from tzero import addmcp
+        target_val = getattr(args, "install_ide", None)
+        target_arg = [] if target_val in ("all", "auto", "") else [target_val]
+        sys.exit(addmcp.run_init(target_arg))
     elif args.init is not None:
-        import addmcp
+        try:
+            import addmcp
+        except ImportError:
+            from tzero import addmcp
         target_arg = [] if args.init == "auto" else [args.init]
         sys.exit(addmcp.run_init(target_arg))
     elif args.add_mcp:
-        import addmcp
+        try:
+            import addmcp
+        except ImportError:
+            from tzero import addmcp
         sys.exit(addmcp.run_cli())
     elif args.mcp:
         from tzero import tzero_mcp

@@ -86,6 +86,12 @@ curl -fsSL https://raw.githubusercontent.com/toprakahmetaydogmus/TZeroAlgorithm/
 # Windows (PowerShell):
 irm https://raw.githubusercontent.com/toprakahmetaydogmus/TZeroAlgorithm/main/install.ps1 | iex
 
+# 🐙 Option E: Git Clone & Source Checkout:
+git clone https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git
+cd TZeroAlgorithm
+python scripts/welcome.py    # Turnkey community welcome & git star reminder
+pip install -e .             # Editable dev install (auto-configures .githooks)
+
 # 🚀 1-Click Configure MCP in Cursor, Claude, Antigravity, Windsurf:
 tzero init
 
@@ -135,16 +141,20 @@ code --install-extension dist/tzero-vscode-11.11.0.vsix
 
 It solves the **Context Token Crisis**: when AI coding models ingest entire codebases as flat text, **80% to 95% of prompt tokens are spent on repetitive internal function bodies, routine loops, local math, and implementation boilerplate**.
 
-### 🥊 Context Architecture Comparison Matrix
+### 🥊 Context Architecture & Tool Comparison Matrix
 
-| Dimension | Raw Prompt Ingestion | Vector DB / Embedding RAG | Repomix (Raw Concat) | Aider (Repo-Map) | T-Zero Deterministic AST Engine |
+| Dimension | Raw Prompt Ingestion (Cursor Composer / Claude) | Vector DB / Embedding RAG | Repomix (Packed File Concat) | Aider (Tree-Sitter Repo-Map) | T-Zero Deterministic AST Engine |
 | :--- | :---: | :---: | :---: | :---: | :---: |
-| **Token Reduction** | 0% (Massive waste) | 40-70% (Fragmented) | 0% (Dumps raw files) | 70-85% (Symbol list only) | **Up to 95.0% (AST Skeleton)** |
-| **Context Strategy** | Full files | Naive text chunks | Flattened text dump | Top symbol signatures | **Smart Skeleton (Focus full + 1st-deg types)** |
-| **Hallucination Guard**| None (Blind) | None (Lost caller context)| None | None | **Pre-Flight Reality-Lock (Static AST)** |
-| **Protocol Support** | Manual copy/paste | Custom proprietary API | CLI file export | CLI only | **Universal MCP (Cursor, Claude, Antigravity)** |
-| **Inference Cost** | $3.00 - $15.00+ / turn | Cloud Vector DB fees | $3.00 - $15.00+ / turn | Model dependent | **$0.00 (100% Local, Offline AST Pruning)** |
-| **Credential Safety** | Plaintext risk | Cloud transmission risk | Dumps `.env` files | None | **Shannon-Entropy Key Scrubber (H ≥ 4.75)** |
+| **Token Reduction** | 0% (Massive context waste) | 40–70% (Fragmented recall) | 0% (Dumps raw source text) | 70–85% (Symbol map only) | **85.0% – 95.0% (Deterministic AST Skeleton)** |
+| **Context Strategy** | Full raw file bodies | Cosine similarity chunks | XML file packing | PageRank top-ranked signatures | **Smart Skeleton (Focus full + 1st-deg typed interfaces)** |
+| **Hallucination Guard**| None (Model hallucinates calls) | None (Caller context lost) | None | None | **Pre-Flight Reality-Lock (Static AST Verification)** |
+| **Polyglot Languages** | Plain text | Plain text | Plain text | 10+ languages | **12+ Languages (Python, TS, Go, Rust, Java, C#, Swift)** |
+| **Protocol Integration** | Manual copy/paste | Custom proprietary cloud | CLI file export | Interactive terminal only | **Universal MCP Server (Cursor, Claude, Windsurf, VS Code)** |
+| **Live Watcher** | Manual reload | Cloud re-indexing | Manual CLI command | None | **Real-Time Live AST Watcher (Sub-8ms on file save)** |
+| **IDE Lifecycle Hooks** | None | None | None | None | **PreToolUse & PostToolUse Guardrails (Claude Code, Gemini)** |
+| **Zero-Leak Security** | Plaintext risk | Cloud embedding risk | Can dump `.env` files | None | **Shannon-Entropy Key Scrubber ($H \ge 4.75$, 100% Local)** |
+| **Architecture Boundaries** | None | None | None | None | **tzero.rules.json CI/CD Gate Enforcement** |
+| **Inference & Tool Cost** | $3.00 – $15.00+ / turn | Cloud Vector DB fees | $3.00 – $15.00+ / turn | API model fees | **$0.00 (100% Free & Open-Source, Local CPU)** |
 
 ---
 

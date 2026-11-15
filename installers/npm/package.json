@@ -35,6 +35,7 @@
     "tzero-mcp": "bin/tzero-mcp.js"
   },
   "scripts": {
+    "postinstall": "node bin/postinstall.js",
     "test": "node --test test/package.test.js"
   },
   "repository": {
