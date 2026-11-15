@@ -27,7 +27,7 @@ on:
 
 jobs:
   test:
-    if: github.actor != 'dependabot[bot]'
+    if: "!endsWith(github.actor, '[bot]') && github.actor != 'dependabot'"
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false

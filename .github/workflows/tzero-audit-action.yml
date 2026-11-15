@@ -27,7 +27,7 @@ on:
 
 jobs:
   tzero-guard:
-    if: github.actor != 'dependabot[bot]'
+    if: "!endsWith(github.actor, '[bot]') && github.actor != 'dependabot'"
     name: AST Context & Zero-Leak Audit
     runs-on: ubuntu-24.04
     steps:
