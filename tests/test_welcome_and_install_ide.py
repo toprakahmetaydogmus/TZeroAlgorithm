@@ -89,13 +89,17 @@ class TestWelcomeAndInstallIde(unittest.TestCase):
         self.assertIn("cursor", res.stdout.lower())
 
     def test_postinstall_node_script(self):
+        env = os.environ.copy()
+        env["TEST_POSTINSTALL"] = "1"
+        env["TZERO_NO_BANNER"] = "0"
         res = subprocess.run(
             ["node", str(ROOT_DIR / "installers" / "npm" / "bin" / "postinstall.js")],
             capture_output=True,
             text=True,
             encoding="utf-8",
             errors="replace",
-            cwd=str(ROOT_DIR)
+            cwd=str(ROOT_DIR),
+            env=env,
         )
         self.assertEqual(res.returncode, 0)
         self.assertIn("T-ZERO MCP INSTALLED SUCCESSFULLY", res.stdout)
@@ -108,9 +112,9 @@ class TestWelcomeAndInstallIde(unittest.TestCase):
             text=True,
             encoding="utf-8",
             errors="replace",
-            cwd=str(ROOT_DIR)
+            cwd=str(ROOT_DIR),
         )
-        self.assertEqual(res.returncode, 0)
+        self.assertEqual(res.returncode, 0, f"setup.py stderr: {res.stderr}")
         self.assertIn("11.12.1", res.stdout)
 
 

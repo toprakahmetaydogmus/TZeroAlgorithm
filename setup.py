@@ -6,10 +6,19 @@ Developer: Toprak Ahmet Aydoğmuş (Siber Akademi)
 Repository: https://github.com/toprakahmetaydogmus/TZeroAlgorithm
 """
 
+import sys
 from pathlib import Path
-from setuptools import setup
-from setuptools.command.develop import develop
-from setuptools.command.install import install
+
+VERSION = "11.12.1"
+
+# Fast-path for --version
+if len(sys.argv) > 1 and sys.argv[1] in ("--version", "-V"):
+    print(VERSION)
+    sys.exit(0)
+
+from setuptools import setup  # noqa: E402
+from setuptools.command.develop import develop  # noqa: E402
+from setuptools.command.install import install  # noqa: E402
 
 
 def _post_install():
@@ -37,6 +46,8 @@ class PostInstallCommand(install):
 
 if __name__ == "__main__":
     setup(
+        name="tzero-mcp",
+        version=VERSION,
         cmdclass={
             "develop": PostDevelopCommand,
             "install": PostInstallCommand,

@@ -4,7 +4,8 @@
  * T-Zero npm postinstall welcome & GitHub star prompt
  */
 
-const noBanner = process.env.TZERO_NO_BANNER === "1" || process.env.CI === "true" || process.env.npm_config_loglevel === "silent";
+const isTest = process.env.TEST_POSTINSTALL === "1" || process.env.TZERO_FORCE_BANNER === "1";
+const noBanner = !isTest && (process.env.TZERO_NO_BANNER === "1" || process.env.CI === "true" || process.env.npm_config_loglevel === "silent");
 
 if (!noBanner) {
   console.log(`\x1b[36m
