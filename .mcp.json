@@ -1,8 +1,0 @@
-{
-  "mcpServers": {
-    "tzero": {
-      "command": "python",
-      "args": ["tzero/tzero/tzero_mcp.py"]
-    }
-  }
-}

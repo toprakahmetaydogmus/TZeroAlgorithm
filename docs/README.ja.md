@@ -14,7 +14,7 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-purple?style=for-the-badge" alt="License MIT" /></a>
 </p>
 
-[English](../README.md) | [Türkçe](../README.tr.md) | **日本語** | [简体中文](README.zh.md)
+[English](../README.md) | [Türkçe](README.tr.md) | **日本語** | [简体中文](README.zh.md)
 
 ---
 
