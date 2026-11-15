@@ -1,5 +1,17 @@
 # Changelog
 
+## [11.12.1] - 2026-11-15
+
+### Added & Improved (npm Trusted Publishing OIDC, Winget v11.12.1 & Latest Registry Sync)
+- **Official npm Trusted Publishing (OIDC) Integration:**
+  - Configured pure OpenID Connect (OIDC) authentication pipeline for GitHub Actions (`publish-npm.yml`).
+  - Added cryptographic build provenance with Sigstore transparency log verification.
+  - Successfully validated Trusted Publisher settings on npmjs.com for `tzero-mcp`.
+- **Microsoft Winget Manifest v11.12.1 Synchronized:**
+  - Multi-file manifest set updated with schema 1.28.0 and exact binary SHA-256 verification.
+- **Single-Source Version Synchronization:**
+  - Synchronized canonical version 11.12.1 across all 26 package manifests (PyPI, npm, VS Code extension, Homebrew, Scoop, and MCP server declarations).
+
 ## [11.11.0] - 2026-11-14
 
 ### Added (AI Supervisor & Godfather Auto-Corrector, Standalone TZeroCLI.exe & Master Release Bundle)

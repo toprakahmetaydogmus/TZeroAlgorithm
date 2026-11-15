@@ -1,0 +1,14 @@
+# Created using wingetcreate 1.12.8.0
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.installer.1.28.0.schema.json
+
+PackageIdentifier: SiberAkademi.TZero
+PackageVersion: 11.12.1
+InstallerType: portable
+Commands:
+  - tzero
+Installers:
+  - Architecture: x64
+    InstallerUrl: https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/download/v11.12.1/TZeroAlgorithm.exe
+    InstallerSha256: 719E6AB0F57CD9914F9ECA5AC3B375EDA1D74DDB712D8B0F963A00CEAC5777EC
+ManifestType: installer
+ManifestVersion: 1.28.0
