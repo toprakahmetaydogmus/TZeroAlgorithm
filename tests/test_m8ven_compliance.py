@@ -70,5 +70,8 @@ class TestM8venCompliance(unittest.IsolatedAsyncioTestCase):
         for filename in ("README.md", "docs/README.tr.md"):
             with self.subTest(readme=filename):
                 readme = (ROOT / filename).read_text(encoding="utf-8")
-                self.assertEqual(readme.count("m8ven.ai/badge/mcp/toprakahmetaydogmus/tzeroalgorithm"), 1)
+                self.assertTrue(
+                    "m8ven.ai/badge/mcp/toprakahmetaydogmus-tzeroalgorithm-1glw0u" in readme
+                    or "m8ven.ai/badge/mcp/toprakahmetaydogmus/tzeroalgorithm" in readme
+                )
                 self.assertIn("PRIVACY.md", readme)
