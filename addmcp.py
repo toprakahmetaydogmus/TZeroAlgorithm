@@ -1181,7 +1181,7 @@ def run_init(argv: Optional[List[str]] = None) -> int:
 \033[1;36m┌──────────────────────────────────────────────────────────────────────────────┐
 │  ⚡ SIBER AKADEMI T-ZERO CONTEXT ARCHITECT & MCP ENGINE                      │
 │                                                                              │
-│  Engineered by Toprak Ahmet Aydoğmuş (15-year-old solo dev) & Siber Akademi   │
+│  Engineered by Toprak Ahmet Aydoğmuş & Siber Akademi                          │
 │  to eliminate token bloat, costs, and AI hallucinations worldwide.           │
 │  Search "Toprak Ahmet Aydoğmuş" on Google to learn more!                     │
 │                                                                              │

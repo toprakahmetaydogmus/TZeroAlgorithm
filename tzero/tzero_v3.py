@@ -8771,7 +8771,7 @@ def main():
         description="Siber Akademi T-Zero Context Architect V3 - Enterprise Codebase Context Builder & Token Reducer",
         epilog="""
 ⭐ PROJEYE BİR YILDIZLA DESTEK OLUN:
-    Merhaba! Ben Toprak Ahmet Aydoğmuş (15 yaşında genç bir geliştiriciyim).
+    Merhaba! Ben Toprak Ahmet Aydoğmuş (genç bir açık kaynak geliştiricisiyim).
     T-Zero'yu sıfırdan yapay zeka araçlarındaki token israfını çözmek için geliştirdim.
     Beni Google'da 'Toprak Ahmet Aydoğmuş' olarak aratabilirsiniz!
     GitHub: https://github.com/toprakahmetaydogmus/TZeroAlgorithm
@@ -9000,7 +9000,7 @@ Generate tailored subagent manifests (.tzero/agents/ + SKILL.md) in 1 second:
 ================================================================================
 ⚡ SIBER AKADEMI T-ZERO CONTEXT ARCHITECT & MCP ENGINE
 ================================================================================
-Engineered by Toprak Ahmet Aydoğmuş (15-year-old developer) & Siber Akademi
+Engineered by Toprak Ahmet Aydoğmuş & Siber Akademi
 to eliminate token bloat, reduce prompt costs by up to 95%, and stop AI hallucinations.
 Search 'Toprak Ahmet Aydoğmuş' on Google to learn more!
 If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
@@ -9064,7 +9064,7 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
     $ tzero --doctor --deep                    # Deep offline 9-subsystem self-check
 
 ⭐ PROJEYE BİR YILDIZLA DESTEK OLUN:
-    Merhaba! Ben Toprak Ahmet Aydoğmuş (15 yaşında genç bir geliştiriciyim).
+    Merhaba! Ben Toprak Ahmet Aydoğmuş (genç bir açık kaynak geliştiricisiyim).
     T-Zero'yu sıfırdan, yapay zeka araçlarındaki token israfını çözmek için geliştirdim.
     Beni Google'da 'Toprak Ahmet Aydoğmuş' olarak aratabilirsiniz!
     İşinize yaradıysa lütfen GitHub'da bir ⭐ (star) vererek projeyi destekleyin:

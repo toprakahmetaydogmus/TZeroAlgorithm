@@ -6,7 +6,7 @@ body:
     attributes:
       value: |
         Thanks for filing a bug report! Please provide as much detail as possible.
-        ⭐ **Support the Project:** If T-Zero has helped your development, please consider [leaving a star on GitHub](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)! Every star helps an independent 15-year-old open-source builder reach our 100-star milestone.
+        ⭐ **Support the Project:** If T-Zero has helped your development, please consider [leaving a star on GitHub](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)! Every star helps an independent young open-source builder reach our 100-star milestone.
   - type: input
     id: version
     attributes:

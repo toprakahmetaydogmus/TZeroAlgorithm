@@ -33,7 +33,7 @@ def get_welcome_banner(version: str = VERSION) -> str:
 │  ⭐ WELCOME TO T-ZERO CONTEXT ARCHITECT & MCP SUITE (v{version})               │
 ├──────────────────────────────────────────────────────────────────────────────┤
 │                                                                              │
-│  Hi! I'm Toprak Ahmet Aydoğmuş (15-year-old solo engineer at Siber Akademi). │
+│  Hi! I'm Toprak Ahmet Aydoğmuş (independent engineer at Siber Akademi).      │
 │  Thank you for cloning & checking out T-Zero!                                │
 │                                                                              │
 │  T-Zero slashes AI coding prompt tokens by 85–95% using deterministic AST    │

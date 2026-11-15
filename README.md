@@ -37,10 +37,10 @@
 ### 🌟 Road to 100 GitHub Stars Milestone: Help Us Hit #100!
 [![GitHub Repo Stars](https://img.shields.io/badge/Current%20Stars-16%20%2F%20100%20Milestone-f59e0b?style=for-the-badge&logo=github&logoColor=white)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)
 [![100% Free & Open Source](https://img.shields.io/badge/Price-%240.00%20(100%25%20Free)-10b981?style=for-the-badge&logo=opensourceinitiative&logoColor=white)](LICENSE)
-[![Solo Engineer](https://img.shields.io/badge/Author-Toprak%20(15%20y%2Fo)-8b5cf6?style=for-the-badge&logo=visualstudiocode&logoColor=white)](https://linkedin.com/in/toprak-ahmet-aydo%C4%9Fmu%C5%9F-60462534b/)
+[![Author](https://img.shields.io/badge/Author-Toprak%20Ahmet%20Aydo%C4%9Fmu%C5%9F-8b5cf6?style=for-the-badge&logo=visualstudiocode&logoColor=white)](https://linkedin.com/in/toprak-ahmet-aydo%C4%9Fmu%C5%9F-60462534b/)
 
 > **If T-Zero cuts your LLM prompt tokens or saves you API bills in Cursor / Claude, please give us a star! ⭐**  
-> *Every star supports an independent 15-year-old developer keeping this project 100% free, offline, and zero-leak.*
+> *Every star supports an independent developer keeping this project 100% free, offline, and zero-leak.*
 
 </div>
 
@@ -48,7 +48,7 @@
 
 <div align="center">
 
-[![VS Code Marketplace](https://img.shields.io/visual-studio-marketplace/v/siber-akademi.tzero-vscode?style=for-the-badge&logo=visual-studio-code&logoColor=white&label=VS%20Code%20Marketplace&color=007ACC)](https://marketplace.visualstudio.com/items?itemName=siber-akademi.tzero-vscode)
+[![VS Code Marketplace](https://img.shields.io/badge/VS%20Code%20Marketplace-v11.12.1-007ACC?style=for-the-badge&logo=visualstudiocode&logoColor=white)](https://marketplace.visualstudio.com/items?itemName=siber-akademi.tzero-vscode)
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/toprakahmetaydogmus/TZeroAlgorithm)
 [![Smithery Registry](https://img.shields.io/badge/%E2%9A%A1%20Smithery%20MCP-Compatible%20v11.12.1-FF5722?style=for-the-badge&logo=dependabot&logoColor=white)](https://smithery.ai)
 [![npm Package](https://img.shields.io/badge/%F0%9F%93%A6%20npm-tzero--mcp-cb3837?style=for-the-badge&logo=npm&logoColor=white)](https://www.npmjs.com/package/tzero-mcp)
