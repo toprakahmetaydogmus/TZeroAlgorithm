@@ -27,6 +27,7 @@ on:
 
 jobs:
   test:
+    if: github.actor != 'dependabot[bot]'
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false

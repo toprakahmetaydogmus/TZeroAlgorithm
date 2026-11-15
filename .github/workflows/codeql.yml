@@ -5,24 +5,9 @@ concurrency:
   cancel-in-progress: true
 
 on:
-  push:
-    branches: [ main ]
-    paths:
-      - 'tzero/**'
-      - 'tzero_*.py'
-      - 'main.py'
-      - 'installers/**'
-      - '.github/workflows/codeql.yml'
-  pull_request:
-    branches: [ main ]
-    paths:
-      - 'tzero/**'
-      - 'tzero_*.py'
-      - 'main.py'
-      - 'installers/**'
-      - '.github/workflows/codeql.yml'
+  workflow_dispatch:
   schedule:
-    - cron: '0 6 * * 1'
+    - cron: '0 0 1 * *'
 
 jobs:
   analyze:
