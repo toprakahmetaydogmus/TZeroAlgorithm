@@ -44,18 +44,18 @@ E-posta: toprakahmetileq@gmail.com
 ## 🐦 2. Twitter / X Paylaşım Metni (Doğrudan Kopyala - Yapıştır)
 
 ```text
-15 yaşında bir lise öğrencisi olarak, yapay zekanın kod yazarken yaptığı token israfını ve uydurma (halüsinatif) kod üretimini %100 yerel ve çevrimdışı çözen T-Zero algoritmasını geliştirdim! 🚀
+Bir teknik kolej / lise öğrencisi olarak, yapay zekanın kod yazarken yaptığı token israfını ve uydurma (halüsinatif) kod üretimini %100 yerel ve çevrimdışı çözen T-Zero algoritmasını geliştirdim! 🚀
 
 - %95 token tasarrufu
 - %0.0 halüsinasyon kaçış oranı
 - 556 otomatik test & MIT açık kaynak
 
-Daha büyük yerli modelleri test edebilmek için yüksek performanslı bir bilgisayara/iş istasyonuna ihtiyacım var. Milli Teknoloji Hamlesi'nde yerli yazılıma desteklerinizi rica ederim. 🙏🇹🇷
+Daha büyük yerli modelleri test edebilmek için yüksek performanslı bir bilgisayara/iş istasyonuna ihtiyacım var. Bize destek olacak teknoloji markamızın logosu projemizin tüm terminal açılışlarında ve GitHub ana sayfasında resmi sponsor olarak yer alacaktır. Milli Teknoloji Hamlesi'nde desteğinizi rica ederim. 🙏🇹🇷
 
 ⭐ GitHub: https://github.com/toprakahmetaydogmus/TZeroAlgorithm
 🌐 Canlı Demo: https://tzero-indol.vercel.app
 
-@Selcuk @haluk @t3vakfi @bilisimvadisi @savunmasanayii
+@Selcuk @haluk @t3vakfi @monsternotebook @bilisimvadisi @savunmasanayii
 #MilliTeknolojiHamlesi #TEKNOFEST #YapayZeka #OpenSource
 ```
 
