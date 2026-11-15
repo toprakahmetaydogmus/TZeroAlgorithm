@@ -1,10 +1,29 @@
 name: T-Zero Codebase & Security Guard
 
+concurrency:
+  group: tzero-audit-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
+  workflow_dispatch:
   push:
     branches: [ main ]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'assets/**'
+      - 'benchmark-site/**'
+      - '.gitignore'
+      - 'LICENSE'
   pull_request:
     branches: [ main ]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'assets/**'
+      - 'benchmark-site/**'
+      - '.gitignore'
+      - 'LICENSE'
 
 jobs:
   tzero-guard:
@@ -20,3 +39,4 @@ jobs:
           mode: 'audit'
           audit-level: 'strict'
           enforce-boundaries: 'false'
+

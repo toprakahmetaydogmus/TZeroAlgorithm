@@ -4,6 +4,10 @@ name: Release
 #   * Push a version tag like v3.0.3  -> test, build, and create/update the release.
 #   * Run manually (Actions tab) -> test and build only; all executables are attached as artifacts.
 
+concurrency:
+  group: release-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   workflow_dispatch:
     inputs:
@@ -24,6 +28,7 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
+          cache: 'pip'
 
       - name: Install dependencies and package
         shell: pwsh
