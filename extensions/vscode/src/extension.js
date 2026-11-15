@@ -47,10 +47,16 @@ function runTZeroCli(args, cwd, stdinText) {
 
 function runInTerminal(args) {
     const exe = getExecutablePath();
-    const cmdLine = [core.quoteTerminalArg(exe), ...args.map((a) => core.quoteTerminalArg(a))].join(' ');
-    const term = vscode.window.createTerminal('T-Zero Architect');
+    const command = core.buildTerminalCommand(exe, args);
+    // The quoting rules above target PowerShell on Windows and POSIX sh elsewhere;
+    // do not send them to an arbitrary user-configured shell such as cmd.exe.
+    const windows = process.platform === 'win32';
+    const shellPath = windows
+        ? path.join(process.env.SystemRoot || 'C:\\Windows', 'System32', 'WindowsPowerShell', 'v1.0', 'powershell.exe')
+        : '/bin/sh';
+    const term = vscode.window.createTerminal({ name: 'T-Zero Architect', shellPath });
     term.show();
-    term.sendText(cmdLine);
+    term.sendText(command);
 }
 
 function activate(context) {

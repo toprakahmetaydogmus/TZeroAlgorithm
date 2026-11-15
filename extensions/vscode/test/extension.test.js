@@ -2,9 +2,21 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('node:path');
 const fs = require('node:fs');
+const { spawnSync } = require('node:child_process');
 
 const extRoot = path.resolve(__dirname, '..');
 const pkg = JSON.parse(fs.readFileSync(path.join(extRoot, 'package.json'), 'utf8'));
+
+test('terminal command preserves arguments in its explicitly selected shell', () => {
+    const core = require('../src/core');
+    const args = ['-e', 'process.stdout.write(JSON.stringify(process.argv.slice(1)))', "a b' $HOME;echo BAD"];
+    const command = core.buildTerminalCommand(process.execPath, args);
+    const windows = process.platform === 'win32';
+    const shell = windows ? path.join(process.env.SystemRoot || 'C:\\Windows', 'System32', 'WindowsPowerShell', 'v1.0', 'powershell.exe') : '/bin/sh';
+    const result = spawnSync(shell, windows ? ['-NoProfile', '-Command', command] : ['-c', command], { encoding: 'utf8' });
+    assert.equal(result.status, 0, result.stderr);
+    assert.deepEqual(JSON.parse(result.stdout), [args[2]]);
+});
 
 test('package.json defines 11.0.0 metadata, sidebar viewContainer, and commands with zero runtime deps', () => {
     assert.equal(pkg.version, '11.14.0');

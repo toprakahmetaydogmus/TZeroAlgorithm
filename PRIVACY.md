@@ -18,3 +18,10 @@ credentials in benchmark inputs or outputs.
 Installing packages, downloading tokenizer data on first use, visiting a
 hosted demo, or using optional network features may contact the relevant
 external service. The offline deep diagnostic avoids downloading tokenizer data.
+
+The optional legacy `jarvis_zero_key_query` tool can send its prompt and system
+prompt to an external inference provider if local Ollama is unavailable. Do
+not use it for private source code, credentials, or other sensitive information
+unless you have independently reviewed and accepted that provider's current
+terms. Provider availability and pricing can change. The optional AI-assisted
+architecture blueprint can also send project context to a configured provider.

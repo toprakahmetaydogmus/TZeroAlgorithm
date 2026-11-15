@@ -20,6 +20,12 @@ function quoteTerminalArg(arg, platform) {
     return `'${raw.replace(/'/g, "'\\''")}'`;
 }
 
+function buildTerminalCommand(executable, args, platform) {
+    const plat = platform || process.platform;
+    const command = [executable, ...args].map((arg) => quoteTerminalArg(arg, plat)).join(' ');
+    return plat === 'win32' ? `& ${command}` : command;
+}
+
 function estimateTokenCount(text) {
     if (!text || typeof text !== 'string') {
         return 0;
@@ -366,6 +372,7 @@ function buildSidebarHtml(state) {
 module.exports = {
     resolveExecutable,
     quoteTerminalArg,
+    buildTerminalCommand,
     estimateTokenCount,
     parseScanJson,
     formatCompactTokens,
