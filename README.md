@@ -12,7 +12,7 @@
 [![Live Vercel Hub](https://img.shields.io/badge/%E2%9A%A1%20Live%20Benchmark-Vercel%20Gateway-000000?style=for-the-badge&logo=vercel)](https://tzero-indol.vercel.app)
 [![Glama MCP Badge](https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm/badges/score.svg)](https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm)
 [![M8ven Score](https://m8ven.ai/badge/mcp/toprakahmetaydogmus/tzeroalgorithm)](https://m8ven.ai/mcp/toprakahmetaydogmus/tzeroalgorithm?s=readme)
-[![TDQS 5.0/5.0](https://img.shields.io/badge/TDQS-5.0%20%2F%205.0%20Anchor%20Certified-10b981?style=flat-square&logo=checkmarx&logoColor=white)](#tdqs-certification)
+[![TDQS](https://img.shields.io/badge/TDQS-Glama%20score-blue?style=flat-square)](https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm/schema)
 [![PyPI Version](https://img.shields.io/pypi/v/tzero-mcp?color=38bdf8&style=flat-square&logo=pypi)](https://pypi.org/project/tzero-mcp/)
 [![npm Version](https://img.shields.io/npm/v/tzero-mcp?color=cb3837&style=flat-square&logo=npm)](https://www.npmjs.com/package/tzero-mcp)
 [![Python Version](https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13-blue?style=flat-square)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions)
@@ -109,7 +109,7 @@ code --install-extension dist/tzero-vscode-11.14.0.vsix
 [![Technical Whitepaper](https://img.shields.io/badge/%F0%9F%93%91%20Scientific%20Whitepaper-v10.7%20Specification-0284c7?style=for-the-badge&logo=googledocs&logoColor=white)](docs/WHITE_PAPER_TZERO_V10.md)
 [![T-Zero PC-Fixer](https://img.shields.io/badge/T--Zero%20PC--Fixer-12%2C200%2B%20Lines%20Doctor-purple?style=for-the-badge&logo=shield&logoColor=white)](https://github.com/toprakahmetaydogmus/tzero-pc-fixer)
 
-[![TDQS 5.0 Anchor](https://img.shields.io/badge/TDQS_5.0-Anchor_Certified-10b981?style=for-the-badge&logo=checkmarx&logoColor=white)](#tdqs-certification)
+[![TDQS on Glama](https://img.shields.io/badge/TDQS-Glama%20score-blue?style=for-the-badge)](https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm/schema)
 [![Why T-Zero](https://img.shields.io/badge/Why_T--Zero-0284c7?style=for-the-badge&logo=rocket&logoColor=white)](#why-t-zero)
 [![Task Benchmark](https://img.shields.io/badge/Task_Benchmark-10b981?style=for-the-badge&logo=speedtest&logoColor=white)](#task-completion-benchmark)
 [![IDE Setup](https://img.shields.io/badge/IDE_Setup-6366f1?style=for-the-badge&logo=visualstudiocode&logoColor=white)](#universal-1-click-ide-setup)
@@ -120,7 +120,7 @@ code --install-extension dist/tzero-vscode-11.14.0.vsix
 [![Türkçe Dokümantasyon](https://img.shields.io/badge/T%C3%BCrk%C3%A7e-Rehber-dc2626?style=for-the-badge&logo=googletranslate&logoColor=white)](#turkce)
 
 <p align="center">
-  <b><a href="#tdqs-certification">TDQS 5.0</a></b> &bull; 
+  <b><a href="#tdqs-certification">Tool quality</a></b> &bull;
   <b><a href="#why-t-zero">Why T-Zero</a></b> &bull; 
   <b><a href="#task-completion-benchmark">Task Benchmark</a></b> &bull; 
   <b><a href="#universal-1-click-ide-setup">Universal IDE Setup</a></b> &bull; 
@@ -355,9 +355,9 @@ tzero swarm "Migrate database schema and optimize websocket streaming"
 ---
 
 <a id="tdqs-certification"></a>
-## 🏆 100% TDQS 5.0 / 5.0 Anchor Certification Standard
+## Tool definition quality
 
-T-Zero is officially certified at **TDQS 5.0 / 5.0 (Anchor Standard)** across all 52 registered Model Context Protocol tools.
+See the [Glama schema page](https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm/schema) for its dated independent TDQS score and evaluated tool set. Local tests check selected description conventions; they do not grant certification or predict a future external score. The default and full tool modes expose different catalogs.
 
 ### What is TDQS (Tool Documentation Quality Score)?
 Frontier LLMs (Claude 3.5 Sonnet, GPT-4o, Gemini 1.5/2.0 Pro) rely exclusively on tool docstrings and parameter schemas to decide:
@@ -367,25 +367,24 @@ Frontier LLMs (Claude 3.5 Sonnet, GPT-4o, Gemini 1.5/2.0 Pro) rely exclusively o
 
 When tool descriptions are vague or contradictory, AI models suffer from **Tool Hallucination**, calling the wrong tool or inventing arguments.
 
-### The 6 Audited Mathematical Dimensions:
-| Dimension | Weight | Anchor 5 Standard Requirement | T-Zero Audit Result |
+### Local description checks:
+| Dimension | Weight | Anchor 5 Standard Requirement | Local convention |
 | :--- | :---: | :--- | :---: |
-| **1. Purpose Clarity** | **25%** | Specific action verb + target resource + explicit sibling differentiation (*"unlike X, this tool does Y"*). Zero tautological phrasing. | **100% PASS** |
-| **2. Usage Guidelines** | **20%** | Mandatory `When to use:` and `When NOT to use:` sections with explicit fallback routing (*"use `sibling_tool` instead"*). | **100% PASS** |
-| **3. Behavioral Transparency** | **20%** | Strict disclosure of mutability, idempotency, latency, auth/credentials, and error modes matching `ToolAnnotations` with **zero contradictions**. | **100% PASS** |
-| **4. Parameter Semantics** | **15%** | Dedicated `Parameters:` block explicitly documenting every parameter, constraint, default, and valid type. | **100% PASS** |
-| **5. Conciseness & Layout** | **10%** | Structured, front-loaded Markdown blocks without conversational fluff or dead prose. | **100% PASS** |
-| **6. Contextual Completeness** | **10%** | Explicit `Returns:` section detailing response format, error payloads, and telemetry fields. | **100% PASS** |
+| **1. Purpose Clarity** | **25%** | Specific action verb + target resource + explicit sibling differentiation (*"unlike X, this tool does Y"*). Zero tautological phrasing. | Checked by local tests |
+| **2. Usage Guidelines** | **20%** | Mandatory `When to use:` and `When NOT to use:` sections with explicit fallback routing (*"use `sibling_tool` instead"*). | Checked by local tests |
+| **3. Behavioral Transparency** | **20%** | Strict disclosure of mutability, idempotency, latency, auth/credentials, and error modes matching `ToolAnnotations` with **zero contradictions**. | Checked by local tests |
+| **4. Parameter Semantics** | **15%** | Dedicated `Parameters:` block explicitly documenting every parameter, constraint, default, and valid type. | Checked by local tests |
+| **5. Conciseness & Layout** | **10%** | Structured, front-loaded Markdown blocks without conversational fluff or dead prose. | Checked by local tests |
+| **6. Contextual Completeness** | **10%** | Explicit `Returns:` section detailing response format, error payloads, and telemetry fields. | Checked by local tests |
 
 ### Automated Verification Pipeline:
 Every single tool is continuously audited in CI via:
 ```bash
-# Automated TDQS 5.0/5.0 unit test:
+# Local description convention test:
 python -m unittest tests/test_tdqs_anchor5.py -v
 
 # Full 52-tool audit runner:
 python scripts/comprehensive_tdqs_audit.py
-# Output: ✅ PERFECT 5/5! No issues detected across all 52 tools!
 ```
 
 ---

@@ -32,9 +32,9 @@ class TestM8venCompliance(unittest.IsolatedAsyncioTestCase):
         with patch.dict(os.environ, {"TZERO_MCP_TOOL_MODE": "canonical"}):
             tools = await tzero_mcp.create_mcp_server().list_tools()
         annotations = {tool.name: tool.annotations.model_dump(by_alias=True) for tool in tools}
-        for name in ("generate_architectural_passport", "transpile_model_bridge", "prove_zero_hallucination"):
+        for name in ("generate_architectural_passport", "transpile_model_bridge"):
             self.assertIs(annotations[name]["readOnlyHint"], True)
-        for name in ("build_ast_snapshot", "diagnose_and_heal_system"):
+        for name in ("build_ast_snapshot", "diagnose_and_heal_system", "prove_zero_hallucination"):
             self.assertIs(annotations[name]["readOnlyHint"], False)
 
     def test_static_catalog_and_fixer_annotations(self):

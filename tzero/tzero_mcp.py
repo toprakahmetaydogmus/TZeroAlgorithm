@@ -258,12 +258,20 @@ def create_mcp_server():
 
     # mcp 2.x (MCPServer) accepts description/version; mcp 1.x (FastMCP) only knows
     # `instructions`. Pass whichever the installed SDK supports so both versions start.
-    summary = "Enterprise-Grade Codebase Context Architect, AST Signatures Analyzer, & Token Reducer"
+    summary = (
+        "Local codebase analysis and context tools. Choose build_project_context for repository "
+        "context, generate_architectural_passport for one Python file, build_ast_snapshot to "
+        "write an index, and generate_architecture_blueprint for diagrams. Use audit_code_quality "
+        "for findings, heal_hallucinated_code for an in-memory candidate, and "
+        "diagnose_and_heal_system for workspace diagnosis or repair. "
+        "execute_codebase_workflow is a compatibility router; prefer the dedicated tools. "
+        "Some operations write files or call external services; inspect tool arguments first."
+    )
     supported = inspect.signature(ServerClass.__init__).parameters
     server_kwargs: Dict[str, Any] = {"name": "tzero-context-engine"}
     if "description" in supported:
         server_kwargs["description"] = summary
-    elif "instructions" in supported:
+    if "instructions" in supported:
         server_kwargs["instructions"] = summary
     if "version" in supported:
         server_kwargs["version"] = SERVER_VERSION
@@ -2939,7 +2947,7 @@ def create_mcp_server():
         name="build_project_context",
         title="Build Hierarchical AST Codebase Context Tree",
         description=(
-            "Scans repository directories to construct a token-optimized hierarchical AST context tree (T-1 to T-4) for LLM prompts, distinguishing from 'prune_code_snippet' and 'search_codebase' by constructing multi-tier repository architecture outlines rather than pruning isolated in-memory snippets or executing keyword searches.\n"
+            "Returns repository-wide context or a selected context view without persisting an index; distinguishing from 'build_ast_snapshot' which writes a cache and 'generate_architectural_passport' which analyzes one Python file.\n"
             "\n"
             "Parameters:\n"
             "- `project_root`: File system directory path; accepts relative or absolute paths, resolving symlinks and automatically skipping .git, node_modules, venv, and binary artifacts.\n"
@@ -4018,7 +4026,7 @@ def create_mcp_server():
         name="build_ast_snapshot",
         title="Build Persistent AST Context Snapshot Cache",
         description=(
-            "Pre-computes and caches high-speed AST symbols, module dependency graphs, and token metrics into a persistent '.tzero/snapshot.json' index, distinguishing from 'build_project_context' and 'search_codebase' by enabling sub-8ms instant context retrieval across multi-turn sessions rather than recalculating full AST representations on every invocation.\n"
+            "Creates or reuses a persistent '.tzero/snapshot.json' AST index and returns cache status, distinguishing from 'build_project_context' which returns context without writing a snapshot and 'generate_architectural_passport' which inspects one file.\n"
             "\n"
             "Parameters:\n"
             "- `workspace_dir` (str, optional, default='.'): Target repository root directory containing source code to index.\n"
@@ -4121,28 +4129,28 @@ def create_mcp_server():
 
     @server.tool(
         name="prove_zero_hallucination",
-        title="Empirical Zero-Hallucination Proof Benchmark",
+        title="Run Hallucination Detection Benchmark",
         description=(
-            "Executes an empirical 60-scenario benchmark mathematically and practically proving a 0.0% AI hallucination escape rate with T-Zero's pre-flight reality-lock compiler, distinguishing from 'verify_hallucination_guard' and 'audit_codebase_quality' by running a formal empirical evaluation suite across 9 hallucination categories rather than verifying a single code snippet.\n"
+            "Runs a fixed 60-scenario hallucination detection benchmark, distinguishing from 'heal_hallucinated_code' for a single candidate snippet and 'audit_code_quality' for repository findings. Results apply only to the tested cases and do not prove absence of other hallucinations.\n"
             "\n"
             "Parameters:\n"
             "- `workspace_dir` (str, optional, default='.'): Target repository root directory containing ground-truth AST symbol definitions.\n"
             "- `export_docs` (bool, optional, default=True): When True, updates docs/ZERO_HALLUCINATION_PROOF.md and docs/zero_hallucination_proof.json.\n"
             "\n"
             "Behavior:\n"
-            "- Read-only: Runs 60 benchmark tests in memory across ghost dependencies, stdlib typos, workspace symbols, schema fields, and signatures without mutating workspace files.\n"
-            "- Idempotent: Deterministic 100.0% detection rate and 0.0% escape rate on repeated runs.\n"
+            "- Mutability: export_docs=True writes benchmark artifacts in docs/ relative to the server working directory; False avoids those writes.\n"
+            "- Idempotency: Report timestamps and measured latencies may differ between runs.\n"
             "- 100% Offline: Operates entirely locally with zero external network access.\n"
             "- Auth & Rate Limits: Zero authentication or cloud credentials required; completes in <100ms.\n"
             "- Error Handling: Emits clean verification status and confusion matrix.\n"
             "\n"
             "Usage Guidelines:\n"
-            "- When to use: Run to verify and mathematically prove that T-Zero's AST reality-lock eliminates 100% of LLM hallucinations before deployment.\n"
-            "- When NOT to use: Do not use for checking single candidate code snippets (use 'verify_hallucination_guard' instead); do not use for security secret scans (use 'verify_zero_leak_security' instead).\n"
+            "- When to use: Measure detection and false-positive rates on the bundled scenarios before or after changes.\n"
+            "- When NOT to use: Do not use for inspecting a single candidate snippet (use 'heal_hallucinated_code' instead); do not use for secret scans (use 'verify_security_guard' instead).\n"
             "\n"
-            "Returns: Comprehensive Markdown proof report with confusion matrix, detection KPI metrics, mathematical theorem, and benchmark breakdown."
+            "Returns: Markdown benchmark results with case counts, detection and false-positive rates, and latency."
         ),
-        annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
+        annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=False, open_world_hint=False)
     )
     def prove_zero_hallucination(
         workspace_dir: Annotated[str, Field(default=".", description="Target repository root directory (default: current directory).")] = ".",
@@ -4151,27 +4159,28 @@ def create_mcp_server():
         """Executes the 60-scenario empirical zero-hallucination benchmark and returns proof report."""
         from tzero.tzero_hallucination_proof import HallucinationProofEngine
         rep = HallucinationProofEngine.run_proof_benchmark(workspace_dir)
-        if export_docs:
-            HallucinationProofEngine.export_artifacts(rep, "docs")
-
         md_report = (
-            f"# 🧠 T-Zero Zero-Hallucination Empirical Proof (0.0% Escape Rate)\n\n"
+            f"# 🧠 T-Zero Hallucination Detection Benchmark\n\n"
             f"- **Evaluated Workspace:** `{rep.workspace_dir}`\n"
             f"- **Timestamp:** `{rep.timestamp}`\n"
             f"- **Total Scenarios Evaluated:** {rep.total_cases}\n\n"
             f"### 📊 Key Verification Metrics:\n"
             f"- **Hallucinated Cases Tested:** {rep.hallucinated_cases}\n"
             f"- **Hallucinations Intercepted:** {rep.detected_hallucinations} / {rep.hallucinated_cases} (**{rep.detection_rate}% Recall**)\n"
-            f"- **Escaped Hallucinations:** **{rep.escaped_hallucinations} ({rep.escape_rate}% ESCAPE RATE - PROVEN ZERO!)**\n"
+            f"- **Escaped Hallucinations:** **{rep.escaped_hallucinations} ({rep.escape_rate}% on tested cases)**\n"
             f"- **Clean Control Passed:** {rep.clean_passed} / {rep.clean_cases} (**{rep.false_positive_rate}% False Positive Rate**)\n"
             f"- **Pre-Flight Accuracy:** **{rep.accuracy}%**\n"
             f"- **Self-Healing AST Syntheses:** {rep.auto_healed_count} cases auto-corrected (**{rep.auto_heal_rate}%**)\n"
             f"- **Average Verification Latency:** {rep.avg_latency_ms} ms / snippet\n\n"
-            f"### 🎯 Mathematical Invariant Theorem:\n"
-            f"> Under the T-Zero Pre-Flight Reality-Lock compiler gate, the workspace symbol universe $V_{{\\text{{universe}}}} = V_{{\\text{{workspace}}}} \\cup V_{{\\text{{stdlib}}}} \\cup V_{{\\text{{manifest}}}}$ is finite and statically closed.\n"
-            f"> For any proposed AST reference $r$, $\\text{{Decision}}(r) = [r \\in V_{{\\text{{universe}}}}] \\in \\{{0, 1\\}}$.\n"
-            f"> Therefore, $\\text{{False Negative Rate (FNR)}} = 0.0\\%$. Code with hallucinations is provably blocked before application."
+            f"Results describe this benchmark only; they do not establish a general false-negative rate or guarantee correctness."
         )
+        if export_docs:
+            from dataclasses import asdict
+            os.makedirs("docs", exist_ok=True)
+            with open(os.path.join("docs", "zero_hallucination_proof.json"), "w", encoding="utf-8") as fp:
+                json.dump(asdict(rep), fp, indent=2)
+            with open(os.path.join("docs", "ZERO_HALLUCINATION_PROOF.md"), "w", encoding="utf-8") as fp:
+                fp.write(md_report + "\n")
         return md_report
 
     @server.tool(
@@ -4291,7 +4300,7 @@ def create_mcp_server():
         name="generate_architectural_passport",
         title="Generate High Density AST Architectural Passport for LLMs",
         description=(
-            "Generates an ultra-dense, prompt-ready AST architectural passport for a target source file, distinguishing from 'build_project_context' which outputs a multi-tier repository tree and 'generate_architecture_blueprint' which builds Mermaid diagrams by distilling module purpose, layer role, cyclomatic complexity, exported symbol contracts, and dependency topologies into a compact prompt block with up to 95% token savings.\n"
+            "Returns a compact architectural passport for one Python file, distinguishing from 'build_project_context' for repository context, 'build_ast_snapshot' for a persisted index, and 'generate_architecture_blueprint' for repository diagrams.\n"
             "\n"
             "Parameters:\n"
             "- `file_path` (str, required): Absolute or relative path to the Python source code file to analyze.\n"
@@ -4337,7 +4346,7 @@ def create_mcp_server():
         name="execute_codebase_workflow",
         title="Execute Composite Multi Step Codebase Workflow",
         description=(
-            "Executes autonomous composite codebase analysis, context generation, and security pipelines in a single command, distinguishing from 'build_project_context', 'audit_code_quality', and 'verify_security_guard' by orchestrating end-to-end multi-step intelligence workflows rather than running isolated single-purpose context builds, quality audits, or secret scans.\n"
+            "Compatibility router for combined reports, distinguishing from 'build_project_context' and 'audit_code_quality' by combining analyses when action='auto'; for individual tasks use the dedicated tools directly.\n"
             "\n"
             "Parameters:\n"
             "- `action`: Workflow operation: 'auto' runs comprehensive all-in-one audit & context pipeline; 'context' builds AST context tree; 'audit' checks code quality & smells; 'security' runs Zero-Leak secret scan; 'blueprint' generates Mermaid architecture; 'dependencies' maps import topology; 'impact' evaluates blast radius of modified symbols; 'search' performs hybrid BM25 code search; 'prune' strips in-memory AST bodies; 'heal' runs AST self-healing; 'memory' manages episodic memory; 'swarm' coordinates multi-agent consensus.\n"
@@ -4346,21 +4355,21 @@ def create_mcp_server():
             "- `options`: Optional JSON string specifying extra configuration parameters (e.g. {\"reduction_mode\": \"ultra\", \"max_tokens\": 32000, \"depth\": 4}).\n"
             "\n"
             "Behavior:\n"
-            "- Mutability: Read-only for analysis actions ('auto', 'context', 'audit', 'security', 'blueprint', 'dependencies', 'impact', 'search'); state-modifying only when executing explicit 'heal' patches or 'memory' resets.\n"
-            "- Idempotency: Deterministic execution across all analytical and context-generation workflows.\n"
-            "- Privacy & Network: 100% offline local execution; zero telemetry or external network calls.\n"
-            "- Performance & Resources: Executes composite pipeline in <500ms using <60MB RAM; thread-safe.\n"
+            "- Mutability: Depends on action and options. Security may install hooks; rules, memory, sync, healing, merge, and generated tests can modify files.\n"
+            "- Idempotency: Not guaranteed for state-changing operations.\n"
+            "- Privacy & Network: Most analysis is local, but blueprint with use_ai can contact a configured provider and transmit context.\n"
+            "- Performance & Resources: Runtime and memory depend on workspace size and selected operation.\n"
             "- Auth: Zero authentication or cloud credentials required.\n"
             "- Return Structure: Emits comprehensive executive Markdown report tailored to the requested action or full autonomous pipeline.\n"
             "- Error Handling: Gracefully reports clean diagnostic notices for missing paths, unparseable files, or invalid JSON options without crashing.\n"
             "\n"
             "Usage Guidelines:\n"
-            "- When to use: Use whenever you want an instant complete overview of a codebase, or want to perform any T-Zero operation through a single unified entrypoint without choosing between individual tools.\n"
+            "- When to use: Use action='auto' for a combined report or retain this router for compatibility with existing clients.\n"
             "- When NOT to use: Do not use when an isolated single-purpose operation is sufficient, such as generating an AST context tree (use 'build_project_context' instead), auditing code smells (use 'audit_code_quality' instead), scanning secrets (use 'verify_security_guard' instead), or pruning an in-memory snippet (use 'prune_code_snippet' instead).\n"
             "\n"
             "Returns: Comprehensive Markdown report tailored to the requested action or full autonomous pipeline.\n"
         ),
-        annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
+        annotations=ToolAnnotations(read_only_hint=False, destructive_hint=True, idempotent_hint=False, open_world_hint=True)
     )
     async def execute_codebase_workflow(
         action: Annotated[str, Field(default="auto", description="Workflow operation: 'auto' (comprehensive all-in-one pipeline), 'context', 'audit', 'security', 'blueprint', 'dependencies', 'impact', 'search', 'prune', 'heal', 'memory', 'swarm', 'design'.")] = "auto",
@@ -4433,32 +4442,30 @@ def create_mcp_server():
             return generate_architecture_blueprint(project_root=target, use_ai=use_ai)
 
         elif act in ("dependencies", "deps", "imports"):
-            focus_f = opts.get("focus_file", query)
-            inc_ext = bool(opts.get("include_external", True))
-            return analyze_code_dependencies(project_root=target, focus_file=focus_f, include_external=inc_ext)
+            return analyze_code_dependencies(project_root=target, analysis_type=opts.get("analysis_type", "dependencies"), target_symbol=opts.get("target_symbol", query), file_path=opts.get("file_path", opts.get("focus_file", "")))
 
         elif act in ("impact", "blast_radius"):
             symbol = query or opts.get("symbol_name", "")
             if not symbol and not os.path.isdir(target):
                 symbol = os.path.basename(target)
-            return analyze_change_impact(symbol_name=symbol, project_root=target if os.path.isdir(target) else ".")
+            return analyze_change_impact(target_symbol=symbol, project_root=target if os.path.isdir(target) else ".", file_path=opts.get("file_path", ""))
 
         elif act in ("search", "find", "semantic"):
             limit = int(opts.get("limit", 8))
-            return search_codebase(query=query or target, project_root="." if os.path.isfile(target) else target, limit=limit)
+            return search_codebase(query=query or target, project_root="." if os.path.isfile(target) else target, top_k=limit)
 
         elif act in ("prune", "snippet", "signature"):
-            lang = opts.get("language", "python")
-            return prune_code_snippet(code_snippet=query or target, language=lang)
+            lang = opts.get("file_name_or_lang", opts.get("language", "snippet.py"))
+            return prune_code_snippet(code=query or target, file_name_or_lang=lang, reduction_mode=opts.get("reduction_mode", "ultra"))
 
         elif act in ("rules", "boundaries", "manage_rules"):
             op = opts.get("operation", "query")
             rule = opts.get("rule_definition", query)
-            return manage_architecture_rules(project_root=target, operation=op, rule_definition=rule)
+            return manage_architecture_rules(project_root=target, action=op, rule_name=opts.get("rule_name", ""), rule_definition=rule)
 
         elif act in ("enforce", "enforce_rules"):
             strict = bool(opts.get("strict", False))
-            return enforce_architecture_rules(project_root=target, strict=strict)
+            return enforce_architecture_rules(project_root=target, strict_mode=strict)
 
         elif act in ("cost", "estimate", "tokens"):
             return estimate_token_cost(project_root=target, text=query)
@@ -4758,7 +4765,7 @@ def create_mcp_server():
         title="Progressive T-Zero MCP Tool Discovery Catalog",
         description=(
             "Progressively discover and search registered T-Zero tools by keyword or domain category rather than loading all 58 schemas at once "
-            "(unlike codebase searches; use 'search_codebase_semantic' for searching repository source files instead).\n\n"
+            "(unlike codebase searches; use 'search_codebase' for searching repository source files instead).\n\n"
             "Parameters:\n"
             "- `query`: Optional keyword query (e.g., 'secret audit', 'pagerank', 'diff', 'merge').\n"
             "- `category`: Domain filter (`all`, `context`, `security`, `ast`, `memory`, `swarm`, `design`).\n"
@@ -4767,8 +4774,8 @@ def create_mcp_server():
             "- Mutability & Speed: Read-only, idempotent catalog lookup executing in <5ms.\n"
             "- Auth & Boundaries: Zero authentication, external credentials, or network access required.\n\n"
             "Usage Guidelines:\n"
-            "- When to use: Use when running in canonical mode (21 tools) and discovering specialized AST, Jarvis, or security tools by keyword.\n"
-            "- When NOT to use: Do not use when searching source files or symbols inside the workspace repository — use 'search_codebase_semantic' instead.\n\n"
+            "- When to use: Discover specialized AST, Jarvis, or security tools by keyword; availability varies by tool mode.\n"
+            "- When NOT to use: Do not use when searching source files or symbols inside the workspace repository — use 'search_codebase' instead.\n\n"
             "Returns: Structured dictionary with `query`, `total_available`, and ranked `tools` (`name`, `category`, `summary`)."
         ),
         structured_output=True,
