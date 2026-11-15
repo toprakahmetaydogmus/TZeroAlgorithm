@@ -46,6 +46,7 @@ Desktop.ini
 # Node & Video Outputs
 node_modules/
 tzero-showcase/node_modules/
+tzero-showcase/package-lock.json
 tzero-showcase/out/
 tzero-showcase/public/*.mp4
 *.mp4
