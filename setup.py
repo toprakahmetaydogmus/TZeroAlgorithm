@@ -9,7 +9,7 @@ Repository: https://github.com/toprakahmetaydogmus/TZeroAlgorithm
 import sys
 from pathlib import Path
 
-VERSION = "11.13.0"
+VERSION = "11.14.0"
 
 # Fast-path for --version
 if len(sys.argv) > 1 and sys.argv[1] in ("--version", "-V"):

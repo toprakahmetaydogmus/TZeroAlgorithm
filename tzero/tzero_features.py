@@ -723,18 +723,20 @@ globs: **/*
             prof = WorkspaceProfiler(project_dir).profile()
             agent_md_content = WorkspaceGovernanceSynthesizer.generate_agent_md(prof)
             
-            agent_p = os.path.join(project_dir, "AGENT.md")
-            with open(agent_p, "w", encoding="utf-8") as f:
-                f.write(agent_md_content)
-            created.append(agent_p)
-
             agents_p = os.path.join(project_dir, "AGENTS.md")
             with open(agents_p, "w", encoding="utf-8") as f:
                 f.write(agent_md_content)
             created.append(agents_p)
 
-            # 8. ARCHITECTURE.md if not exists
-            arch_p = os.path.join(project_dir, "ARCHITECTURE.md")
+            agent_p = os.path.join(project_dir, "AGENT.md")
+            with open(agent_p, "w", encoding="utf-8") as f:
+                f.write(agent_md_content)
+            created.append(agent_p)
+
+            # 8. ARCHITECTURE.md (in docs/ if docs exists, else root)
+            docs_dir = os.path.join(project_dir, "docs")
+            target_arch_dir = docs_dir if os.path.isdir(docs_dir) else project_dir
+            arch_p = os.path.join(target_arch_dir, "ARCHITECTURE.md")
             if not os.path.isfile(arch_p):
                 with open(arch_p, "w", encoding="utf-8") as f:
                     f.write(WorkspaceGovernanceSynthesizer.generate_architecture_md(prof))
@@ -1621,6 +1623,62 @@ def launch_web_dashboard(project_dir: str = ".", port: int = 7300, open_browser:
 # 7. ZERO-HALLUCINATION GUARD & PRE-FLIGHT SYMBOL / CALL VALIDATOR (TOOL 17)
 # =============================================================================
 
+import importlib
+import builtins
+
+PYTHON_BUILTIN_FUNCTIONS = set(dir(builtins))
+
+BUILTIN_COMMON_METHODS = {
+    # unittest / testing
+    "assert", "assertequal", "assertnotequal", "asserttrue", "assertfalse",
+    "assertis", "assertisnot", "assertisnone", "assertisnotnone",
+    "assertin", "assertnotin", "assertisinstance", "assertnotisinstance",
+    "assertgreater", "assertgreaterequal", "assertless", "assertlessequal",
+    "assertalmostequal", "assertnotalmostequal", "assertraises", "assertwarns",
+    "assertlogs", "assertcount", "assertsequenceequal", "assertdictequal",
+    "setup", "teardown", "setupclass", "teardownclass",
+    # pathlib & fs methods
+    "write_text", "read_text", "write_bytes", "read_bytes", "mkdir", "unlink",
+    "rmdir", "rename", "replace", "stat", "chmod", "touch", "iterdir", "glob",
+    "rglob", "is_dir", "is_file", "is_symlink", "samefile", "expanduser",
+    # dict / list / set / str / io / process methods
+    "append", "extend", "insert", "remove", "pop", "clear", "index", "count",
+    "sort", "reverse", "copy", "get", "setdefault", "update", "values",
+    "keys", "items", "split", "rsplit", "splitlines", "join", "strip",
+    "lstrip", "rstrip", "lower", "upper", "capitalize", "title", "startswith",
+    "endswith", "replace", "find", "rfind", "encode", "decode", "format",
+    "read", "readline", "readlines", "write", "writelines", "close", "seek",
+    "tell", "flush", "seekable", "readable", "writable", "fileno", "isatty",
+    "communicate", "poll", "wait", "terminate", "kill", "send_signal",
+    "dump", "dumps", "load", "loads", "run", "call", "check_call", "check_output",
+    "exists", "is_file", "is_dir", "resolve", "parent", "parents", "stem",
+    "suffix", "suffixes", "name", "as_posix", "match", "search", "findall",
+    "finditer", "sub", "subn", "group", "groups", "groupdict", "start", "end",
+    "span", "sleep", "time", "monotonic", "now", "utcnow", "isoformat",
+    "strftime", "strptime", "timestamp", "date", "year", "month", "day",
+    "hour", "minute", "second", "microsecond", "total_seconds", "days",
+    "parse", "unparse", "walk", "visit", "generic_visit"
+}
+
+STD_SMART_ALIASES = {
+    ("math", "squareroot"): "sqrt",
+    ("math", "square_root"): "sqrt",
+    ("math", "power"): "pow",
+    ("json", "dumpp"): "dump",
+    ("json", "dumpss"): "dumps",
+    ("json", "loadd"): "load",
+    ("json", "loadss"): "loads",
+    ("os.path", "exsits"): "exists",
+    ("os.path", "is_file"): "isfile",
+    ("os.path", "is_dir"): "isdir",
+    ("re", "matches"): "match",
+    ("shutil", "copy_directory"): "copytree",
+    ("shutil", "copy_dir"): "copytree",
+    ("hashlib", "sha256_hex"): "sha256",
+    ("datetime", "now_utc"): "utcnow",
+    ("sys", "exit_process"): "exit",
+}
+
 class _SelfHealingTransformer(ast.NodeTransformer):
     """AST transformer that automatically corrects hallucinated imports, function names, and kwargs."""
     def __init__(self, fixes: Dict[str, Any]):
@@ -1657,7 +1715,12 @@ class _SelfHealingTransformer(ast.NodeTransformer):
                 attr = node.func.attr
             fname = attr
             try:
-                full_name = f"{ast.unparse(node.func.value)}.{attr}"
+                val_unparsed = ast.unparse(node.func.value)
+                full_name = f"{val_unparsed}.{attr}"
+                if (val_unparsed, attr) in self.call_fixes:
+                    node.func.attr = self.call_fixes[(val_unparsed, attr)]
+                    attr = node.func.attr
+                    full_name = f"{val_unparsed}.{attr}"
             except Exception:
                 full_name = attr
 
@@ -1861,6 +1924,8 @@ class ZeroHallucinationGuard:
                         if item.name not in self.function_signatures:
                             self.function_signatures[item.name] = sig
                         if item.name == "__init__":
+                            self.function_signatures[node.name] = sig
+                            self.function_signatures[f"{stem}.{node.name}"] = sig
                             for sub in ast.walk(item):
                                 if isinstance(sub, ast.Assign):
                                     for t in sub.targets:
@@ -1945,6 +2010,7 @@ class ZeroHallucinationGuard:
             "all_params": all_params,
             "sig_str": sig_str,
             "return_type": ret_type,
+            "is_async": isinstance(node, ast.AsyncFunctionDef),
         }
 
     def validate_code(self, proposed_code: str, target_file: str = "") -> Dict[str, Any]:
@@ -1967,7 +2033,41 @@ class ZeroHallucinationGuard:
         repairs_applied: List[str] = []
 
         # ---------------------------------------------------------------------
-        # 1. TIER 1 & 2: GHOST DEPENDENCY & WORKSPACE IMPORT GUARDS
+        # 0. MAP LOCAL IMPORTS & VARIABLE INFERRED TYPES
+        # ---------------------------------------------------------------------
+        imported_modules: Dict[str, str] = {}
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                for alias in node.names:
+                    imported_modules[alias.asname or alias.name] = alias.name
+            elif isinstance(node, ast.ImportFrom):
+                if node.module:
+                    for alias in node.names:
+                        imported_modules[alias.asname or alias.name] = f"{node.module}.{alias.name}"
+
+        var_types: Dict[str, str] = {}
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Assign):
+                for target in node.targets:
+                    if isinstance(target, ast.Name):
+                        if isinstance(node.value, ast.Call):
+                            c_name = ""
+                            if isinstance(node.value.func, ast.Name):
+                                c_name = node.value.func.id
+                            elif isinstance(node.value.func, ast.Attribute):
+                                c_name = node.value.func.attr
+                            if c_name:
+                                var_types[target.id] = c_name
+            elif isinstance(node, ast.AnnAssign):
+                if isinstance(node.target, ast.Name) and node.annotation:
+                    try:
+                        ann_str = ast.unparse(node.annotation)
+                        var_types[node.target.id] = ann_str
+                    except Exception:
+                        pass
+
+        # ---------------------------------------------------------------------
+        # 1. TIER 1 & 2: GHOST DEPENDENCY & WORKSPACE / STDLIB IMPORT GUARDS
         # ---------------------------------------------------------------------
         for node in ast.walk(tree):
             if isinstance(node, ast.ImportFrom):
@@ -1988,18 +2088,38 @@ class ZeroHallucinationGuard:
                                     f"Import Hallucination: Symbol `{alias.name}` does not exist in workspace module `{node.module}`.{did_you_mean}"
                                 )
                     else:
-                        # Check external third-party package against stdlib + manifests + environment
+                        # Check if module is standard library
                         b_lower = base_mod.lower()
                         is_std = b_lower in self.stdlib_modules
-                        is_dec = b_lower in self.declared_packages or b_lower.replace("_", "-") in self.declared_packages
-                        is_inst = b_lower in self.installed_packages or b_lower in self.known_package_aliases or self.known_package_aliases.get(b_lower) in self.installed_packages
-                        if not (is_std or is_dec or is_inst):
-                            all_known = list(self.declared_packages | self.installed_packages | set(self.known_package_aliases.keys()))
-                            close_pkg = difflib.get_close_matches(b_lower, all_known, n=1, cutoff=0.6)
-                            hint = f" Did you mean `{close_pkg[0]}`?" if close_pkg else ""
-                            violations.append(
-                                f"Ghost Dependency Hallucination: Package `{base_mod}` is not part of Python stdlib, not declared in requirements.txt/pyproject.toml, and not installed in environment.{hint}"
-                            )
+                        if is_std:
+                            try:
+                                std_mod = importlib.import_module(node.module)
+                                for alias in node.names:
+                                    if alias.name != "*" and not hasattr(std_mod, alias.name):
+                                        candidates = [m for m in dir(std_mod) if not m.startswith("_")]
+                                        smart_match = STD_SMART_ALIASES.get((node.module, alias.name))
+                                        close = [smart_match] if smart_match else difflib.get_close_matches(alias.name, candidates, n=1, cutoff=0.55)
+                                        did_you_mean = f" Did you mean: `{close[0]}`?" if close else ""
+                                        if close:
+                                            fixes["imports"][(node.module, alias.name)] = close[0]
+                                            fixes["calls"][alias.name] = close[0]
+                                            repairs_applied.append(f"Import `{alias.name}` -> `{close[0]}` (in stdlib `{node.module}`)")
+                                        violations.append(
+                                            f"Stdlib Import Hallucination: Symbol `{alias.name}` does not exist in standard library module `{node.module}`.{did_you_mean}"
+                                        )
+                            except Exception:
+                                pass
+                        else:
+                            # Check external third-party package against manifests + environment
+                            is_dec = b_lower in self.declared_packages or b_lower.replace("_", "-") in self.declared_packages
+                            is_inst = b_lower in self.installed_packages or b_lower in self.known_package_aliases or self.known_package_aliases.get(b_lower) in self.installed_packages
+                            if not (is_dec or is_inst):
+                                all_known = list(self.declared_packages | self.installed_packages | set(self.known_package_aliases.keys()))
+                                close_pkg = difflib.get_close_matches(b_lower, all_known, n=1, cutoff=0.6)
+                                hint = f" Did you mean `{close_pkg[0]}`?" if close_pkg else ""
+                                violations.append(
+                                    f"Ghost Dependency Hallucination: Package `{base_mod}` is not part of Python stdlib, not declared in requirements.txt/pyproject.toml, and not installed in environment.{hint}"
+                                )
 
             elif isinstance(node, ast.Import):
                 for alias in node.names:
@@ -2019,22 +2139,110 @@ class ZeroHallucinationGuard:
                             )
 
         # ---------------------------------------------------------------------
-        # 2. TIER 3 & 4: CALL SIGNATURE, KWARGS & SCHEMA FIELD GUARDS
+        # 2. TIER 3 & 4: CALL SIGNATURE, STDLIB, CLASS & SCHEMA FIELD GUARDS
         # ---------------------------------------------------------------------
         for node in ast.walk(tree):
             if isinstance(node, ast.Call):
                 func_name = ""
                 attr_name = ""
+                val_str = ""
+                is_attr_call = False
+                sig = None
                 if isinstance(node.func, ast.Name):
                     func_name = node.func.id
                 elif isinstance(node.func, ast.Attribute):
-                    val_str = ast.unparse(node.func.value)
+                    is_attr_call = True
+                    try:
+                        val_str = ast.unparse(node.func.value)
+                    except Exception:
+                        val_str = ""
                     attr_name = node.func.attr
-                    func_name = f"{val_str}.{attr_name}"
+                    func_name = f"{val_str}.{attr_name}" if val_str else attr_name
 
-                sig = self.function_signatures.get(func_name)
+                # A. Validate Standard Library Module Method Calls
+                if is_attr_call and val_str:
+                    mod_to_check = imported_modules.get(val_str, val_str)
+                    root_std = mod_to_check.split('.')[0].lower()
+                    if root_std in self.stdlib_modules:
+                        try:
+                            mod_obj = importlib.import_module(mod_to_check)
+                            if not hasattr(mod_obj, attr_name):
+                                candidates = [m for m in dir(mod_obj) if not m.startswith("_")]
+                                smart_match = STD_SMART_ALIASES.get((mod_to_check, attr_name)) or STD_SMART_ALIASES.get((root_std, attr_name))
+                                close = [smart_match] if smart_match else difflib.get_close_matches(attr_name, candidates, n=1, cutoff=0.55)
+                                hint = f" Did you mean `{close[0]}`?" if close else ""
+                                if close:
+                                    fixes["calls"][attr_name] = close[0]
+                                    fixes["calls"][(val_str, attr_name)] = close[0]
+                                    repairs_applied.append(f"Stdlib `{val_str}.{attr_name}()` -> `.{close[0]}()`")
+                                violations.append(
+                                    f"Stdlib Method Hallucination: Standard library module `{mod_to_check}` has no method or attribute `{attr_name}`.{hint}"
+                                )
+                                continue
+                            else:
+                                # Attribute is valid on stdlib module; do not flag as workspace mismatch
+                                continue
+                        except Exception:
+                            pass
+
+                # B. Skip built-in python methods (append, get, strip, etc.) and private methods
+                if is_attr_call and (attr_name.startswith("_") or attr_name.lower() in BUILTIN_COMMON_METHODS):
+                    continue
+
+                # C. Validate Class Instance Method Calls
+                if is_attr_call and val_str in var_types:
+                    raw_class = var_types[val_str]
+                    inferred_class = raw_class
+                    for (mod, old_sym), new_sym in fixes["imports"].items():
+                        if old_sym == raw_class:
+                            inferred_class = new_sym
+                            break
+                    if inferred_class in fixes["calls"]:
+                        inferred_class = fixes["calls"][inferred_class]
+
+                    if inferred_class in self.class_methods:
+                        c_methods = self.class_methods[inferred_class]
+                        c_fields = self.class_fields.get(inferred_class, set())
+                        if attr_name in c_methods or attr_name in c_fields:
+                            sig = self.function_signatures.get(f"{inferred_class}.{attr_name}") or self.function_signatures.get(attr_name)
+                        else:
+                            candidates = list(c_methods | c_fields)
+                            close = difflib.get_close_matches(attr_name, candidates, n=1, cutoff=0.50)
+                            hint = f" Did you mean `{close[0]}`?" if close else ""
+                            if close:
+                                fixes["calls"][attr_name] = close[0]
+                                fixes["calls"][(val_str, attr_name)] = close[0]
+                                repairs_applied.append(f"Method `{val_str}.{attr_name}()` -> `.{close[0]}()`")
+                            violations.append(
+                                f"Class Member Hallucination: Class `{inferred_class}` has no declared method or attribute `{attr_name}`.{hint}"
+                            )
+                            continue
+
+                # D. Validate Explicit Workspace Module Function Calls
+                if is_attr_call and val_str not in var_types and val_str in imported_modules and val_str in self.modules:
+                    avail = self.exported_symbols.get(val_str, set())
+                    if attr_name in avail or f"{val_str}.{attr_name}" in self.function_signatures or attr_name in self.function_signatures:
+                        sig = self.function_signatures.get(f"{val_str}.{attr_name}") or self.function_signatures.get(attr_name)
+                    else:
+                        matches = difflib.get_close_matches(attr_name, list(avail) or [s.split('.')[-1] for s in self.function_signatures.keys()], n=1, cutoff=0.50)
+                        hint = f" Did you mean `{matches[0]}`?" if matches else ""
+                        if matches:
+                            fixes["calls"][attr_name] = matches[0]
+                            fixes["calls"][(val_str, attr_name)] = matches[0]
+                            repairs_applied.append(f"Method `{val_str}.{attr_name}()` -> `.{matches[0]}()`")
+                        violations.append(
+                            f"Workspace Method Hallucination: Module `{val_str}` has no exported function or attribute `{attr_name}`.{hint}"
+                        )
+                        continue
+
+                # E. Look up signature for parameter / kwarg validation
+                if not sig:
+                    sig = self.function_signatures.get(func_name)
                 if not sig and attr_name:
-                    sig = self.function_signatures.get(attr_name)
+                    if (val_str in self.modules or val_str in var_types or
+                        any(val_str == c for c in self.class_methods) or
+                        not is_attr_call):
+                        sig = self.function_signatures.get(attr_name)
 
                 # Schema & Dataclass field validation on class instantiation
                 target_class = func_name or attr_name
@@ -2063,6 +2271,7 @@ class ZeroHallucinationGuard:
                                     target_k = func_name or sig["name"]
                                     fixes["kwargs"][(target_k, kw.arg)] = close_kw[0]
                                     fixes["kwargs"][(sig["name"], kw.arg)] = close_kw[0]
+                                    fixes["kwargs"][("", kw.arg)] = close_kw[0]
                                     if attr_name:
                                         fixes["kwargs"][(attr_name, kw.arg)] = close_kw[0]
                                     repairs_applied.append(f"Param `{kw.arg}` -> `{close_kw[0]}` in `{func_name or sig['name']}()`")
@@ -2074,7 +2283,7 @@ class ZeroHallucinationGuard:
                     is_method_attr_call = isinstance(node.func, ast.Attribute)
                     effective_min = sig["min_pos"]
                     effective_max = sig["max_pos"]
-                    if is_method_attr_call and "self" in sig["all_params"]:
+                    if "self" in sig["all_params"]:
                         effective_min = max(0, effective_min - 1)
                         if effective_max != float("inf"):
                             effective_max = max(0, effective_max - 1)
@@ -2087,17 +2296,16 @@ class ZeroHallucinationGuard:
                         violations.append(
                             f"Call Hallucination: `{func_name or sig['name']}` received too many positional arguments ({num_pos} provided, at most {effective_max} allowed). Valid signature: `{sig['sig_str']}`"
                         )
-                elif isinstance(node.func, ast.Attribute):
-                    target_attr = node.func.attr
+                elif not is_attr_call and func_name not in PYTHON_BUILTIN_FUNCTIONS and func_name not in imported_modules:
+                    # Check standalone function call against workspace functions
                     all_sigs = list(self.function_signatures.keys())
-                    matches = difflib.get_close_matches(target_attr, [s.split('.')[-1] for s in all_sigs], n=1, cutoff=0.5)
+                    matches = difflib.get_close_matches(func_name, [s.split('.')[-1] for s in all_sigs], n=1, cutoff=0.60)
                     if matches:
                         cand_sigs = [self.function_signatures[m]["sig_str"] for m in matches if m in self.function_signatures]
-                        val_str = ast.unparse(node.func.value)
-                        fixes["calls"][target_attr] = matches[0]
-                        repairs_applied.append(f"Method `{val_str}.{target_attr}()` -> `.{matches[0]}()`")
+                        fixes["calls"][func_name] = matches[0]
+                        repairs_applied.append(f"Function `{func_name}()` -> `{matches[0]}()`")
                         violations.append(
-                            f"Call Hallucination: Method or function `{val_str}.{target_attr}` does not exist! Did you mean: `{'; '.join(cand_sigs or matches)}`?"
+                            f"Call Hallucination: Function `{func_name}` does not exist! Did you mean: `{'; '.join(cand_sigs or matches)}`?"
                         )
 
         # ---------------------------------------------------------------------
@@ -2115,15 +2323,38 @@ class ZeroHallucinationGuard:
                             violations.append(
                                 f"Return Contract Hallucination: Function `{c_name}` returns `{rt}`, which is not iterable in a loop!"
                             )
-            # Check attribute access on None return: func().attr
+            # Check attribute access on return: func().attr
             elif isinstance(node, ast.Attribute):
                 if isinstance(node.value, ast.Call):
                     c_name = ast.unparse(node.value.func).strip()
                     sig = self.function_signatures.get(c_name) or self.function_signatures.get(c_name.split('.')[-1])
-                    if sig and sig.get("return_type") in ("None", "NoneType"):
-                        violations.append(
-                            f"Return Contract Hallucination: Function `{c_name}` has declared return type 'None', cannot access member `.{node.attr}` on NoneType!"
-                        )
+                    if sig and sig.get("return_type"):
+                        rt = sig["return_type"].strip()
+                        rt_clean = rt.split("[")[0].strip().lower()
+                        if rt in ("None", "NoneType"):
+                            violations.append(
+                                f"Return Contract Hallucination: Function `{c_name}` has declared return type 'None', cannot access member `.{node.attr}` on NoneType!"
+                            )
+                        elif rt_clean in ("list", "sequence") and node.attr not in dir(list):
+                            violations.append(
+                                f"Return Contract Hallucination: Function `{c_name}` returns a list/sequence, which has no member or method `.{node.attr}`!"
+                            )
+                        elif rt_clean in ("dict", "mapping") and node.attr not in dir(dict):
+                            violations.append(
+                                f"Return Contract Hallucination: Function `{c_name}` returns a dict/mapping, which has no member or method `.{node.attr}`!"
+                            )
+                        elif rt_clean == "set" and node.attr not in dir(set):
+                            violations.append(
+                                f"Return Contract Hallucination: Function `{c_name}` returns a set, which has no member or method `.{node.attr}`!"
+                            )
+                        elif rt_clean == "str" and node.attr not in dir(str):
+                            violations.append(
+                                f"Return Contract Hallucination: Function `{c_name}` returns a str, which has no member or method `.{node.attr}`!"
+                            )
+                        elif rt_clean in ("int", "float", "bool") and node.attr not in dir(int):
+                            violations.append(
+                                f"Return Contract Hallucination: Function `{c_name}` returns a primitive `{rt}`, which has no member or method `.{node.attr}`!"
+                            )
 
         # ---------------------------------------------------------------------
         # 4. SELF-HEALING AST REPAIR SYNTHESIS

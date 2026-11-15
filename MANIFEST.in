@@ -13,5 +13,7 @@ include tzero.py
 include tzero_mcp.py
 include docs/VIRAL_GROWTH_100_STARS.md
 include docs/REAL_PC_BENCHMARK_REPORT.md
+include docs/ZERO_HALLUCINATION_PROOF.md
+include docs/zero_hallucination_proof.json
 include assets/tzero_badge_card.svg
 recursive-include tzero *.py *.html *.json *.ico

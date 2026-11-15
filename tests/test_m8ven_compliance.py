@@ -20,7 +20,7 @@ class TestM8venCompliance(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(all(type(value) is bool for value in (annotations[key] for key in HINTS)))
 
     async def test_runtime_tool_annotations(self):
-        for mode, expected_count in (("canonical", 21), ("all", 58)):
+        for mode, expected_count in (("canonical", 22), ("all", 59)):
             with self.subTest(mode=mode), patch.dict(os.environ, {"TZERO_MCP_TOOL_MODE": mode}):
                 tools = await tzero_mcp.create_mcp_server().list_tools()
                 self.assertEqual(len(tools), expected_count)
@@ -32,7 +32,7 @@ class TestM8venCompliance(unittest.IsolatedAsyncioTestCase):
         with patch.dict(os.environ, {"TZERO_MCP_TOOL_MODE": "canonical"}):
             tools = await tzero_mcp.create_mcp_server().list_tools()
         annotations = {tool.name: tool.annotations.model_dump(by_alias=True) for tool in tools}
-        for name in ("generate_architectural_passport", "transpile_model_bridge"):
+        for name in ("generate_architectural_passport", "transpile_model_bridge", "prove_zero_hallucination"):
             self.assertIs(annotations[name]["readOnlyHint"], True)
         for name in ("build_ast_snapshot", "diagnose_and_heal_system"):
             self.assertIs(annotations[name]["readOnlyHint"], False)

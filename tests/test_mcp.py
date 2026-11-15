@@ -36,9 +36,10 @@ class TestMCPServer(unittest.TestCase):
         """Verifies that all 47 specialized MCP tools and grounding prompt are properly registered."""
         tools = self.run_async(self.server.list_tools())
         tool_names = [t.name for t in tools]
-        self.assertEqual(len(tool_names), 58)
+        self.assertEqual(len(tool_names), 59)
         self.assertIn("search_tools", tool_names)
         self.assertIn("execute_codebase_workflow", tool_names)
+        self.assertIn("prove_zero_hallucination", tool_names)
         expected_tools = [
             "execute_codebase_workflow",
             "get_project_context_tree",
@@ -748,16 +749,17 @@ diff --git a/core.py b/core.py
             default_server = tzero_mcp.create_mcp_server()
             tools_def = self.run_async(default_server.list_tools())
             tool_names = [t.name for t in tools_def]
-            self.assertEqual(len(tool_names), 21)
+            self.assertEqual(len(tool_names), 22)
             self.assertIn("search_tools", tool_names)
             self.assertIn("execute_codebase_workflow", tool_names)
             self.assertIn("build_project_context", tool_names)
             self.assertIn("manage_memory_store", tool_names)
+            self.assertIn("prove_zero_hallucination", tool_names)
 
             os.environ["TZERO_MCP_TOOL_MODE"] = "all"
             full_server = tzero_mcp.create_mcp_server()
             tools_all = self.run_async(full_server.list_tools())
-            self.assertEqual(len(tools_all), 58)
+            self.assertEqual(len(tools_all), 59)
             self.assertIn("execute_codebase_workflow", [t.name for t in tools_all])
         finally:
             if old_val is not None:
