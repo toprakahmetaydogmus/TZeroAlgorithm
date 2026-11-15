@@ -2,10 +2,6 @@ name: Publish to npm
 
 on:
   workflow_dispatch:
-  push:
-    tags:
-      - 'v*'
-      - 'release-*'
 
 jobs:
   npm-publish:

@@ -11,10 +11,6 @@ on:
         description: 'Publish to VS Code Marketplace'
         type: boolean
         default: true
-  push:
-    tags:
-      - 'v*'
-      - 'release-*'
 
 jobs:
   package-and-publish:

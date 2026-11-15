@@ -28,7 +28,7 @@
 
 <p align="center">
   <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm">
-    <img src="assets/tzero_badge_card.svg" alt="T-Zero Context Architect Live Badge Card" width="100%" style="max-width: 800px; border-radius: 14px; box-shadow: 0 18px 40px rgba(0, 0, 0, 0.8);">
+    <img src="https://raw.githubusercontent.com/toprakahmetaydogmus/TZeroAlgorithm/main/assets/tzero_badge_card.svg" alt="T-Zero Context Architect Live Badge Card" width="100%" style="max-width: 800px; border-radius: 14px; box-shadow: 0 18px 40px rgba(0, 0, 0, 0.8);">
   </a>
 </p>
 
@@ -50,7 +50,7 @@
 
 [![VS Code Marketplace](https://img.shields.io/visual-studio-marketplace/v/siber-akademi.tzero-vscode?style=for-the-badge&logo=visual-studio-code&logoColor=white&label=VS%20Code%20Marketplace&color=007ACC)](https://marketplace.visualstudio.com/items?itemName=siber-akademi.tzero-vscode)
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/toprakahmetaydogmus/TZeroAlgorithm)
-[![Smithery Badge](https://smithery.ai/badge/@toprakahmetaydogmus/TZeroAlgorithm)](https://smithery.ai/server/@toprakahmetaydogmus/TZeroAlgorithm)
+[![Smithery Registry](https://img.shields.io/badge/%E2%9A%A1%20Smithery%20MCP-Compatible%20v11.12.1-FF5722?style=for-the-badge&logo=dependabot&logoColor=white)](https://smithery.ai)
 [![npm Package](https://img.shields.io/badge/%F0%9F%93%A6%20npm-tzero--mcp-cb3837?style=for-the-badge&logo=npm&logoColor=white)](https://www.npmjs.com/package/tzero-mcp)
 [![Glama Grade A](https://img.shields.io/badge/%E2%9A%A1%20Glama%20MCP-Grade%20A%20Verified-8b5cf6?style=for-the-badge&logo=checkmarx&logoColor=white)](https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm)
 [![M8ven Verified](https://m8ven.ai/badge/mcp/toprakahmetaydogmus/tzeroalgorithm?variant=verified)](https://m8ven.ai/mcp/toprakahmetaydogmus/tzeroalgorithm?s=readme)

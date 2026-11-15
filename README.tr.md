@@ -14,7 +14,7 @@
 
 <p align="center">
   <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm">
-    <img src="assets/tzero_badge_card.svg" alt="T-Zero Context Architect Canlı Rozet Kartı" width="100%" style="max-width: 800px; border-radius: 14px; box-shadow: 0 18px 40px rgba(0, 0, 0, 0.8);">
+    <img src="https://raw.githubusercontent.com/toprakahmetaydogmus/TZeroAlgorithm/main/assets/tzero_badge_card.svg" alt="T-Zero Context Architect Canlı Rozet Kartı" width="100%" style="max-width: 800px; border-radius: 14px; box-shadow: 0 18px 40px rgba(0, 0, 0, 0.8);">
   </a>
 </p>
 
