@@ -13,7 +13,7 @@ from pathlib import Path
 from typing import Optional
 
 REPO_URL = "https://github.com/toprakahmetaydogmus/TZeroAlgorithm"
-VERSION = "11.12.1"
+VERSION = "11.13.0"
 _BANNER_PRINTED = False
 
 

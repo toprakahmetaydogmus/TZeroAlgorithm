@@ -1,8 +1,19 @@
 # Changelog
 
-## [11.12.1] - 2026-11-15
+## [11.13.0] - 2026-11-15
 
-### Added & Improved (npm Trusted Publishing OIDC, Winget v11.12.1 & Latest Registry Sync)
+### Added & Improved (Sovereign Clean-Root Architecture & High-Fidelity Docs Hierarchy)
+- **Sovereign Clean-Root Directory Architecture:**
+  - Organized all auxiliary project documentation, guides, and localized multi-language walkthroughs (`README.tr.md`, `README.ja.md`, `README.zh.md`, `ARCHITECTURE.md`, `CHANGELOG.md`, `ROADMAP.md`, `WALKTHROUGH.md`, `WORKSPACE_ORCHESTRATION.md`, `CITATION.cff`) into a dedicated `docs/` hierarchy.
+  - Eliminated redundant root duplicates (`Dockerfile.glama`, `AGENT.md`, legacy `smithery.yaml`, `mcp.json`, `.mcp.json`) for instant readability and smooth scrolling directly to `README.md`.
+- **Standardized Community Health Profiles:**
+  - Community governance and security standards indexed cleanly under `.github/` (`SECURITY.md`, `CODE_OF_CONDUCT.md`, `SUPPORT.md`, `FUNDING.yml`, issue templates).
+- **Refined Author & Brand Presentation:**
+  - Standardized author profile to Toprak Ahmet Aydoğmuş and replaced retired shields.io marketplace endpoints with reliable high-fidelity badges.
+- **Automated Multi-IDE MCP Auto-Integration:**
+  - `tzero install-ide` and `npx tzero-mcp --install` updated to v11.13.0 with turnkey detection across Cursor, Claude Desktop, Antigravity, VS Code, and Windsurf.
+- **10/10 CI Verification Matrix:**
+  - 100% green verification suite across Ubuntu 24.04, Windows Latest, and macOS on Python 3.11, 3.12, and 3.13.
 - **Official npm Trusted Publishing (OIDC) Integration:**
   - Configured pure OpenID Connect (OIDC) authentication pipeline for GitHub Actions (`publish-npm.yml`).
   - Added cryptographic build provenance with Sigstore transparency log verification.

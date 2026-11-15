@@ -106,6 +106,8 @@ class TestWelcomeAndInstallIde(unittest.TestCase):
         self.assertIn("https://github.com/toprakahmetaydogmus/TZeroAlgorithm", res.stdout)
 
     def test_setup_py_execution(self):
+        import tomllib
+        canonical = tomllib.loads((ROOT_DIR / "pyproject.toml").read_text(encoding="utf-8"))["project"]["version"]
         res = subprocess.run(
             [sys.executable, str(ROOT_DIR / "setup.py"), "--version"],
             capture_output=True,
@@ -115,7 +117,7 @@ class TestWelcomeAndInstallIde(unittest.TestCase):
             cwd=str(ROOT_DIR),
         )
         self.assertEqual(res.returncode, 0, f"setup.py stderr: {res.stderr}")
-        self.assertIn("11.12.1", res.stdout)
+        self.assertIn(canonical, res.stdout)
 
 
 if __name__ == "__main__":

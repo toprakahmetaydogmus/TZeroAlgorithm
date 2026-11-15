@@ -47,6 +47,12 @@ def sync_release_metadata(target_version: str, check_only: bool = False) -> Dict
         rf'\1"{target_version}"',
         check_only,
     )
+    results["setup.py"] = _regex_replace(
+        ROOT_DIR / "setup.py",
+        r'(?m)^(VERSION\s*=\s*)"[^"]+"',
+        rf'\1"{target_version}"',
+        check_only,
+    )
     results["server.json"] = _update_json_version(
         ROOT_DIR / "server.json", target_version, ["version", "packages[0].version"], check_only
     )
@@ -75,6 +81,12 @@ def sync_release_metadata(target_version: str, check_only: bool = False) -> Dict
     results["tzero_mcp.py"] = _regex_replace(
         ROOT_DIR / "tzero" / "tzero_mcp.py",
         r'(?m)^(SERVER_VERSION\s*=\s*)"[^"]+"',
+        rf'\1"{target_version}"',
+        check_only,
+    )
+    results["tzero_welcome.py"] = _regex_replace(
+        ROOT_DIR / "tzero" / "tzero_welcome.py",
+        r'(?m)^(VERSION\s*=\s*)"[^"]+"',
         rf'\1"{target_version}"',
         check_only,
     )
