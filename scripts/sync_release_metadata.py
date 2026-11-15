@@ -164,6 +164,20 @@ def sync_release_metadata(target_version: str, check_only: bool = False) -> Dict
     t_ct = ROOT_DIR / "tests" / "test_contracts.py"
     results["tests/test_contracts.py"] = _regex_replace(t_ct, r'self\.assertEqual\(driver\["version"\],\s*"[^"]+"\)', f'self.assertEqual(driver["version"], "{target_version}")', check_only)
 
+    # Documentation & README release links and badges
+    readme_p = ROOT_DIR / "README.md"
+    c_rm1 = _regex_replace(readme_p, r'VS%20Code%20Marketplace-v[0-9]+\.[0-9]+\.[0-9]+', f"VS%20Code%20Marketplace-v{target_version}", check_only)
+    c_rm2 = _regex_replace(readme_p, r'Smithery%20MCP-Compatible%20v[0-9]+\.[0-9]+\.[0-9]+', f"Smithery%20MCP-Compatible%20v{target_version}", check_only)
+    c_rm3 = _regex_replace(readme_p, r'download/v[0-9]+\.[0-9]+\.[0-9]+/TZero-v[0-9]+\.[0-9]+\.[0-9]+-Windows-x64\.zip', f"download/v{target_version}/TZero-v{target_version}-Windows-x64.zip", check_only)
+    c_rm4 = _regex_replace(readme_p, r'dist/tzero-vscode-[0-9]+\.[0-9]+\.[0-9]+\.vsix', f"dist/tzero-vscode-{target_version}.vsix", check_only)
+    results["README.md"] = any((c_rm1, c_rm2, c_rm3, c_rm4))
+
+    tr_readme_p = ROOT_DIR / "docs" / "README.tr.md"
+    if tr_readme_p.is_file():
+        c_tr1 = _regex_replace(tr_readme_p, r'VS%20Code-v[0-9]+\.[0-9]+\.[0-9]+', f"VS%20Code-v{target_version}", check_only)
+        c_tr2 = _regex_replace(tr_readme_p, r'dist/tzero-vscode-[0-9]+\.[0-9]+\.[0-9]+\.vsix', f"dist/tzero-vscode-{target_version}.vsix", check_only)
+        results["docs/README.tr.md"] = c_tr1 or c_tr2
+
     return results
 
 
