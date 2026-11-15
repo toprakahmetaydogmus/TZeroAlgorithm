@@ -499,7 +499,58 @@ tzero --tree . --out context.txt
 
 # 4. Launch local Zero-GPU Web Studio:
 tzero space
+
+# 5. Run Local CI & Pre-Push Verification Shield ($0 Actions quota burn):
+tzero local-ci --quick
+
+# 6. Install automated git pre-push shield:
+tzero local-ci --install-hook
 ```
+
+<a id="tzero-local-ci"></a>
+## ⚡ T-Zero Local CI & Pre-Push Verification Shield ($0 Quota Burn)
+
+Stop burning GitHub Actions runner minutes and waiting minutes for remote build results. **T-Zero Local CI** executes a complete 7-gate verification pipeline locally in **<10 seconds** before code ever reaches remote repositories:
+
+```
+┌────────────────────────────────────────────────────────────────────────┐
+│  ⚡ T-ZERO LOCAL CI & PRE-PUSH VERIFICATION RUNNER                     │
+│  Zero Quota Burn • 100% Offline • Zero-Leak Guaranteed                 │
+└────────────────────────────────────────────────────────────────────────┘
+
+  [1/7] Metadata & Version Sync ................ [PASS] (0.48s)
+  [2/7] 100% Zero-Leak Security Audit .......... [PASS] (0.39s)
+  [3/7] AST & Architecture Boundaries .......... [PASS] (1.88s)
+  [4/7] Static Code Quality & Lint ............. [PASS] (3.64s)
+  [5/7] Automated Unit Test Suite .............. [PASS] (2.01s)
+  [6/7] Ecosystem & Extension Tests ............ [PASS] (0.46s)
+  [7/7] M8ven MCP Compliance ................... [PASS] (0.00s)
+
+════════════════════════════════════════════════════════════════════════
+✔ ALL LOCAL CI GATES PASSED! Safe to push to remote.
+  ⚡ Remote CI minutes saved: ~15.0 minutes (Execution took 8.86s)
+════════════════════════════════════════════════════════════════════════
+```
+
+### 🛠️ CLI & Standalone Executable Usage
+```bash
+# Run fast verification battery (seconds):
+tzero local-ci --quick
+# or via dedicated binary:
+tzero-ci --quick
+dist/TZeroCI.exe --quick
+
+# Run full matrix verification battery:
+tzero local-ci --all
+
+# Auto-repair metadata mismatches:
+tzero local-ci --fix
+
+# Install automated Git pre-push hook (intercepts 'git push' locally):
+tzero local-ci --install-hook
+# (To uninstall: tzero local-ci --uninstall-hook)
+```
+
 <a id="tzero-pc-fixer"></a>
 ## 🩺 T-Zero PC-Fixer & Codebase Doctor: The 12,600+ Line Autonomous Self-Healing Monolith
 

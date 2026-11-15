@@ -97,6 +97,8 @@ tzero-cost = "tzero.tzero_cost:main"
 tzero-drift = "tzero.tzero_drift:main"
 tzero-fixer = "tzero.tzero_v3:main"
 tzero-explain = "tzero.tzero_v3:main"
+tzero-ci = "tzero.tzero_ci:main"
+tzero-local-ci = "tzero.tzero_ci:main"
 
 [tool.setuptools]
 packages = ["tzero", "tzero.tzero_jarvis", "tzero.tzero_fixer"]

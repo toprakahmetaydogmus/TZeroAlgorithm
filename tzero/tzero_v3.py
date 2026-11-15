@@ -8767,6 +8767,12 @@ def main():
             sys.stderr.write(f"[ERROR] Failed to execute T-Zero IDE installer: {e}\n")
             sys.exit(1)
 
+    # Fast path for local-ci / ci subcommands
+    if len(sys.argv) > 1 and sys.argv[1].lower() in ("local-ci", "localci", "ci-local"):
+        from tzero.tzero_ci import main as ci_main
+        sys.argv.pop(1)
+        sys.exit(ci_main())
+
     parser = argparse.ArgumentParser(
         description="Siber Akademi T-Zero Context Architect V3 - Enterprise Codebase Context Builder & Token Reducer",
         epilog="""
@@ -8844,7 +8850,10 @@ def main():
     parser.add_argument("--cache-aligned", action="store_true", help="Order context for KV-cache prefix stability (immutable static prefix before dynamic query suffix)")
     parser.add_argument("--commit-msg", action="store_true", help="Generate Conventional Commit message from local AST git diff ($0 local engine)")
     parser.add_argument("--changelog", nargs="?", const="v11.14.0", default=None, metavar="VERSION", help="Generate release CHANGELOG markdown from git history")
-    parser.add_argument("--ci", choices=["github", "gitlab", "pre-commit", "all"], default=None, help="Install turnkey CI/CD security and verification workflow")
+    parser.add_argument("--ci", choices=["github", "gitlab", "pre-commit", "local", "all"], default=None, help="Install CI/CD workflow or run local verification suite")
+    parser.add_argument("--local-ci", action="store_true", help="Run comprehensive Local CI & Pre-Push verification battery ($0 quota burn)")
+    parser.add_argument("--quick-ci", action="store_true", help="Run fast Local CI smoke checks in seconds")
+    parser.add_argument("--ci-hook", choices=["install", "uninstall"], default=None, help="Install or uninstall automated git pre-push Local CI hook")
     parser.add_argument("--stubs", nargs="?", const=".", default=None, metavar="PATH", help="Generate PEP-484 AST type stubs (.pyi) for target file or workspace")
     parser.add_argument("--stubs-out", default=None, metavar="DIR", help="Output directory for generated type stubs (default: alongside .py files)")
     parser.add_argument("--guard-install", action="store_true", help="Install local git pre-commit zero-leak and token security hook")
@@ -9835,8 +9844,19 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
         entry = LocalSemanticCommitSynthesizer.generate_changelog_entry(version=args.changelog, repo_dir=args.dir)
         print(entry)
     elif args.ci is not None:
-        from tzero.tzero_ci import CIPipelineGenerator
         target = args.ci
+        if target in ("local", "run"):
+            from tzero.tzero_ci import LocalCIRunner
+            runner = LocalCIRunner(repo_dir=args.dir, quick=getattr(args, "quick_ci", False))
+            report = runner.run()
+            if getattr(args, "format", "text") == "json":
+                import json
+                print(json.dumps(report.to_dict(), indent=2))
+            else:
+                print(LocalCIRunner.render_terminal_report(report))
+            sys.exit(0 if report.passed else 1)
+
+        from tzero.tzero_ci import CIPipelineGenerator
         installed = []
         if target in ("github", "all"):
             _, p = CIPipelineGenerator.install_github_workflow(args.dir)
@@ -9850,6 +9870,28 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
         print("\033[32m[SUCCESS] Turnkey CI/CD pipelines installed:\033[0m")
         for p in installed:
             print(f"  - {os.path.relpath(p, args.dir)}")
+    elif getattr(args, "local_ci", False) or getattr(args, "quick_ci", False):
+        from tzero.tzero_ci import LocalCIRunner
+        runner = LocalCIRunner(repo_dir=args.dir, quick=getattr(args, "quick_ci", False), auto_fix=getattr(args, "fix", False))
+        report = runner.run()
+        if getattr(args, "format", "text") == "json":
+            import json
+            print(json.dumps(report.to_dict(), indent=2))
+        else:
+            print(LocalCIRunner.render_terminal_report(report))
+        sys.exit(0 if report.passed else 1)
+    elif getattr(args, "ci_hook", None):
+        from tzero.tzero_ci import LocalCIRunner
+        if args.ci_hook == "install":
+            ok, msg = LocalCIRunner.install_git_pre_push_hook(args.dir)
+        else:
+            ok, msg = LocalCIRunner.uninstall_git_pre_push_hook(args.dir)
+        if ok:
+            print(f"\033[32m[SUCCESS]\033[0m {msg}")
+            sys.exit(0)
+        else:
+            print(f"\033[31m[FAILED]\033[0m {msg}")
+            sys.exit(1)
     elif args.stubs is not None:
         from tzero.tzero_stubs import TypeStubGenerator
         target = args.stubs

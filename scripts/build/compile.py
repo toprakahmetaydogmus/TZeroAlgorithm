@@ -76,7 +76,7 @@ def generate_siber_akademi_icon():
 def kill_running_tzero_processes():
     """Kill any running T-Zero binaries to avoid file locking on Windows."""
     if os.name == "nt":
-        for proc_name in ("TZeroAlgorithm.exe", "TZeroCLI.exe", "TZeroMCP.exe", "AddMCP.exe"):
+        for proc_name in ("TZeroAlgorithm.exe", "TZeroCLI.exe", "TZeroMCP.exe", "AddMCP.exe", "TZeroCI.exe"):
             try:
                 subprocess.run(["taskkill", "/F", "/IM", proc_name, "/T"], capture_output=True, text=True)
             except Exception:
@@ -238,6 +238,28 @@ def build_binary():
         prepare_target_file(installer_name)
         subprocess.run(installer_args, check=True)
 
+        ci_args = [
+            sys.executable, "-m", "PyInstaller",
+            "--onefile",
+            "--clean",
+            "--noconfirm",
+            "--name=TZeroCI",
+            "--distpath=dist",
+            "--workpath=build/TZeroCI",
+            "--specpath=build/specs",
+            "--collect-all=tzero",
+            "--collect-all=keyring",
+            "--collect-all=requests",
+            "--copy-metadata=keyring",
+            "--copy-metadata=requests",
+        ]
+        if icon_file:
+            ci_args.append(f"--icon={os.path.abspath(icon_file)}")
+        ci_args.extend(["--paths=.", "tzero/tzero_ci.py"])
+        ci_name = "TZeroCI.exe" if os.name == "nt" else "TZeroCI"
+        prepare_target_file(ci_name)
+        subprocess.run(ci_args, check=True)
+
         # Cleanup leftover .old_ backup files if any
         if os.path.exists("dist"):
             for fname in os.listdir("dist"):
@@ -253,6 +275,7 @@ def build_binary():
             os.path.join("dist", f"TZeroCLI{suffix}"),
             os.path.join("dist", f"TZeroMCP{suffix}"),
             os.path.join("dist", f"AddMCP{suffix}"),
+            os.path.join("dist", f"TZeroCI{suffix}"),
         ]
         missing = [path for path in expected_outputs if not os.path.exists(path)]
         if missing:

@@ -84,7 +84,24 @@ tzero init
 
 # 🧩 VS Code / Cursor Eklentisini (.vsix) Yükle:
 code --install-extension dist/tzero-vscode-11.14.0.vsix
+
+# ⚡ Yerel CI ve Pre-Push Korumasını Çalıştır ($0 Kota):
+tzero local-ci --quick
+
+# 🛡️ Otomatik Git Pre-Push Hook Kur (Hatalı push'ları engeller):
+tzero local-ci --install-hook
 ```
+
+---
+
+## ⚡ T-Zero Local CI: Sıfır Kota Tüketimiyle Yerel Doğrulama
+
+GitHub Actions dakikalarını yakıp uzakta hata beklemenin önüne geçin! **T-Zero Local CI**, uzaktaki tüm testleri yerel makinenizde **<10 saniyede** çalıştırır:
+
+- **7 Kademe Doğrulama:** Metadata Senkronizasyonu, %100 Sıfır-Sızıntı Güvenlik Taraması, AST ve T-4 Mimari Sınırları, flake8 Linter, Unit Testler, Node.js Eklenti Testleri ve M8ven MCP Uyumluluğu.
+- **Otomatik Git Kalkanı (`--install-hook`):** `git push` yaptığınızda yerel CI otomatik devreye girer. Tek bir hata varsa push durdurulur ve GitHub Actions kotanızdan **0 saniye** harcanır!
+- **Bağımsız Binary:** `dist/TZeroCI.exe` ile Python kurulumuna bile gerek kalmadan çalıştırabilirsiniz.
+
 
 ---
 

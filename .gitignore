@@ -6,7 +6,8 @@ __pycache__/
 .Python
 
 # PyInstaller / Build artifacts
-build/
+/build/
+!scripts/build/
 dist/
 *.vsix
 *.spec
