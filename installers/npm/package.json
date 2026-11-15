@@ -83,6 +83,7 @@
   },
   "homepage": "https://github.com/toprakahmetaydogmus/TZeroAlgorithm#readme",
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   }
 }

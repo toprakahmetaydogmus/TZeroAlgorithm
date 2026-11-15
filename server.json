@@ -2,7 +2,7 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.toprakahmetaydogmus/tzero",
   "title": "T-Zero AST Context Engine & Token Reducer",
-  "description": "Deterministic AST context compressor, 95% token reducer, and 20-tool Model Context Protocol (MCP) server for Cursor, Claude Desktop, Antigravity, Windsurf, and Copilot.",
+  "description": "Deterministic AST context compressor & 95% token reducer MCP server for AI coding assistants.",
   "repository": {
     "url": "https://github.com/toprakahmetaydogmus/TZeroAlgorithm",
     "source": "github"

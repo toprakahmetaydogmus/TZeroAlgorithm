@@ -19,8 +19,19 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
-          registry-url: 'https://registry.npmjs.org'
+          node-version: 24
+
+      - name: Ensure modern npm for OIDC Trusted Publishing
+        run: npm install -g npm@latest
+
+      - name: Strip any conflicting npmrc auth
+        run: |
+          if [ -f "$HOME/.npmrc" ]; then
+            sed -i '/_authToken/d' "$HOME/.npmrc" || true
+          fi
+          if [ -n "$NPM_CONFIG_USERCONFIG" ] && [ -f "$NPM_CONFIG_USERCONFIG" ]; then
+            sed -i '/_authToken/d' "$NPM_CONFIG_USERCONFIG" || true
+          fi
 
       - name: Publish package to npm
         run: |
