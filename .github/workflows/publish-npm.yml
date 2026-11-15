@@ -11,6 +11,9 @@ jobs:
   npm-publish:
     name: Publish tzero-mcp to npm
     runs-on: ubuntu-24.04
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - uses: actions/checkout@v5
 
@@ -20,22 +23,14 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
 
       - name: Publish package to npm
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          if [ -z "$NODE_AUTH_TOKEN" ]; then
-            echo "NPM_TOKEN secret is not set. Skipping npm publish."
-            exit 0
-          fi
           cd installers/npm
           PACKAGE_VERSION=$(node -p "require('./package.json').version")
           REMOTE_VERSION=$(npm view tzero-mcp version 2>/dev/null || echo "0.0.0")
+          echo "Package version: $PACKAGE_VERSION | Remote version: $REMOTE_VERSION"
           if [ "$PACKAGE_VERSION" = "$REMOTE_VERSION" ]; then
             echo "Version $PACKAGE_VERSION is already published on npm. Skipping."
           else
-            npm publish --access public || {
-              echo "::warning::npm publish failed. Verify NPM_TOKEN permissions and 2FA settings."
-              exit 0
-            }
+            npm publish --access public --provenance
           fi
 
