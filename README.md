@@ -1,4 +1,5 @@
 <a id="top"></a>
+<!-- mcp-name: io.github.toprakahmetaydogmus/tzero -->
 <div align="center">
 
 # 🧠 T-Zero: Deterministic AST Context Compressor & MCP Server
