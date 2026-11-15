@@ -5,11 +5,12 @@ name: Release
 #   * Run manually (Actions tab) -> test and build only; all executables are attached as artifacts.
 
 on:
-  push:
-    tags:
-      - "v*"
-      - "release-*"
   workflow_dispatch:
+    inputs:
+      create_release:
+        description: 'Publish executable artifacts to GitHub Release'
+        type: boolean
+        default: false
 
 permissions:
   contents: write
