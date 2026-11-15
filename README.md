@@ -11,7 +11,7 @@
 [![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Zero--GPU%20Live%20Demo-ffd21e?style=for-the-badge&logo=huggingface&logoColor=black)](https://huggingface.co/spaces/toprakke4/tzero-token-reducer)
 [![Live Vercel Hub](https://img.shields.io/badge/%E2%9A%A1%20Live%20Benchmark-Vercel%20Gateway-000000?style=for-the-badge&logo=vercel)](https://tzero-indol.vercel.app)
 [![Glama MCP Badge](https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm/badges/score.svg)](https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm)
-[![M8ven Score](https://m8ven.ai/badge/mcp/toprakahmetaydogmus-tzeroalgorithm-1glw0u?v=40132561a35221541690f473a64dca64)](https://m8ven.ai/mcp/toprakahmetaydogmus-tzeroalgorithm-1glw0u?s=readme)
+[![M8ven Score](https://m8ven.ai/badge/mcp/toprakahmetaydogmus/tzeroalgorithm)](https://m8ven.ai/mcp/toprakahmetaydogmus/tzeroalgorithm?s=readme)
 [![TDQS 5.0/5.0](https://img.shields.io/badge/TDQS-5.0%20%2F%205.0%20Anchor%20Certified-10b981?style=flat-square&logo=checkmarx&logoColor=white)](#tdqs-certification)
 [![PyPI Version](https://img.shields.io/pypi/v/tzero-mcp?color=38bdf8&style=flat-square&logo=pypi)](https://pypi.org/project/tzero-mcp/)
 [![npm Version](https://img.shields.io/npm/v/tzero-mcp?color=cb3837&style=flat-square&logo=npm)](https://www.npmjs.com/package/tzero-mcp)
@@ -54,7 +54,7 @@
 [![Smithery Registry](https://img.shields.io/badge/%E2%9A%A1%20Smithery%20MCP-Compatible%20v11.13.0-FF5722?style=for-the-badge&logo=dependabot&logoColor=white)](https://smithery.ai)
 [![npm Package](https://img.shields.io/badge/%F0%9F%93%A6%20npm-tzero--mcp-cb3837?style=for-the-badge&logo=npm&logoColor=white)](https://www.npmjs.com/package/tzero-mcp)
 [![Glama Grade A](https://img.shields.io/badge/%E2%9A%A1%20Glama%20MCP-Grade%20A%20Verified-8b5cf6?style=for-the-badge&logo=checkmarx&logoColor=white)](https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm)
-[![M8ven Score](https://m8ven.ai/badge/mcp/toprakahmetaydogmus-tzeroalgorithm-1glw0u?v=40132561a35221541690f473a64dca64)](https://m8ven.ai/mcp/toprakahmetaydogmus-tzeroalgorithm-1glw0u?s=readme)
+[![M8ven Score](https://m8ven.ai/badge/mcp/toprakahmetaydogmus/tzeroalgorithm)](https://m8ven.ai/mcp/toprakahmetaydogmus/tzeroalgorithm?s=readme)
 
 </div>
 
