@@ -32,6 +32,7 @@ class TestPackagingAndVersionSync(unittest.TestCase):
         scripts = data["project"]["scripts"]
         self.assertEqual(scripts.get("tzero-tui"), "tzero.tzero_tui:main")
         self.assertEqual(scripts.get("pc-fixer-mcp"), "pc_fixer_mcp:main")
+        self.assertEqual(scripts.get("tzero-promo"), "tzero.tzero_promo:main")
         self.assertIn("space", data["project"]["optional-dependencies"])
 
     def test_all_release_manifests_share_canonical_version(self):
@@ -63,6 +64,17 @@ class TestPackagingAndVersionSync(unittest.TestCase):
             self.assertIsNotNone(m, f"Version missing in {rb_path}")
             self.assertEqual(m.group(1), canonical, f"Version mismatch in {rb_path}")
             self.assertIn(f"release-{canonical}.tar.gz", rb_text)
+
+        scoop_pkg = json.loads((ROOT_DIR / "installers" / "scoop" / "tzero.json").read_text(encoding="utf-8"))
+        self.assertEqual(scoop_pkg["version"], canonical)
+
+        winget_dir = ROOT_DIR / "installers" / "winget" / "manifests" / "s" / "SiberAkademi" / "TZero" / canonical
+        self.assertTrue(winget_dir.is_dir(), f"Winget manifest dir missing for {canonical}")
+        for manifest_suffix in ("yaml", "installer.yaml", "locale.en-US.yaml"):
+            manifest_file = winget_dir / f"SiberAkademi.TZero.{manifest_suffix}"
+            self.assertTrue(manifest_file.is_file(), f"Missing winget manifest: {manifest_file}")
+            text = manifest_file.read_text(encoding="utf-8")
+            self.assertIn(f"PackageVersion: {canonical}", text)
 
         import addmcp
         from tzero import tzero_mcp

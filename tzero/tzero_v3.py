@@ -8736,6 +8736,7 @@ def run_watch_mode(target_dir: str = ".", interval: float = 1.0, once_test: bool
 
 def main():
     import argparse
+    import json
 
     try:
         try:
@@ -8772,6 +8773,12 @@ def main():
         from tzero.tzero_ci import main as ci_main
         sys.argv.pop(1)
         sys.exit(ci_main())
+
+    # Fast path for promo / launch subcommands
+    if len(sys.argv) > 1 and sys.argv[1].lower() in ("promo", "launch", "marketing"):
+        from tzero.tzero_promo import main as promo_main
+        sys.argv.pop(1)
+        sys.exit(promo_main())
 
     parser = argparse.ArgumentParser(
         description="Siber Akademi T-Zero Context Architect V3 - Enterprise Codebase Context Builder & Token Reducer",
@@ -8827,6 +8834,7 @@ def main():
     parser.add_argument("--helpers", "--suggest-helpers", metavar="QUERY", help="Discover reusable helpers/utilities across repository AST to avoid duplicate code")
     parser.add_argument("--guard", "--verify-code", metavar="CODE_OR_FILE", help="Validate code against AST contracts to eliminate hallucinations before applying")
     parser.add_argument("--grounding-contract", action="store_true", help="Generate immutable AST grounding contract for LLM prompt pinning")
+    parser.add_argument("--promo", action="store_true", help="Generate zero-cost organic launch kit in docs/launch/")
     parser.add_argument("--patch", "--apply-patch", dest="apply_patch", metavar="DIFF_FILE_OR_STR", help="Apply patch with AST-tolerant fuzzy matching (whitespace & line drift agnostic)")
     parser.add_argument("--target", default=None, metavar="TARGET_FILE", help="Target file for --patch (optional if patch specifies file header)")
     parser.add_argument("--fuzzy", action="store_true", default=True, help="Enable fuzzy AST and whitespace matching for patch application (default: True)")
@@ -9207,6 +9215,9 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
     if getattr(args, "info", False):
         print_quickstart_guide()
         return
+    elif getattr(args, "promo", False):
+        from tzero.tzero_promo import main as promo_main
+        sys.exit(promo_main())
     elif args.doctor:
         if tzero_deps is None:
             print("[ERROR] tzero_deps.py is missing; reinstall T-Zero to use --doctor.")

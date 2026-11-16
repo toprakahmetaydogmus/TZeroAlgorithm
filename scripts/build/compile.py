@@ -312,6 +312,7 @@ def create_release_bundle():
         f"TZeroCLI{suffix}",
         f"TZeroMCP{suffix}",
         f"AddMCP{suffix}",
+        f"TZeroCI{suffix}",
     ]
     
     if os.name == "nt":

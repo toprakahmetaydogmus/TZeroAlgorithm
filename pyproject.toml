@@ -99,6 +99,7 @@ tzero-fixer = "tzero.tzero_v3:main"
 tzero-explain = "tzero.tzero_v3:main"
 tzero-ci = "tzero.tzero_ci:main"
 tzero-local-ci = "tzero.tzero_ci:main"
+tzero-promo = "tzero.tzero_promo:main"
 
 [tool.setuptools]
 packages = ["tzero", "tzero.tzero_jarvis", "tzero.tzero_fixer"]

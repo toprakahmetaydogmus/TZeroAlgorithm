@@ -68,6 +68,9 @@ def sync_release_metadata(target_version: str, check_only: bool = False) -> Dict
     results["extensions/vscode/package.json"] = _update_json_version(
         ROOT_DIR / "extensions" / "vscode" / "package.json", target_version, ["version"], check_only
     )
+    results["installers/scoop/tzero.json"] = _update_json_version(
+        ROOT_DIR / "installers" / "scoop" / "tzero.json", target_version, ["version"], check_only
+    )
 
     for rel in ("Formula/tzero.rb", "installers/brew/tzero.rb"):
         p = ROOT_DIR / rel
