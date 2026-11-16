@@ -1,9 +1,10 @@
 ---
-name: 💡 Feature Request
+name: "\U0001F4A1 Feature Request"
 about: Suggest an idea or new language support for T-Zero
 title: "[FEATURE] "
 labels: enhancement
 assignees: toprakahmetaydogmus
+
 ---
 
 ### Is your feature request related to a problem?
