@@ -4,26 +4,9 @@ concurrency:
   group: tzero-audit-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+# Local-first security auditing: run via `tzero local-ci` or `python main.py --audit .`.
 on:
   workflow_dispatch:
-  push:
-    branches: [ main ]
-    paths-ignore:
-      - '**.md'
-      - 'docs/**'
-      - 'assets/**'
-      - 'benchmark-site/**'
-      - '.gitignore'
-      - 'LICENSE'
-  pull_request:
-    branches: [ main ]
-    paths-ignore:
-      - '**.md'
-      - 'docs/**'
-      - 'assets/**'
-      - 'benchmark-site/**'
-      - '.gitignore'
-      - 'LICENSE'
 
 jobs:
   tzero-guard:

@@ -187,7 +187,7 @@ function activate(context) {
             { label: '$(tools) System Diagnostics (--doctor)', command: 'tzero.doctor' },
             { label: '$(globe) Launch Local Web Dashboard', command: 'tzero.openDashboard' }
         ];
-        const picked = await vscode.window.showQuickPick(items, { placeHolder: 'T-Zero Context Architect Command Center (v11.15.0)' });
+        const picked = await vscode.window.showQuickPick(items, { placeHolder: 'T-Zero Context Architect Command Center (v11.15.1)' });
         if (picked) {
             vscode.commands.executeCommand(picked.command);
         }
@@ -508,6 +508,29 @@ function activate(context) {
         if (wsRoot && !fs.existsSync(path.join(wsRoot, '.tzero')) && !fs.existsSync(path.join(wsRoot, '.mcp.json'))) {
             runTZeroCli(['--init', 'all'], wsRoot).then(() => refreshWorkspaceMetrics()).catch(() => {});
         }
+    }
+
+    // One-time gentle GitHub Star prompt after positive activation
+    const hasPromptedStar = context.globalState.get('tzero.hasPromptedStar', false);
+    if (!hasPromptedStar) {
+        const starTimer = setTimeout(async () => {
+            try {
+                const choice = await vscode.window.showInformationMessage(
+                    '⭐ Enjoying T-Zero Context Architect? Support our open-source project with a star on GitHub!',
+                    '⭐ Star on GitHub',
+                    'Dismiss'
+                );
+                if (choice === '⭐ Star on GitHub') {
+                    vscode.env.openExternal(vscode.Uri.parse('https://github.com/toprakahmetaydogmus/TZeroAlgorithm'));
+                    context.globalState.update('tzero.hasPromptedStar', true);
+                } else if (choice === 'Dismiss') {
+                    context.globalState.update('tzero.hasPromptedStar', true);
+                }
+            } catch (_) {
+                // Ignore if window is disposed
+            }
+        }, 30000);
+        context.subscriptions.push({ dispose: () => clearTimeout(starTimer) });
     }
 }
 

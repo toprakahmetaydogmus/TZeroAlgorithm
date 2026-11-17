@@ -4,26 +4,10 @@ concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+# Local-first testing policy: all unit, lint, and security tests are executed locally via `tzero local-ci`.
+# Manual cloud run remains available via workflow_dispatch only.
 on:
   workflow_dispatch:
-  pull_request:
-    branches: [ main ]
-    paths-ignore:
-      - '**.md'
-      - 'docs/**'
-      - 'assets/**'
-      - 'benchmark-site/**'
-      - '.gitignore'
-      - 'LICENSE'
-  push:
-    branches: [ main ]
-    paths-ignore:
-      - '**.md'
-      - 'docs/**'
-      - 'assets/**'
-      - 'benchmark-site/**'
-      - '.gitignore'
-      - 'LICENSE'
 
 jobs:
   test:

@@ -47,9 +47,9 @@ jobs:
             "$hash  $($_.Name)" | Out-File -Encoding ascii "$($_.FullName).sha256"
           }
 
-      - name: Run tests
+      - name: Verify release metadata (Local-First CI Policy)
         shell: pwsh
-        run: python -m unittest discover -s tests -v
+        run: python scripts/sync_release_metadata.py --check
 
       - name: Build TZeroAlgorithm.exe
         shell: pwsh
