@@ -2129,7 +2129,7 @@ def create_mcp_server():
         name="jarvis_self_healing_execute",
         title="Diagnose Test Failures and Apply AST Self-Healing Patches",
         description=(
-            "Runs a trusted shell command and attempts a limited, verified Python syntax repair. Commands run on the host and are not sandboxed.\n"
+            "Runs a trusted shell command and attempts a limited, verified Python syntax repair. Agent shell execution is disabled by default; the server operator must explicitly set TZERO_ALLOW_AGENT_SHELL=1 before starting the server. Commands run on the host and are not sandboxed.\n"
             "\n"
             "Parameters:\n"
             "- `command` (str, required): Shell command or test script to execute.\n"
@@ -2155,6 +2155,11 @@ def create_mcp_server():
         max_retries: Annotated[int, Field(default=3, description="Zero disables repair; a positive value permits one repair attempt.")] = 3
     ) -> str:
         """Runs command with autonomous AST error diagnosis and auto-repair."""
+        from tzero.tzero_jarvis.self_healing import agent_command_execution_enabled
+        if not agent_command_execution_enabled():
+            return ("Self-healing command blocked: agent shell execution is disabled. "
+                    "Only the server operator can enable it with TZERO_ALLOW_AGENT_SHELL=1; "
+                    "enabled commands run without a sandbox.")
         from tzero.tzero_jarvis import SelfHealingExecutionEngine
         engine = SelfHealingExecutionEngine()
         res = engine.execute_and_heal(command, max_retries=max_retries)
@@ -4525,6 +4530,15 @@ def create_mcp_server():
         elif act in ("drift", "drift_analysis", "instruction_drift", "attention_drift"):
             return analyze_instruction_drift(workspace_dir=target if os.path.isdir(target) else ".")
 
+        elif act in ("ci", "local_ci", "local-ci", "run_local_ci"):
+            return run_local_ci(
+                quick=bool(opts.get("quick", False)),
+                auto_fix=bool(opts.get("auto_fix", False)),
+                install_hook=bool(opts.get("install_hook", False)),
+                uninstall_hook=bool(opts.get("uninstall_hook", False)),
+                project_root=target if os.path.isdir(target) else "."
+            )
+
         elif act in ("merge_heal", "semantic_merge", "merge", "conflict_heal"):
             from tzero.tzero_semantic_merge import ASTSemanticMerger
             target_file = target or query
@@ -4729,7 +4743,27 @@ def create_mcp_server():
             f"❌ Unknown action '{act}'.\n"
             f"Supported actions: 'auto', 'context', 'audit', 'security', 'blueprint', 'dependencies', "
             f"'impact', 'search', 'prune', 'rules', 'enforce', 'cost', 'memory', 'swarm', 'heal', 'design', "
-            f"'patch', 'pagerank', 'dead_code', 'duplicity', 'call_chain', 'sync', 'roi', 'drift'."
+            f"'patch', 'pagerank', 'dead_code', 'duplicity', 'call_chain', 'sync', 'roi', 'drift', 'ci', 'local_ci'."
+        )
+
+    def run_local_ci(quick: bool = False, auto_fix: bool = False, install_hook: bool = False, uninstall_hook: bool = False, project_root: str = ".") -> str:
+        """Executes T-Zero Local CI suite locally on the developer machine."""
+        from tzero.tzero_ci import LocalCIRunner
+        if install_hook:
+            ok, msg = LocalCIRunner.install_git_pre_push_hook(project_root)
+            return f"### T-Zero Pre-Push Git Hook Installation\n- Status: {'SUCCESS' if ok else 'FAILED'}\n- Message: {msg}\n"
+        if uninstall_hook:
+            ok, msg = LocalCIRunner.uninstall_git_pre_push_hook(project_root)
+            return f"### T-Zero Pre-Push Git Hook Removal\n- Status: {'SUCCESS' if ok else 'FAILED'}\n- Message: {msg}\n"
+
+        runner = LocalCIRunner(repo_dir=project_root, quick=quick, auto_fix=auto_fix)
+        report = runner.run()
+        return (
+            f"### T-Zero Local CI Verification Report\n"
+            f"- **Status:** {'✅ ALL PASSED' if report.passed else '❌ FAILED'}\n"
+            f"- **Duration:** {report.total_duration:.2f}s\n"
+            f"- **Remote Actions Quota Saved:** ~{report.estimated_actions_minutes_saved:.1f} minutes\n\n"
+            + "\n".join([f"- [{'PASS' if s.passed else 'FAIL'}] **{s.name}** ({s.duration:.2f}s): {s.output or s.error}" for s in report.steps])
         )
 
     # Register canonical mappings
@@ -4757,9 +4791,13 @@ def create_mcp_server():
     _CANONICAL_DISPATCH['sync_workspace_rules'] = sync_workspace_rules
     _CANONICAL_DISPATCH['calculate_token_cost_roi'] = calculate_token_cost_roi
     _CANONICAL_DISPATCH['analyze_instruction_drift'] = analyze_instruction_drift
+    _CANONICAL_DISPATCH['run_local_ci'] = run_local_ci
+    _CANONICAL_DISPATCH['execute_local_ci'] = run_local_ci
     _LEGACY_DISPATCH['sync_workspace_rules'] = sync_workspace_rules
     _LEGACY_DISPATCH['calculate_token_cost_roi'] = calculate_token_cost_roi
     _LEGACY_DISPATCH['analyze_instruction_drift'] = analyze_instruction_drift
+    _LEGACY_DISPATCH['run_local_ci'] = run_local_ci
+    _LEGACY_DISPATCH['execute_local_ci'] = run_local_ci
 
     @server.tool(
         name="search_tools",

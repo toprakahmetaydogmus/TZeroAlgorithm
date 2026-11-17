@@ -21,6 +21,11 @@ from typing import Any, Dict, List, Optional, Tuple
 from tzero.tzero_jarvis.causal_graph import CausalTemporalGraph
 
 
+def agent_command_execution_enabled() -> bool:
+    """Require the server operator to opt in before agent shell execution."""
+    return os.environ.get("TZERO_ALLOW_AGENT_SHELL") == "1"
+
+
 @dataclass
 class ExecutionResult:
     command: str

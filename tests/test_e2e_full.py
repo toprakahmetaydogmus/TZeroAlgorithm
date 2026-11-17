@@ -6,6 +6,7 @@ Tests all 37 MCP tools, the polyglot engine across all languages, and the web da
 import asyncio
 import json
 import os
+from unittest.mock import patch
 import threading
 import time
 import unittest
@@ -224,7 +225,8 @@ class TestAllMCPToolsExhaustive(unittest.TestCase):
         self.assertTrue(len(res) > 10)
 
         # 30. jarvis_self_healing_execute
-        res = self.call("jarvis_self_healing_execute", {"command": "python -c \"print('healing check')\""})
+        with patch.dict(os.environ, {"TZERO_ALLOW_AGENT_SHELL": "1"}):
+            res = self.call("jarvis_self_healing_execute", {"command": "python -c \"print('healing check')\""})
         self.assertIn("healing check", res)
 
         # 31. jarvis_consolidate_memory

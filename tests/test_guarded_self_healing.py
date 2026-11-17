@@ -3,11 +3,22 @@ import sys
 import tempfile
 import unittest
 from unittest.mock import patch
+import os
 
-from tzero.tzero_jarvis.self_healing import ExecutionResult, SelfHealingExecutionEngine
+from tzero.tzero_jarvis.self_healing import (
+    ExecutionResult, SelfHealingExecutionEngine, agent_command_execution_enabled,
+)
 
 
 class GuardedHealingTests(unittest.TestCase):
+    def test_agent_shell_requires_explicit_operator_opt_in(self):
+        with patch.dict(os.environ, {}, clear=True):
+            self.assertFalse(agent_command_execution_enabled())
+            os.environ["TZERO_ALLOW_AGENT_SHELL"] = "true"
+            self.assertFalse(agent_command_execution_enabled())
+            os.environ["TZERO_ALLOW_AGENT_SHELL"] = "1"
+            self.assertTrue(agent_command_execution_enabled())
+
     def test_successful_repair_and_diff(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "broken.py"

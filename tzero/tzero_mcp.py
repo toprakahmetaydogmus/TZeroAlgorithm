@@ -2129,7 +2129,7 @@ def create_mcp_server():
         name="jarvis_self_healing_execute",
         title="Diagnose Test Failures and Apply AST Self-Healing Patches",
         description=(
-            "Runs a trusted shell command and attempts a limited, verified Python syntax repair. Commands run on the host and are not sandboxed.\n"
+            "Runs a trusted shell command and attempts a limited, verified Python syntax repair. Agent shell execution is disabled by default; the server operator must explicitly set TZERO_ALLOW_AGENT_SHELL=1 before starting the server. Commands run on the host and are not sandboxed.\n"
             "\n"
             "Parameters:\n"
             "- `command` (str, required): Shell command or test script to execute.\n"
@@ -2155,6 +2155,11 @@ def create_mcp_server():
         max_retries: Annotated[int, Field(default=3, description="Zero disables repair; a positive value permits one repair attempt.")] = 3
     ) -> str:
         """Runs command with autonomous AST error diagnosis and auto-repair."""
+        from tzero.tzero_jarvis.self_healing import agent_command_execution_enabled
+        if not agent_command_execution_enabled():
+            return ("Self-healing command blocked: agent shell execution is disabled. "
+                    "Only the server operator can enable it with TZERO_ALLOW_AGENT_SHELL=1; "
+                    "enabled commands run without a sandbox.")
         from tzero.tzero_jarvis import SelfHealingExecutionEngine
         engine = SelfHealingExecutionEngine()
         res = engine.execute_and_heal(command, max_retries=max_retries)

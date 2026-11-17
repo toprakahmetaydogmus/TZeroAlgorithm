@@ -11,6 +11,14 @@ Writes use same-directory atomic replacement and check for observed concurrent
 changes before replacement. These checks are not an atomic compare-and-swap;
 avoid concurrent writers while healing.
 
+The MCP self-healing command endpoint denies agent-supplied commands by
+default. A server operator can opt in by setting `TZERO_ALLOW_AGENT_SHELL=1`
+in the server environment before startup. Do not enable this for untrusted
+agents: it allows arbitrary host shell commands. This gate applies to this
+endpoint (including its self-healing dispatch), not to other tools, direct
+Python calls, or processes outside T-Zero. It is not a sandbox or a general
+defense against malicious agents.
+
 ```python
 from tzero.tzero_jarvis.self_healing import SelfHealingExecutionEngine
 

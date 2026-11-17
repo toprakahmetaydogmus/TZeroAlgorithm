@@ -5,6 +5,7 @@ import os
 import unittest
 import tempfile
 import asyncio
+from unittest.mock import patch
 from tzero import tzero_mcp
 
 
@@ -31,6 +32,15 @@ class TestMCPServer(unittest.TestCase):
 
     def run_async(self, coro):
         return asyncio.run(coro)
+
+    def test_self_healing_agent_shell_blocked_by_default(self):
+        with patch.dict(os.environ, {"TZERO_ALLOW_AGENT_SHELL": ""}):
+            with patch("tzero.tzero_jarvis.self_healing.SelfHealingExecutionEngine.execute_and_heal") as execute:
+                result = self.run_async(self.server.call_tool(
+                    "jarvis_self_healing_execute", {"command": "dangerous command"}
+                ))
+                self.assertIn("blocked", tool_result_text(result))
+                execute.assert_not_called()
 
     def test_mcp_tools_and_prompts_registration(self):
         """Verifies that all 47 specialized MCP tools and grounding prompt are properly registered."""
@@ -504,10 +514,11 @@ class Worker:
         self.assertIn("T-Zero Chronological Timeline", out_causal)
 
         # 2. Self-Healing Execute
-        res_heal = self.run_async(self.server.call_tool(
-            "jarvis_self_healing_execute",
-            {"command": "python -c \"print('MCP Self-Healing Test OK')\""}
-        ))
+        with patch.dict(os.environ, {"TZERO_ALLOW_AGENT_SHELL": "1"}):
+            res_heal = self.run_async(self.server.call_tool(
+                "jarvis_self_healing_execute",
+                {"command": "python -c \"print('MCP Self-Healing Test OK')\""}
+            ))
         out_heal = tool_result_text(res_heal)
         self.assertIn("Self-Healing Execution Result", out_heal)
         self.assertIn("MCP Self-Healing Test OK", out_heal)
