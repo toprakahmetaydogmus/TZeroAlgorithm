@@ -2129,18 +2129,18 @@ def create_mcp_server():
         name="jarvis_self_healing_execute",
         title="Diagnose Test Failures and Apply AST Self-Healing Patches",
         description=(
-            "Executes commands in a guarded environment with automated error analysis and self-healing retry loops, distinguishing from 'jarvis_orchestrate_goal' and 'jarvis_bft_swarm_consensus' by focusing specifically on command execution recovery rather than full workspace orchestration or swarm consensus.\n"
+            "Runs a trusted shell command and attempts a limited, verified Python syntax repair. Commands run on the host and are not sandboxed.\n"
             "\n"
             "Parameters:\n"
             "- `command` (str, required): Shell command or test script to execute.\n"
-            "- `max_retries` (int, optional, default=3): Maximum self-healing repair iterations if execution fails.\n"
+            "- `max_retries` (int, optional, default=3): Set to zero to disable repairs; positive values permit one repair attempt.\n"
             "\n"
             "Behavior:\n"
             "- State-Modifying: Executes shell commands on local system and applies automated fixes on failure.\n"
             "- Non-idempotent: Command output and environmental state depend on local system execution.\n"
-            "- 100% Offline: Executes locally using native system shell; operates strictly offline.\n"
-            "- Auth & Rate Limits: Zero credentials required; execution bounded by command timeout (60s default).\n"
-            "- Error Handling: Intercepts non-zero exit codes, analyzes error stack traces, and synthesizes corrective micro-patches.\n"
+            "- Network: The engine makes no network calls itself, but the supplied command can access the network or incur costs.\n"
+            "- Execution: Commands run with a 30-second timeout and may have side effects.\n"
+            "- Error Handling: Supports a single missing-colon syntax repair; retries the command and rolls back on failure when the file is unchanged.\n"
             "\n"
             "Usage Guidelines:\n"
             "- When to use: Run test suites, build scripts, or deployment commands that may require automated error diagnosis and self-healing fixes.\n"
@@ -2148,11 +2148,11 @@ def create_mcp_server():
             "\n"
             "Returns: Markdown execution log with process exit code, stdout/stderr output, diagnostic analysis, and applied self-healing remedies."
         ),
-        annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=False, open_world_hint=False)
+        annotations=ToolAnnotations(read_only_hint=False, destructive_hint=True, idempotent_hint=False, open_world_hint=True)
     )
     def _legacy_jarvis_self_healing_execute(
         command: Annotated[str, Field(description="Shell command or test script to execute.")],
-        max_retries: Annotated[int, Field(default=3, description="Maximum self-healing repair iterations if execution fails (default: 3).")] = 3
+        max_retries: Annotated[int, Field(default=3, description="Zero disables repair; a positive value permits one repair attempt.")] = 3
     ) -> str:
         """Runs command with autonomous AST error diagnosis and auto-repair."""
         from tzero.tzero_jarvis import SelfHealingExecutionEngine
@@ -2168,6 +2168,7 @@ def create_mcp_server():
             f"- **Duration:** `{res.duration_ms} ms`\n"
             f"- **Applied Patches:** `{len(res.applied_patches)}`\n"
             + (f"- **Error Type:** `{res.error_type}` in `{res.error_file}:{res.error_line}`\n" if res.error_type else "")
+            + ("- **Diagnostics:** " + "; ".join(res.diagnostics) + "\n" if res.diagnostics else "")
             + f"\n**Stdout:**\n```\n{res.stdout[:1500]}\n```\n"
             + (f"**Stderr:**\n```\n{res.stderr[:1000]}\n```\n" if res.stderr else "")
         )

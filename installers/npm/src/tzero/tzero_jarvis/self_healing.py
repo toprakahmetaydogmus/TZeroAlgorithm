@@ -1,26 +1,24 @@
-# -*- coding: utf-8 -*-
-"""
-T-ZERO AUTONOMOUS SELF-HEALING EXECUTION ENGINE
-Developer: Toprak Ahmet Aydoğmuş (Siber Akademi)
-Version: 4.4.0
+"""Conservative, local Python repair with verification and rollback.
 
-Bu modül, kodları ve terminal komutlarını izole bir şekilde yürüten,
-oluşan hataları (SyntaxError, NameError, ImportError, runtime panic vb.)
-AST ve kural tabanlı cerrahi yamalarla otomatik olarak onaran (Auto-Patch)
-ve çözümü nedensellik çizgesine kaydeden otonom onarım motorudur.
+Commands are run on the host, not in a sandbox. Only run trusted commands.
+Repairs are intentionally limited to cases that can be checked syntactically.
 """
-
 from __future__ import annotations
-import os
-import sys
-import re
+
 import ast
-import time
+import difflib
+import io
+import os
+from pathlib import Path
+import re
 import subprocess
-import traceback
-from typing import Dict, List, Optional, Tuple, Any
+import tempfile
+import time
+import tokenize
 from dataclasses import dataclass, field
-from tzero.tzero_jarvis.causal_graph import CausalTemporalGraph, CausalRelationType
+from typing import Any, Dict, List, Optional, Tuple
+
+from tzero.tzero_jarvis.causal_graph import CausalTemporalGraph
 
 
 @dataclass
@@ -36,273 +34,184 @@ class ExecutionResult:
     error_file: Optional[str] = None
     applied_patches: List[str] = field(default_factory=list)
     resolved: bool = False
+    diagnostics: List[str] = field(default_factory=list)
 
     def to_dict(self) -> Dict[str, Any]:
-        return {
-            "command": self.command,
-            "exit_code": self.exit_code,
-            "stdout": self.stdout,
-            "stderr": self.stderr,
-            "duration_ms": self.duration_ms,
-            "success": self.success,
-            "error_type": self.error_type,
-            "error_line": self.error_line,
-            "error_file": self.error_file,
-            "applied_patches": self.applied_patches,
-            "resolved": self.resolved
-        }
+        return dict(self.__dict__)
+
+
+@dataclass(frozen=True)
+class RepairProposal:
+    path: Path
+    original: bytes
+    replacement: bytes
+    description: str
+    diff: str
 
 
 class SelfHealingExecutionEngine:
-    """
-    Otonom Hata Yakalama, Teşhis ve AST Tabanlı Otomatik Onarım Motoru.
-    """
+    """Propose limited repairs, then retain them only after command success."""
 
-    def __init__(self, causal_graph: Optional[CausalTemporalGraph] = None, work_dir: Optional[str] = None):
+    def __init__(self, causal_graph: Optional[CausalTemporalGraph] = None,
+                 work_dir: Optional[str] = None):
         self.causal_graph = causal_graph or CausalTemporalGraph()
-        self.work_dir = work_dir or os.getcwd()
+        self.work_dir = str(Path(work_dir or os.getcwd()).resolve())
 
     def run_command(self, command: str, timeout: int = 30) -> ExecutionResult:
-        """
-        Komutu çalıştırır, süreyi ve çıktıları ölçer.
-        """
-        start_time = time.time()
+        start = time.monotonic()
         try:
-            res = subprocess.run(
-                command,
-                shell=True,
-                capture_output=True,
-                text=True,
-                timeout=timeout,
-                cwd=self.work_dir
-            )
-            duration_ms = (time.time() - start_time) * 1000.0
-            success = (res.returncode == 0)
-            
-            error_type, error_file, error_line = None, None, None
-            if not success:
-                error_type, error_file, error_line = self.diagnose_error(res.stderr or res.stdout)
-
-            return ExecutionResult(
-                command=command,
-                exit_code=res.returncode,
-                stdout=res.stdout,
-                stderr=res.stderr,
-                duration_ms=round(duration_ms, 2),
-                success=success,
-                error_type=error_type,
-                error_file=error_file,
-                error_line=error_line,
-                resolved=success
-            )
-        except subprocess.TimeoutExpired:
-            return ExecutionResult(
-                command=command,
-                exit_code=-1,
-                stdout="",
-                stderr=f"TimeoutExpired after {timeout} seconds",
-                duration_ms=timeout * 1000.0,
-                success=False,
-                error_type="TimeoutExpired",
-                resolved=False
-            )
-        except Exception as e:
-            return ExecutionResult(
-                command=command,
-                exit_code=-2,
-                stdout="",
-                stderr=str(e),
-                duration_ms=(time.time() - start_time) * 1000.0,
-                success=False,
-                error_type=type(e).__name__,
-                resolved=False
-            )
+            proc = subprocess.run(command, shell=True, capture_output=True,
+                                  text=True, errors="replace", timeout=timeout,
+                                  cwd=self.work_dir)
+            kind, path, line = self.diagnose_error(proc.stderr or proc.stdout) if proc.returncode else (None, None, None)
+            return ExecutionResult(command, proc.returncode, proc.stdout, proc.stderr,
+                                   round((time.monotonic() - start) * 1000, 2),
+                                   proc.returncode == 0, kind, line, path,
+                                   resolved=proc.returncode == 0)
+        except (OSError, subprocess.TimeoutExpired) as exc:
+            return ExecutionResult(command, -1, "", str(exc),
+                                   round((time.monotonic() - start) * 1000, 2),
+                                   False, type(exc).__name__)
 
     def diagnose_error(self, error_text: str) -> Tuple[Optional[str], Optional[str], Optional[int]]:
-        """
-        Stderr ve stacktrace içinden hata türünü, dosya yolunu ve satır numarasını ayıklar.
-        """
-        if not error_text:
-            return None, None, None
-
-        # 1. Python Traceback: File "...", line X, in ...
-        py_tb_match = re.findall(r'File "([^"]+)", line (\d+)', error_text)
-        error_file, error_line = None, None
-        if py_tb_match:
-            error_file, line_str = py_tb_match[-1]
-            try:
-                error_line = int(line_str)
-            except ValueError:
-                pass
-
-        # 2. Rust/Cargo Error: --> src/main.rs:12:5
-        rust_match = re.search(r'-->\s+([^:]+):(\d+):(\d+)', error_text)
-        if rust_match:
-            error_file = rust_match.group(1)
-            try:
-                error_line = int(rust_match.group(2))
-            except ValueError:
-                pass
-
-        # 3. Hata Tipi Tespiti
-        err_type = "GenericExecutionError"
-        for line in reversed(error_text.strip().splitlines()):
-            line_str = line.strip()
-            # Örn: NameError: name 'foo' is not defined
-            # SyntaxError: invalid syntax
-            # ModuleNotFoundError: No module named '...'
-            match = re.match(r'^([A-Z][a-zA-Z0-9_]+Error|Exception|Panic|error\[E\d+\]):\s*(.*)', line_str)
+        matches = re.findall(r'File "([^"\n]+)", line (\d+)', error_text or "")
+        path, line = (matches[-1][0], int(matches[-1][1])) if matches else (None, None)
+        kind = None
+        for text in reversed((error_text or "").splitlines()):
+            match = re.match(r'^\s*([A-Za-z_][\w.]*(?:Error|Exception))(?::|$)', text)
             if match:
-                err_type = match.group(1)
+                kind = match.group(1)
                 break
-            if "panic" in line_str.lower():
-                err_type = "RustPanic"
-                break
-            if "syntax error" in line_str.lower():
-                err_type = "SyntaxError"
-                break
+        return kind or ("GenericExecutionError" if error_text else None), path, line
 
-        return err_type, error_file, error_line
-
-    def auto_repair_python_file(self, file_path: str, error_type: str, error_line: Optional[int], stderr: str) -> bool:
-        """
-        Belirtilen Python dosyasındaki yaygın hataları AST ve kural tabanlı olarak otomatik onarır.
-        """
-        if not os.path.exists(file_path):
-            return False
-
+    def _target(self, file_path: str) -> Optional[Path]:
+        root = Path(self.work_dir)
+        path = Path(file_path)
+        if not path.is_absolute():
+            path = root / path
+        # Disallow symlinks in every component, including the target.
         try:
-            with open(file_path, "r", encoding="utf-8") as f:
-                content = f.read()
-        except Exception:
+            if any(part.is_symlink() for part in (path, *path.parents)):
+                return None
+            resolved = path.resolve(strict=True)
+            relative = resolved.relative_to(root)
+            current = root
+            for part in relative.parts:
+                if part == "..":
+                    return None
+                current = current / part
+                if current.is_symlink():
+                    return None
+            return resolved if resolved.is_file() and resolved.suffix == ".py" else None
+        except (ValueError, OSError, RuntimeError):
+            return None
+
+    def propose_repair(self, file_path: str, error_type: str,
+                       error_line: Optional[int], stderr: str) -> Optional[RepairProposal]:
+        path = self._target(file_path)
+        if path is None:
+            return None
+        try:
+            original = path.read_bytes()
+            encoding, _ = tokenize.detect_encoding(io.BytesIO(original).readline)
+            source = original.decode(encoding)
+        except (OSError, SyntaxError, UnicodeError):
+            return None
+        lines = source.splitlines(keepends=True)
+        if error_type not in ("SyntaxError", "IndentationError") or not error_line or not 1 <= error_line <= len(lines):
+            return None
+        # Only act on Python's explicit missing-colon diagnostic, and only
+        # on simple, single-line compound statements without comments.
+        if not re.search(r"expected ['\"]:['\"]", stderr):
+            return None
+        idx = error_line - 1
+        line = lines[idx]
+        body = line.rstrip("\r\n")
+        if not re.match(r'^\s*(?:async\s+def|def|class|if|elif|else|for|while|with|try|except|finally)\b', body):
+            return None
+        if body.rstrip().endswith(":") or "#" in body or "\\" in body:
+            return None
+        ending = line[len(body):]
+        lines[idx] = body.rstrip() + ":" + ending
+        replacement_text = "".join(lines)
+        try:
+            ast.parse(replacement_text, filename=str(path))
+            replacement = replacement_text.encode(encoding)
+        except (SyntaxError, UnicodeError):
+            return None
+        diff = "".join(difflib.unified_diff(source.splitlines(True), replacement_text.splitlines(True),
+                                            fromfile=str(path), tofile=str(path)))
+        return RepairProposal(path, original, replacement, f"Add missing colon at line {error_line}", diff)
+
+    def auto_repair_python_file(self, file_path: str, error_type: str,
+                                error_line: Optional[int], stderr: str) -> bool:
+        """Legacy direct repair: syntax checked, but not command verified."""
+        proposal = self.propose_repair(file_path, error_type, error_line, stderr)
+        if proposal is None:
+            return False
+        try:
+            return self._replace_if_unchanged(proposal.path, proposal.original, proposal.replacement)
+        except OSError:
             return False
 
-        lines = content.splitlines(keepends=True)
-        modified = False
-        patch_note = ""
+    def _replace_if_unchanged(self, path: Path, expected: bytes, replacement: bytes) -> bool:
+        """Replace from a same-directory temporary file; refuse observed changes.
 
-        # Hata 1: ModuleNotFoundError / ImportError: No module named 'xxx'
-        mod_match = re.search(r"No module named ['\"]([^'\"]+)['\"]", stderr)
-        if mod_match:
-            missing_mod = mod_match.group(1)
-            # Eğer dahili bir alt paket veya standart kütüphane eksikliği ise sys.path ekle
-            if missing_mod in ("tzero_jarvis", "tzero", "crates"):
-                sys_path_inject = f"import sys, os\nsys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))\n"
-                if sys_path_inject not in content:
-                    lines.insert(0, sys_path_inject)
-                    modified = True
-                    patch_note = f"Injected sys.path for missing internal module {missing_mod}"
-
-        # Hata 2: NameError: name 'X' is not defined (Yaygın: os, sys, json, time, re, math)
-        name_match = re.search(r"name ['\"]([^'\"]+)['\"] is not defined", stderr)
-        if name_match:
-            missing_name = name_match.group(1)
-            common_std_libs = {
-                "os": "import os\n",
-                "sys": "import sys\n",
-                "json": "import json\n",
-                "time": "import time\n",
-                "re": "import re\n",
-                "math": "import math\n",
-                "Path": "from pathlib import Path\n",
-                "Optional": "from typing import Optional\n",
-                "List": "from typing import List\n",
-                "Dict": "from typing import Dict\n",
-                "Tuple": "from typing import Tuple\n",
-                "Any": "from typing import Any\n",
-            }
-            if missing_name in common_std_libs:
-                lines.insert(0, common_std_libs[missing_name])
-                modified = True
-                patch_note = f"Imported missing name '{missing_name}'"
-
-        # Hata 3: SyntaxError / IndentationError satır sonu eksik parantez veya iki nokta ':'
-        if error_type in ("SyntaxError", "IndentationError") and error_line and 1 <= error_line <= len(lines):
-            idx = error_line - 1
-            bad_line = lines[idx]
-            stripped = bad_line.strip()
-            # if, for, while, def, class sonuna ':' ekleme
-            for kw in ("if ", "for ", "while ", "def ", "class ", "elif ", "else:", "except"):
-                if stripped.startswith(kw) and not stripped.endswith(":"):
-                    lines[idx] = bad_line.rstrip() + ":\n"
-                    modified = True
-                    patch_note = f"Added missing colon ':' on line {error_line}"
-                    break
-
-        if modified:
-            try:
-                # AST syntax kontrolü yap, eğer geçerliyse kaydet
-                ast.parse("".join(lines))
-                with open(file_path, "w", encoding="utf-8") as f:
-                    f.writelines(lines)
-                return True
-            except SyntaxError:
-                # AST yine geçmediyse geri al
+        This is not a compare-and-swap: another process can still race the final
+        check. Atomic replacement avoids exposing a partially written file.
+        """
+        if self._target(str(path)) != path or path.read_bytes() != expected:
+            return False
+        mode = path.stat().st_mode & 0o777
+        temp_name = None
+        try:
+            with tempfile.NamedTemporaryFile(dir=str(path.parent), prefix=".tzero-heal-", delete=False) as temp:
+                temp_name = temp.name
+                temp.write(replacement)
+                temp.flush()
+                os.fsync(temp.fileno())
+            os.chmod(temp_name, mode)
+            if self._target(str(path)) != path or path.read_bytes() != expected:
                 return False
-
-        return False
+            os.replace(temp_name, path)
+            temp_name = None
+            return True
+        finally:
+            if temp_name is not None:
+                try:
+                    os.unlink(temp_name)
+                except FileNotFoundError:
+                    pass
 
     def execute_and_heal(self, command: str, max_retries: int = 3) -> ExecutionResult:
-        """
-        Komutu çalıştırır. Hata olursa teşhis eder, otomatik onarım uygular
-        ve başarıya ulaşana kadar (veya max_retries dolana kadar) döngüyü sürdürür.
-        Sonucu Causal Graph'a kaydeder.
-        """
-        attempt = 0
-        current_res = self.run_command(command)
-        applied_patches = []
-
-        while not current_res.success and attempt < max_retries:
-            attempt += 1
-            error_type = current_res.error_type or "UnknownError"
-            error_file = current_res.error_file
-
-            # Causal Graph'a hatayı düğüm olarak ekle
-            err_node_id = f"err_{int(time.time()*1000)%100000}"
-            self.causal_graph.add_node(
-                node_id=err_node_id,
-                label=f"Failure: {error_type} in {error_file or 'command'}",
-                entity_type="VULN",
-                attributes={"stderr": current_res.stderr[:200]}
-            )
-
-            repaired = False
-            if error_file and error_file.endswith(".py") and os.path.isabs(error_file):
-                repaired = self.auto_repair_python_file(
-                    error_file,
-                    error_type,
-                    current_res.error_line,
-                    current_res.stderr
-                )
-            elif error_file and error_file.endswith(".py"):
-                # Göreceli yol ise work_dir ile birleştir
-                full_path = os.path.join(self.work_dir, error_file)
-                if os.path.exists(full_path):
-                    repaired = self.auto_repair_python_file(
-                        full_path,
-                        error_type,
-                        current_res.error_line,
-                        current_res.stderr
-                    )
-
-            if repaired:
-                patch_id = f"patch_{int(time.time()*1000)%100000}"
-                self.causal_graph.add_node(
-                    node_id=patch_id,
-                    label=f"AutoPatch applied to {error_file}",
-                    entity_type="SOFTWARE"
-                )
-                self.causal_graph.add_edge(patch_id, err_node_id, relation=CausalRelationType.FIXES)
-                applied_patches.append(f"Auto-patched {error_file} on line {current_res.error_line}")
-                
-                # Tekrar dene
-                current_res = self.run_command(command)
-                if current_res.success:
-                    current_res.resolved = True
-                    break
+        result = self.run_command(command)
+        if result.success or max_retries <= 0 or not result.error_file:
+            return result
+        proposal = self.propose_repair(result.error_file, result.error_type or "", result.error_line,
+                                       result.stderr or result.stdout)
+        if proposal is None:
+            result.diagnostics.append("No supported safe repair proposal found.")
+            return result
+        try:
+            if not self._replace_if_unchanged(proposal.path, proposal.original, proposal.replacement):
+                result.diagnostics.append("File changed before repair; no patch applied.")
+                return result
+            verified = self.run_command(command)
+            if verified.success and self._target(str(proposal.path)) == proposal.path and proposal.path.read_bytes() == proposal.replacement:
+                verified.applied_patches.append(proposal.description + "\n" + proposal.diff)
+                return verified
+            if self._replace_if_unchanged(proposal.path, proposal.replacement, proposal.original):
+                verified.diagnostics.append("Verification failed; original file restored.")
             else:
-                # Otomatik kural bulunamadı, döngüden çık
-                break
-
-        current_res.applied_patches = applied_patches
-        return current_res
+                verified.success = False
+                verified.resolved = False
+                verified.diagnostics.append("File changed during verification; repair is unverified and automatic rollback was skipped.")
+            return verified
+        except OSError as exc:
+            result.diagnostics.append(f"Repair failed: {exc}")
+            try:
+                if self._replace_if_unchanged(proposal.path, proposal.replacement, proposal.original):
+                    result.diagnostics.append("Original file restored after repair error.")
+            except OSError as rollback_error:
+                result.diagnostics.append(f"Rollback failed: {rollback_error}")
+            return result

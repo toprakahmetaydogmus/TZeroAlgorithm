@@ -130,14 +130,9 @@ class JarvisOrchestrator:
             err = res["stderr"]
             logger.warning(f"Otonom Hata Tespiti (Deneme {attempts}/{max_retries}): {err[:150]}")
 
-            # Basit eksik paket tespiti (Örn: ModuleNotFoundError: No module named 'xyz')
-            mod_match = re.search(r"No module named ['\"]([^'\"]+)['\"]", err)
-            if mod_match:
-                missing_pkg = mod_match.group(1)
-                pip_res = self.execute_terminal(f"python -m pip install {missing_pkg}")
-                if pip_res["success"]:
-                    logger.info(f"Otonom Paket Onarımı: {missing_pkg} yüklendi.")
-                    continue
+            # Never install packages inferred from untrusted command output.
+            # Dependency installation may access the network or incur charges.
+            break
 
         return {
             "success": False,
