@@ -2161,22 +2161,33 @@ def create_mcp_server():
                     "Only the server operator can enable it with TZERO_ALLOW_AGENT_SHELL=1; "
                     "enabled commands run without a sandbox.")
         from tzero.tzero_jarvis import SelfHealingExecutionEngine
-        engine = SelfHealingExecutionEngine()
+        engine = SelfHealingExecutionEngine(enforce_agent_policy=True)
         res = engine.execute_and_heal(command, max_retries=max_retries)
-        
+
         status_emoji = "✅" if res.success else "❌"
-        return (
-            f"### {status_emoji} Self-Healing Execution Result\n"
-            f"- **Command:** `{res.command}`\n"
-            f"- **Success:** `{res.success}` (Resolved: `{res.resolved}`)\n"
-            f"- **Exit Code:** `{res.exit_code}`\n"
-            f"- **Duration:** `{res.duration_ms} ms`\n"
-            f"- **Applied Patches:** `{len(res.applied_patches)}`\n"
-            + (f"- **Error Type:** `{res.error_type}` in `{res.error_file}:{res.error_line}`\n" if res.error_type else "")
-            + ("- **Diagnostics:** " + "; ".join(res.diagnostics) + "\n" if res.diagnostics else "")
-            + f"\n**Stdout:**\n```\n{res.stdout[:1500]}\n```\n"
-            + (f"**Stderr:**\n```\n{res.stderr[:1000]}\n```\n" if res.stderr else "")
-        )
+        lines = [
+            f"### {status_emoji} Self-Healing Execution Result",
+            f"- **Command:** `{res.command}`",
+            f"- **Success:** `{res.success}` (Resolved: `{res.resolved}`)",
+            f"- **Exit Code:** `{res.exit_code}`",
+            f"- **Duration:** `{res.duration_ms} ms`",
+            f"- **Applied Patches:** `{len(res.applied_patches)}`"
+        ]
+        if res.risk_level:
+            lines.append(f"- **Risk Level:** `{res.risk_level}`")
+        if res.blocked_by_policy:
+            lines.append("- **Security Notice:** 🛡️ Command execution blocked by safety policy.")
+        if res.dry_run:
+            lines.append("- **Execution Mode:** `[Dry-Run Preview]`")
+        if res.error_type:
+            lines.append(f"- **Error Type:** `{res.error_type}` in `{res.error_file}:{res.error_line}`")
+        if res.diagnostics:
+            lines.append("- **Diagnostics:** " + "; ".join(res.diagnostics))
+        if res.stdout:
+            lines.append(f"\n**Stdout:**\n```\n{res.stdout[:1500]}\n```")
+        if res.stderr:
+            lines.append(f"\n**Stderr:**\n```\n{res.stderr[:1000]}\n```")
+        return "\n".join(lines)
 
     # -------------------------------------------------------------------------
     # TOOL 31: jarvis_consolidate_memory

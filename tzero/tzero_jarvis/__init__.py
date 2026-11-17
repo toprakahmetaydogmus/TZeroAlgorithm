@@ -32,7 +32,21 @@ from .causal_graph import (
 )
 from .self_healing import (
     SelfHealingExecutionEngine,
-    ExecutionResult
+    ExecutionResult,
+    RepairProposal
+)
+from .agent_guard import (
+    CommandRiskLevel,
+    CommandEvaluation,
+    CommandRiskAssessor,
+    CommandExecutionPolicy,
+    PathGuard,
+    SecretRedactor,
+    AIGroundingVerifier,
+    MultiFileRollbackStack,
+    SecurityAuditEvent,
+    SecurityAuditLogger,
+    GLOBAL_AUDIT_LOGGER
 )
 from .memory_consolidation import (
     ConsolidationEngine,

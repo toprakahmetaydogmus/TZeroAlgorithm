@@ -28,6 +28,13 @@ from typing import Dict, List, Optional, Any, Callable
 from .semantic_compressor import get_global_compressor
 from .zero_key_router import ZeroKeyAIRouter
 from .workspace_orchestrator import WorkspaceOrchestrator, WorkspaceProfile
+from .agent_guard import (
+    CommandRiskAssessor,
+    CommandExecutionPolicy,
+    SecretRedactor,
+    GLOBAL_AUDIT_LOGGER,
+)
+from .self_healing import SelfHealingExecutionEngine
 
 # Core T-Zero Import
 try:
@@ -85,9 +92,25 @@ class JarvisOrchestrator:
     def execute_terminal(self, command: str, cwd: Optional[str] = None, timeout: int = 40) -> Dict[str, Any]:
         """PowerShell / Komut satırı üzerinden komut çalıştırır."""
         work_dir = cwd or self.workspace_root
+        policy = CommandExecutionPolicy.from_environment()
+        evaluation = CommandRiskAssessor.assess(command)
+
+        # Enforce operator policy when agent shell execution is evaluated
+        if os.environ.get("TZERO_ENFORCE_AGENT_POLICY") == "1" or not policy.allow_agent_shell:
+            allowed, reason = policy.is_command_allowed(evaluation)
+            if not allowed:
+                GLOBAL_AUDIT_LOGGER.record("ORCHESTRATOR_COMMAND_BLOCKED", command, "DENY", reason)
+                return {
+                    "exit_code": -1,
+                    "stdout": "",
+                    "stderr": f"Command blocked by safety policy: {reason}",
+                    "success": False
+                }
+
         try:
+            shell_cmd = ["powershell", "-NoProfile", "-Command", command] if os.name == "nt" else ["sh", "-c", command]
             p = subprocess.Popen(
-                ["powershell", "-NoProfile", "-Command", command],
+                shell_cmd,
                 cwd=work_dir,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
@@ -96,49 +119,33 @@ class JarvisOrchestrator:
                 errors="replace"
             )
             stdout, stderr = p.communicate(timeout=timeout)
+            safe_stdout = SecretRedactor.sanitize(stdout.strip())
+            safe_stderr = SecretRedactor.sanitize(stderr.strip())
             return {
                 "exit_code": p.returncode,
-                "stdout": stdout.strip(),
-                "stderr": stderr.strip(),
+                "stdout": safe_stdout,
+                "stderr": safe_stderr,
                 "success": p.returncode == 0
             }
         except subprocess.TimeoutExpired:
             p.kill()
             return {"exit_code": -1, "stdout": "", "stderr": f"Komut zaman aşımına uğradı ({timeout}s).", "success": False}
         except Exception as e:
-            return {"exit_code": -1, "stdout": "", "stderr": str(e), "success": False}
+            return {"exit_code": -1, "stdout": "", "stderr": SecretRedactor.sanitize(str(e)), "success": False}
 
     def run_self_healing_command(self, command: str, max_retries: int = 2) -> Dict[str, Any]:
         """
         Komutu çalıştırır, hata oluşursa traceback'i analiz edip
         otonom iyileştirme adımlarıyla tekrar dener.
         """
-        attempts = 0
-        current_cmd = command
-
-        while attempts <= max_retries:
-            res = self.execute_terminal(current_cmd)
-            if res["success"]:
-                return {
-                    "success": True,
-                    "attempts": attempts,
-                    "final_output": res["stdout"],
-                    "error": None
-                }
-
-            attempts += 1
-            err = res["stderr"]
-            logger.warning(f"Otonom Hata Tespiti (Deneme {attempts}/{max_retries}): {err[:150]}")
-
-            # Never install packages inferred from untrusted command output.
-            # Dependency installation may access the network or incur charges.
-            break
-
+        engine = SelfHealingExecutionEngine(work_dir=self.workspace_root)
+        res = engine.execute_and_heal(command, max_retries=max_retries)
         return {
-            "success": False,
-            "attempts": attempts,
-            "final_output": res["stdout"],
-            "error": res["stderr"]
+            "success": res.success,
+            "attempts": len(res.applied_patches),
+            "final_output": res.stdout,
+            "error": res.stderr if not res.success else None,
+            "diagnostics": res.diagnostics
         }
 
     def orchestrate_goal(self, goal: str, auto_heal: bool = True) -> AutonomousGoalResult:
