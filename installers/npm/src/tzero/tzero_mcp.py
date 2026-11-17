@@ -33,7 +33,7 @@ import ast
 import inspect
 import logging
 
-SERVER_VERSION = "11.14.0"
+SERVER_VERSION = "11.15.0"
 
 # Version checks must not initialize the MCP SDK or dependency bootstrap. Besides
 # being needlessly expensive, that path may wait on package discovery/network
@@ -2129,7 +2129,7 @@ def create_mcp_server():
         name="jarvis_self_healing_execute",
         title="Diagnose Test Failures and Apply AST Self-Healing Patches",
         description=(
-            "Runs a trusted shell command and attempts a limited, verified Python syntax repair. Agent shell execution is disabled by default; the server operator must explicitly set TZERO_ALLOW_AGENT_SHELL=1 before starting the server. Commands run on the host and are not sandboxed.\n"
+            "Runs a trusted shell command and attempts a limited, verified Python syntax repair, distinguishing from 'jarvis_orchestrate_goal' and 'diagnose_and_heal_system' by executing focused single commands with AST rollback rather than multi-phase project workflows.\n"
             "\n"
             "Parameters:\n"
             "- `command` (str, required): Shell command or test script to execute.\n"
@@ -2139,7 +2139,8 @@ def create_mcp_server():
             "- State-Modifying: Executes shell commands on local system and applies automated fixes on failure.\n"
             "- Non-idempotent: Command output and environmental state depend on local system execution.\n"
             "- Network: The engine makes no network calls itself, but the supplied command can access the network or incur costs.\n"
-            "- Execution: Commands run with a 30-second timeout and may have side effects.\n"
+            "- Auth & Credentials: Zero external credentials or API keys required by the engine; host commands operate under local user environment.\n"
+            "- Execution: Commands run with a 30-second timeout and are gated by operator opt-in (TZERO_ALLOW_AGENT_SHELL=1).\n"
             "- Error Handling: Supports a single missing-colon syntax repair; retries the command and rolls back on failure when the file is unchanged.\n"
             "\n"
             "Usage Guidelines:\n"

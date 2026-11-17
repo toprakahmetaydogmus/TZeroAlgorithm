@@ -482,7 +482,7 @@ def calculate_token_cost(token_count: int, provider_name: str) -> float:
 # i18n Translations
 TRANSLATIONS: Dict[str, Dict[str, str]] = {
     "en": {
-        "title": "T-Zero Developer Console & Context Architect v11.13.0",
+        "title": "T-Zero Developer Console & Context Architect v11.15.0",
         "subtitle": f"Developer: {DEV_NAME} | {DEV_URL_MAIN} | {DEV_URL_BIO}",
         "overview_tab": "🏠 Overview Dashboard",
         "setup_tab": "⚡ Setup & AI Models",
@@ -519,7 +519,7 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "audit_btn": "🛡️ SECURITY AUDIT"
     },
     "tr": {
-        "title": "T-Zero Geliştirici Konsolu & Bağlam Mimarı v11.13.0",
+        "title": "T-Zero Geliştirici Konsolu & Bağlam Mimarı v11.15.0",
         "subtitle": f"Geliştirici: {DEV_NAME} | {DEV_URL_MAIN} | {DEV_URL_BIO}",
         "overview_tab": "🏠 Genel Bakış",
         "setup_tab": "⚡ Kurulum & Model",
@@ -8736,6 +8736,7 @@ def run_watch_mode(target_dir: str = ".", interval: float = 1.0, once_test: bool
 
 def main():
     import argparse
+    import json
 
     try:
         try:
@@ -8766,6 +8767,18 @@ def main():
         except Exception as e:
             sys.stderr.write(f"[ERROR] Failed to execute T-Zero IDE installer: {e}\n")
             sys.exit(1)
+
+    # Fast path for local-ci / ci subcommands
+    if len(sys.argv) > 1 and sys.argv[1].lower() in ("local-ci", "localci", "ci-local"):
+        from tzero.tzero_ci import main as ci_main
+        sys.argv.pop(1)
+        sys.exit(ci_main())
+
+    # Fast path for promo / launch subcommands
+    if len(sys.argv) > 1 and sys.argv[1].lower() in ("promo", "launch", "marketing"):
+        from tzero.tzero_promo import main as promo_main
+        sys.argv.pop(1)
+        sys.exit(promo_main())
 
     parser = argparse.ArgumentParser(
         description="Siber Akademi T-Zero Context Architect V3 - Enterprise Codebase Context Builder & Token Reducer",
@@ -8821,6 +8834,7 @@ def main():
     parser.add_argument("--helpers", "--suggest-helpers", metavar="QUERY", help="Discover reusable helpers/utilities across repository AST to avoid duplicate code")
     parser.add_argument("--guard", "--verify-code", metavar="CODE_OR_FILE", help="Validate code against AST contracts to eliminate hallucinations before applying")
     parser.add_argument("--grounding-contract", action="store_true", help="Generate immutable AST grounding contract for LLM prompt pinning")
+    parser.add_argument("--promo", action="store_true", help="Generate zero-cost organic launch kit in docs/launch/")
     parser.add_argument("--patch", "--apply-patch", dest="apply_patch", metavar="DIFF_FILE_OR_STR", help="Apply patch with AST-tolerant fuzzy matching (whitespace & line drift agnostic)")
     parser.add_argument("--target", default=None, metavar="TARGET_FILE", help="Target file for --patch (optional if patch specifies file header)")
     parser.add_argument("--fuzzy", action="store_true", default=True, help="Enable fuzzy AST and whitespace matching for patch application (default: True)")
@@ -8843,8 +8857,11 @@ def main():
                         default="o200k_base", help="BPE encoding for --symbol-context")
     parser.add_argument("--cache-aligned", action="store_true", help="Order context for KV-cache prefix stability (immutable static prefix before dynamic query suffix)")
     parser.add_argument("--commit-msg", action="store_true", help="Generate Conventional Commit message from local AST git diff ($0 local engine)")
-    parser.add_argument("--changelog", nargs="?", const="v11.13.0", default=None, metavar="VERSION", help="Generate release CHANGELOG markdown from git history")
-    parser.add_argument("--ci", choices=["github", "gitlab", "pre-commit", "all"], default=None, help="Install turnkey CI/CD security and verification workflow")
+    parser.add_argument("--changelog", nargs="?", const="v11.15.0", default=None, metavar="VERSION", help="Generate release CHANGELOG markdown from git history")
+    parser.add_argument("--ci", choices=["github", "gitlab", "pre-commit", "local", "all"], default=None, help="Install CI/CD workflow or run local verification suite")
+    parser.add_argument("--local-ci", action="store_true", help="Run comprehensive Local CI & Pre-Push verification battery ($0 quota burn)")
+    parser.add_argument("--quick-ci", action="store_true", help="Run fast Local CI smoke checks in seconds")
+    parser.add_argument("--ci-hook", choices=["install", "uninstall"], default=None, help="Install or uninstall automated git pre-push Local CI hook")
     parser.add_argument("--stubs", nargs="?", const=".", default=None, metavar="PATH", help="Generate PEP-484 AST type stubs (.pyi) for target file or workspace")
     parser.add_argument("--stubs-out", default=None, metavar="DIR", help="Output directory for generated type stubs (default: alongside .py files)")
     parser.add_argument("--guard-install", action="store_true", help="Install local git pre-commit zero-leak and token security hook")
@@ -8904,7 +8921,7 @@ def main():
     parser.add_argument("--card", "--badge", nargs="?", const="assets/tzero_badge_card.svg", default=None, metavar="FILE", help="Generate viral dark-mode SVG banner card and GitHub README badges")
     parser.add_argument("--showcase", nargs="?", const="tzero_showcase.html", default=None, metavar="FILE", help="Generate interactive split-screen HTML5 comparison showcase slider")
     parser.add_argument("--marketing", "--growth", action="store_true", help="Launch $0-budget viral growth engine and export campaign materials for Reddit, HN, X, and Product Hunt")
-    parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect v11.13.0 Master Edition (engine v4.1.0)")
+    parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect v11.15.0 Master Edition (engine v4.1.0)")
 
 
     def print_master_tutorial():
@@ -9013,7 +9030,7 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
     def print_quickstart_guide():
         print("""
 ================================================================================
-⚡ SİBER AKADEMİ — T-ZERO CONTEXT ARCHITECT & MCP v11.13.0 MASTER (engine v4.1.0)
+⚡ SİBER AKADEMİ — T-ZERO CONTEXT ARCHITECT & MCP v11.15.0 MASTER (engine v4.1.0)
 ================================================================================
 🎯 %95'e Varan Token Tasarrufu & Otonom Yapay Zeka Mimari Bağlam Motoru
 
@@ -9198,6 +9215,9 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
     if getattr(args, "info", False):
         print_quickstart_guide()
         return
+    elif getattr(args, "promo", False):
+        from tzero.tzero_promo import main as promo_main
+        sys.exit(promo_main())
     elif args.doctor:
         if tzero_deps is None:
             print("[ERROR] tzero_deps.py is missing; reinstall T-Zero to use --doctor.")
@@ -9835,8 +9855,19 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
         entry = LocalSemanticCommitSynthesizer.generate_changelog_entry(version=args.changelog, repo_dir=args.dir)
         print(entry)
     elif args.ci is not None:
-        from tzero.tzero_ci import CIPipelineGenerator
         target = args.ci
+        if target in ("local", "run"):
+            from tzero.tzero_ci import LocalCIRunner
+            runner = LocalCIRunner(repo_dir=args.dir, quick=getattr(args, "quick_ci", False))
+            report = runner.run()
+            if getattr(args, "format", "text") == "json":
+                import json
+                print(json.dumps(report.to_dict(), indent=2))
+            else:
+                print(LocalCIRunner.render_terminal_report(report))
+            sys.exit(0 if report.passed else 1)
+
+        from tzero.tzero_ci import CIPipelineGenerator
         installed = []
         if target in ("github", "all"):
             _, p = CIPipelineGenerator.install_github_workflow(args.dir)
@@ -9850,6 +9881,28 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
         print("\033[32m[SUCCESS] Turnkey CI/CD pipelines installed:\033[0m")
         for p in installed:
             print(f"  - {os.path.relpath(p, args.dir)}")
+    elif getattr(args, "local_ci", False) or getattr(args, "quick_ci", False):
+        from tzero.tzero_ci import LocalCIRunner
+        runner = LocalCIRunner(repo_dir=args.dir, quick=getattr(args, "quick_ci", False), auto_fix=getattr(args, "fix", False))
+        report = runner.run()
+        if getattr(args, "format", "text") == "json":
+            import json
+            print(json.dumps(report.to_dict(), indent=2))
+        else:
+            print(LocalCIRunner.render_terminal_report(report))
+        sys.exit(0 if report.passed else 1)
+    elif getattr(args, "ci_hook", None):
+        from tzero.tzero_ci import LocalCIRunner
+        if args.ci_hook == "install":
+            ok, msg = LocalCIRunner.install_git_pre_push_hook(args.dir)
+        else:
+            ok, msg = LocalCIRunner.uninstall_git_pre_push_hook(args.dir)
+        if ok:
+            print(f"\033[32m[SUCCESS]\033[0m {msg}")
+            sys.exit(0)
+        else:
+            print(f"\033[31m[FAILED]\033[0m {msg}")
+            sys.exit(1)
     elif args.stubs is not None:
         from tzero.tzero_stubs import TypeStubGenerator
         target = args.stubs
@@ -9893,7 +9946,7 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
         if not os.path.exists(app_path):
             app_path = os.path.join(os.getcwd(), "huggingface-space", "app.py")
         print("\033[36m" + "=" * 80)
-        print("🤗 SİBER AKADEMİ — T-ZERO HUGGING FACE SPACE & GRADIO COCKPIT (v11.13.0)")
+        print("🤗 SİBER AKADEMİ — T-ZERO HUGGING FACE SPACE & GRADIO COCKPIT (v11.15.0)")
         print("=" * 80 + "\033[0m")
         print("🌐 Official Live Space : https://huggingface.co/spaces/toprakke4/tzero-token-reducer")
         print(f"📁 Local Application   : {app_path}")

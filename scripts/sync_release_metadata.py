@@ -72,6 +72,38 @@ def sync_release_metadata(target_version: str, check_only: bool = False) -> Dict
         ROOT_DIR / "installers" / "scoop" / "tzero.json", target_version, ["version"], check_only
     )
 
+    winget_base = ROOT_DIR / "installers" / "winget" / "manifests" / "s" / "SiberAkademi" / "TZero"
+    winget_ver_dir = winget_base / target_version
+    winget_drifted = False
+
+    if not winget_ver_dir.is_dir():
+        winget_drifted = True
+        if not check_only:
+            winget_ver_dir.mkdir(parents=True, exist_ok=True)
+            existing_dirs = sorted([d for d in winget_base.iterdir() if d.is_dir() and d.name != target_version])
+            src_dir = existing_dirs[-1] if existing_dirs else None
+            if src_dir:
+                for src_file in src_dir.glob("SiberAkademi.TZero.*"):
+                    shutil.copy2(src_file, winget_ver_dir / src_file.name)
+
+    if winget_ver_dir.is_dir():
+        for suffix in ("yaml", "installer.yaml", "locale.en-US.yaml"):
+            mf = winget_ver_dir / f"SiberAkademi.TZero.{suffix}"
+            if not mf.is_file():
+                winget_drifted = True
+                continue
+            c_ver = _regex_replace(mf, r'(?m)^(PackageVersion:\s*).+$', rf'\g<1>{target_version}', check_only)
+            c_url = _regex_replace(
+                mf,
+                r'(?m)^(    InstallerUrl:\s*https://github\.com/[^/]+/[^/]+/releases/download/v)[^/]+/(TZero-v)[^/]+(-Windows-x64\.zip)$',
+                rf'\g<1>{target_version}/\g<2>{target_version}\g<3>',
+                check_only,
+            )
+            if c_ver or c_url:
+                winget_drifted = True
+
+    results["installers/winget"] = winget_drifted
+
     for rel in ("Formula/tzero.rb", "installers/brew/tzero.rb"):
         p = ROOT_DIR / rel
         c1 = _regex_replace(
