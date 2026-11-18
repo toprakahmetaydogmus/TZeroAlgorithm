@@ -2,7 +2,7 @@
 """
 Siber Akademi — T-Zero Real-Time Token Cost & Financial ROI Cockpit.
 Developer: Toprak Ahmet Aydoğmuş (Siber Akademi)
-License: MIT
+License: AGPL-3.0-only
 
 Calculates exact token footprints, API cost per query, and team financial ROI
 comparing raw full-codebase injection against T-Zero AST-pruned context

@@ -3,7 +3,7 @@
 T-ZERO JARVIS MULTI-MODAL CREATIVE DIRECTOR & PROMPT ENGINE
 ------------------------------------------------------------
 Developer: Toprak Ahmet Aydoğmuş (Siber Akademi)
-Version: 5.1.0 | License: MIT
+Version: 5.1.0 | License: AGPL-3.0-only
 
 Autonomous creative director that synthesizes ultra-photorealistic image prompts
 (Midjourney v6.1, Flux.1 Pro, Imagen 3) and cinematic video generation prompts

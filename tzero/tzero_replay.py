@@ -2,7 +2,7 @@
 """
 Siber Akademi — T-Zero Historical Token ROI & Savings Replay.
 Developer: Toprak Ahmet Aydoğmuş (Siber Akademi)
-License: MIT
+License: AGPL-3.0-only
 
 Replays git commit history to compute cumulative historical token reduction
 and dollar savings across Claude 3.5 Sonnet, GPT-4o, and Gemini models.

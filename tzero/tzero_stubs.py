@@ -2,7 +2,7 @@
 """
 Siber Akademi — T-Zero AST Type Stub & Interface (.pyi) Generator.
 Developer: Toprak Ahmet Aydoğmuş (Siber Akademi)
-License: MIT
+License: AGPL-3.0-only
 
 Extracts ultra-compact, type-safe Python interface stubs (.pyi) directly from
 AST syntax trees. Replaces function/method implementations with `...`, preserves

@@ -62,6 +62,6 @@ Write-Host "│  If this open-source tool saved you tokens or improved your codi
 Write-Host "│  👉 Please consider giving it a ⭐ on GitHub:                                │" -ForegroundColor Cyan
 Write-Host "│     https://github.com/toprakahmetaydogmus/TZeroAlgorithm                    │" -ForegroundColor Yellow
 Write-Host "│                                                                              │" -ForegroundColor Cyan
-Write-Host "│  100% Free & Open-Source under MIT License. Thank you! 🚀                   │" -ForegroundColor Cyan
+Write-Host "│  100% Free & Open-Source under AGPL-3.0-only. Thank you! 🚀                   │" -ForegroundColor Cyan
 Write-Host "└──────────────────────────────────────────────────────────────────────────────┘" -ForegroundColor Cyan
 Write-Host ""

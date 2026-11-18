@@ -11,7 +11,7 @@ Synthesizes high-fidelity AI video generation prompts, photorealistic visual pro
 
 Developer: Toprak Ahmet Aydoğmuş (Siber Akademi)  
 Engine: T-Zero Jarvis Multi-Modal Director v5.1.0  
-License: MIT  
+License: AGPL-3.0-only
 
 ---
 

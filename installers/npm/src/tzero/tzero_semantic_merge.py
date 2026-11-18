@@ -2,7 +2,7 @@
 """
 Siber Akademi — T-Zero AST Semantic 3-Way Merge & Conflict Healer.
 Developer: Toprak Ahmet Aydoğmuş (Siber Akademi)
-License: MIT
+License: AGPL-3.0-only
 
 Performs AST-aware 3-way code merging and automated resolution of git conflict blocks.
 Safely combines independent function additions, deduplicates polyglot imports,

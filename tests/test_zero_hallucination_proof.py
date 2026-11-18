@@ -2,7 +2,7 @@
 """Automated Verification Suite for T-Zero Empirical Zero-Hallucination Proof.
 
 Developer: Toprak Ahmet Aydoğmuş (Siber Akademi)
-License: MIT
+License: AGPL-3.0-only
 """
 
 import os

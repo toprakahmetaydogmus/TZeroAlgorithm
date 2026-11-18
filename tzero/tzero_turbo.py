@@ -2,7 +2,7 @@
 """
 Siber Akademi — T-Zero Turbo Overdrive & Adaptive Burst Accelerator ("Kamçılama Modu").
 Developer: Toprak Ahmet Aydoğmuş (Siber Akademi)
-License: MIT
+License: AGPL-3.0-only
 
 Dynamically senses codebase processing latency. Whenever AST parsing, context
 generation, or file walks start to slow down (>150ms or high file volume),

@@ -2,7 +2,7 @@
 """
 Siber Akademi — T-Zero Local Semantic Git Commit & Changelog Synthesizer.
 Developer: Toprak Ahmet Aydoğmuş (Siber Akademi)
-License: MIT
+License: AGPL-3.0-only
 
 Analyzes staged or unstaged AST git diffs locally (100% offline, $0 cost) to
 synthesize Conventional Commit messages and structured CHANGELOG entries

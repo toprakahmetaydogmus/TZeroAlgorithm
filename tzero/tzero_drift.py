@@ -2,7 +2,7 @@
 """
 Siber Akademi — T-Zero Instruction & Architecture Drift Scorer.
 Developer: Toprak Ahmet Aydoğmuş (Siber Akademi)
-License: MIT
+License: AGPL-3.0-only
 
 Quantifies how closely LLM code generations and workspace modifications adhere
 to initial system prompt rules, negative constraints, and architectural boundaries.

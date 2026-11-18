@@ -2,7 +2,7 @@
 """T-Zero Community Welcome & GitHub Star Prompt Module.
 
 Developer: Toprak Ahmet Aydoğmuş (Siber Akademi)
-License: MIT
+License: AGPL-3.0-only
 Repository: https://github.com/toprakahmetaydogmus/TZeroAlgorithm
 """
 

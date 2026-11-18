@@ -2,7 +2,7 @@
 """
 Siber Akademi — T-Zero Multi-Agent Swarm Blackboard & In-Memory Working Memory.
 Developer: Toprak Ahmet Aydoğmuş (Siber Akademi)
-License: MIT
+License: AGPL-3.0-only
 
 Provides thread-safe inter-agent blackboard communication, symbol-level reservation locks,
 shared architectural invariants, and zero-token AST context caching for multi-agent swarms.

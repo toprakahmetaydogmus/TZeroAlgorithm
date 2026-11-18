@@ -66,6 +66,6 @@ echo -e "${CYAN}│  If this open-source tool saved you tokens or improved your 
 echo -e "${CYAN}│  👉 Please consider giving it a ⭐ on GitHub:                                │${NC}"
 echo -e "${YELLOW}│     https://github.com/toprakahmetaydogmus/TZeroAlgorithm                    │${NC}"
 echo -e "${CYAN}│                                                                              │${NC}"
-echo -e "${CYAN}│  100% Free & Open-Source under MIT License. Thank you! 🚀                   │${NC}"
+echo -e "${CYAN}│  100% Free & Open-Source under AGPL-3.0-only. Thank you! 🚀                   │${NC}"
 echo -e "${CYAN}└──────────────────────────────────────────────────────────────────────────────┘${NC}"
 echo ""

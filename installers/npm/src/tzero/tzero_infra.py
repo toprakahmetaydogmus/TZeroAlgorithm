@@ -2,7 +2,7 @@
 """
 Siber Akademi — T-Zero Infrastructure & Database Schema AST Compressor.
 Developer: Toprak Ahmet Aydoğmuş (Siber Akademi)
-License: MIT
+License: AGPL-3.0-only
 
 Extracts high-value architectural contracts from SQL DDL, Kubernetes YAML,
 Dockerfiles, and Terraform HCL, achieving 75% to 95% token reduction on
