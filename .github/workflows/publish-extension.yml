@@ -19,6 +19,10 @@ on:
         type: boolean
         default: true
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   package-and-publish:
     name: Package & Publish VSIX
@@ -50,18 +54,10 @@ jobs:
 
       - name: Publish to Open VSX Registry
         if: ${{ startsWith(github.ref, 'refs/tags/v') || inputs.publish_openvsx }}
-        env:
-          OVSX_PAT: ${{ secrets.OVSX_PAT }}
         run: |
-          if [ -z "$OVSX_PAT" ]; then
-            echo "OVSX_PAT secret is not configured; skipping Open VSX publish."
-            exit 0
-          fi
           VSIX_PATH=$(ls dist/*.vsix | head -n 1)
-          echo "Ensuring Open VSX namespace 'siber-akademi' exists..."
-          npx --yes ovsx create-namespace siber-akademi -p "$OVSX_PAT" || true
-          echo "Publishing $VSIX_PATH to Open VSX..."
-          npx --yes ovsx publish "$VSIX_PATH" -p "$OVSX_PAT"
+          echo "Publishing $VSIX_PATH to Open VSX with trusted publishing..."
+          npx --yes ovsx@1.2.0 publish "$VSIX_PATH" --trusted-publishing
 
       - name: Publish to VS Code Marketplace
         if: ${{ startsWith(github.ref, 'refs/tags/v') || inputs.publish_vscode }}
