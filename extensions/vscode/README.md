@@ -9,7 +9,7 @@
 <p align="center">
   <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm"><img src="https://img.shields.io/badge/Version-10.9.0-0284c7?style=flat-square&logo=visualstudiocode" alt="Version 10.9.0" /></a>
   <a href="https://www.npmjs.com/package/tzero-mcp"><img src="https://img.shields.io/npm/v/tzero-mcp?color=cb3837&logo=npm&style=flat-square" alt="NPM Version" /></a>
-  <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-green.svg?style=flat-square" alt="License" /></a>
+  <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-AGPL--3.0--only-green.svg?style=flat-square" alt="License" /></a>
 </p>
 
 ---
@@ -50,4 +50,4 @@ Open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`):
 
 **Developer:** Toprak Ahmet Aydoğmuş ([Siber Akademi](https://github.com/toprakahmetaydogmus/TZeroAlgorithm))  
 **Repository:** [https://github.com/toprakahmetaydogmus/TZeroAlgorithm](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)  
-**License:** MIT
+**License:** AGPL-3.0-only

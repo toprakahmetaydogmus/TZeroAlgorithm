@@ -21,7 +21,7 @@ def generate_readme():
 [![Security](https://img.shields.io/badge/security-Shannon%20Entropy%20(H%20%3E%3D%204.75)-38bdf8?style=flat-square&logo=shield)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm#security-architecture)
 [![Reality-Lock](https://img.shields.io/badge/reality--lock-Static%20AST%20Grounding-10b981?style=flat-square&logo=probot)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm#pre-flight-reality-lock)
 [![Token Reduction](https://img.shields.io/badge/token%20savings-up%20to%2094.6%25%20(AST)-f43f5e?style=flat-square)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm#task-completion-benchmark)
-[![License](https://img.shields.io/badge/license-MIT-f8fafc?style=flat-square)](LICENSE)
+[![License](https://img.shields.io/badge/license-AGPL--3.0--only-f8fafc?style=flat-square)](LICENSE)
 
 <br>
 
@@ -354,7 +354,7 @@ tzero space
 - **Author & Architect:** Toprak Ahmet Aydoğmuş (Siber Akademi)
 - **LinkedIn:** [Toprak Ahmet Aydoğmuş](https://linkedin.com/in/toprak-ahmet-aydo%C4%9Fmu%C5%9F-60462534b/)
 - **Bio & Hub:** [hopp.bio/siberegitim](https://hopp.bio/siberegitim)
-- **License:** [MIT Open Source License](LICENSE)
+- **License:** [GNU AGPL-3.0-only](LICENSE). [Copyright, author attribution, and Section 7 terms](NOTICE).
 """
 
 if __name__ == "__main__":

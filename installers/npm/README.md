@@ -3,7 +3,7 @@
 > **Deterministic AST Context Compressor, 95% Token Reducer & 20-Tool MCP Server for Cursor, Claude Desktop, Antigravity & Copilot.**
 
 [![npm version](https://img.shields.io/npm/v/tzero-mcp.svg?color=cb3837&logo=npm)](https://www.npmjs.com/package/tzero-mcp)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: AGPL-3.0-only](https://img.shields.io/badge/License-AGPL--3.0--only-yellow.svg)](./LICENSE)
 [![Socket Badge](https://socket.dev/api/badge/npm/package/tzero-mcp)](https://socket.dev/npm/package/tzero-mcp)
 [![GitHub Stars](https://img.shields.io/github/stars/toprakahmetaydogmus/TZeroAlgorithm?style=social)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)
 
@@ -16,7 +16,7 @@ Hi! I'm **Toprak Ahmet Aydoğmuş** from **Siber Akademi**. I created T-Zero fro
 If this package helps your engineering team or AI workflows:  
 ⭐ **Please give our repository a STAR on GitHub:**  
 👉 **[https://github.com/toprakahmetaydogmus/TZeroAlgorithm](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)**  
-*100% Free & Open-Source under MIT License. Thank you! 🚀*
+*100% Free & Open-Source under AGPL-3.0-only. Thank you! 🚀*
 
 ---
 
@@ -61,4 +61,4 @@ tzero-add-mcp
 
 ## 📄 License
 
-MIT © [Toprak Ahmet Aydoğmuş](https://github.com/toprakahmetaydogmus)
+AGPL-3.0-only © [Toprak Ahmet Aydoğmuş](https://github.com/toprakahmetaydogmus)

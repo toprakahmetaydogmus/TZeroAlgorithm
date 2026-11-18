@@ -28,6 +28,7 @@
     "CHANGELOG.md",
     "CONTRIBUTING.md",
     "LICENSE",
+    "NOTICE",
     "package.json"
   ],
   "bin": {
@@ -78,7 +79,7 @@
       "url": "https://github.com/toprakahmetaydogmus"
     }
   ],
-  "license": "MIT",
+  "license": "AGPL-3.0-only",
   "bugs": {
     "url": "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/issues"
   },

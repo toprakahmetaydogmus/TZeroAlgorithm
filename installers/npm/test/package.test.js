@@ -7,7 +7,7 @@ const pkg = require("../package.json");
 
 test("package.json metadata integrity", () => {
   assert.strictEqual(pkg.name, "tzero-mcp");
-  assert.strictEqual(pkg.license, "MIT");
+  assert.strictEqual(pkg.license, "AGPL-3.0-only");
   assert.strictEqual(typeof pkg.version, "string");
   assert.strictEqual(pkg.bin["tzero"], "bin/tzero.js");
   assert.strictEqual(pkg.bin["tzero-mcp"], "bin/tzero-mcp.js");

@@ -1,3 +1,8 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Copyright (c) 2026 Toprak Ahmet Aydoğmuş
+# Additional terms under AGPL-3.0 section 7: see NOTICE in the distribution
+# or https://github.com/toprakahmetaydogmus/TZeroAlgorithm/blob/main/NOTICE.
+
 """T-Zero's public Python API and package namespace."""
 
 from importlib import import_module

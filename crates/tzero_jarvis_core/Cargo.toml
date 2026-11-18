@@ -4,7 +4,7 @@ version = "6.0.0"
 edition = "2021"
 authors = ["Toprak Ahmet Aydogmus <siberakademi@org.tr>"]
 description = "Ultra-Fast 3-Layer Semantic Memory & Autonomous Super-Agent Orchestrator Core for T-Zero"
-license = "MIT"
+license = "AGPL-3.0-only"
 
 [dependencies]
 serde = { version = "1.0", features = ["derive"] }

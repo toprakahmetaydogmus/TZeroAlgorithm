@@ -11,7 +11,7 @@
   <a href="https://www.npmjs.com/package/tzero-mcp"><img src="https://img.shields.io/npm/v/tzero-mcp?style=for-the-badge&logo=npm&color=cb3837" alt="npm version" /></a>
   <a href="https://pypi.org/project/tzero-mcp/"><img src="https://img.shields.io/pypi/v/tzero-mcp?style=for-the-badge&logo=pypi&color=3775a9" alt="PyPI version" /></a>
   <a href="https://socket.dev/npm/package/tzero-mcp"><img src="https://img.shields.io/badge/Socket.dev-100%2F100_Safe-10b981?style=for-the-badge&logo=socketdotdev" alt="Socket.dev Score" /></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-purple?style=for-the-badge" alt="License MIT" /></a>
+  <a href="../LICENSE"><img src="https://img.shields.io/badge/License-AGPL--3.0--only-purple?style=for-the-badge" alt="License AGPL-3.0-only" /></a>
 </p>
 
 [English](../README.md) | [Türkçe](README.tr.md) | **日本語** | [简体中文](README.zh.md)
@@ -125,6 +125,6 @@ tzero init
 ## 🤝 開発者 & ライセンス
 
 - **作者:** Toprak Ahmet Aydoğmuş ([Siber Akademi](https://github.com/toprakahmetaydogmus))
-- **ライセンス:** MIT License
+- **ライセンス:** AGPL-3.0-only
 - T-Zero がお役に立ちましたら、ぜひ GitHub リポジトリへの **⭐ Star** をお願いいたします！
 

@@ -131,3 +131,7 @@ Eğer T-Zero işinize yaradıysa lütfen GitHub üzerinden bir ⭐ vermeyi unutm
 
 ---
 [Ana Dokümantasyona Dön (English)](README.md)
+
+## Lisans
+
+T-Zero, [GNU AGPL-3.0-only](../LICENSE) ile lisanslanır. [Telif bildirimi, yazar atfı ve 7. bölüm koşulları](../NOTICE).

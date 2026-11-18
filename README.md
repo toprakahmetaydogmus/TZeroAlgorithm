@@ -24,7 +24,7 @@
 [![Reality-Lock](https://img.shields.io/badge/reality--lock-Static%20AST%20Grounding-10b981?style=flat-square&logo=probot)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm#pre-flight-reality-lock)
 [![Token Reduction](https://img.shields.io/badge/token%20savings-up%20to%2094.6%25%20(AST)-f43f5e?style=flat-square)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm#task-completion-benchmark)
 [![GitHub Stars](https://img.shields.io/github/stars/toprakahmetaydogmus/TZeroAlgorithm?style=social)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)
-[![License](https://img.shields.io/badge/license-MIT-f8fafc?style=flat-square)](LICENSE)
+[![License](https://img.shields.io/badge/license-AGPL--3.0--only-f8fafc?style=flat-square)](LICENSE)
 
 <br>
 
@@ -626,4 +626,4 @@ Join the revolution in context engineering and deterministic token pruning!
 - **Author & Architect:** Toprak Ahmet Aydoğmuş (Lead Software Engineer & Architect, Siber Akademi)
 - **LinkedIn:** [Toprak Ahmet Aydoğmuş](https://linkedin.com/in/toprak-ahmet-aydo%C4%9Fmu%C5%9F-60462534b/)
 - **Bio & Hub:** [hopp.bio/siberegitim](https://hopp.bio/siberegitim)
-- **License:** [MIT Open Source License](LICENSE)
+- **License:** [GNU AGPL-3.0-only](LICENSE). [Copyright, author attribution, and Section 7 terms](NOTICE).

@@ -7,7 +7,7 @@ sdk: gradio
 sdk_version: 5.9.1
 app_file: app.py
 pinned: false
-license: mit
+license: agpl-3.0
 short_description: Enterprise AST Context Architect, Token Reducer & AgentOS for LLMs
 ---
 

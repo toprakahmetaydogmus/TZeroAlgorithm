@@ -7,6 +7,7 @@ include action.yml
 include .pre-commit-hooks.yaml
 include requirements.txt
 include LICENSE
+include NOTICE
 include README.md
 include docs/README.tr.md
 include tzero.py

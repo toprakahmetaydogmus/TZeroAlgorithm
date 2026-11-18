@@ -17,6 +17,6 @@
     "developer-tools",
     "rag-systems"
   ],
-  "license": "MIT",
+  "license": "AGPL-3.0-only",
   "homepage": "https://tzero-indol.vercel.app"
 }
