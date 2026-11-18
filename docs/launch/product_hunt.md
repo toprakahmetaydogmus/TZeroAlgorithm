@@ -1,17 +1,17 @@
-# Product Hunt Launch Kit (v11.14.0)
+# Product Hunt Launch Kit (v11.15.3)
 
 - **Name:** T-Zero Context Architect
 - **Tagline:** Cut AI coding context tokens by up to 95% using AST pruning
 - **Topics:** Developer Tools, Artificial Intelligence, Open Source, Productivity, Python
 
 ### Short Description:
-T-Zero is an open-source Model Context Protocol (MCP) server for Cursor, Claude Desktop, Windsurf, and local LLMs. It deterministically prunes codebase bodies to typed AST skeletons, reducing prompt tokens by 85–95% with 100% Zero-Leak security auditing.
+T-Zero is an open-source Model Context Protocol (MCP) server for Cursor, Claude Desktop, Windsurf, and local LLMs. It deterministically prunes codebase bodies to typed AST skeletons, reducing prompt tokens by 85–95% in measured examples, with local secret scanning and redaction.
 
 ### Maker First Comment:
 ```markdown
 Hey Product Hunt community! 👋
 
-I'm Toprak (Toprak Ahmet Aydoğmuş) from Siber Akademi. Over the past several months, we engineered **T-Zero** (v11.14.0) to solve prompt context bloat in AI coding workflows.
+I'm Toprak (Toprak Ahmet Aydoğmuş) from Siber Akademi. Over the past several months, we engineered **T-Zero** (v11.15.3) to solve prompt context bloat in AI coding workflows.
 
 ### Why We Built T-Zero:
 Large language models are remarkably capable at software development, but feeding them medium or large codebases quickly leads to:
@@ -26,9 +26,9 @@ The result is **up to 95% token savings** while retaining complete architectural
 
 ### Key Capabilities:
 - ⚡ **1-Click MCP Setup:** Integrates seamlessly into Cursor, Claude Desktop, Windsurf, Copilot, and Antigravity.
-- 🔒 **100% Zero-Leak:** In-memory Shannon entropy scanner automatically detects and redacts private keys.
+- 🔒 **Local-first secret scanning:** In-memory entropy and pattern checks detect and redact likely credentials.
 - 🤖 **AI Hallucination Guard:** Validates AI code imports against your actual workspace symbol tree.
-- ⏱ **Sub-400ms Local Latency:** 100% offline and free under MIT license.
+- ⏱ **Reproducible local measurements:** Run the included benchmark on your own repository; free under MIT license.
 
 We'd love your feedback, questions, and ideas on how to make AI context engineering even more efficient!
 

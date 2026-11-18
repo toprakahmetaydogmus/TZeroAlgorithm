@@ -66,12 +66,12 @@ Instead of stripping files arbitrarily or relying on heuristic summaries, T-Zero
 - **Raw Codebase Context:** 10,910,525 tokens ($32.73 per prompt fill on standard cloud models)
 - **T-Zero 4-Tier Hierarchical AST Tree:** 1,309,263 tokens (**-88.0% token reduction**)
 - **Target File Skeleton (Tier-3):** **-94.6% token reduction**
-- **AST Visitor Latency:** <400ms locally on standard CPU without GPU requirements
-- **Test Coverage:** Comprehensive suite with 100% green test passes
+- **Measurement note:** Results vary by repository, language mix, and selected tier; run the included benchmark locally
+- **Release verification:** The tagged release is validated by the GitHub Actions test suite
 
-### Security & Privacy (100% Zero-Leak):
+### Security & Privacy:
 - Computes in-memory Shannon entropy (H >= 4.75) alongside regex guards to identify and redact API keys, private certificates, and credentials before context is emitted.
-- Operates 100% offline via local stdio MCP. Zero external network telemetry or third-party cloud calls.
+- The local stdio MCP path runs without telemetry or third-party cloud calls; remote AI providers are optional.
 
 ### Installation & Integrations:
 - **Windows (WinGet):** `winget install SiberAkademi.TZero`
@@ -94,8 +94,8 @@ I'd appreciate technical critique on our AST extraction heuristics, type bridgin
 def build_reddit_localllama(version: str) -> Dict[str, str]:
     """Generates unslop Reddit r/LocalLLaMA post with clear affiliation disclosure."""
     subreddit = "r/LocalLLaMA"
-    title = f"T-Zero: 100% offline, zero-cloud AST codebase context pruner for local models (Ollama, LM Studio, Qwen 2.5 Coder, DeepSeek) [Disclosure: Project Author]"
-    body = f"""**Affiliation Disclosure:** I am the author of T-Zero, an open-source project maintained at Siber Akademi. The software is 100% free under the MIT license with no paid tier, no telemetry, and no external API dependencies.
+    title = f"T-Zero: Local-first AST codebase context pruner for local models (Ollama, LM Studio, Qwen 2.5 Coder, DeepSeek) [Disclosure: Project Author]"
+    body = f"""**Affiliation Disclosure:** I am the author of T-Zero, an open-source project maintained at Siber Akademi. The software is 100% free under the MIT license with no paid tier; local MCP mode does not require telemetry or external APIs.
 
 ---
 
@@ -112,12 +112,12 @@ When running local coding models (Qwen 2.5 Coder 7B/14B/32B, DeepSeek-Coder, Lla
 4. **Local BM25 Hybrid Search:** Instant symbol search and call-chain tracing without running a separate vector database or local embedding model.
 5. **Shannon Entropy Zero-Leak:** Scans tokens in memory to prevent accidental exposure of local `.env` keys or tokens.
 
-### Real Benchmark Metrics:
+### Example Benchmark Metrics:
 - **Tested Project:** 465 files, ~89,000 LOC
 - **Raw token count:** 10,910,525 tokens
 - **T-Zero AST Tree:** 1,309,263 tokens (-88.0% reduction)
 - **Focused Skeleton Mode:** up to -94.6% reduction
-- **Execution Speed:** <400ms locally
+- **Measurement note:** Timing depends on repository size and selected operation; reproduce it with the included benchmark command
 
 ### Limitations & Trade-Offs (Being Honest):
 - AST pruning is designed for **architectural understanding, cross-file navigation, type checking, and interface generation**.
@@ -156,16 +156,14 @@ def build_twitter_thread(version: str) -> List[str]:
 Meet T-Zero {version}: open-source local MCP server cutting context bloat.
 
 Technical breakdown 🧵👇""",
-        """2/7 💡 The Problem with Raw Code Context:
+        """2/7 💡 Raw code context wastes attention.
 
-When an AI assistant creates a route or fixes a bug, it doesn't need 200 lines of SQL query bodies from your database driver.
-
-It needs:
+Coding models usually need:
 • Class inheritance
 • Typed signatures
 • Return types & docstrings
 
-T-Zero extracts this in <400ms.""",
+T-Zero extracts this locally; benchmark your repository and mode.""",
         """3/7 🌐 True Polyglot AST Engine:
 
 Deterministic AST extraction across:
@@ -178,24 +176,22 @@ Deterministic AST extraction across:
 🍎 Swift & Ruby
 
 Parsed on your local CPU with zero cloud calls.""",
-        """4/7 🔒 100% Zero-Leak Security:
+        """4/7 🔒 Local-First Secret Scanning:
 
-Accidentally leaking API keys into LLM prompts is an enterprise risk.
+T-Zero detects likely API keys and credentials in memory and redacts them before context leaves the local path.
 
-T-Zero runs an in-memory Shannon Entropy scanner (H >= 4.75) that detects secrets and redacts them *before* any text leaves your machine.
-
-100% private & offline.""",
+No cloud calls or telemetry are required in local mode.""",
         f"""5/7 🤖 AI Hallucination Guard:
 
 T-Zero {version} inspects AI-suggested code diffs against your workspace AST symbol table.
 
 If an LLM invents a nonexistent method or phantom import, T-Zero flags the discrepancy before code is committed to disk.""",
-        """6/7 🚀 Turnkey Local CI (Sub-2s Execution):
+        """6/7 🚀 Turnkey Local CI:
 
 Run the entire verification pipeline on your machine:
 $ tzero local-ci --quick
 
-Integrates with Git pre-push hooks (`.git/hooks/pre-push`) to guarantee zero broken builds on remote CI runners.""",
+Integrates with Git pre-push hooks (`.git/hooks/pre-push`) to flag issues before they reach remote CI.""",
         f"""7/7 📦 Free & Open Source (MIT):
 
 Install:
@@ -217,7 +213,7 @@ def build_product_hunt(version: str) -> Dict[str, str]:
     description = (
         "T-Zero is an open-source Model Context Protocol (MCP) server for Cursor, Claude Desktop, "
         "Windsurf, and local LLMs. It deterministically prunes codebase bodies to typed AST skeletons, "
-        "reducing prompt tokens by 85–95% with 100% Zero-Leak security auditing."
+        "reducing prompt tokens by 85–95% in measured examples, with local secret scanning and redaction."
     )
     maker_comment = f"""Hey Product Hunt community! 👋
 
@@ -236,9 +232,9 @@ The result is **up to 95% token savings** while retaining complete architectural
 
 ### Key Capabilities:
 - ⚡ **1-Click MCP Setup:** Integrates seamlessly into Cursor, Claude Desktop, Windsurf, Copilot, and Antigravity.
-- 🔒 **100% Zero-Leak:** In-memory Shannon entropy scanner automatically detects and redacts private keys.
+- 🔒 **Local-first secret scanning:** In-memory entropy and pattern checks detect and redact likely credentials.
 - 🤖 **AI Hallucination Guard:** Validates AI code imports against your actual workspace symbol tree.
-- ⏱ **Sub-400ms Local Latency:** 100% offline and free under MIT license.
+- ⏱ **Reproducible local measurements:** Run the included benchmark on your own repository; free under MIT license.
 
 We'd love your feedback, questions, and ideas on how to make AI context engineering even more efficient!
 
@@ -272,7 +268,7 @@ T-Zero is a high-performance Model Context Protocol (MCP) server that compresses
 2. `get_smart_skeleton_context` — Focus-aware dynamic skeletonizer delivering target implementation + surrounding 1st-degree AST interface skeletons.
 3. `prune_code_snippet` — In-memory AST signature compressor for arbitrary code snippets.
 4. `verify_hallucination_guard` — Verifies AI-generated imports and function signatures against the workspace AST symbol table.
-5. `audit_codebase_quality` — Static AST code smell audit and 100% Zero-Leak security scanner for hardcoded credentials.
+5. `audit_codebase_quality` — Static AST code smell audit and local secret scanner for likely hardcoded credentials.
 6. `estimate_token_cost` — Real-time token and financial cost estimation across OpenAI, Anthropic, Gemini, and DeepSeek.
 
 #### ⚙ Quick Configuration:
@@ -306,7 +302,7 @@ T-Zero is a high-performance Model Context Protocol (MCP) server that compresses
 winget install SiberAkademi.TZero
 ```
 
-*100% local, zero telemetry, zero cloud tokens.*
+*Local mode uses no telemetry or cloud tokens.*
 """
     return {"title": title, "content": content}
 
@@ -320,7 +316,7 @@ This directory contains clean, high-conversion, unslop organic developer launch 
 All materials strictly adhere to:
 1. **Unslop Quality:** Technical, grounded, engineer-to-engineer tone without hyperbolic claims or excessive emojis.
 2. **Transparent Affiliation:** Every post includes unambiguous disclosure of authorship and organization affiliation.
-3. **100% Zero-Leak:** No private keys, phone numbers, internal network paths, or confidential credentials.
+3. **Local-first privacy:** No private keys, phone numbers, internal network paths, or confidential credentials are included in the launch copy.
 4. **Reproducible Benchmarks:** Exact metrics and CLI commands to verify token reduction claims.
 
 ---
@@ -358,7 +354,7 @@ python scripts/generate_promo_pack.py --print discord
 
 ---
 
-*Engineered by Siber Akademi — 100% Zero-Leak Certified.*
+*Engineered by Siber Akademi — benchmark claims are intended to be reproducible locally.*
 """
 
 
@@ -496,7 +492,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     print(f"  {args.output_dir}")
     for name, path in results.items():
         print(f"  - {path.name:<26} ({path.stat().st_size} bytes)")
-    print("\n\033[36m⚡ Unslop quality & 100% Zero-Leak security verified.\033[0m")
+    print("\n\033[36m⚡ Grounded copy and reproducible benchmark notes verified.\033[0m")
     return 0
 
 

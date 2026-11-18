@@ -21,12 +21,12 @@ Instead of stripping files arbitrarily or relying on heuristic summaries, T-Zero
 - **Raw Codebase Context:** 10,910,525 tokens ($32.73 per prompt fill on standard cloud models)
 - **T-Zero 4-Tier Hierarchical AST Tree:** 1,309,263 tokens (**-88.0% token reduction**)
 - **Target File Skeleton (Tier-3):** **-94.6% token reduction**
-- **AST Visitor Latency:** <400ms locally on standard CPU without GPU requirements
-- **Test Coverage:** Comprehensive suite with 100% green test passes
+- **Measurement note:** Results vary by repository, language mix, and selected tier; run the included benchmark locally
+- **Release verification:** The tagged release is validated by the GitHub Actions test suite
 
-### Security & Privacy (100% Zero-Leak):
+### Security & Privacy:
 - Computes in-memory Shannon entropy (H >= 4.75) alongside regex guards to identify and redact API keys, private certificates, and credentials before context is emitted.
-- Operates 100% offline via local stdio MCP. Zero external network telemetry or third-party cloud calls.
+- The local stdio MCP path runs without telemetry or third-party cloud calls; remote AI providers are optional.
 
 ### Installation & Integrations:
 - **Windows (WinGet):** `winget install SiberAkademi.TZero`

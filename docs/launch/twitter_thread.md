@@ -1,4 +1,4 @@
-# Twitter / X Launch Thread (v11.14.0)
+# Twitter / X Launch Thread (v11.15.3)
 
 ### Tweet 1 (270 chars):
 ```text
@@ -8,23 +8,21 @@
 🟢 T-Zero AST pruning: 1.3M tokens (-88% reduction)
 🎯 Target skeleton: -94.6% reduction
 
-Meet T-Zero v11.14.0: open-source local MCP server cutting context bloat.
+Meet T-Zero v11.15.3: open-source local MCP server cutting context bloat.
 
 Technical breakdown 🧵👇
 ```
 
-### Tweet 2 (278 chars):
+### Tweet 2 (203 chars):
 ```text
-2/7 💡 The Problem with Raw Code Context:
+2/7 💡 Raw code context wastes attention.
 
-When an AI assistant creates a route or fixes a bug, it doesn't need 200 lines of SQL query bodies from your database driver.
-
-It needs:
+Coding models usually need:
 • Class inheritance
 • Typed signatures
 • Return types & docstrings
 
-T-Zero extracts this in <400ms.
+T-Zero extracts this locally; benchmark your repository and mode.
 ```
 
 ### Tweet 3 (227 chars):
@@ -43,34 +41,32 @@ Deterministic AST extraction across:
 Parsed on your local CPU with zero cloud calls.
 ```
 
-### Tweet 4 (265 chars):
+### Tweet 4 (204 chars):
 ```text
-4/7 🔒 100% Zero-Leak Security:
+4/7 🔒 Local-First Secret Scanning:
 
-Accidentally leaking API keys into LLM prompts is an enterprise risk.
+T-Zero detects likely API keys and credentials in memory and redacts them before context leaves the local path.
 
-T-Zero runs an in-memory Shannon Entropy scanner (H >= 4.75) that detects secrets and redacts them *before* any text leaves your machine.
-
-100% private & offline.
+No cloud calls or telemetry are required in local mode.
 ```
 
 ### Tweet 5 (242 chars):
 ```text
 5/7 🤖 AI Hallucination Guard:
 
-T-Zero v11.14.0 inspects AI-suggested code diffs against your workspace AST symbol table.
+T-Zero v11.15.3 inspects AI-suggested code diffs against your workspace AST symbol table.
 
 If an LLM invents a nonexistent method or phantom import, T-Zero flags the discrepancy before code is committed to disk.
 ```
 
-### Tweet 6 (236 chars):
+### Tweet 6 (207 chars):
 ```text
-6/7 🚀 Turnkey Local CI (Sub-2s Execution):
+6/7 🚀 Turnkey Local CI:
 
 Run the entire verification pipeline on your machine:
 $ tzero local-ci --quick
 
-Integrates with Git pre-push hooks (`.git/hooks/pre-push`) to guarantee zero broken builds on remote CI runners.
+Integrates with Git pre-push hooks (`.git/hooks/pre-push`) to flag issues before they reach remote CI.
 ```
 
 ### Tweet 7 (257 chars):
