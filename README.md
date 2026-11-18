@@ -627,3 +627,7 @@ Join the revolution in context engineering and deterministic token pruning!
 - **LinkedIn:** [Toprak Ahmet Aydoğmuş](https://linkedin.com/in/toprak-ahmet-aydo%C4%9Fmu%C5%9F-60462534b/)
 - **Bio & Hub:** [hopp.bio/siberegitim](https://hopp.bio/siberegitim)
 - **License:** [GNU AGPL-3.0-only](LICENSE). [Copyright, author attribution, and Section 7 terms](NOTICE).
+
+The [upstream repository](https://github.com/toprakahmetaydogmus/TZeroAlgorithm) records the project's original authorship and release history. When distributing T-Zero code covered by the Section 7 terms, preserve the copyright and author attribution in [NOTICE](NOTICE) and clearly identify modified versions. Section 13 requires operators of modified versions that support remote network interaction to offer their remote users the corresponding source at no charge.
+
+The [last main-branch snapshot before the AGPL transition](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/blob/8972be7b94eac8d5d7e0d5e2047603ed29191768/LICENSE) was published under MIT. The license supplied with each earlier release continues to apply to that release.
