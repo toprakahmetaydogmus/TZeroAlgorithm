@@ -5,10 +5,25 @@
   "version": "11.15.1",
   "publisher": "siber-akademi",
   "license": "MIT",
+  "homepage": "https://tzero-indol.vercel.app",
+  "bugs": {
+    "url": "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/issues"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git"
   },
+  "galleryBanner": {
+    "color": "#0b1120",
+    "theme": "dark"
+  },
+  "keywords": [
+    "mcp",
+    "cursor",
+    "claude",
+    "ast",
+    "token-reduction"
+  ],
   "engines": {
     "vscode": "^1.75.0"
   },

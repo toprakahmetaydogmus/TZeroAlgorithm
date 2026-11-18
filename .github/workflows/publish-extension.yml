@@ -49,19 +49,29 @@ jobs:
           path: dist/*.vsix
 
       - name: Publish to Open VSX Registry
-        if: ${{ (github.event_name == 'push' || inputs.publish_openvsx) && env.OVSX_PAT != '' }}
+        if: ${{ startsWith(github.ref, 'refs/tags/v') || inputs.publish_openvsx }}
         env:
           OVSX_PAT: ${{ secrets.OVSX_PAT }}
         run: |
+          if [ -z "$OVSX_PAT" ]; then
+            echo "OVSX_PAT secret is not configured; skipping Open VSX publish."
+            exit 0
+          fi
           VSIX_PATH=$(ls dist/*.vsix | head -n 1)
+          echo "Ensuring Open VSX namespace 'siber-akademi' exists..."
+          npx --yes ovsx create-namespace siber-akademi -p "$OVSX_PAT" || true
           echo "Publishing $VSIX_PATH to Open VSX..."
           npx --yes ovsx publish "$VSIX_PATH" -p "$OVSX_PAT"
 
       - name: Publish to VS Code Marketplace
-        if: ${{ (github.event_name == 'push' || inputs.publish_vscode) && env.VSCE_PAT != '' }}
+        if: ${{ startsWith(github.ref, 'refs/tags/v') || inputs.publish_vscode }}
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
         run: |
+          if [ -z "$VSCE_PAT" ]; then
+            echo "VSCE_PAT secret is not configured; skipping VS Code Marketplace publish."
+            exit 0
+          fi
           VSIX_PATH=$(ls dist/*.vsix | head -n 1)
           echo "Publishing $VSIX_PATH to VS Code Marketplace..."
           npx --yes @vscode/vsce publish --packagePath "$VSIX_PATH" -p "$VSCE_PAT"
