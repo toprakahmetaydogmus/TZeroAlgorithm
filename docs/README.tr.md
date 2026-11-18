@@ -8,7 +8,7 @@
 [![M8ven Score](https://m8ven.ai/badge/mcp/toprakahmetaydogmus/tzeroalgorithm)](https://m8ven.ai/mcp/toprakahmetaydogmus/tzeroalgorithm?s=readme)
 [![PyPI](https://img.shields.io/pypi/v/tzero-mcp?color=38bdf8&style=flat-square&logo=pypi)](https://pypi.org/project/tzero-mcp/)
 [![npm](https://img.shields.io/npm/v/tzero-mcp?color=cb3837&style=flat-square&logo=npm)](https://www.npmjs.com/package/tzero-mcp)
-[![VS Code](https://img.shields.io/badge/VS%20Code-v11.15.2-007ACC?style=flat-square&logo=visualstudiocode&logoColor=white)](https://marketplace.visualstudio.com/items?itemName=siber-akademi.tzero-vscode)
+[![VS Code](https://img.shields.io/badge/VS%20Code-v11.15.3-007ACC?style=flat-square&logo=visualstudiocode&logoColor=white)](https://marketplace.visualstudio.com/items?itemName=siber-akademi.tzero-vscode)
 
 <br>
 
@@ -83,7 +83,7 @@ pip install -e .             # Geliştirici modu (.githooks otomatik aktifleşir
 tzero init
 
 # 🧩 VS Code / Cursor Eklentisini (.vsix) Yükle:
-code --install-extension dist/tzero-vscode-11.15.2.vsix
+code --install-extension dist/tzero-vscode-11.15.3.vsix
 
 # ⚡ Yerel CI ve Pre-Push Korumasını Çalıştır ($0 Kota):
 tzero local-ci --quick

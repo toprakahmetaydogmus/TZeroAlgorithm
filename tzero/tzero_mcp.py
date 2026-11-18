@@ -33,7 +33,7 @@ import ast
 import inspect
 import logging
 
-SERVER_VERSION = "11.15.2"
+SERVER_VERSION = "11.15.3"
 
 # Version checks must not initialize the MCP SDK or dependency bootstrap. Besides
 # being needlessly expensive, that path may wait on package discovery/network
@@ -79,7 +79,7 @@ try:
 except ImportError:
     pass
 
-# Core T-Zero V3 Engine Imports
+# Core T-Zero Engine Imports
 try:
     from tzero.tzero_v3 import (
         CodebaseScanner,

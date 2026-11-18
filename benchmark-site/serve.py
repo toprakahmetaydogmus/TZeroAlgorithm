@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-T-Zero V3 Benchmark & Live Laboratory Server
+T-Zero Benchmark & Live Laboratory Server
 Hosts the benchmark dashboard locally on http://127.0.0.1:8080 and opens browser.
 """
 

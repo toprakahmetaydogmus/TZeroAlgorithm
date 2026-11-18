@@ -8,6 +8,7 @@ import subprocess
 import tempfile
 import shutil
 import tomllib
+from unittest.mock import patch
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 with open(os.path.join(ROOT_DIR, "pyproject.toml"), "rb") as manifest:
@@ -91,6 +92,41 @@ class TestComprehensiveCLI(unittest.TestCase):
         with open(out_file, encoding="utf-8") as f:
             content = f.read()
         self.assertIn("T-Zero Context Tree", content)
+
+    def test_cli_dry_run_protects_existing_readme(self):
+        readme = os.path.join(self.temp_dir, "README.md")
+        with open(readme, "w", encoding="utf-8") as f:
+            f.write("project-owned README\n")
+
+        res = self._run_cli(["--dry-run", "--dir", self.temp_dir])
+
+        self.assertEqual(res.returncode, 0)
+        with open(readme, encoding="utf-8") as f:
+            self.assertEqual(f.read(), "project-owned README\n")
+        self.assertTrue(os.path.exists(os.path.join(self.temp_dir, "TZERO_CONTEXT.md")))
+
+    def test_guided_cli_passes_target_dir_and_protects_readme(self):
+        readme = os.path.join(self.temp_dir, "README.md")
+        with open(readme, "w", encoding="utf-8") as f:
+            f.write("project-owned README\n")
+
+        from tzero import tzero_v3
+
+        with patch.object(tzero_v3, "run_dry_run_cli") as dry_run, \
+             patch.object(tzero_v3, "_config_mgr") as config, \
+             patch.object(tzero_v3, "CodebaseScanner") as scanner, \
+             patch("builtins.input", return_value="2"), \
+             patch.object(sys, "argv", ["tzero_v3.py", "--cli", "--dir", self.temp_dir]):
+            config.get_profile.return_value = {"provider": "NVIDIA NIM"}
+            config.get_credential.return_value = None
+            scanner.return_value.scan_directory.return_value = ([], {}, {})
+            tzero_v3.main()
+
+        dry_run.assert_called_once_with(
+            os.path.abspath(self.temp_dir),
+            os.path.join(os.path.abspath(self.temp_dir), "TZERO_CONTEXT.md"),
+            force=True,
+        )
 
     def test_cli_export_agents(self):
         out_file = os.path.join(self.temp_dir, "agents_test.md")

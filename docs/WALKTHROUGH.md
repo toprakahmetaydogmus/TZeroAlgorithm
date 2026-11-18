@@ -1,6 +1,6 @@
-# T-Zero Context Architect V3 — Geliştirme Rehberi (Walkthrough)
+# T-Zero Context Architect — Geliştirme Rehberi (Walkthrough)
 
-> Bu belge, T-Zero Context Architect V3 projesinin tüm geliştirme sürecini,
+> Bu belge, T-Zero Context Architect projesinin tüm geliştirme sürecini,
 > mimari kararlarını ve teknik detaylarını kapsamlı şekilde anlatır.
 
 **Geliştirici:** Toprak Ahmet Aydoğmuş  
@@ -12,13 +12,13 @@
 
 ## 🏗 Mimari Genel Bakış
 
-T-Zero V3, **tek dosya mimarisinde** (monolithic single-file) tasarlanmıştır. Bu yaklaşım:
+T-Zero Context Architect, **tek dosya mimarisinde** (monolithic single-file) tasarlanmıştır. Bu yaklaşım:
 - Çift tıkla çalıştırmayı kolaylaştırır
 - Modül import hatalarını ortadan kaldırır  
 - PyInstaller ile tek .exe çıktısı üretmeyi basitleştirir
 - Deployment ve dağıtım sürecini minimalize eder
 
-### Katmanlı Yapı (tzero_v3.py içinde)
+### Katmanlı Yapı (tzero_v3.py çekirdek dosyasında)
 
 ```
 ┌────────────────────────────────────────┐
@@ -168,5 +168,5 @@ Her tema 11 renk değişkeni tanımlar: `bg_start`, `card_bg`, `card_border`, `c
 
 ---
 
-> **SİBER AKADEMİ** — T-Zero Context Architect V3  
+> **SİBER AKADEMİ** — T-Zero Context Architect
 > © 2024-2026 Toprak Ahmet Aydoğmuş | [LinkedIn](https://linkedin.com/in/toprak-ahmet-aydo%C4%9Fmu%C5%9F-60462534b/) • [GitHub](https://github.com/toprakahmetaydogmus)
