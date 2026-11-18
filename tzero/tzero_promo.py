@@ -33,7 +33,7 @@ AUTHOR = "Toprak Ahmet Aydoğmuş"
 ORGANIZATION = "Siber Akademi"
 PYPI_PKG = "tzero-mcp"
 NPM_PKG = "tzero-mcp"
-CANONICAL_VERSION = "v11.14.0"
+CANONICAL_VERSION = "v11.15.2"
 
 
 def get_current_version() -> str:

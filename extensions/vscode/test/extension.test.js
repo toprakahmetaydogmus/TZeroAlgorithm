@@ -19,7 +19,7 @@ test('terminal command preserves arguments in its explicitly selected shell', ()
 });
 
 test('package.json defines 11.0.0 metadata, sidebar viewContainer, and commands with zero runtime deps', () => {
-    assert.equal(pkg.version, '11.15.1');
+    assert.equal(pkg.version, '11.15.2');
     assert.equal(pkg.dependencies === undefined || Object.keys(pkg.dependencies).length === 0, true);
     assert.ok(pkg.contributes.viewsContainers && Array.isArray(pkg.contributes.viewsContainers.activitybar));
     assert.ok(pkg.contributes.views && Array.isArray(pkg.contributes.views.tzeroSidebar));

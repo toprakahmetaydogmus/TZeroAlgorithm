@@ -41,6 +41,11 @@ jobs:
           mkdir -p dist
           cp LICENSE extensions/vscode/ 2>/dev/null || true
           cd extensions/vscode
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          if [[ "${GITHUB_REF}" == refs/tags/v* && "${GITHUB_REF_NAME}" != "v${PACKAGE_VERSION}" ]]; then
+            echo "::error::Tag ${GITHUB_REF_NAME} does not match extension version v${PACKAGE_VERSION}"
+            exit 1
+          fi
           npx --yes @vscode/vsce package --no-dependencies
           mv *.vsix ../../dist/
           cd ../..
@@ -65,7 +70,11 @@ jobs:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
         run: |
           if [ -z "$VSCE_PAT" ]; then
-            echo "VSCE_PAT secret is not configured; skipping VS Code Marketplace publish."
+            if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
+              echo "::error::VSCE_PAT is required for tagged releases."
+              exit 1
+            fi
+            echo "VSCE_PAT is not configured; skipping manual publish."
             exit 0
           fi
           VSIX_PATH=$(ls dist/*.vsix | head -n 1)

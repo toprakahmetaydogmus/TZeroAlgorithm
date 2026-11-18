@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tzero-mcp"
-version = "11.15.1"
+version = "11.15.2"
 description = "Enterprise Codebase Context Builder, AST Signatures Analyzer, & Token Reducer for LLMs"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -119,3 +119,6 @@ Benchmark = "https://tzero-indol.vercel.app"
 Discussions = "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/discussions"
 LinkedIn = "https://linkedin.com/in/toprak-ahmet-aydo%C4%9Fmu%C5%9F-60462534b/"
 Biography = "https://hopp.bio/siberegitim"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

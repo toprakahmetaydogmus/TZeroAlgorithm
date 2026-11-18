@@ -42,7 +42,7 @@ class DatabaseClient:
             with open(out_p, "r", encoding="utf-8") as f:
                 data = json.load(f)
             self.assertIn("symbols", data)
-            self.assertEqual(data["version"], "11.15.1")
+            self.assertEqual(data["version"], "11.15.2")
         finally:
             if os.path.exists(tmp_golden):
                 os.remove(tmp_golden)

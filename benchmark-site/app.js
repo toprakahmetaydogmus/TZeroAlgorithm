@@ -892,8 +892,8 @@ function initCalculator() {
     const devCount = parseInt(devSlider.value) || 3;
     const totalRequests = monthlyRequestsPerDev * devCount;
 
-    const rawTokensPerReq = 102265;
-    const tzeroTokensPerReq = 5274;
+    const rawTokensPerReq = 1912455;
+    const tzeroTokensPerReq = 105185;
 
     const totalRawTokens = totalRequests * rawTokensPerReq;
     const totalTzeroTokens = totalRequests * tzeroTokensPerReq;

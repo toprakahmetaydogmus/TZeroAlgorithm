@@ -6,7 +6,7 @@ delivering maximum semantic grounding to LLMs (Claude, GPT, Gemini, DeepSeek) wi
 up to 95% token savings compared to raw file ingestion.
 
 Author: Toprak Ahmet Aydogmus (Siber Akademi)
-Version: 10.5.0
+Version: 11.15.1
 """
 
 import ast

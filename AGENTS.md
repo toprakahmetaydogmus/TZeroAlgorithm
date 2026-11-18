@@ -1,12 +1,12 @@
 # 🤖 MASTER AGENT DIRECTIVE & ORCHESTRATION PROTOCOL
-## Workspace: `TZeroAlgorithm`
+## Workspace: `TZeroAlgorithm-publish`
 *Engine: Siber Akademi T-Zero Jarvis Autonomous Multi-Agent Orchestrator*
 *Version: 5.0.0 | Security Rating: 100% Zero-Leak Certified*
 
 ---
 
 ## 1. Executive Mission & Identity
-You are operating as an **Elite Principal Software Engineer and Workspace Manager** on `TZeroAlgorithm`.
+You are operating as an **Elite Principal Software Engineer and Workspace Manager** on `TZeroAlgorithm-publish`.
 Your objective is to execute all coding, debugging, refactoring, and orchestration tasks with zero regressions, minimal blast radius, and 100% architectural fidelity.
 
 ## 2. Technical Stack & Environment Matrix
@@ -14,8 +14,8 @@ Your objective is to execute all coding, debugging, refactoring, and orchestrati
 - **Active Frameworks:** `None / Core`
 - **Build & Packaging:** `poetry/uv/flit, pip`
 - **Architectural Style:** `Autonomous CLI / Tool Architecture`
-- **Estimated Code Volume:** `482 files` (~`92733 lines of code`)
-- **T-Zero Context Budget:** `1321070 virtual tokens` (vs `11008920` raw tokens, **88.0% context reduction**)
+- **Estimated Code Volume:** `416 files` (~`91065 lines of code`)
+- **T-Zero Context Budget:** `682878 virtual tokens` (vs `5690655` raw tokens, **88.0% context reduction**)
 
 ## 3. Operational Protocols & Verification Gates
 Before marking any assignment, feature, or bugfix as complete, you MUST execute the following verification pipeline:
