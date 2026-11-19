@@ -53,7 +53,7 @@
 
 <div align="center">
 
-[![VS Code Marketplace](https://img.shields.io/badge/VS%20Code%20Marketplace-v11.15.3-007ACC?style=for-the-badge&logo=visualstudiocode&logoColor=white)](https://marketplace.visualstudio.com/items?itemName=siber-akademi.tzero-vscode)
+[![VS Code Marketplace](https://img.shields.io/badge/VS%20Code%20Marketplace-v11.15.4-007ACC?style=for-the-badge&logo=visualstudiocode&logoColor=white)](https://marketplace.visualstudio.com/items?itemName=siber-akademi.tzero-vscode)
 [![Open VSX Downloads](https://img.shields.io/open-vsx/dt/siber-akademi/tzero-vscode?style=for-the-badge&logo=openvsx&color=purple)](https://open-vsx.org/extension/siber-akademi/tzero-vscode)
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/toprakahmetaydogmus/TZeroAlgorithm)
 [![Smithery Registry](https://img.shields.io/badge/%E2%9A%A1%20Smithery%20MCP-Compatible%20v11.15.3-FF5722?style=for-the-badge&logo=dependabot&logoColor=white)](https://smithery.ai)

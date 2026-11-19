@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <a href="https://marketplace.visualstudio.com/items?itemName=siber-akademi.tzero-vscode"><img src="https://img.shields.io/badge/Version-11.15.3-0284c7?style=for-the-badge&logo=visualstudiocode&logoColor=white" alt="Version 11.15.3" /></a>
+  <a href="https://marketplace.visualstudio.com/items?itemName=siber-akademi.tzero-vscode"><img src="https://img.shields.io/badge/Version-11.15.4-0284c7?style=for-the-badge&logo=visualstudiocode&logoColor=white" alt="Version 11.15.4" /></a>
   <a href="https://open-vsx.org/extension/siber-akademi/tzero-vscode"><img src="https://img.shields.io/open-vsx/dt/siber-akademi/tzero-vscode?style=for-the-badge&logo=openvsx&color=purple&label=Downloads" alt="Open VSX Downloads" /></a>
   <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm"><img src="https://img.shields.io/github/stars/toprakahmetaydogmus/TZeroAlgorithm?style=for-the-badge&logo=github&color=f59e0b&logoColor=white" alt="GitHub Stars" /></a>
   <a href="https://www.npmjs.com/package/tzero-mcp"><img src="https://img.shields.io/npm/v/tzero-mcp?color=cb3837&logo=npm&style=for-the-badge&logoColor=white" alt="NPM Version" /></a>
