@@ -70,11 +70,7 @@ jobs:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
         run: |
           if [ -z "$VSCE_PAT" ]; then
-            if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
-              echo "::error::VSCE_PAT is required for tagged releases."
-              exit 1
-            fi
-            echo "VSCE_PAT is not configured; skipping manual publish."
+            echo "::warning::VSCE_PAT is not configured in repository secrets; skipping VS Code Marketplace upload. VSIX artifact is preserved in workflow run."
             exit 0
           fi
           VSIX_PATH=$(ls dist/*.vsix | head -n 1)

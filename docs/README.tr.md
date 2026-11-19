@@ -11,7 +11,7 @@
 [![PyPI İndirmeleri](https://img.shields.io/pypi/dm/tzero-mcp?color=38bdf8&style=flat-square&logo=pypi)](https://pypi.org/project/tzero-mcp/)
 [![npm](https://img.shields.io/npm/v/tzero-mcp?color=cb3837&style=flat-square&logo=npm)](https://www.npmjs.com/package/tzero-mcp)
 [![npm İndirmeleri](https://img.shields.io/npm/dt/tzero-mcp?color=cb3837&style=flat-square&logo=npm)](https://www.npmjs.com/package/tzero-mcp)
-[![VS Code](https://img.shields.io/badge/VS%20Code-v11.15.4-007ACC?style=flat-square&logo=visualstudiocode&logoColor=white)](https://marketplace.visualstudio.com/items?itemName=siber-akademi.tzero-vscode)
+[![VS Code](https://img.shields.io/badge/VS%20Code-v11.15.3-007ACC?style=flat-square&logo=visualstudiocode&logoColor=white)](https://marketplace.visualstudio.com/items?itemName=siber-akademi.tzero-vscode)
 [![Open VSX](https://img.shields.io/open-vsx/dt/siber-akademi/tzero-vscode?style=flat-square&logo=openvsx&color=purple)](https://open-vsx.org/extension/siber-akademi/tzero-vscode)
 
 <br>
