@@ -62,7 +62,16 @@ jobs:
         run: |
           VSIX_PATH=$(ls dist/*.vsix | head -n 1)
           echo "Publishing $VSIX_PATH to Open VSX with trusted publishing..."
-          npx --yes ovsx@1.2.0 publish "$VSIX_PATH" --trusted-publishing
+          OUTPUT=$(npx --yes ovsx@1.2.0 publish "$VSIX_PATH" --trusted-publishing 2>&1) || {
+            STATUS=$?
+            echo "$OUTPUT"
+            if echo "$OUTPUT" | grep -qi "already published"; then
+              echo "::notice::Extension version is already published on Open VSX."
+              exit 0
+            fi
+            exit $STATUS
+          }
+          echo "$OUTPUT"
 
       - name: Publish to VS Code Marketplace
         if: ${{ startsWith(github.ref, 'refs/tags/v') || inputs.publish_vscode }}
