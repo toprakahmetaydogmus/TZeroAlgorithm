@@ -28,6 +28,7 @@ class TZeroShowcaseGenerator:
         raw_tokens: int = 10809938,
         pruned_tokens: int = 1297192,
         annual_savings_usd: float = 14280.0,
+        current_stars: int = 32,
         output_file: str = "assets/tzero_badge_card.svg"
     ) -> str:
         """Generates a futuristic, high-DPI 800x240 SVG banner card for repository READMEs."""
@@ -143,7 +144,7 @@ class TZeroShowcaseGenerator:
             <rect x="0" y="0" width="178" height="90" rx="10" fill="#1e1b4b" stroke="#6366f1" stroke-width="1"/>
             <text x="16" y="26" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#a5b4fc">ROAD TO 100 STARS</text>
             <text x="16" y="54" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="900" fill="#ffffff">⭐ STAR ON GITHUB</text>
-            <text x="16" y="76" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="600" fill="#38bdf8">16 / 100 Milestone</text>
+            <text x="16" y="76" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="600" fill="#38bdf8">{current_stars} / 100 Milestone</text>
         </g>
     </g>
 
@@ -188,7 +189,8 @@ class TZeroShowcaseGenerator:
         cls,
         output_file: str = "tzero_showcase.html",
         raw_code_sample: Optional[str] = None,
-        pruned_code_sample: Optional[str] = None
+        pruned_code_sample: Optional[str] = None,
+        current_stars: int = 32
     ) -> str:
         """Generates an interactive standalone split-screen HTML5 comparison slider."""
         raw_code = raw_code_sample or '''class EnterpriseAuthService:
@@ -396,7 +398,7 @@ class TZeroShowcaseGenerator:
 
     <div style="margin-top: 32px; padding: 26px 32px; background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.35); border-radius: 16px; max-width: 900px; width: 100%; text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.45);">
         <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(245, 158, 11, 0.15); border: 1px solid #f59e0b; padding: 4px 16px; border-radius: 20px; color: #fbbf24; font-size: 13px; font-weight: 700; margin-bottom: 12px;">
-            ⭐ ROAD TO 100 STARS MILESTONE (16 / 100)
+            ⭐ ROAD TO 100 STARS MILESTONE ({current_stars} / 100)
         </div>
         <p style="font-size: 19px; font-weight: 800; color: #f8fafc; margin-bottom: 8px;">
             Support Open-Source Local AI Tooling &bull; Yıldız Vererek Destekleyin!

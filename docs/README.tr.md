@@ -6,9 +6,13 @@
 
 [![GitHub Stars](https://img.shields.io/github/stars/toprakahmetaydogmus/TZeroAlgorithm?style=social)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)
 [![M8ven Score](https://m8ven.ai/badge/mcp/toprakahmetaydogmus/tzeroalgorithm)](https://m8ven.ai/mcp/toprakahmetaydogmus/tzeroalgorithm?s=readme)
+[![Verified on FreeAPI](https://findfreeapi.com/api/badge/tzeroalgorithm)](https://findfreeapi.com/en/service/tzeroalgorithm)
 [![PyPI](https://img.shields.io/pypi/v/tzero-mcp?color=38bdf8&style=flat-square&logo=pypi)](https://pypi.org/project/tzero-mcp/)
+[![PyPI İndirmeleri](https://img.shields.io/pypi/dm/tzero-mcp?color=38bdf8&style=flat-square&logo=pypi)](https://pypi.org/project/tzero-mcp/)
 [![npm](https://img.shields.io/npm/v/tzero-mcp?color=cb3837&style=flat-square&logo=npm)](https://www.npmjs.com/package/tzero-mcp)
+[![npm İndirmeleri](https://img.shields.io/npm/dt/tzero-mcp?color=cb3837&style=flat-square&logo=npm)](https://www.npmjs.com/package/tzero-mcp)
 [![VS Code](https://img.shields.io/badge/VS%20Code-v11.15.3-007ACC?style=flat-square&logo=visualstudiocode&logoColor=white)](https://marketplace.visualstudio.com/items?itemName=siber-akademi.tzero-vscode)
+[![Open VSX](https://img.shields.io/open-vsx/dt/siber-akademi/tzero-vscode?style=flat-square&logo=openvsx&color=purple)](https://open-vsx.org/extension/siber-akademi/tzero-vscode)
 
 <br>
 
@@ -21,7 +25,7 @@
 <div align="center">
 
 ### 🌟 100 Yıldız Yolculuğu: T-Zero'nun 100 Yıldız Hedefine Ulaşmasına Destek Olun!
-[![GitHub Yıldızları](https://img.shields.io/badge/Mevcut%20Y%C4%B1ld%C4%B1z-16%20%2F%20100%20Hedefi-f59e0b?style=for-the-badge&logo=github&logoColor=white)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)
+[![GitHub Yıldızları](https://img.shields.io/github/stars/toprakahmetaydogmus/TZeroAlgorithm?style=for-the-badge&logo=github&logoColor=white&label=Y%C4%B1ld%C4%B1zlar%20%7C%20Hedef:%20100&color=f59e0b)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)
 [![%100 Ücretsiz & Açık Kaynak](https://img.shields.io/badge/Fiyat-0%20TL%20(%25100%20%C3%9Ccretsiz)-10b981?style=for-the-badge&logo=opensourceinitiative&logoColor=white)](LICENSE)
 [![Geliştirici](https://img.shields.io/badge/Geli%C5%9Ftirici-Toprak%20Ahmet%20Aydo%C4%9Fmu%C5%9F-8b5cf6?style=for-the-badge&logo=visualstudiocode&logoColor=white)](https://linkedin.com/in/toprak-ahmet-aydo%C4%9Fmu%C5%9F-60462534b/)
 
