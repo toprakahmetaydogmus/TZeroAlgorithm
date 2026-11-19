@@ -78,10 +78,11 @@ jobs:
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
         run: |
-          if [ -z "$VSCE_PAT" ]; then
-            echo "::warning::VSCE_PAT is not configured in repository secrets; skipping VS Code Marketplace upload. VSIX artifact is preserved in workflow run."
-            exit 0
-          fi
           VSIX_PATH=$(ls dist/*.vsix | head -n 1)
-          echo "Publishing $VSIX_PATH to VS Code Marketplace..."
-          npx --yes @vscode/vsce publish --packagePath "$VSIX_PATH" -p "$VSCE_PAT"
+          if [ -n "$VSCE_PAT" ]; then
+            echo "Publishing $VSIX_PATH to VS Code Marketplace using PAT..."
+            npx --yes @vscode/vsce publish --packagePath "$VSIX_PATH" -p "$VSCE_PAT" --skip-duplicate
+          else
+            echo "Publishing $VSIX_PATH to VS Code Marketplace using Trusted Publishing (--oidc)..."
+            npx --yes @vscode/vsce publish --packagePath "$VSIX_PATH" --oidc --skip-duplicate
+          fi

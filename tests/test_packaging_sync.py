@@ -38,7 +38,7 @@ class TestPackagingAndVersionSync(unittest.TestCase):
     def test_all_release_manifests_share_canonical_version(self):
         pyproject = tomllib.loads((ROOT_DIR / "pyproject.toml").read_text(encoding="utf-8"))
         canonical = pyproject["project"]["version"]
-        self.assertEqual(canonical, "11.15.3")
+        self.assertEqual(canonical, "11.15.5")
 
         server = json.loads((ROOT_DIR / "server.json").read_text(encoding="utf-8"))
         self.assertEqual(server["version"], canonical)

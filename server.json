@@ -7,12 +7,12 @@
     "url": "https://github.com/toprakahmetaydogmus/TZeroAlgorithm",
     "source": "github"
   },
-  "version": "11.15.3",
+  "version": "11.15.5",
   "packages": [
     {
       "registryType": "pypi",
       "identifier": "tzero-mcp",
-      "version": "11.15.3",
+      "version": "11.15.5",
       "transport": {
         "type": "stdio"
       }

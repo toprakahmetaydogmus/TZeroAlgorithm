@@ -53,10 +53,10 @@
 
 <div align="center">
 
-[![VS Code Marketplace](https://img.shields.io/badge/VS%20Code%20Marketplace-v11.15.3-007ACC?style=for-the-badge&logo=visualstudiocode&logoColor=white)](https://marketplace.visualstudio.com/items?itemName=siber-akademi.tzero-vscode)
+[![VS Code Marketplace](https://img.shields.io/badge/VS%20Code%20Marketplace-v11.15.5-007ACC?style=for-the-badge&logo=visualstudiocode&logoColor=white)](https://marketplace.visualstudio.com/items?itemName=siber-akademi.tzero-vscode)
 [![Open VSX Downloads](https://img.shields.io/open-vsx/dt/siber-akademi/tzero-vscode?style=for-the-badge&logo=openvsx&color=purple)](https://open-vsx.org/extension/siber-akademi/tzero-vscode)
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/toprakahmetaydogmus/TZeroAlgorithm)
-[![Smithery Registry](https://img.shields.io/badge/%E2%9A%A1%20Smithery%20MCP-Compatible%20v11.15.3-FF5722?style=for-the-badge&logo=dependabot&logoColor=white)](https://smithery.ai)
+[![Smithery Registry](https://img.shields.io/badge/%E2%9A%A1%20Smithery%20MCP-Compatible%20v11.15.5-FF5722?style=for-the-badge&logo=dependabot&logoColor=white)](https://smithery.ai)
 [![npm Package](https://img.shields.io/badge/%F0%9F%93%A6%20npm-tzero--mcp-cb3837?style=for-the-badge&logo=npm&logoColor=white)](https://www.npmjs.com/package/tzero-mcp)
 [![npm Total Downloads](https://img.shields.io/npm/dt/tzero-mcp?style=for-the-badge&logo=npm&color=cb3837&label=npm%20downloads)](https://www.npmjs.com/package/tzero-mcp)
 [![PyPI Downloads](https://img.shields.io/pypi/dm/tzero-mcp?style=for-the-badge&logo=pypi&color=38bdf8&label=PyPI%20downloads)](https://pypi.org/project/tzero-mcp/)
@@ -105,10 +105,10 @@ tzero init
 
 # 🖥️ Option D: Standalone Windows 64-Bit Executable Suite (Zero Dependencies):
 # Download all-in-one suite (.ZIP) with GUI, CLI, MCP Server & 1-Click Configurator:
-# https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/download/v11.15.3/TZero-v11.15.3-Windows-x64.zip
+# https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/download/v11.15.5/TZero-v11.15.5-Windows-x64.zip
 
 # 🧩 Install VS Code / Cursor Extension (.vsix):
-code --install-extension dist/tzero-vscode-11.15.3.vsix
+code --install-extension dist/tzero-vscode-11.15.5.vsix
 ```
 
 ### 🧭 Navigation & Interactive Jump Stations
@@ -239,7 +239,7 @@ tzero init --vscode        # VS Code (Continue / Copilot)
 tzero init --zed           # Zed Editor
 
 # Install official VS Code / Cursor Extension (.vsix):
-code --install-extension dist/tzero-vscode-11.15.3.vsix
+code --install-extension dist/tzero-vscode-11.15.5.vsix
 ```
 
 ### Manual Configuration Snippets (Any MCP Client)
