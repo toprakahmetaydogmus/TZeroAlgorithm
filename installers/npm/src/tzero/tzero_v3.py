@@ -38,7 +38,7 @@ import shutil
 
 # Safe UTF-8 reconfiguration & Windows console attachment for frozen executables
 if sys.platform.startswith("win"):
-    if len(sys.argv) > 1:
+    if len(sys.argv) > 1 and getattr(sys, "frozen", False):
         try:
             import ctypes
             if ctypes.windll.kernel32.AttachConsole(-1):
@@ -8760,6 +8760,47 @@ def run_watch_mode(target_dir: str = ".", interval: float = 1.0, once_test: bool
         return True
 
 
+def print_viral_share_hub():
+    """Prints 1-click social share links for Twitter, Reddit, LinkedIn, Hacker News, WhatsApp, and GitHub."""
+    import urllib.parse
+    repo_url = "https://github.com/toprakahmetaydogmus/TZeroAlgorithm"
+    tweet_text = "T-Zero: Deterministic AST Context Compressor & MCP Server cutting AI prompt tokens by up to 95% with zero regressions. Built by Toprak Ahmet Aydoğmuş (Siber Akademi). 100% free & local!"
+    tweet_url = f"https://twitter.com/intent/tweet?text={urllib.parse.quote(tweet_text)}&url={urllib.parse.quote(repo_url)}&hashtags=CursorAI,ClaudeAI,MCP,OpenSource"
+    reddit_url = f"https://www.reddit.com/submit?url={urllib.parse.quote(repo_url)}&title={urllib.parse.quote('T-Zero — Deterministic AST Context Compressor & Canonical MCP Server (cuts tokens by 95%)')}"
+    hn_url = f"https://news.ycombinator.com/submitlink?u={urllib.parse.quote(repo_url)}&t={urllib.parse.quote('Show HN: T-Zero – Deterministic AST Codebase Context Compressor & MCP Server')}"
+    linkedin_url = f"https://www.linkedin.com/sharing/share-offsite/?url={urllib.parse.quote(repo_url)}"
+    wa_url = f"https://api.whatsapp.com/send?text={urllib.parse.quote(f'Check out T-Zero: {repo_url}')}"
+
+    print(f"""
+┌────────────────────────────────────────────────────────────────────────┐
+│  🚀 T-ZERO 1-CLICK COMMUNITY SHARE & VIRAL LAUNCH HUB                  │
+│  Empowering Developers Worldwide • 100% Free & Open Source             │
+└────────────────────────────────────────────────────────────────────────┘
+
+  🐦 Twitter / X (1-Click Tweet):
+     {tweet_url}
+
+  🔴 Reddit (r/LocalLLaMA, r/Cursor):
+     {reddit_url}
+
+  🟠 Hacker News (Show HN):
+     {hn_url}
+
+  💼 LinkedIn:
+     {linkedin_url}
+
+  💬 WhatsApp:
+     {wa_url}
+
+  ⭐ Star on GitHub (Goal: 100 Stars):
+     {repo_url}
+
+════════════════════════════════════════════════════════════════════════
+✔ Every share and star supports independent open-source AI tooling!
+════════════════════════════════════════════════════════════════════════
+""")
+
+
 def main():
     import argparse
     import json
@@ -8799,6 +8840,11 @@ def main():
         from tzero.tzero_ci import main as ci_main
         sys.argv.pop(1)
         sys.exit(ci_main())
+
+    # Fast path for share / viral subcommands
+    if len(sys.argv) > 1 and sys.argv[1].lower() in ("share", "--share", "-share", "tweet", "social"):
+        print_viral_share_hub()
+        sys.exit(0)
 
     # Fast path for promo / launch subcommands
     if len(sys.argv) > 1 and sys.argv[1].lower() in ("promo", "launch", "marketing", "--promo", "-promo"):
@@ -8862,6 +8908,7 @@ def main():
     parser.add_argument("--guard", "--verify-code", metavar="CODE_OR_FILE", help="Validate code against AST contracts to eliminate hallucinations before applying")
     parser.add_argument("--grounding-contract", action="store_true", help="Generate immutable AST grounding contract for LLM prompt pinning")
     parser.add_argument("--promo", action="store_true", help="Generate zero-cost organic launch kit in docs/launch/")
+    parser.add_argument("--share", action="store_true", help="Generate 1-click social sharing links for Twitter/X, Reddit, Hacker News, and LinkedIn")
     parser.add_argument("--patch", "--apply-patch", dest="apply_patch", metavar="DIFF_FILE_OR_STR", help="Apply patch with AST-tolerant fuzzy matching (whitespace & line drift agnostic)")
     parser.add_argument("--target", default=None, metavar="TARGET_FILE", help="Target file for --patch (optional if patch specifies file header)")
     parser.add_argument("--fuzzy", action="store_true", default=True, help="Enable fuzzy AST and whitespace matching for patch application (default: True)")
@@ -9129,6 +9176,9 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
             "install-ide": "--install-ide",
             "install": "--install-ide",
             "add-mcp": "--install-ide",
+            "share": "--share",
+            "tweet": "--share",
+            "social": "--share",
             "audit": "--audit",
             "vault": "--vault",
             "auto-vault": "--auto-vault",
@@ -9246,6 +9296,9 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
         from tzero.tzero_promo import main as promo_main
         promo_args = [a for a in sys.argv[1:] if a.lower() not in ("--promo", "-promo")]
         sys.exit(promo_main(promo_args))
+    elif getattr(args, "share", False):
+        print_viral_share_hub()
+        return
     elif args.doctor:
         if tzero_deps is None:
             print("[ERROR] tzero_deps.py is missing; reinstall T-Zero to use --doctor.")
