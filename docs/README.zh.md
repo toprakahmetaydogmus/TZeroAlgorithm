@@ -7,11 +7,11 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm"><img src="https://img.shields.io/github/stars/toprakahmetaydogmus/TZeroAlgorithm?style=for-the-badge&logo=github&color=00f0ff" alt="GitHub Stars" /></a>
-  <a href="https://www.npmjs.com/package/tzero-mcp"><img src="https://img.shields.io/npm/v/tzero-mcp?style=for-the-badge&logo=npm&color=cb3837" alt="npm version" /></a>
-  <a href="https://pypi.org/project/tzero-mcp/"><img src="https://img.shields.io/pypi/v/tzero-mcp?style=for-the-badge&logo=pypi&color=3775a9" alt="PyPI version" /></a>
-  <a href="https://socket.dev/npm/package/tzero-mcp"><img src="https://img.shields.io/badge/Socket.dev-100%2F100_Safe-10b981?style=for-the-badge&logo=socketdotdev" alt="Socket.dev Score" /></a>
-  <a href="../LICENSE"><img src="https://img.shields.io/badge/License-AGPL--3.0--only-purple?style=for-the-badge" alt="License AGPL-3.0-only" /></a>
+  <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm"><img src="https://img.shields.io/github/stars/toprakahmetaydogmus/TZeroAlgorithm?style=for-the-badge&logo=github&color=22c55e&label=GitHub%20Stars" alt="GitHub Stars" /></a>
+  <a href="https://www.npmjs.com/package/tzero-mcp"><img src="https://img.shields.io/npm/dt/tzero-mcp?style=for-the-badge&logo=npm&color=cb3837&label=npm%20Downloads" alt="npm Downloads" /></a>
+  <a href="https://pypi.org/project/tzero-mcp/"><img src="https://img.shields.io/pepy/dt/tzero-mcp?style=for-the-badge&logo=pypi&color=38bdf8&label=PyPI%20Downloads" alt="PyPI Downloads" /></a>
+  <a href="https://open-vsx.org/extension/siber-akademi/tzero-vscode"><img src="https://img.shields.io/open-vsx/dt/siber-akademi/tzero-vscode?style=for-the-badge&logo=openvsx&color=8b5cf6&label=Open-VSX" alt="Open VSX Downloads" /></a>
+  <a href="../LICENSE"><img src="https://img.shields.io/badge/License-AGPL--3.0--only-blue?style=for-the-badge" alt="License AGPL-3.0-only" /></a>
 </p>
 
 [English](../README.md) | [Türkçe](README.tr.md) | [日本語](README.ja.md) | **简体中文**
@@ -128,3 +128,12 @@ tzero init
 - **开源许可证:** AGPL-3.0-only
 - 如果 T-Zero 帮您节省了 Token 费用并提升了开发效率，欢迎在 GitHub 上点亮一颗 **⭐ Star**！您的支持是开源创作者最大的动力！
 
+---
+
+## 📈 Star History
+
+<div align="center">
+  <a href="https://star-history.com/#toprakahmetaydogmus/TZeroAlgorithm&Date">
+    <img src="https://api.star-history.com/svg?repos=toprakahmetaydogmus/TZeroAlgorithm&type=Date" alt="T-Zero Star History" width="100%" style="max-width: 800px; border-radius: 10px;">
+  </a>
+</div>
