@@ -39,6 +39,11 @@ def _attach_windows_console() -> None:
                     sys.stderr = open("CONOUT$", "w", encoding="utf-8", errors="replace")
         except Exception:
             pass
+    try:
+        from tzero.tzero_terminal import init_terminal
+        init_terminal()
+    except Exception:
+        pass
 
 
 @dataclass(frozen=True)
@@ -1117,22 +1122,28 @@ def run_init(argv: Optional[List[str]] = None) -> int:
         "gemini-cli": ["gemini-cli"],
     }
 
+    try:
+        from tzero.tzero_terminal import sanitize_terminal_text
+    except Exception:
+        def sanitize_terminal_text(t):
+            return t
+
     # Print banner
-    print("""
+    print(sanitize_terminal_text("""
 \033[1;36m================================================================================
 ⚡ SİBER AKADEMİ — T-ZERO 1-CLICK MCP INITIALIZATION (v11.15.5)
 ================================================================================\033[0m
-\033[32m🎯 Zero-Config AST Codebase Context & 100% Zero-Leak Security Guard\033[0m
-""")
+\033[32m★ Zero-Config AST Codebase Context & 100% Zero-Leak Security Guard\033[0m
+"""))
 
     # Parse arguments
     flags = [a.lower().lstrip("-") for a in argv]
     if "list" in flags or "l" in flags or "--list" in argv:
-        print("\033[1;33m📋 Supported & Detected IDE Environments:\033[0m\n")
+        print(sanitize_terminal_text("\033[1;33m★ Supported & Detected IDE Environments:\033[0m\n"))
         for t in all_targets:
             state = "\033[32m✓ DETECTED\033[0m" if t.detected else "\033[90mnot found \033[0m"
-            print(f"  [{state}] {t.name:<25} : key='{t.key}' ({t.config_path})")
-        print("\n\033[36m💡 Run: 'tzero init' to install to all detected IDEs automatically.\033[0m\n")
+            print(sanitize_terminal_text(f"  [{state}] {t.name:<25} : key='{t.key}' ({t.config_path})"))
+        print(sanitize_terminal_text("\n\033[36m• Run: 'tzero init' to install to all detected IDEs automatically.\033[0m\n"))
         return 0
 
     selected_keys = set()
@@ -1142,11 +1153,11 @@ def run_init(argv: Optional[List[str]] = None) -> int:
         detected_targets = [t for t in all_targets if t.detected]
         if detected_targets:
             selected_targets = detected_targets
-            print(f"\033[34m[AUTO-DETECT]\033[0m Found {len(selected_targets)} active IDE environment(s):")
+            print(sanitize_terminal_text(f"\033[34m[AUTO-DETECT]\033[0m Found {len(selected_targets)} active IDE environment(s):"))
             for t in selected_targets:
-                print(f"  • {t.name}")
+                print(sanitize_terminal_text(f"  • {t.name}"))
         else:
-            print("\033[33m[INFO]\033[0m No active IDEs currently detected; configuring default targets (Cursor, Claude, VS Code, Windsurf)...")
+            print(sanitize_terminal_text("\033[33m[INFO]\033[0m No active IDEs currently detected; configuring default targets (Cursor, Claude, VS Code, Windsurf)..."))
             selected_targets = [t for t in all_targets if t.key in ("cursor", "claude-desktop", "vscode", "windsurf")]
     else:
         for f in flags:
@@ -1157,22 +1168,22 @@ def run_init(argv: Optional[List[str]] = None) -> int:
         selected_targets = [t for t in all_targets if t.key in selected_keys]
 
     if not selected_targets:
-        print(f"\033[31m[ERROR]\033[0m No matching IDE target found for: {argv}")
+        print(sanitize_terminal_text(f"\033[31m[ERROR]\033[0m No matching IDE target found for: {argv}"))
         print("Available targets: cursor, claude, windsurf, vscode, cline, roo, antigravity, gemini, all")
         return 1
 
-    print(f"\n\033[35m[INSTALLING]\033[0m Configuring {len(selected_targets)} target(s)...")
+    print(sanitize_terminal_text(f"\n\033[35m[INSTALLING]\033[0m Configuring {len(selected_targets)} target(s)..."))
     successes, failures = install_targets(
         selected_targets,
-        log_fn=lambda m: print(f"  \033[32m✓\033[0m {m}")
+        log_fn=lambda m: print(sanitize_terminal_text(f"  \033[32m✓\033[0m {m}"))
     )
 
-    print(f"\n\033[1;32m🎉 [SUCCESS] T-Zero MCP Server successfully registered in {successes} client(s)!\033[0m")
+    print(sanitize_terminal_text(f"\n\033[1;32m★ [SUCCESS] T-Zero MCP Server successfully registered in {successes} client(s)!\033[0m"))
     if failures:
-        print(f"\033[33m⚠️  {failures} client(s) could not be updated.\033[0m")
+        print(sanitize_terminal_text(f"\033[33m⚠️  {failures} client(s) could not be updated.\033[0m"))
 
-    print("""
-\033[1;37m🚀 HOW TO USE IN YOUR IDE (CURSOR, CLAUDE, WINDSURF):
+    print(sanitize_terminal_text("""
+\033[1;37m★ HOW TO USE IN YOUR IDE (CURSOR, CLAUDE, WINDSURF):
 1. Restart your IDE or Reload Window.
 2. In Composer / Chat, prompt your agent:\033[0m
    \033[36m"Use T-Zero to get the project skeleton and analyze the blast radius."\033[0m
@@ -1186,12 +1197,12 @@ def run_init(argv: Optional[List[str]] = None) -> int:
 │  Search "Toprak Ahmet Aydoğmuş" on Google to learn more!                     │
 │                                                                              │
 │  If this open-source tool saved you tokens or improved your coding flow:     │
-│  👉 Please consider giving it a ⭐ on GitHub:                                │
+│  ► Please consider giving it a ★ on GitHub:                                  │
 │     https://github.com/toprakahmetaydogmus/TZeroAlgorithm                    │
 │                                                                              │
-│  100% Free & Open-Source under MIT License. Thank you! 🚀                   │
+│  100% Free & Open-Source under AGPL-3.0 License. Thank you! ★                │
 └──────────────────────────────────────────────────────────────────────────────┘\033[0m
-""")
+"""))
     return 0 if failures == 0 else 1
 
 

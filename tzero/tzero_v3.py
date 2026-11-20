@@ -36,6 +36,17 @@ import random
 import logging
 import shutil
 
+# Universal terminal initialization (Windows VT100, UTF-8, ANSI safe-filtering, SMP emoji sanitization)
+try:
+    from tzero.tzero_terminal import init_terminal
+    init_terminal()
+except ImportError:
+    try:
+        from tzero_terminal import init_terminal
+        init_terminal()
+    except Exception:
+        pass
+
 # Safe UTF-8 reconfiguration & Windows console attachment for frozen executables
 if sys.platform.startswith("win"):
     if len(sys.argv) > 1 and getattr(sys, "frozen", False):
@@ -8763,6 +8774,17 @@ def run_watch_mode(target_dir: str = ".", interval: float = 1.0, once_test: bool
 def print_viral_share_hub():
     """Prints 1-click social share links for Twitter, Reddit, LinkedIn, Hacker News, WhatsApp, and GitHub."""
     import urllib.parse
+    try:
+        from tzero.tzero_terminal import init_terminal, sanitize_terminal_text
+        init_terminal()
+    except ImportError:
+        try:
+            from tzero_terminal import init_terminal, sanitize_terminal_text
+            init_terminal()
+        except Exception:
+            def sanitize_terminal_text(t):
+                return t
+
     repo_url = "https://github.com/toprakahmetaydogmus/TZeroAlgorithm"
     tweet_text = "T-Zero: Deterministic AST Context Compressor & MCP Server cutting AI prompt tokens by up to 95% with zero regressions. Built by Toprak Ahmet Aydoğmuş (Siber Akademi). 100% free & local!"
     tweet_url = f"https://twitter.com/intent/tweet?text={urllib.parse.quote(tweet_text)}&url={urllib.parse.quote(repo_url)}&hashtags=CursorAI,ClaudeAI,MCP,OpenSource"
@@ -8771,34 +8793,35 @@ def print_viral_share_hub():
     linkedin_url = f"https://www.linkedin.com/sharing/share-offsite/?url={urllib.parse.quote(repo_url)}"
     wa_url = f"https://api.whatsapp.com/send?text={urllib.parse.quote(f'Check out T-Zero: {repo_url}')}"
 
-    print(f"""
+    raw_hub = f"""
 ┌────────────────────────────────────────────────────────────────────────┐
-│  🚀 T-ZERO 1-CLICK COMMUNITY SHARE & VIRAL LAUNCH HUB                  │
+│  ★ T-ZERO 1-CLICK COMMUNITY SHARE & VIRAL LAUNCH HUB                  │
 │  Empowering Developers Worldwide • 100% Free & Open Source             │
 └────────────────────────────────────────────────────────────────────────┘
 
-  🐦 Twitter / X (1-Click Tweet):
+  [X] Twitter / X (1-Click Tweet):
      {tweet_url}
 
-  🔴 Reddit (r/LocalLLaMA, r/Cursor):
+  [Reddit] Reddit (r/LocalLLaMA, r/Cursor):
      {reddit_url}
 
-  🟠 Hacker News (Show HN):
+  [HN] Hacker News (Show HN):
      {hn_url}
 
-  💼 LinkedIn:
+  [LinkedIn] LinkedIn:
      {linkedin_url}
 
-  💬 WhatsApp:
+  [WhatsApp] WhatsApp:
      {wa_url}
 
-  ⭐ Star on GitHub (Goal: 100 Stars):
+  ★ Star on GitHub (Goal: 100 Stars):
      {repo_url}
 
 ════════════════════════════════════════════════════════════════════════
 ✔ Every share and star supports independent open-source AI tooling!
 ════════════════════════════════════════════════════════════════════════
-""")
+"""
+    print(sanitize_terminal_text(raw_hub))
 
 
 def main():

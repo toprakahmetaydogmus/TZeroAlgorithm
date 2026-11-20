@@ -2,7 +2,7 @@
 
 > **Research & Engineering Report**  
 > **Author:** Toprak Ahmet Aydoğmuş (Siber Akademi)  
-> **Evaluation Timestamp:** `2026-11-15 19:27:58`  
+> **Evaluation Timestamp:** `2026-11-20 19:25:52`  
 > **Target Workspace:** `C:\Users\topra_n3vq63d\.gemini\antigravity-ide\scratch\TZeroAlgorithm`  
 > **Certification:** 100% Zero-Hallucination Certified (0.0% Escape Rate)  
 
@@ -21,7 +21,7 @@ Traditional Large Language Models (LLMs) generate code probabilistically by samp
 | **False Positive Rate** | N/A | **0.0%** | 0 False Alarms on Clean Code |
 | **Overall Accuracy** | 65.8% - 81.6% | **100.0%** | Mathematically Verified |
 | **Self-Healing AST Synthesizer** | 0.0% | **100.0%** | Automatically Repaired to Valid AST |
-| **Pre-Flight Validation Latency** | N/A | **0.29 ms** | Instantaneous Local Verification |
+| **Pre-Flight Validation Latency** | N/A | **0.38 ms** | Instantaneous Local Verification |
 
 ---
 
@@ -86,7 +86,7 @@ The benchmark suite evaluates **60 diverse scenarios** across all failure catego
 | **7. Positional Parameter Arity** | 4 | 4 (100%) | **0 (0.0%)** | N/A | <1.8 ms |
 | **8. Return Contract & NoneType** | 3 | 3 (100%) | **0 (0.0%)** | N/A | <2.0 ms |
 | **9. Clean Control Cases (Zero FP)** | 5 | 0 FP | **0 (0.0%)** | N/A | <1.5 ms |
-| **TOTAL / COMPOSITE** | **60** | **55** | **0 (0.0%)** | **23** | **0.29 ms** |
+| **TOTAL / COMPOSITE** | **60** | **55** | **0 (0.0%)** | **23** | **0.38 ms** |
 
 ---
 

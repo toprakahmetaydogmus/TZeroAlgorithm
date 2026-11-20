@@ -12,6 +12,29 @@ import subprocess
 from pathlib import Path
 from typing import Optional
 
+try:
+    from tzero.tzero_terminal import (
+        init_terminal,
+        sanitize_terminal_text,
+        supports_ansi,
+    )
+except ImportError:
+    try:
+        from tzero_terminal import (
+            init_terminal,
+            sanitize_terminal_text,
+            supports_ansi,
+        )
+    except ImportError:
+        def init_terminal(*args, **kwargs):
+            pass
+
+        def sanitize_terminal_text(text, *args, **kwargs):
+            return text
+
+        def supports_ansi(*args, **kwargs):
+            return False
+
 REPO_URL = "https://github.com/toprakahmetaydogmus/TZeroAlgorithm"
 VERSION = "11.15.5"
 _BANNER_PRINTED = False
@@ -28,9 +51,9 @@ def find_git_root(start_dir: Optional[Path] = None) -> Optional[Path]:
 
 def get_welcome_banner(version: str = VERSION) -> str:
     """Returns the ANSI styled welcome banner asking developers to star the project."""
-    return f"""\033[1;36m
+    raw_banner = f"""\033[1;36m
 ┌──────────────────────────────────────────────────────────────────────────────┐
-│  ⭐ WELCOME TO T-ZERO CONTEXT ARCHITECT & MCP SUITE (v{version})               │
+│  ★ WELCOME TO T-ZERO CONTEXT ARCHITECT & MCP SUITE (v{version})               │
 ├──────────────────────────────────────────────────────────────────────────────┤
 │                                                                              │
 │  Hi! I'm Toprak Ahmet Aydoğmuş (independent engineer at Siber Akademi).      │
@@ -39,14 +62,15 @@ def get_welcome_banner(version: str = VERSION) -> str:
 │  T-Zero slashes AI coding prompt tokens by 85–95% using deterministic AST    │
 │  signature extraction with 100% Zero-Leak security and 20 MCP tools.         │
 │                                                                              │
-│  ⭐ \033[1;33mIf this saves your context window, please drop a star on GitHub:\033[1;36m        │
-│     \033[1;32m👉 {REPO_URL}\033[1;36m                     │
+│  ★ \033[1;33mIf this saves your context window, please drop a star on GitHub:\033[1;36m        │
+│     \033[1;32m► {REPO_URL}\033[1;36m                     │
 │                                                                              │
-│  💡 Quick Start:                                                             │
+│  • Quick Start:                                                              │
 │     \033[1;37mtzero install-ide\033[1;36m        1-Click install into Cursor, Claude, Windsurf   │
 │     \033[1;37mtzero-mcp\033[1;36m                Start local Model Context Protocol server       │
 │     \033[1;37mtzero --benchmark\033[1;36m        Run multi-model token savings benchmark        │
 └──────────────────────────────────────────────────────────────────────────────┘\033[0m"""
+    return sanitize_terminal_text(raw_banner)
 
 
 def print_star_banner(force: bool = False) -> None:
@@ -76,6 +100,7 @@ def print_star_banner(force: bool = False) -> None:
                 return
 
     try:
+        init_terminal()
         print(get_welcome_banner())
         _BANNER_PRINTED = True
         # Silently ensure git hooks are installed if running inside repository
@@ -97,8 +122,8 @@ def install_git_star_hooks(repo_dir: Optional[Path] = None) -> bool:
         hook_content = f"""#!/bin/sh
 # T-Zero GitHub Star & Community Reminder
 if [ -z "$TZERO_NO_BANNER" ] && [ -z "$CI" ]; then
-  printf "\\n\\033[1;33m⭐ Enjoying T-Zero Context Architect?\\033[0m\\n"
-  printf "\\033[1;36m👉 Please star the repository on GitHub: {REPO_URL}\\033[0m\\n\\n"
+  printf "\\n\\033[1;33m★ Enjoying T-Zero Context Architect?\\033[0m\\n"
+  printf "\\033[1;36m► Please star the repository on GitHub: {REPO_URL}\\033[0m\\n\\n"
 fi
 exit 0
 """
@@ -125,10 +150,12 @@ exit 0
 
 def main():
     """CLI entrypoint for scripts/welcome.py."""
+    init_terminal()
     print_star_banner(force=True)
     if install_git_star_hooks():
-        print("\033[32m✔ Git community hooks configured (.githooks)\033[0m")
-    print(f"\033[36mFor questions or support, visit:\033[0m {REPO_URL}/discussions\n")
+        print(sanitize_terminal_text("\033[32m✔ Git community hooks configured (.githooks)\033[0m"))
+    info_text = f"\033[36mFor questions or support, visit:\033[0m {REPO_URL}/discussions\n"
+    print(sanitize_terminal_text(info_text))
 
 
 if __name__ == "__main__":

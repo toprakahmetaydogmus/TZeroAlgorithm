@@ -1,6 +1,6 @@
 {
   "workspace_dir": "C:\\Users\\topra_n3vq63d\\.gemini\\antigravity-ide\\scratch\\TZeroAlgorithm",
-  "timestamp": "2026-11-15 19:27:58",
+  "timestamp": "2026-11-20 19:25:52",
   "total_cases": 60,
   "hallucinated_cases": 55,
   "clean_cases": 5,
@@ -15,7 +15,7 @@
   "accuracy": 100.0,
   "auto_healed_count": 23,
   "auto_heal_rate": 100.0,
-  "avg_latency_ms": 0.29,
+  "avg_latency_ms": 0.38,
   "cases": [
     {
       "case_id": "GHOST-01",
@@ -27,7 +27,7 @@
       "false_positive": false,
       "can_auto_heal": false,
       "repaired_code": "",
-      "latency_ms": 1.12,
+      "latency_ms": 1.15,
       "report": "Ghost Dependency Hallucination: Package `fake_langchain_super_agent_v2` is not part of Python stdlib, not declared in requirements.txt/pyproject.toml, and not installed in environment.; Ghost Dependency Hallucination: Package `fake_langchain_super_agent_v2` is not part of Python stdlib, not declared in requirements.txt/pyproject.toml, and not installed in environment."
     },
     {
@@ -40,7 +40,7 @@
       "false_positive": false,
       "can_auto_heal": false,
       "repaired_code": "",
-      "latency_ms": 1.04,
+      "latency_ms": 1.1,
       "report": "Ghost Dependency Hallucination: Package `crypto_vault_secure` is not part of Python stdlib, not declared in requirements.txt/pyproject.toml, and not installed in environment."
     },
     {
@@ -53,7 +53,7 @@
       "false_positive": false,
       "can_auto_heal": false,
       "repaired_code": "",
-      "latency_ms": 0.89,
+      "latency_ms": 1.04,
       "report": "Ghost Dependency Hallucination: Package `openai_token_optimizer_ultra` is not part of Python stdlib, not declared in requirements.txt/pyproject.toml, and not installed in environment."
     },
     {
@@ -66,7 +66,7 @@
       "false_positive": false,
       "can_auto_heal": false,
       "repaired_code": "",
-      "latency_ms": 1.43,
+      "latency_ms": 1.31,
       "report": "Ghost Dependency Hallucination: Package `phantom_ai_vector_db` is not part of Python stdlib, not declared in requirements.txt/pyproject.toml, and not installed in environment."
     },
     {
@@ -79,7 +79,7 @@
       "false_positive": false,
       "can_auto_heal": false,
       "repaired_code": "",
-      "latency_ms": 0.82,
+      "latency_ms": 0.84,
       "report": "Ghost Dependency Hallucination: Package `nonexistent_fastapi_auth` is not part of Python stdlib, not declared in requirements.txt/pyproject.toml, and not installed in environment."
     },
     {
@@ -92,7 +92,7 @@
       "false_positive": false,
       "can_auto_heal": false,
       "repaired_code": "",
-      "latency_ms": 0.7,
+      "latency_ms": 0.76,
       "report": "Ghost Dependency Hallucination: Package `torch_distributed_quantum_core` is not part of Python stdlib, not declared in requirements.txt/pyproject.toml, and not installed in environment."
     },
     {
@@ -105,7 +105,7 @@
       "false_positive": false,
       "can_auto_heal": false,
       "repaired_code": "",
-      "latency_ms": 0.71,
+      "latency_ms": 0.78,
       "report": "Ghost Dependency Hallucination: Package `super_redis_cache_layer` is not part of Python stdlib, not declared in requirements.txt/pyproject.toml, and not installed in environment."
     },
     {
@@ -118,7 +118,7 @@
       "false_positive": false,
       "can_auto_heal": false,
       "repaired_code": "",
-      "latency_ms": 0.61,
+      "latency_ms": 0.89,
       "report": "Ghost Dependency Hallucination: Package `magic_automl_pipeline_builder` is not part of Python stdlib, not declared in requirements.txt/pyproject.toml, and not installed in environment."
     },
     {
@@ -131,7 +131,7 @@
       "false_positive": false,
       "can_auto_heal": false,
       "repaired_code": "",
-      "latency_ms": 0.75,
+      "latency_ms": 0.93,
       "report": "Ghost Dependency Hallucination: Package `cloud_cost_telemetry_pro` is not part of Python stdlib, not declared in requirements.txt/pyproject.toml, and not installed in environment."
     },
     {
@@ -144,7 +144,7 @@
       "false_positive": false,
       "can_auto_heal": false,
       "repaired_code": "",
-      "latency_ms": 0.96,
+      "latency_ms": 1.11,
       "report": "Ghost Dependency Hallucination: Package `omni_data_ingestor_v3` is not part of Python stdlib, not declared in requirements.txt/pyproject.toml, and not installed in environment."
     },
     {
@@ -157,7 +157,7 @@
       "false_positive": false,
       "can_auto_heal": true,
       "repaired_code": "import math\nx = math.sqrt(16)",
-      "latency_ms": 0.26,
+      "latency_ms": 1.55,
       "report": "Stdlib Method Hallucination: Standard library module `math` has no method or attribute `squareroot`. Did you mean `sqrt`?"
     },
     {
@@ -170,7 +170,7 @@
       "false_positive": false,
       "can_auto_heal": true,
       "repaired_code": "import json\ns = json.dump({'key': 'val'})",
-      "latency_ms": 0.21,
+      "latency_ms": 0.38,
       "report": "Stdlib Method Hallucination: Standard library module `json` has no method or attribute `dumpp`. Did you mean `dump`?"
     },
     {
@@ -183,7 +183,7 @@
       "false_positive": false,
       "can_auto_heal": true,
       "repaired_code": "import os\nb = os.path.exists('test.py')",
-      "latency_ms": 0.18,
+      "latency_ms": 0.44,
       "report": "Stdlib Method Hallucination: Standard library module `os.path` has no method or attribute `exsits`. Did you mean `exists`?"
     },
     {
@@ -196,7 +196,7 @@
       "false_positive": false,
       "can_auto_heal": true,
       "repaired_code": "import re\nm = re.match('\\\\d+', '123')",
-      "latency_ms": 0.16,
+      "latency_ms": 0.34,
       "report": "Stdlib Method Hallucination: Standard library module `re` has no method or attribute `matches`. Did you mean `match`?"
     },
     {
@@ -209,7 +209,7 @@
       "false_positive": false,
       "can_auto_heal": true,
       "repaired_code": "import shutil\nshutil.copytree('src', 'dst')",
-      "latency_ms": 0.15,
+      "latency_ms": 0.3,
       "report": "Stdlib Method Hallucination: Standard library module `shutil` has no method or attribute `copy_directory`. Did you mean `copytree`?"
     },
     {
@@ -222,7 +222,7 @@
       "false_positive": false,
       "can_auto_heal": true,
       "repaired_code": "import hashlib\nh = hashlib.sha256(b'data')",
-      "latency_ms": 0.15,
+      "latency_ms": 0.29,
       "report": "Stdlib Method Hallucination: Standard library module `hashlib` has no method or attribute `sha256_hex`. Did you mean `sha256`?"
     },
     {
@@ -235,7 +235,7 @@
       "false_positive": false,
       "can_auto_heal": true,
       "repaired_code": "import datetime\nd = datetime.utcnow()",
-      "latency_ms": 0.13,
+      "latency_ms": 0.17,
       "report": "Stdlib Method Hallucination: Standard library module `datetime` has no method or attribute `now_utc`. Did you mean `utcnow`?"
     },
     {
@@ -248,7 +248,7 @@
       "false_positive": false,
       "can_auto_heal": true,
       "repaired_code": "import sys\nsys.exit(0)",
-      "latency_ms": 0.14,
+      "latency_ms": 0.16,
       "report": "Stdlib Method Hallucination: Standard library module `sys` has no method or attribute `exit_process`. Did you mean `exit`?"
     },
     {
@@ -274,7 +274,7 @@
       "false_positive": false,
       "can_auto_heal": true,
       "repaired_code": "import json\nd = json.load(fp)",
-      "latency_ms": 0.16,
+      "latency_ms": 0.15,
       "report": "Stdlib Method Hallucination: Standard library module `json` has no method or attribute `loadd`. Did you mean `load`?"
     },
     {
@@ -287,7 +287,7 @@
       "false_positive": false,
       "can_auto_heal": true,
       "repaired_code": "from math import sqrt\nx = sqrt(25)",
-      "latency_ms": 0.15,
+      "latency_ms": 0.16,
       "report": "Stdlib Import Hallucination: Symbol `squareroot` does not exist in standard library module `math`. Did you mean: `sqrt`?"
     },
     {
@@ -300,7 +300,7 @@
       "false_positive": false,
       "can_auto_heal": true,
       "repaired_code": "from json import dump\ns = dump({'a': 1})",
-      "latency_ms": 0.16,
+      "latency_ms": 0.19,
       "report": "Stdlib Import Hallucination: Symbol `dumpp` does not exist in standard library module `json`. Did you mean: `dump`?"
     },
     {
@@ -313,7 +313,7 @@
       "false_positive": false,
       "can_auto_heal": false,
       "repaired_code": "",
-      "latency_ms": 0.34,
+      "latency_ms": 0.32,
       "report": "Stdlib Import Hallucination: Symbol `non_existent_system_utility` does not exist in standard library module `os`."
     },
     {
@@ -365,7 +365,7 @@
       "false_positive": false,
       "can_auto_heal": true,
       "repaired_code": "from tzero.tzero_features import ZeroHallucinationGuard\ng = ZeroHallucinationGuard('.')",
-      "latency_ms": 0.47,
+      "latency_ms": 0.5,
       "report": "Import Hallucination: Symbol `ZeroHallucinationGard` does not exist in workspace module `tzero.tzero_features`. Did you mean: `ZeroHallucinationGuard`?"
     },
     {
@@ -378,7 +378,7 @@
       "false_positive": false,
       "can_auto_heal": false,
       "repaired_code": "",
-      "latency_ms": 0.26,
+      "latency_ms": 0.27,
       "report": "Import Hallucination: Symbol `PhantomContextArchitect` does not exist in workspace module `tzero.tzero_features`."
     },
     {
@@ -404,7 +404,7 @@
       "false_positive": false,
       "can_auto_heal": true,
       "repaired_code": "from tzero.tzero_v3 import TokenReducer",
-      "latency_ms": 0.65,
+      "latency_ms": 1.13,
       "report": "Import Hallucination: Symbol `TokenReducerr` does not exist in workspace module `tzero.tzero_v3`. Did you mean: `TokenReducer`?"
     },
     {
@@ -417,7 +417,7 @@
       "false_positive": false,
       "can_auto_heal": true,
       "repaired_code": "from tzero.tzero_benchmark import TZeroBenchmarkEngine",
-      "latency_ms": 0.14,
+      "latency_ms": 0.31,
       "report": "Import Hallucination: Symbol `TZeroBenchmarkEngin` does not exist in workspace module `tzero.tzero_benchmark`. Did you mean: `TZeroBenchmarkEngine`?"
     },
     {
@@ -430,7 +430,7 @@
       "false_positive": false,
       "can_auto_heal": true,
       "repaired_code": "from tzero.tzero_guard import GitSecurityGuard",
-      "latency_ms": 0.09,
+      "latency_ms": 0.19,
       "report": "Import Hallucination: Symbol `GitSecurityGaurd` does not exist in workspace module `tzero.tzero_guard`. Did you mean: `GitSecurityGuard`?"
     },
     {
@@ -443,7 +443,7 @@
       "false_positive": false,
       "can_auto_heal": false,
       "repaired_code": "",
-      "latency_ms": 0.34,
+      "latency_ms": 0.63,
       "report": "Import Hallucination: Symbol `FastCompressor` does not exist in workspace module `tzero.non_existent_engine`."
     },
     {
@@ -456,7 +456,7 @@
       "false_positive": false,
       "can_auto_heal": true,
       "repaired_code": "from tzero.tzero_features import ChangeImpactAnalyzer",
-      "latency_ms": 0.3,
+      "latency_ms": 0.25,
       "report": "Import Hallucination: Symbol `ChangeImpactAnalyzr` does not exist in workspace module `tzero.tzero_features`. Did you mean: `ChangeImpactAnalyzer`?"
     },
     {
@@ -469,7 +469,7 @@
       "false_positive": false,
       "can_auto_heal": true,
       "repaired_code": "from tzero.tzero_neural_cortex import HallucinationGuard",
-      "latency_ms": 0.42,
+      "latency_ms": 0.4,
       "report": "Import Hallucination: Symbol `HallucinationGaurd` does not exist in workspace module `tzero.tzero_neural_cortex`. Did you mean: `HallucinationGuard`?"
     },
     {
@@ -482,7 +482,7 @@
       "false_positive": false,
       "can_auto_heal": false,
       "repaired_code": "",
-      "latency_ms": 0.23,
+      "latency_ms": 0.29,
       "report": "Import Hallucination: Symbol `GhostSecurityVerifier` does not exist in workspace module `tzero.tzero_features`."
     },
     {
@@ -495,7 +495,7 @@
       "false_positive": false,
       "can_auto_heal": false,
       "repaired_code": "",
-      "latency_ms": 0.14,
+      "latency_ms": 0.15,
       "report": "Schema Field Hallucination: Class `ZeroHallucinationGuard` has no declared attribute or field `ghost_flag`.; Call Hallucination: `ZeroHallucinationGuard` does not accept keyword argument `ghost_flag`. Valid signature: `__init__(self, project_dir: str)`; Call Hallucination: `ZeroHallucinationGuard` missing required positional arguments (0 provided, at least 1 required). Valid signature: `__init__(self, project_dir: str)`"
     },
     {
@@ -508,7 +508,7 @@
       "false_positive": false,
       "can_auto_heal": false,
       "repaired_code": "",
-      "latency_ms": 0.14,
+      "latency_ms": 0.16,
       "report": "Schema Field Hallucination: Class `TierMetric` has no declared attribute or field `phantom_prop`."
     },
     {
@@ -560,7 +560,7 @@
       "false_positive": false,
       "can_auto_heal": false,
       "repaired_code": "",
-      "latency_ms": 0.12,
+      "latency_ms": 0.13,
       "report": "Schema Field Hallucination: Class `ArchitectureRuleEngine` has no declared attribute or field `strict_boundary_mode`.; Call Hallucination: `ArchitectureRuleEngine` does not accept keyword argument `strict_boundary_mode`. Valid signature: `__init__(self, project_dir: str, config_path: Optional[str] = None)`; Call Hallucination: `ArchitectureRuleEngine` missing required positional arguments (0 provided, at least 1 required). Valid signature: `__init__(self, project_dir: str, config_path: Optional[str] = None)`"
     },
     {
@@ -573,7 +573,7 @@
       "false_positive": false,
       "can_auto_heal": true,
       "repaired_code": "from tzero.tzero_fix import find_best_symbol_match\nfind_best_symbol_match('target', {'cand'}, cutoff=0.5)",
-      "latency_ms": 0.22,
+      "latency_ms": 0.23,
       "report": "Call Hallucination: `find_best_symbol_match` does not accept keyword argument `cutof`. Did you mean parameter `cutoff`? Valid signature: `find_best_symbol_match(target: str, candidates: Set[str], cutoff: float = 0.5) -> Tuple[Optional[str], float]`"
     },
     {
@@ -599,7 +599,7 @@
       "false_positive": false,
       "can_auto_heal": false,
       "repaired_code": "",
-      "latency_ms": 0.14,
+      "latency_ms": 0.15,
       "report": "Call Hallucination: `g.repair_code` does not accept keyword argument `force_write`. Valid signature: `repair_code(self, proposed_code: str, target_file: str = '') -> str`"
     },
     {
@@ -625,7 +625,7 @@
       "false_positive": false,
       "can_auto_heal": false,
       "repaired_code": "",
-      "latency_ms": 0.09,
+      "latency_ms": 0.1,
       "report": "Call Hallucination: `TZeroBenchmarkEngine.run_benchmark` does not accept keyword argument `export_json_now`. Valid signature: `run_benchmark(cls, workspace_dir: str = '.') -> BenchmarkReport`; Call Hallucination: `TZeroBenchmarkEngine.run_benchmark` missing required positional arguments (0 provided, at least 1 required). Valid signature: `run_benchmark(cls, workspace_dir: str = '.') -> BenchmarkReport`"
     },
     {
@@ -690,7 +690,7 @@
       "false_positive": false,
       "can_auto_heal": false,
       "repaired_code": "",
-      "latency_ms": 0.04,
+      "latency_ms": 0.17,
       "report": "Call Hallucination: `ZeroHallucinationGuard` received too many positional arguments (2 provided, at most 1 allowed). Valid signature: `__init__(self, project_dir: str)`"
     },
     {
@@ -703,7 +703,7 @@
       "false_positive": false,
       "can_auto_heal": false,
       "repaired_code": "",
-      "latency_ms": 0.07,
+      "latency_ms": 0.16,
       "report": "Call Hallucination: `TZeroBenchmarkEngine.render_cli` missing required positional arguments (1 provided, at least 2 required). Valid signature: `render_cli(cls, rep: BenchmarkReport) -> None`; Return Contract Hallucination: Function `TZeroBenchmarkEngine.render_cli` returns `None`, which is not iterable in a loop!"
     },
     {
@@ -716,7 +716,7 @@
       "false_positive": false,
       "can_auto_heal": false,
       "repaired_code": "",
-      "latency_ms": 0.12,
+      "latency_ms": 0.29,
       "report": "Return Contract Hallucination: Function `get_ignore_patterns` returns a list/sequence, which has no member or method `.non_existent_attribute_on_list`!"
     },
     {
@@ -729,7 +729,7 @@
       "false_positive": false,
       "can_auto_heal": false,
       "repaired_code": "",
-      "latency_ms": 0.11,
+      "latency_ms": 0.34,
       "report": "Call Hallucination: `TZeroBenchmarkEngine.render_cli` missing required positional arguments (1 provided, at least 2 required). Valid signature: `render_cli(cls, rep: BenchmarkReport) -> None`; Return Contract Hallucination: Function `TZeroBenchmarkEngine.render_cli` has declared return type 'None', cannot access member `.save` on NoneType!"
     },
     {
@@ -742,7 +742,7 @@
       "false_positive": false,
       "can_auto_heal": false,
       "repaired_code": "",
-      "latency_ms": 0.11,
+      "latency_ms": 0.3,
       "report": "PASS"
     },
     {
@@ -755,7 +755,7 @@
       "false_positive": false,
       "can_auto_heal": false,
       "repaired_code": "",
-      "latency_ms": 0.1,
+      "latency_ms": 0.22,
       "report": "PASS"
     },
     {
@@ -768,7 +768,7 @@
       "false_positive": false,
       "can_auto_heal": false,
       "repaired_code": "",
-      "latency_ms": 0.08,
+      "latency_ms": 0.2,
       "report": "PASS"
     },
     {
@@ -781,7 +781,7 @@
       "false_positive": false,
       "can_auto_heal": false,
       "repaired_code": "",
-      "latency_ms": 0.07,
+      "latency_ms": 0.15,
       "report": "PASS"
     },
     {
@@ -794,7 +794,7 @@
       "false_positive": false,
       "can_auto_heal": false,
       "repaired_code": "",
-      "latency_ms": 0.09,
+      "latency_ms": 0.19,
       "report": "PASS"
     }
   ]

@@ -7,6 +7,12 @@
 
 from importlib import import_module
 
+try:
+    from tzero.tzero_terminal import init_terminal
+    init_terminal()
+except Exception:
+    pass
+
 _EXPORTS = {
     'CodebaseScanner': 'tzero.tzero_v3',
     'TokenReducer': 'tzero.tzero_v3',
