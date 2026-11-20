@@ -3,7 +3,7 @@
 T-ZERO $0.00 BUDGET VIRAL MARKETING & COMMUNITY GROWTH AUTOMATION ENGINE
 ------------------------------------------------------------------------
 Developer: Toprak Ahmet Aydoğmuş (Siber Akademi)
-License: MIT | Version: 11.11.0
+License: AGPL-3.0-only | Version: 11.15.5
 
 Strictly $0.00 budget: Zero paid ads, zero paid APIs, zero cloud tokens.
 Pure organic developer-to-developer growth engine engineered to drive 100+ GitHub stars.
@@ -14,9 +14,17 @@ Twitter/X, LinkedIn, Dev.to, Turkish Tech Hubs, and Awesome-Lists.
 import sys
 import os
 import json
+import urllib.parse
 import urllib.request
 from pathlib import Path
 from typing import Dict, Any, List
+
+try:
+    from tzero.tzero_terminal import init_terminal, sanitize_terminal_text
+    init_terminal()
+except Exception:
+    def sanitize_terminal_text(t):
+        return t
 
 REPO_URL = "https://github.com/toprakahmetaydogmus/TZeroAlgorithm"
 WEB_URL = "https://tzero-indol.vercel.app"
@@ -91,7 +99,7 @@ Add this to your Cursor MCP settings (`~/.cursor/mcp.json`):
 - Zero external LLM calls or cloud telemetry.
 - Built-in Shannon Entropy scanner (H >= 4.75) detects and redacts hardcoded API keys and credentials locally.
 
-I'm 15 years old and building this as a solo open-source engineer at {ORGANIZATION}. Everything is 100% free under MIT.
+I'm 15 years old and building this as a solo open-source engineer at {ORGANIZATION}. Everything is 100% free under AGPL-3.0-only.
 
 If this saves your Cursor context budget, **I'd genuinely appreciate a star on GitHub ⭐** — we are on the road to our first 100 stars!
 
@@ -129,7 +137,7 @@ Add to your `claude_desktop_config.json`:
 
 - **Cost:** $0.00 (Zero paid APIs, runs 100% offline)
 - **Security:** In-memory Shannon entropy scanner redacts API keys
-- **License:** MIT Open Source
+- **License:** AGPL-3.0-only Open Source
 
 Check it out and drop a star if you find it useful! ⭐  
 👉 **GitHub:** {REPO_URL}  
@@ -166,7 +174,7 @@ Bu problemi çözmek için geliştirdiğim **T-Zero (Token Zero)** projesini {VE
 - Model Context Protocol (MCP) standardında çalıştığı için Cursor ve Claude Desktop'a tek tıkla ekleniyor.
 - %100 yerel ve çevrimdışı çalışıyor; hiçbir harici ücretli API veya sunucuya bağlanmıyor ($0 maliyet).
 - Yeni {VERSION} sürümünde eklenen **AI Godfather Süpervizörü** sayesinde yapay zekanın uydurduğu (hallucinated) sahte fonksiyon çağrılarını ve eksik importları otomatik düzeltiyor.
-- 537 otomatik testten %100 başarıyla geçmektedir.
+- 617 otomatik testten %100 başarıyla geçmektedir.
 
 Projeyi GitHub'da yıldızlayarak (Star ⭐) ilk 100 yıldız hedefimize ulaşmamıza destek olursanız çok sevinirim!
 
@@ -203,7 +211,7 @@ On our benchmark repository of 481 files (~86,000 lines of code):
 - **100% Zero-Leak:** Calculates in-memory Shannon entropy (H >= 4.75) alongside regex patterns to detect and redact API keys, JWTs, and private keys locally before any context is emitted.
 - **Zero Cloud Telemetry:** Operates 100% offline via local stdio MCP protocol.
 
-The codebase is open source under MIT: {REPO_URL}
+The codebase is open source under AGPL-3.0-only: {REPO_URL}
 Web Playground: {WEB_URL}
 
 I would love to hear thoughts, critique, and feedback on our AST pruning heuristics and MCP server architecture!
@@ -301,7 +309,7 @@ The result? **Up to 95% token savings** while providing the LLM with pristine ar
 - ⚡ 1-Click setup for Cursor, Claude, Antigravity & Windsurf
 - 🔒 100% Zero-Leak: Local Shannon entropy scanner stops credential leaks
 - 🤖 AI Godfather Supervisor: Auto-corrects hallucinated method names
-- 💸 100% Free & Open Source under MIT
+- 💸 100% Free & Open Source under AGPL-3.0-only
 
 I'd love your feedback, reviews, and feature ideas! Check out the repo and give us a star if you find it valuable:
 {REPO_URL}
@@ -317,7 +325,7 @@ def generate_awesome_lists_prs() -> Dict[str, str]:
 - **Name:** [T-Zero Context Architect]({REPO_URL})
 - **Description:** Deterministic AST codebase context compressor & MCP server reducing prompt tokens by 80–95% for Cursor, Claude, and local LLMs. Includes Zero-Leak credential protection and AI hallucination auto-corrector.
 - **Category:** Code Intelligence / Developer Tools
-- **License:** MIT
+- **License:** AGPL-3.0-only
 """,
         "awesome-cursorrules": f"""### Add T-Zero Context Engine for Cursor
 
@@ -398,18 +406,18 @@ def export_all_marketing_materials(output_dir: Path) -> None:
 
 def main():
     stars = get_live_github_stars()
-    print("=" * 70)
-    print("⚡ T-ZERO $0.00 BUDGET VIRAL MARKETING & GROWTH AUTOMATION ENGINE")
-    print(f"🎯 Milestone Progress: {render_progress_bar(stars, 100)}")
-    print(f"📦 Active Release    : {VERSION} (PyPI: {PYPI_PKG} | npm: {NPM_PKG})")
-    print(f"🌐 Web Benchmark     : {WEB_URL}")
-    print(f"⭐ Repository        : {REPO_URL}")
-    print("=" * 70)
+    print(sanitize_terminal_text("=" * 70))
+    print(sanitize_terminal_text("⚡ T-ZERO $0.00 BUDGET VIRAL MARKETING & GROWTH AUTOMATION ENGINE"))
+    print(sanitize_terminal_text(f"★ Milestone Progress: {render_progress_bar(stars, 100)}"))
+    print(sanitize_terminal_text(f"📦 Active Release    : {VERSION} (PyPI: {PYPI_PKG} | npm: {NPM_PKG})"))
+    print(sanitize_terminal_text(f"🌐 Web Benchmark     : {WEB_URL}"))
+    print(sanitize_terminal_text(f"★ Repository        : {REPO_URL}"))
+    print(sanitize_terminal_text("=" * 70))
 
     export_dir = WORKSPACE_ROOT / "docs" / "marketing_pack"
     export_all_marketing_materials(export_dir)
 
-    print("\n🚀 All campaign materials are 100% copy-paste ready in 'docs/marketing_pack/'!")
+    print(sanitize_terminal_text("\n★ All campaign materials are 100% copy-paste ready in 'docs/marketing_pack/'!"))
 
 
 if __name__ == "__main__":
