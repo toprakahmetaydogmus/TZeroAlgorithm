@@ -8771,7 +8771,7 @@ def run_watch_mode(target_dir: str = ".", interval: float = 1.0, once_test: bool
         return True
 
 
-def print_viral_share_hub():
+def print_viral_share_hub(open_browser: bool = False):
     """Prints 1-click social share links for Twitter, Reddit, LinkedIn, Hacker News, WhatsApp, and GitHub."""
     import urllib.parse
     try:
@@ -8822,6 +8822,14 @@ def print_viral_share_hub():
 ════════════════════════════════════════════════════════════════════════
 """
     print(sanitize_terminal_text(raw_hub))
+    if open_browser:
+        try:
+            import webbrowser
+            print(sanitize_terminal_text("\n\033[36m► Opening 1-click share links in default browser...\033[0m"))
+            webbrowser.open(tweet_url)
+            webbrowser.open(reddit_url)
+        except Exception:
+            pass
 
 
 def main():
@@ -8866,7 +8874,8 @@ def main():
 
     # Fast path for share / viral subcommands
     if len(sys.argv) > 1 and sys.argv[1].lower() in ("share", "--share", "-share", "tweet", "social"):
-        print_viral_share_hub()
+        open_b = any(arg in ("--open", "-o", "open") for arg in sys.argv[2:])
+        print_viral_share_hub(open_browser=open_b)
         sys.exit(0)
 
     # Fast path for promo / launch subcommands
