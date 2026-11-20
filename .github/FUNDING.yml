@@ -1,6 +1,7 @@
-# GitHub Sponsors and Project Funding Configuration
+# GitHub Sponsors and Open-Source Project Funding Configuration
+# Zero-Leak Compliant: No sensitive bank, card, or private credentials are included.
 
 github: [toprakahmetaydogmus]
 custom:
+  - "https://tzero-indol.vercel.app"
   - "https://hopp.bio/siberegitim"
-  - "https://github.com/toprakahmetaydogmus/TZeroAlgorithm"
