@@ -107,6 +107,9 @@ pip install -e .             # Editable dev install (auto-configures .githooks)
 # 🚀 1-Click Configure MCP in Cursor, Claude, Antigravity, Windsurf:
 tzero init
 
+# 📢 1-Click Viral Community Share Hub (Twitter, Reddit, Hacker News):
+tzero share
+
 # 🖥️ Option D: Standalone Windows 64-Bit Executable Suite (Zero Dependencies):
 # Download all-in-one suite (.ZIP) with GUI, CLI, MCP Server & 1-Click Configurator:
 # https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/download/v11.15.5/TZero-v11.15.5-Windows-x64.zip
@@ -624,6 +627,17 @@ If T-Zero helped you cut prompt tokens or saved your daily coding workflow, plea
 [![PyPI Monthly Downloads](https://img.shields.io/pypi/dm/tzero-mcp?style=for-the-badge&logo=pypi&color=0284c7&label=PyPI%20Downloads%2FMonth)](https://pypi.org/project/tzero-mcp/)
 [![Open VSX Downloads](https://img.shields.io/open-vsx/dt/siber-akademi/tzero-vscode?style=for-the-badge&logo=openvsx&color=8b5cf6&label=Open-VSX%20Downloads)](https://open-vsx.org/extension/siber-akademi/tzero-vscode)
 [![Latest Commit](https://img.shields.io/github/last-commit/toprakahmetaydogmus/TZeroAlgorithm?style=for-the-badge&logo=github&color=10b981&label=Latest%20Commit)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/commits/main)
+
+<br>
+
+### 🚀 1-Click Community Share Hub
+Help us reach our **100 Stars Milestone**! Share T-Zero with your network in one click:
+
+[![Share on X](https://img.shields.io/badge/Share%20on-X%20%2F%20Twitter-000000?style=for-the-badge&logo=x&logoColor=white)](https://twitter.com/intent/tweet?text=T-Zero%3A%20Deterministic%20AST%20Context%20Compressor%20%26%20MCP%20Server%20cutting%20AI%20prompt%20tokens%20by%20up%20to%2095%25.%20Built%20by%20Toprak%20Ahmet%20Aydo%C4%9Fmu%C5%9F%20(Siber%20Akademi).&url=https%3A%2F%2Fgithub.com%2Ftoprakahmetaydogmus%2FTZeroAlgorithm&hashtags=CursorAI,ClaudeAI,MCP,OpenSource)
+[![Post to Reddit](https://img.shields.io/badge/Post%20to-Reddit-FF4500?style=for-the-badge&logo=reddit&logoColor=white)](https://www.reddit.com/submit?url=https%3A%2F%2Fgithub.com%2Ftoprakahmetaydogmus%2FTZeroAlgorithm&title=T-Zero%20%E2%80%94%20Deterministic%20AST%20Context%20Compressor%20%26%20Canonical%20MCP%20Server%20(cuts%20tokens%20by%2095%25))
+[![Share on LinkedIn](https://img.shields.io/badge/Share%20on-LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fgithub.com%2Ftoprakahmetaydogmus%2FTZeroAlgorithm)
+[![Submit to Hacker News](https://img.shields.io/badge/Submit%20to-Hacker%20News-FF6600?style=for-the-badge&logo=ycombinator&logoColor=white)](https://news.ycombinator.com/submitlink?u=https%3A%2F%2Fgithub.com%2Ftoprakahmetaydogmus%2FTZeroAlgorithm&t=Show%20HN%3A%20T-Zero%20%E2%80%93%20Deterministic%20AST%20Codebase%20Context%20Compressor%20%26%20MCP%20Server)
+[![Star on GitHub](https://img.shields.io/badge/Star%20on-GitHub%20%E2%AD%90-f59e0b?style=for-the-badge&logo=github&logoColor=white)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)
 
 <br>
 
