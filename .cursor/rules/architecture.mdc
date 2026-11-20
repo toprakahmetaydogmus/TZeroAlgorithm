@@ -1,8 +1,8 @@
 ---
-description: Architectural Boundary & Modularity Standards for TZeroAlgorithm-publish
+description: Architectural Boundary & Modularity Standards for TZeroAlgorithm
 globs: **/*.py
 ---
-# Architecture Standards for TZeroAlgorithm-publish
+# Architecture Standards for TZeroAlgorithm
 
 ## Active Architectural Layers:
 - **Layer `tests`:** `tests/**`

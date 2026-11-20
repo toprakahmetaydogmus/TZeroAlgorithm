@@ -16,9 +16,11 @@
 [![Verified on FreeAPI](https://findfreeapi.com/api/badge/tzeroalgorithm)](https://findfreeapi.com/en/service/tzeroalgorithm)
 [![TDQS](https://img.shields.io/badge/TDQS-Glama%20score-blue?style=flat-square)](https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm/schema)
 [![PyPI Version](https://img.shields.io/pypi/v/tzero-mcp?color=38bdf8&style=flat-square&logo=pypi)](https://pypi.org/project/tzero-mcp/)
-[![PyPI Downloads](https://img.shields.io/pypi/dm/tzero-mcp?color=38bdf8&style=flat-square&logo=pypi)](https://pypi.org/project/tzero-mcp/)
+[![PyPI Total Downloads](https://img.shields.io/pepy/dt/tzero-mcp?color=38bdf8&style=flat-square&logo=pypi)](https://pypi.org/project/tzero-mcp/)
+[![PyPI Monthly Downloads](https://img.shields.io/pypi/dm/tzero-mcp?color=38bdf8&style=flat-square&logo=pypi)](https://pypi.org/project/tzero-mcp/)
 [![npm Version](https://img.shields.io/npm/v/tzero-mcp?color=cb3837&style=flat-square&logo=npm)](https://www.npmjs.com/package/tzero-mcp)
-[![npm Downloads](https://img.shields.io/npm/dt/tzero-mcp?color=cb3837&style=flat-square&logo=npm)](https://www.npmjs.com/package/tzero-mcp)
+[![npm Total Downloads](https://img.shields.io/npm/dt/tzero-mcp?color=cb3837&style=flat-square&logo=npm)](https://www.npmjs.com/package/tzero-mcp)
+[![npm Monthly Downloads](https://img.shields.io/npm/dm/tzero-mcp?color=cb3837&style=flat-square&logo=npm)](https://www.npmjs.com/package/tzero-mcp)
 [![Python Version](https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13-blue?style=flat-square)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions)
 [![CI](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions/workflows/ci.yml/badge.svg)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions/workflows/ci.yml)
 [![GitHub Action](https://img.shields.io/badge/GitHub%20Action-CI%20Review%20Gate-2088FF?style=flat-square&logo=githubactions&logoColor=white)](docs/github_action_guide.md)
@@ -54,12 +56,14 @@
 <div align="center">
 
 [![VS Code Marketplace](https://img.shields.io/badge/VS%20Code%20Marketplace-v11.15.5-007ACC?style=for-the-badge&logo=visualstudiocode&logoColor=white)](https://marketplace.visualstudio.com/items?itemName=siber-akademi.tzero-vscode)
-[![Open VSX Downloads](https://img.shields.io/open-vsx/dt/siber-akademi/tzero-vscode?style=for-the-badge&logo=openvsx&color=purple)](https://open-vsx.org/extension/siber-akademi/tzero-vscode)
+[![Open VSX Downloads](https://img.shields.io/open-vsx/dt/siber-akademi/tzero-vscode?style=for-the-badge&logo=openvsx&color=8b5cf6&label=Open-VSX)](https://open-vsx.org/extension/siber-akademi/tzero-vscode)
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/toprakahmetaydogmus/TZeroAlgorithm)
 [![Smithery Registry](https://img.shields.io/badge/%E2%9A%A1%20Smithery%20MCP-Compatible%20v11.15.5-FF5722?style=for-the-badge&logo=dependabot&logoColor=white)](https://smithery.ai)
 [![npm Package](https://img.shields.io/badge/%F0%9F%93%A6%20npm-tzero--mcp-cb3837?style=for-the-badge&logo=npm&logoColor=white)](https://www.npmjs.com/package/tzero-mcp)
 [![npm Total Downloads](https://img.shields.io/npm/dt/tzero-mcp?style=for-the-badge&logo=npm&color=cb3837&label=npm%20downloads)](https://www.npmjs.com/package/tzero-mcp)
-[![PyPI Downloads](https://img.shields.io/pypi/dm/tzero-mcp?style=for-the-badge&logo=pypi&color=38bdf8&label=PyPI%20downloads)](https://pypi.org/project/tzero-mcp/)
+[![npm Monthly Downloads](https://img.shields.io/npm/dm/tzero-mcp?style=for-the-badge&logo=npm&color=ef4444&label=npm%2Fmonth)](https://www.npmjs.com/package/tzero-mcp)
+[![PyPI Total Downloads](https://img.shields.io/pepy/dt/tzero-mcp?style=for-the-badge&logo=pypi&color=38bdf8&label=PyPI%20downloads)](https://pypi.org/project/tzero-mcp/)
+[![PyPI Monthly Downloads](https://img.shields.io/pypi/dm/tzero-mcp?style=for-the-badge&logo=pypi&color=0284c7&label=PyPI%2Fmonth)](https://pypi.org/project/tzero-mcp/)
 [![Glama Grade A](https://img.shields.io/badge/%E2%9A%A1%20Glama%20MCP-Grade%20A%20Verified-8b5cf6?style=for-the-badge&logo=checkmarx&logoColor=white)](https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm)
 [![M8ven Score](https://m8ven.ai/badge/mcp/toprakahmetaydogmus/tzeroalgorithm)](https://m8ven.ai/mcp/toprakahmetaydogmus/tzeroalgorithm?s=readme)
 
@@ -609,8 +613,19 @@ If T-Zero helped you cut prompt tokens or saved your daily coding workflow, plea
 
 <div align="center">
 
-[![GitHub stars](https://img.shields.io/github/stars/toprakahmetaydogmus/TZeroAlgorithm?style=social)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)
-[![GitHub forks](https://img.shields.io/github/forks/toprakahmetaydogmus/TZeroAlgorithm?style=social)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)
+### 📊 Real-Time Live Community & Distribution Analytics
+*(Auto-updated 24/7 via GitHub API, npm Registry & PyPI PePy)*
+
+[![GitHub Stars](https://img.shields.io/github/stars/toprakahmetaydogmus/TZeroAlgorithm?style=for-the-badge&logo=github&color=22c55e&label=GitHub%20Stars)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/stargazers)
+[![GitHub Forks](https://img.shields.io/github/forks/toprakahmetaydogmus/TZeroAlgorithm?style=for-the-badge&logo=github&color=3b82f6&label=Forks)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/network/members)
+[![npm Total Downloads](https://img.shields.io/npm/dt/tzero-mcp?style=for-the-badge&logo=npm&color=cb3837&label=npm%20Total%20Downloads)](https://www.npmjs.com/package/tzero-mcp)
+[![npm Monthly Downloads](https://img.shields.io/npm/dm/tzero-mcp?style=for-the-badge&logo=npm&color=ef4444&label=npm%20Downloads%2FMonth)](https://www.npmjs.com/package/tzero-mcp)
+[![PyPI Total Downloads](https://img.shields.io/pepy/dt/tzero-mcp?style=for-the-badge&logo=pypi&color=38bdf8&label=PyPI%20Total%20Downloads)](https://pypi.org/project/tzero-mcp/)
+[![PyPI Monthly Downloads](https://img.shields.io/pypi/dm/tzero-mcp?style=for-the-badge&logo=pypi&color=0284c7&label=PyPI%20Downloads%2FMonth)](https://pypi.org/project/tzero-mcp/)
+[![Open VSX Downloads](https://img.shields.io/open-vsx/dt/siber-akademi/tzero-vscode?style=for-the-badge&logo=openvsx&color=8b5cf6&label=Open-VSX%20Downloads)](https://open-vsx.org/extension/siber-akademi/tzero-vscode)
+[![Latest Commit](https://img.shields.io/github/last-commit/toprakahmetaydogmus/TZeroAlgorithm?style=for-the-badge&logo=github&color=10b981&label=Latest%20Commit)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/commits/main)
+
+<br>
 
 **T-Zero is 100% Free, Open-Source & Offline Forever.**  
 *Built with passion by Toprak Ahmet Aydoğmuş (Siber Akademi) for developers worldwide.*

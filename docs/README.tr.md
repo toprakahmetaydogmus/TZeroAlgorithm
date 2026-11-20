@@ -8,9 +8,11 @@
 [![M8ven Score](https://m8ven.ai/badge/mcp/toprakahmetaydogmus/tzeroalgorithm)](https://m8ven.ai/mcp/toprakahmetaydogmus/tzeroalgorithm?s=readme)
 [![Verified on FreeAPI](https://findfreeapi.com/api/badge/tzeroalgorithm)](https://findfreeapi.com/en/service/tzeroalgorithm)
 [![PyPI](https://img.shields.io/pypi/v/tzero-mcp?color=38bdf8&style=flat-square&logo=pypi)](https://pypi.org/project/tzero-mcp/)
-[![PyPI İndirmeleri](https://img.shields.io/pypi/dm/tzero-mcp?color=38bdf8&style=flat-square&logo=pypi)](https://pypi.org/project/tzero-mcp/)
+[![PyPI Toplam](https://img.shields.io/pepy/dt/tzero-mcp?color=38bdf8&style=flat-square&logo=pypi)](https://pypi.org/project/tzero-mcp/)
+[![PyPI Aylık](https://img.shields.io/pypi/dm/tzero-mcp?color=38bdf8&style=flat-square&logo=pypi)](https://pypi.org/project/tzero-mcp/)
 [![npm](https://img.shields.io/npm/v/tzero-mcp?color=cb3837&style=flat-square&logo=npm)](https://www.npmjs.com/package/tzero-mcp)
-[![npm İndirmeleri](https://img.shields.io/npm/dt/tzero-mcp?color=cb3837&style=flat-square&logo=npm)](https://www.npmjs.com/package/tzero-mcp)
+[![npm Toplam](https://img.shields.io/npm/dt/tzero-mcp?color=cb3837&style=flat-square&logo=npm)](https://www.npmjs.com/package/tzero-mcp)
+[![npm Aylık](https://img.shields.io/npm/dm/tzero-mcp?color=cb3837&style=flat-square&logo=npm)](https://www.npmjs.com/package/tzero-mcp)
 [![VS Code](https://img.shields.io/badge/VS%20Code-v11.15.5-007ACC?style=flat-square&logo=visualstudiocode&logoColor=white)](https://marketplace.visualstudio.com/items?itemName=siber-akademi.tzero-vscode)
 [![Open VSX](https://img.shields.io/open-vsx/dt/siber-akademi/tzero-vscode?style=flat-square&logo=openvsx&color=purple)](https://open-vsx.org/extension/siber-akademi/tzero-vscode)
 
@@ -117,7 +119,22 @@ Eğer T-Zero işinize yaradıysa lütfen GitHub üzerinden bir ⭐ vermeyi unutm
 
 <div align="center">
 
-[![GitHub stars](https://img.shields.io/github/stars/toprakahmetaydogmus/TZeroAlgorithm?style=social)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)
+### 📊 Canlı Ekosistem ve Dağıtım İstatistikleri
+*(GitHub API, npm Registry ve PyPI PePy üzerinden 7/24 anlık otomatik güncellenir)*
+
+[![GitHub Yıldızları](https://img.shields.io/github/stars/toprakahmetaydogmus/TZeroAlgorithm?style=for-the-badge&logo=github&color=22c55e&label=GitHub%20Y%C4%B1ld%C4%B1zlar%C4%B1)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/stargazers)
+[![GitHub Forklar](https://img.shields.io/github/forks/toprakahmetaydogmus/TZeroAlgorithm?style=for-the-badge&logo=github&color=3b82f6&label=Forklar)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/network/members)
+[![npm Toplam İndirme](https://img.shields.io/npm/dt/tzero-mcp?style=for-the-badge&logo=npm&color=cb3837&label=npm%20Toplam%20%C4%B0ndirme)](https://www.npmjs.com/package/tzero-mcp)
+[![npm Aylık İndirme](https://img.shields.io/npm/dm/tzero-mcp?style=for-the-badge&logo=npm&color=ef4444&label=npm%20Ayl%C4%B1k%20%C4%B0ndirme)](https://www.npmjs.com/package/tzero-mcp)
+[![PyPI Toplam İndirme](https://img.shields.io/pepy/dt/tzero-mcp?style=for-the-badge&logo=pypi&color=38bdf8&label=PyPI%20Toplam%20%C4%B0ndirme)](https://pypi.org/project/tzero-mcp/)
+[![PyPI Aylık İndirme](https://img.shields.io/pypi/dm/tzero-mcp?style=for-the-badge&logo=pypi&color=0284c7&label=PyPI%20Ayl%C4%B1k%20%C4%B0ndirme)](https://pypi.org/project/tzero-mcp/)
+[![Open VSX İndirme](https://img.shields.io/open-vsx/dt/siber-akademi/tzero-vscode?style=for-the-badge&logo=openvsx&color=8b5cf6&label=Open-VSX%20%C4%B0ndirme)](https://open-vsx.org/extension/siber-akademi/tzero-vscode)
+[![Son Commit](https://img.shields.io/github/last-commit/toprakahmetaydogmus/TZeroAlgorithm?style=for-the-badge&logo=github&color=10b981&label=Son%20Commit)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/commits/main)
+
+<br>
+
+**T-Zero Sonsuza Kadar %100 Ücretsiz, Açık Kaynak ve Çevrimdışıdır.**  
+*Toprak Ahmet Aydoğmuş (Siber Akademi) tarafından dünya genelindeki tüm geliştiriciler için sevgiyle geliştirildi.*
 
 </div>
 
