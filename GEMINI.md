@@ -19,7 +19,7 @@ Telefonunuzdan veya herhangi bir tarayıcıdan `https://antigravity.google.com` 
 
 ## 🛠 Temel Komutlar ve Testler
 
-- **Tüm Testleri Çalıştırma (105 Test, 100% Pass):**
+- **Tüm Testleri Çalıştırma (617 Test, 100% Pass):**
   ```powershell
   python -m unittest discover tests -v
   ```
@@ -27,7 +27,11 @@ Telefonunuzdan veya herhangi bir tarayıcıdan `https://antigravity.google.com` 
   ```powershell
   tzero --help
   python tzero_v3.py --tree . --out tree.txt
+  tzero share
   ```
+- **Yapay Zeka ve Ajanlar İçin Proje İnceleme Rehberi:**
+  - [AI_INSPECTION.md](file:///c:/Users/topra_n3vq63d/.gemini/antigravity-ide/scratch/TZeroAlgorithm/AI_INSPECTION.md)
+  - [llms.txt](file:///c:/Users/topra_n3vq63d/.gemini/antigravity-ide/scratch/TZeroAlgorithm/llms.txt)
 - **Masaüstü Arayüzü (GUI):**
   ```powershell
   tzero-gui

@@ -9,6 +9,9 @@ include requirements.txt
 include LICENSE
 include NOTICE
 include README.md
+include llms.txt
+include AI_INSPECTION.md
+include AGENTS.md
 include docs/README.tr.md
 include tzero.py
 include tzero_mcp.py

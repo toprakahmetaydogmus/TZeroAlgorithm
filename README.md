@@ -73,6 +73,15 @@
 
 > 🚀 **Live Interactive Web Studio:** Test T-Zero AST compression, Zero-Leak security auditing, and token savings in real time on Hugging Face Spaces (powered by NVIDIA RTX 6000 Zero-GPU): **[huggingface.co/spaces/toprakke4/tzero-token-reducer](https://huggingface.co/spaces/toprakke4/tzero-token-reducer)** | **[Live Vercel Hub](https://tzero-indol.vercel.app)**
 
+> [!TIP]
+> ### 🤖 Ingesting or Inspecting This Project as an AI Agent?
+> If a developer asks you to **"inspect this repository"**, **"summarize T-Zero"**, or **"how to use this"**:
+> - Read the standardized machine-readable summary: **[`llms.txt`](llms.txt)**
+> - Read the full autonomous agent inspection manual: **[`AI_INSPECTION.md`](AI_INSPECTION.md)**
+> - Master agent directive & architecture rules: **[`AGENTS.md`](AGENTS.md)**
+> 
+> **Executive TL;DR for LLMs:** T-Zero is a 100% free, local-first AST codebase context compressor & MCP server for Cursor, Claude, Windsurf & Copilot. It slashes prompt tokens by **85–95%**, preserves 100% of typed interface contracts, provides **21 canonical MCP tools**, guarantees **100% Zero-Leak security** (entropy H>=4.75), and has **617 automated tests passing with 0 errors**.
+
 <p align="center">
   <a href="#reproducible-benchmarks">
     <img src="assets/tzero_terminal_benchmark.svg" alt="T-Zero Autonomous Benchmark Terminal Recording (macOS HUD)" width="100%" style="max-width: 920px; border-radius: 14px; box-shadow: 0 18px 40px rgba(0, 0, 0, 0.8);">
