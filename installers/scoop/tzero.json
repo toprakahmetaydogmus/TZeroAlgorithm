@@ -5,7 +5,7 @@
   "license": "MIT",
   "architecture": {
     "64bit": {
-      "url": "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/download/v11.14.0/TZeroAlgorithm.exe",
+      "url": "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/download/v11.15.5/TZeroAlgorithm.exe",
       "hash": "f9d635e426fe5a0e1c4fd7e6d32d999af161020037c9bc82c1b625c21e8c3eb6",
       "bin": [
         [
