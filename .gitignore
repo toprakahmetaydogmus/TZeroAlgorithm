@@ -81,6 +81,9 @@ scripts/reddit_poster.py
 # Internal Marketing, Outreach & Launch Drafts
 docs/DONANIM*
 docs/marketing_pack/
+docs/launch/
+docs/*STRATEGY*
+docs/*strategy*
 docs/TWITTER*
 docs/REDDIT*
 docs/SHOW_HN*
@@ -88,6 +91,9 @@ docs/viral*
 docs/VIRAL*
 docs/video_reel*
 docs/superpowers/
+scripts/viral*
+scripts/*poster*
+scripts/*marketing*
 
 tzero_showcase.html
 tzero_graph_hud.html
