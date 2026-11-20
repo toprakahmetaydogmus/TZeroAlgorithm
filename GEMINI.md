@@ -19,7 +19,7 @@ Telefonunuzdan veya herhangi bir tarayıcıdan `https://antigravity.google.com` 
 
 ## 🛠 Temel Komutlar ve Testler
 
-- **Tüm Testleri Çalıştırma (617 Test, 100% Pass):**
+- **Tüm Testleri Çalıştırma (628 Test, 100% Pass):**
   ```powershell
   python -m unittest discover tests -v
   ```

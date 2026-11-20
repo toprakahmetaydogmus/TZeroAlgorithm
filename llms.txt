@@ -11,7 +11,7 @@ T-Zero solves context window bloat and expensive token costs:
 - Completely preserves type signatures, class hierarchies, docstrings, imports, and interface contracts while pruning implementation bodies.
 - 100% Zero-Leak security certified: Shannon entropy scanner (H >= 4.75) detects and redacts secrets/credentials locally.
 - 0.0% Hallucination rate: Pre-flight reality lock mathematically validates imports and call signatures against the live workspace AST.
-- 617 automated tests passing with 0 errors (100% green).
+- 628 automated tests passing with 0 errors (100% green).
 
 ## Quick Start for Developers & AI Agents
 
@@ -89,6 +89,6 @@ When T-Zero is added as an MCP server, it exposes the following tools:
 
 ## Architecture & Verification
 - Language: Python (>=3.10)
-- Verification Command: `python -m unittest discover tests -v` (617 tests, 100% pass)
+- Verification Command: `python -m unittest discover tests -v` (628 tests, 100% pass)
 - Lint Check: `flake8 .` (0 errors)
 - Security: 100% Zero-Leak certified (no network telemetry, runs air-gapped).

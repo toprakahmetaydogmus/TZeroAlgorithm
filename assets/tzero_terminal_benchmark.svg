@@ -62,7 +62,7 @@
     <!-- Line 2 & 3: Banner (Step 1) -->
     <g class="anim-1">
       <text x="45" y="118" fill="url(#cyan-glow)" font-weight="700">⚡ SİBER AKADEMİ — T-ZERO AUTONOMOUS BENCHMARK ENGINE v11.15.2</text>
-      <text x="45" y="138" fill="#64748b">Analyzing 386 active files • 184,048 lines of code • Polyglot AST Engine</text>
+      <text x="45" y="138" fill="#64748b">Analyzing 281 active files • 51,541 lines of code • Polyglot AST Engine</text>
     </g>
 
     <!-- Scanning & AST Reduction Metrics (Step 2) -->
@@ -70,7 +70,7 @@
       <!-- Raw Box -->
       <rect x="45" y="160" width="265" height="66" rx="8" fill="#1e1b2e" stroke="#ef4444" stroke-width="1.2"/>
       <text x="60" y="184" fill="#fca5a5" font-size="11.5" font-weight="600">RAW CODEBASE CONTEXT</text>
-      <text x="60" y="210" fill="#ef4444" font-size="20" font-weight="700">1,947,536 <tspan font-size="12" fill="#94a3b8">tokens</tspan></text>
+      <text x="60" y="210" fill="#ef4444" font-size="20" font-weight="700">1,168,014 <tspan font-size="12" fill="#94a3b8">tokens</tspan></text>
 
       <!-- Arrow -->
       <text x="325" y="200" fill="#38bdf8" font-size="22" font-weight="700">→</text>
@@ -78,12 +78,12 @@
       <!-- T-Zero Compressed Box -->
       <rect x="360" y="160" width="265" height="66" rx="8" fill="#062822" stroke="#10b981" stroke-width="1.2"/>
       <text x="375" y="184" fill="#6ee7b7" font-size="11.5" font-weight="600">T-ZERO AST SKELETON (TIER-2)</text>
-      <text x="375" y="210" fill="#10b981" font-size="20" font-weight="700">107,114 <tspan font-size="12" fill="#94a3b8">tokens</tspan></text>
+      <text x="375" y="210" fill="#10b981" font-size="20" font-weight="700">64,240 <tspan font-size="12" fill="#94a3b8">tokens</tspan></text>
 
       <!-- Reduction Badge -->
       <rect x="645" y="160" width="230" height="66" rx="8" fill="#082f49" stroke="#0284c7" stroke-width="1.2"/>
       <text x="660" y="184" fill="#7dd3fc" font-size="11.5" font-weight="600">NET TOKEN REDUCTION</text>
-      <text x="660" y="210" fill="#38bdf8" font-size="20" font-weight="700">-94.5% <tspan font-size="12" fill="#10b981">(-1,840,422)</tspan></text>
+      <text x="660" y="210" fill="#38bdf8" font-size="20" font-weight="700">-94.5% <tspan font-size="12" fill="#10b981">(-1,103,774)</tspan></text>
     </g>
 
     <!-- Model Table (Step 3) -->
@@ -98,31 +98,31 @@
 
       <!-- Model 1: Claude 3.5 Sonnet -->
       <text x="60" y="292" fill="#f8fafc" font-weight="600">Anthropic Claude 3.5 Sonnet</text>
-      <text x="320" y="292" fill="#ef4444">$5.843</text>
-      <text x="460" y="292" fill="#10b981" font-weight="600">$0.321</text>
+      <text x="320" y="292" fill="#ef4444">$3.504</text>
+      <text x="460" y="292" fill="#10b981" font-weight="600">$0.193</text>
       <text x="610" y="292" fill="#38bdf8" font-weight="700">-94.5%</text>
-      <text x="730" y="292" fill="#10b981" font-weight="700">+$30,366.96</text>
+      <text x="730" y="292" fill="#10b981" font-weight="700">+$18,212.27</text>
 
       <!-- Model 2: OpenAI GPT-4o -->
       <text x="60" y="318" fill="#f8fafc" font-weight="600">OpenAI GPT-4o</text>
-      <text x="320" y="318" fill="#ef4444">$4.869</text>
-      <text x="460" y="318" fill="#10b981" font-weight="600">$0.268</text>
+      <text x="320" y="318" fill="#ef4444">$2.920</text>
+      <text x="460" y="318" fill="#10b981" font-weight="600">$0.161</text>
       <text x="610" y="318" fill="#38bdf8" font-weight="700">-94.5%</text>
-      <text x="730" y="318" fill="#10b981" font-weight="700">+$25,305.80</text>
+      <text x="730" y="318" fill="#10b981" font-weight="700">+$15,176.89</text>
 
       <!-- Model 3: Google Gemini 1.5 Pro -->
       <text x="60" y="344" fill="#f8fafc" font-weight="600">Google Gemini 1.5 Pro</text>
-      <text x="320" y="344" fill="#ef4444">$2.434</text>
-      <text x="460" y="344" fill="#10b981" font-weight="600">$0.134</text>
+      <text x="320" y="344" fill="#ef4444">$1.460</text>
+      <text x="460" y="344" fill="#10b981" font-weight="600">$0.080</text>
       <text x="610" y="344" fill="#38bdf8" font-weight="700">-94.5%</text>
-      <text x="730" y="344" fill="#10b981" font-weight="700">+$12,652.90</text>
+      <text x="730" y="344" fill="#10b981" font-weight="700">+$7,588.45</text>
 
       <!-- Model 4: DeepSeek V3 -->
       <text x="60" y="370" fill="#f8fafc" font-weight="600">DeepSeek V3 / R1</text>
-      <text x="320" y="370" fill="#ef4444">$0.526</text>
-      <text x="460" y="370" fill="#10b981" font-weight="600">$0.029</text>
+      <text x="320" y="370" fill="#ef4444">$0.315</text>
+      <text x="460" y="370" fill="#10b981" font-weight="600">$0.017</text>
       <text x="610" y="370" fill="#38bdf8" font-weight="700">-94.5%</text>
-      <text x="730" y="370" fill="#10b981" font-weight="700">+$2,733.03</text>
+      <text x="730" y="370" fill="#10b981" font-weight="700">+$1,639.10</text>
     </g>
 
     <!-- Security & Quality Badges (Step 4) -->
@@ -134,13 +134,13 @@
       <text x="400" y="424" fill="#38bdf8" font-size="13" font-weight="700">✓ 0.0% Hallucinations</text>
       <text x="575" y="424" fill="#94a3b8" font-size="12">(Reality-Lock AST Grounded)</text>
 
-      <text x="760" y="424" fill="#fbbf24" font-size="13" font-weight="700">⚡ 1.0x Faster</text>
+      <text x="760" y="424" fill="#fbbf24" font-size="13" font-weight="700">⚡ 171.8x Faster</text>
     </g>
 
     <!-- Bottom Footer (Step 5) -->
     <g class="anim-5">
       <text x="45" y="482" fill="#10b981" font-weight="700">🚀 Enterprise ROI:</text>
-      <text x="185" y="482" fill="#f8fafc">Saving an estimated <tspan fill="#10b981" font-weight="700">$17,764.67 / month</tspan> per 10-developer team</text>
+      <text x="185" y="482" fill="#f8fafc">Saving an estimated <tspan fill="#10b981" font-weight="700">$10,654.18 / month</tspan> per 10-developer team</text>
       <text x="780" y="482" fill="#64748b" font-size="11">T-Zero V11.15.2</text>
     </g>
   </g>

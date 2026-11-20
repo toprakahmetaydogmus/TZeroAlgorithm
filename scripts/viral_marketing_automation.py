@@ -73,7 +73,7 @@ To solve this, I spent the last several months engineering **T-Zero** ({VERSION}
 - **T-Zero 4-Tier AST Tree:** 1,319,828 tokens (**-88.0% token reduction**)
 - **Focus File Skeleton (T-3):** **-94.6% token reduction**
 - **AST Visitor Speed:** <400ms (100% offline via local Python AST parser)
-- **Unit & E2E Tests:** 617 automated tests passing with 0 errors
+- **Unit & E2E Tests:** 628 automated tests passing with 0 errors
 
 ### 🤖 New in {VERSION} — AI Godfather Auto-Corrector:
 - Catches AI coding hallucinations before code is committed.
@@ -174,7 +174,7 @@ Bu problemi çözmek için geliştirdiğim **T-Zero (Token Zero)** projesini {VE
 - Model Context Protocol (MCP) standardında çalıştığı için Cursor ve Claude Desktop'a tek tıkla ekleniyor.
 - %100 yerel ve çevrimdışı çalışıyor; hiçbir harici ücretli API veya sunucuya bağlanmıyor ($0 maliyet).
 - Yeni {VERSION} sürümünde eklenen **AI Godfather Süpervizörü** sayesinde yapay zekanın uydurduğu (hallucinated) sahte fonksiyon çağrılarını ve eksik importları otomatik düzeltiyor.
-- 617 otomatik testten %100 başarıyla geçmektedir.
+- 628 otomatik testten %100 başarıyla geçmektedir.
 
 Projeyi GitHub'da yıldızlayarak (Star ⭐) ilk 100 yıldız hedefimize ulaşmamıza destek olursanız çok sevinirim!
 
