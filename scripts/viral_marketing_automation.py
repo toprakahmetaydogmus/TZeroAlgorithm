@@ -22,7 +22,7 @@ REPO_URL = "https://github.com/toprakahmetaydogmus/TZeroAlgorithm"
 WEB_URL = "https://tzero-indol.vercel.app"
 AUTHOR = "Toprak Ahmet Aydoğmuş"
 ORGANIZATION = "Siber Akademi"
-VERSION = "v11.11.0"
+VERSION = "v11.15.5"
 PYPI_PKG = "tzero-mcp"
 NPM_PKG = "tzero-mcp"
 
@@ -36,9 +36,9 @@ def get_live_github_stars() -> int:
         req = urllib.request.Request(url, headers={"User-Agent": "T-Zero-Marketing-Engine"})
         with urllib.request.urlopen(req, timeout=5) as resp:
             data = json.loads(resp.read().decode("utf-8"))
-            return int(data.get("stargazers_count", 16))
+            return int(data.get("stargazers_count", 45))
     except Exception:
-        return 16
+        return 45
 
 
 def render_progress_bar(current: int, target: int = 100, length: int = 30) -> str:
@@ -65,7 +65,7 @@ To solve this, I spent the last several months engineering **T-Zero** ({VERSION}
 - **T-Zero 4-Tier AST Tree:** 1,319,828 tokens (**-88.0% token reduction**)
 - **Focus File Skeleton (T-3):** **-94.6% token reduction**
 - **AST Visitor Speed:** <400ms (100% offline via local Python AST parser)
-- **Unit & E2E Tests:** 537 automated tests passing with 0 errors
+- **Unit & E2E Tests:** 617 automated tests passing with 0 errors
 
 ### 🤖 New in {VERSION} — AI Godfather Auto-Corrector:
 - Catches AI coding hallucinations before code is committed.
@@ -264,7 +264,7 @@ Option C (Standalone .exe):
 Download precompiled Windows 64-bit binaries from our GitHub Releases!""",
         f"""7/7 🌟 We are on a mission to reach our first 100 stars on GitHub!
 
-Built by Toprak Ahmet Aydoğmuş (15-year-old solo engineer at Siber Akademi). 100% free under MIT.
+Built by Toprak Ahmet Aydoğmuş (Siber Akademi). 100% free under AGPL-3.0-only.
 
 If you care about AI efficiency and open source tooling, please drop a star ⭐:
 
