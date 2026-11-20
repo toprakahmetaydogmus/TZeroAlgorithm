@@ -77,8 +77,10 @@ class TestPackagingAndVersionSync(unittest.TestCase):
             self.assertIn(f"PackageVersion: {canonical}", text)
 
         import addmcp
+        import tzero
         from tzero import tzero_mcp
         from tzero import tzero_task_benchmark
+        self.assertEqual(tzero.__version__, canonical)
         self.assertEqual(tzero_mcp.SERVER_VERSION, canonical)
         self.assertEqual(addmcp.APP_VERSION, canonical)
         self.assertEqual(tzero_task_benchmark.TaskBenchmarkReport().version, canonical)

@@ -20,7 +20,7 @@
 
 <p align="center">
   <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm">
-    <img src="assets/tzero_badge_card.svg" alt="T-Zero Context Architect Canlı Rozet Kartı" width="100%" style="max-width: 800px; border-radius: 14px; box-shadow: 0 18px 40px rgba(0, 0, 0, 0.8);">
+    <img src="../assets/tzero_badge_card.svg" alt="T-Zero Context Architect Canlı Rozet Kartı" width="100%" style="max-width: 800px; border-radius: 14px; box-shadow: 0 18px 40px rgba(0, 0, 0, 0.8);">
   </a>
 </p>
 
@@ -28,7 +28,7 @@
 
 ### 🌟 100 Yıldız Yolculuğu: T-Zero'nun 100 Yıldız Hedefine Ulaşmasına Destek Olun!
 [![GitHub Yıldızları](https://img.shields.io/github/stars/toprakahmetaydogmus/TZeroAlgorithm?style=for-the-badge&logo=github&logoColor=white&label=Y%C4%B1ld%C4%B1zlar%20%7C%20Hedef:%20100&color=f59e0b)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)
-[![%100 Ücretsiz & Açık Kaynak](https://img.shields.io/badge/Fiyat-0%20TL%20(%25100%20%C3%9Ccretsiz)-10b981?style=for-the-badge&logo=opensourceinitiative&logoColor=white)](LICENSE)
+[![%100 Ücretsiz & Açık Kaynak](https://img.shields.io/badge/Fiyat-0%20TL%20(%25100%20%C3%9Ccretsiz)-10b981?style=for-the-badge&logo=opensourceinitiative&logoColor=white)](../LICENSE)
 [![Geliştirici](https://img.shields.io/badge/Geli%C5%9Ftirici-Toprak%20Ahmet%20Aydo%C4%9Fmu%C5%9F-8b5cf6?style=for-the-badge&logo=visualstudiocode&logoColor=white)](https://linkedin.com/in/toprak-ahmet-aydo%C4%9Fmu%C5%9F-60462534b/)
 
 > **T-Zero LLM bağlam boyutunuzu küçülttüyse veya token faturalarınızı düşürdüyse lütfen GitHub'da bize bir yıldız verin! ⭐**  
