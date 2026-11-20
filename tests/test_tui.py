@@ -101,6 +101,93 @@ class TestTZeroTerminalCockpit(unittest.TestCase):
             self.assertGreater(metrics["raw_tokens"], 0)
             self.assertGreater(metrics["savings_pct"], 0.0)
 
+    def test_menu_wrap_around_and_navigation(self):
+        menu_len = len(TZeroTerminalCockpit.MENU_OPTIONS)
+        self.assertEqual(menu_len, 12)
+        # Wrap up from top to bottom
+        top_idx = 0
+        wrap_up = (top_idx - 1) % menu_len
+        self.assertEqual(wrap_up, menu_len - 1)
+        self.assertEqual(TZeroTerminalCockpit.MENU_OPTIONS[wrap_up][0], "0")
+
+        # Wrap down from bottom to top
+        bottom_idx = menu_len - 1
+        wrap_down = (bottom_idx + 1) % menu_len
+        self.assertEqual(wrap_down, 0)
+        self.assertEqual(TZeroTerminalCockpit.MENU_OPTIONS[wrap_down][0], "1")
+
+    def test_render_cockpit_with_selection(self):
+        dummy_metrics = {
+            "workspace_name": "TestWorkspace",
+            "total_files": 10,
+            "raw_tokens": 5000,
+            "pruned_tokens": 500,
+            "savings_pct": 90.0,
+            "monthly_roi_saved": 50.0,
+            "zero_leak_status": "100% SECURE (VERIFIED)",
+            "languages": {"python": 10}
+        }
+        # Top item highlighted
+        screen_top = TZeroTerminalCockpit.render_cockpit(dummy_metrics, selected_index=0)
+        self.assertIn("▶", screen_top)
+        self.assertIn("Pack Context Window", screen_top)
+
+        # Bottom item (Exit TUI) highlighted
+        screen_bottom = TZeroTerminalCockpit.render_cockpit(dummy_metrics, selected_index=11)
+        self.assertIn("▶", screen_bottom)
+        self.assertIn("Exit TUI", screen_bottom)
+
+    def test_execute_action_exit_codes(self):
+        self.assertFalse(TZeroTerminalCockpit.execute_action("0"))
+        self.assertFalse(TZeroTerminalCockpit.execute_action("q"))
+        self.assertFalse(TZeroTerminalCockpit.execute_action("Q"))
+        self.assertFalse(TZeroTerminalCockpit.execute_action("exit"))
+        self.assertFalse(TZeroTerminalCockpit.execute_action("quit"))
+
+    def test_visual_width_calculation(self):
+        self.assertEqual(TZeroTerminalCockpit.visual_width("Hello World"), 11)
+        self.assertEqual(TZeroTerminalCockpit.visual_width("\033[32mHello\033[0m"), 5)
+        # Emojis occupy 2 visual columns
+        self.assertEqual(TZeroTerminalCockpit.visual_width("⚡"), 2)
+        self.assertEqual(TZeroTerminalCockpit.visual_width("🗜️"), 2)
+
+    def test_render_cockpit_exact_box_alignment(self):
+        metrics_cases = [
+            {},
+            {
+                "workspace_name": "TestWorkspaceWithALongName",
+                "total_files": 482,
+                "raw_tokens": 11011279,
+                "pruned_tokens": 1321353,
+                "savings_pct": 88.0,
+                "monthly_roi_saved": 2150.80,
+                "zero_leak_status": "100% SECURE (VERIFIED)",
+                "languages": {"python": 350, "typescript": 80, "json": 52},
+            },
+            {
+                "workspace_name": "Minimal",
+                "total_files": 1,
+                "raw_tokens": 100,
+                "pruned_tokens": 10,
+                "savings_pct": 90.0,
+                "monthly_roi_saved": 0.05,
+                "zero_leak_status": "WARNING: 1 SECRET(S)",
+                "languages": {},
+            },
+        ]
+        for m in metrics_cases:
+            for sel_idx in range(len(TZeroTerminalCockpit.MENU_OPTIONS)):
+                screen = TZeroTerminalCockpit.render_cockpit(m, selected_index=sel_idx)
+                lines = screen.split("\n")
+                self.assertGreater(len(lines), 15)
+                for line in lines:
+                    vw = TZeroTerminalCockpit.visual_width(line)
+                    self.assertEqual(
+                        vw,
+                        80,
+                        f"Line '{line}' has width {vw} != 80 in cockpit screen",
+                    )
+
 
 if __name__ == "__main__":
     unittest.main()

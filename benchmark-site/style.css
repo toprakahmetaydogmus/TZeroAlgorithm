@@ -1929,6 +1929,10 @@ input[type="range"]::-moz-range-thumb {
     top: 100%;
     left: 0;
     width: 100%;
+    max-height: calc(100vh - 75px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
     background: rgba(8, 12, 24, 0.98);
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
@@ -2688,4 +2692,74 @@ input[type="range"]::-moz-range-thumb {
   background: #ff6600;
   border-color: #ff6600;
   color: #fff;
+}
+
+
+/* ===== FLOATING BACK TO TOP BUTTON (ÜSTE ÇIK) ===== */
+.back-to-top {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 999;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: rgba(13, 20, 36, 0.88);
+  color: #f1f5f9;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-radius: 9999px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5), 0 0 16px rgba(56, 189, 248, 0.15);
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(16px);
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  outline: none;
+}
+
+.back-to-top:hover {
+  background: rgba(20, 32, 60, 0.98);
+  border-color: #00f0ff;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6), 0 0 24px rgba(0, 240, 255, 0.35);
+  transform: translateY(-2px);
+  color: #ffffff;
+}
+
+.back-to-top:active {
+  transform: translateY(0);
+}
+
+.back-to-top.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.back-to-top svg {
+  transition: transform 0.2s ease;
+}
+
+.back-to-top:hover svg {
+  transform: translateY(-2px);
+}
+
+@media (max-width: 600px) {
+  .back-to-top {
+    bottom: 20px;
+    right: 20px;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    justify-content: center;
+    border-radius: 50%;
+  }
+  .back-to-top-text {
+    display: none;
+  }
 }

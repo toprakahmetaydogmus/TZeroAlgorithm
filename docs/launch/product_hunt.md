@@ -1,4 +1,4 @@
-# Product Hunt Launch Kit (v11.15.3)
+# Product Hunt Launch Kit (v11.15.5)
 
 - **Name:** T-Zero Context Architect
 - **Tagline:** Cut AI coding context tokens by up to 95% using AST pruning
@@ -11,7 +11,7 @@ T-Zero is an open-source Model Context Protocol (MCP) server for Cursor, Claude 
 ```markdown
 Hey Product Hunt community! 👋
 
-I'm Toprak (Toprak Ahmet Aydoğmuş) from Siber Akademi. Over the past several months, we engineered **T-Zero** (v11.15.3) to solve prompt context bloat in AI coding workflows.
+I'm Toprak (Toprak Ahmet Aydoğmuş) from Siber Akademi. Over the past several months, we engineered **T-Zero** (v11.15.5) to solve prompt context bloat in AI coding workflows.
 
 ### Why We Built T-Zero:
 Large language models are remarkably capable at software development, but feeding them medium or large codebases quickly leads to:

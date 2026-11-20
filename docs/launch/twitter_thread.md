@@ -1,4 +1,4 @@
-# Twitter / X Launch Thread (v11.15.3)
+# Twitter / X Launch Thread (v11.15.5)
 
 ### Tweet 1 (270 chars):
 ```text
@@ -8,7 +8,7 @@
 🟢 T-Zero AST pruning: 1.3M tokens (-88% reduction)
 🎯 Target skeleton: -94.6% reduction
 
-Meet T-Zero v11.15.3: open-source local MCP server cutting context bloat.
+Meet T-Zero v11.15.5: open-source local MCP server cutting context bloat.
 
 Technical breakdown 🧵👇
 ```
@@ -54,7 +54,7 @@ No cloud calls or telemetry are required in local mode.
 ```text
 5/7 🤖 AI Hallucination Guard:
 
-T-Zero v11.15.3 inspects AI-suggested code diffs against your workspace AST symbol table.
+T-Zero v11.15.5 inspects AI-suggested code diffs against your workspace AST symbol table.
 
 If an LLM invents a nonexistent method or phantom import, T-Zero flags the discrepancy before code is committed to disk.
 ```

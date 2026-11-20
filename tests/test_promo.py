@@ -88,6 +88,23 @@ class TestPromoToolkit(unittest.TestCase):
             rc_ok = promo_main(["--output-dir", str(out_dir), "--check"])
             self.assertEqual(rc_ok, 0)
 
+    def test_promo_cli_handles_promo_flag(self):
+        with tempfile.TemporaryDirectory() as td:
+            out_dir = pathlib.Path(td)
+            # Passing --promo along with output dir should not crash with unrecognized arguments
+            rc = promo_main(["--promo", "--output-dir", str(out_dir)])
+            self.assertEqual(rc, 0)
+            self.assertTrue((out_dir / "README.md").is_file())
+
+    def test_promo_cli_handles_aliases_and_extraneous_args(self):
+        with tempfile.TemporaryDirectory() as td:
+            out_dir = pathlib.Path(td)
+            # Test --out alias and extraneous arguments passed from parent CLI
+            rc = promo_main(["--promo", "--dir", ".", "--unknown-parent-flag", "--out", str(out_dir)])
+            self.assertEqual(rc, 0)
+            self.assertTrue((out_dir / "README.md").is_file())
+            self.assertTrue((out_dir / "show_hn.md").is_file())
+
 
 if __name__ == "__main__":
     unittest.main()

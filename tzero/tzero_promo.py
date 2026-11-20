@@ -33,7 +33,7 @@ AUTHOR = "Toprak Ahmet Aydoğmuş"
 ORGANIZATION = "Siber Akademi"
 PYPI_PKG = "tzero-mcp"
 NPM_PKG = "tzero-mcp"
-CANONICAL_VERSION = "v11.15.2"
+CANONICAL_VERSION = "v11.15.5"
 
 
 def get_current_version() -> str:
@@ -426,10 +426,18 @@ def main(argv: Optional[List[str]] = None) -> int:
     )
     parser.add_argument(
         "--output-dir",
+        "--out",
+        "--output",
         "-o",
         type=pathlib.Path,
         default=ROOT_DIR / "docs" / "launch",
         help="Target directory for generated launch markdown files (default: docs/launch)",
+    )
+    parser.add_argument(
+        "--dir",
+        type=pathlib.Path,
+        default=ROOT_DIR,
+        help="Workspace root directory (default: repo root)",
     )
     parser.add_argument(
         "--print",
@@ -444,8 +452,13 @@ def main(argv: Optional[List[str]] = None) -> int:
         action="store_true",
         help="Verify all launch files exist and contain valid non-empty markdown",
     )
+    parser.add_argument(
+        "--promo",
+        action="store_true",
+        help="Generate zero-cost organic launch kit in docs/launch/",
+    )
 
-    args = parser.parse_args(argv)
+    args, _ = parser.parse_known_args(argv)
     version = get_current_version()
 
     if args.check:

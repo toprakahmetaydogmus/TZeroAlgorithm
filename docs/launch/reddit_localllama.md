@@ -10,7 +10,7 @@ When running local coding models (Qwen 2.5 Coder 7B/14B/32B, DeepSeek-Coder, Lla
 - **Attention degradation:** Dumping entire 100+ line execution bodies into the prompt forces the local model's attention mechanism to sift through implementation details rather than architectural contracts.
 
 ### How T-Zero Solves This
-**T-Zero** (v11.15.3) parses your multi-file codebase into an AST locally and extracts the exact architectural skeleton:
+**T-Zero** (v11.15.5) parses your multi-file codebase into an AST locally and extracts the exact architectural skeleton:
 1. **Signature Preservation:** Retains class definitions, inheritance chains, typed function signatures, argument defaults, and docstrings.
 2. **Body Pruning:** Replaces method execution blocks with `...`, reducing prompt footprint by 85% to 95%.
 3. **Graph-Theory PageRank:** When a strict token budget (e.g. 8K tokens) is provided, T-Zero ranks modules by in-degree/out-degree centrality so core interfaces are prioritized over leaf utilities.

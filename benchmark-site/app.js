@@ -578,6 +578,56 @@ function initNavbarScroll() {
     });
   }
 
+  // Smooth wrap-around keyboard navigation for navbar links
+  if (navLinks && links.length > 0) {
+    const linkArray = Array.from(links);
+    navLinks.addEventListener("keydown", (e) => {
+      const activeIdx = linkArray.indexOf(document.activeElement);
+      if (activeIdx !== -1) {
+        if (e.key === "ArrowDown" || e.key === "ArrowRight") {
+          e.preventDefault();
+          const nextIdx = (activeIdx + 1) % linkArray.length; // wrap-around to top
+          linkArray[nextIdx].focus();
+        } else if (e.key === "ArrowUp" || e.key === "ArrowLeft") {
+          e.preventDefault();
+          const prevIdx = (activeIdx - 1 + linkArray.length) % linkArray.length; // wrap-around to bottom
+          linkArray[prevIdx].focus();
+        } else if (e.key === "Home") {
+          e.preventDefault();
+          linkArray[0].focus();
+        } else if (e.key === "End") {
+          e.preventDefault();
+          linkArray[linkArray.length - 1].focus();
+        } else if (e.key === "Escape" && navLinks.classList.contains("nav-open")) {
+          mobileBtn?.classList.remove("active");
+          navLinks.classList.remove("nav-open");
+          mobileBtn?.focus();
+        }
+      }
+    });
+  }
+
+  // Floating Back to Top (Üste Çık) Handler
+  const backToTopBtn = document.getElementById("back-to-top");
+  if (backToTopBtn) {
+    const updateBackToTop = () => {
+      if (window.scrollY > 350) {
+        backToTopBtn.classList.add("visible");
+      } else {
+        backToTopBtn.classList.remove("visible");
+      }
+    };
+    window.addEventListener("scroll", updateBackToTop, { passive: true });
+    updateBackToTop();
+
+    backToTopBtn.addEventListener("click", () => {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+    });
+  }
+
   // Rock-solid ScrollSpy calculation
   const sectionEls = Array.from(document.querySelectorAll("section[id]"));
   function updateScrollSpy() {

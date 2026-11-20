@@ -8801,10 +8801,10 @@ def main():
         sys.exit(ci_main())
 
     # Fast path for promo / launch subcommands
-    if len(sys.argv) > 1 and sys.argv[1].lower() in ("promo", "launch", "marketing"):
+    if len(sys.argv) > 1 and sys.argv[1].lower() in ("promo", "launch", "marketing", "--promo", "-promo"):
         from tzero.tzero_promo import main as promo_main
-        sys.argv.pop(1)
-        sys.exit(promo_main())
+        promo_args = [a for a in sys.argv[1:] if a.lower() not in ("promo", "launch", "marketing", "--promo", "-promo")]
+        sys.exit(promo_main(promo_args))
 
     parser = argparse.ArgumentParser(
         description="Siber Akademi T-Zero Context Architect - Enterprise Codebase Context Builder & Token Reducer",
@@ -9244,7 +9244,8 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
         return
     elif getattr(args, "promo", False):
         from tzero.tzero_promo import main as promo_main
-        sys.exit(promo_main())
+        promo_args = [a for a in sys.argv[1:] if a.lower() not in ("--promo", "-promo")]
+        sys.exit(promo_main(promo_args))
     elif args.doctor:
         if tzero_deps is None:
             print("[ERROR] tzero_deps.py is missing; reinstall T-Zero to use --doctor.")
