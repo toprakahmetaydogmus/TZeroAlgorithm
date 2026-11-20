@@ -595,11 +595,17 @@ curl -fsSL https://raw.githubusercontent.com/toprakahmetaydogmus/tzero-pc-fixer/
 
 ---
 
-## ⭐ Support Open-Source Innovation!
+## 💖 Support Open-Source Innovation!
 
 Hi! I'm **Toprak Ahmet Aydoğmuş** from Siber Akademi. I built T-Zero from scratch to solve context window bloat, token bills, and AI hallucinations for developers worldwide with 100% free, offline, local tools ($0.00 cloud cost).
 
-If T-Zero helped you cut prompt tokens or saved your daily coding workflow, please consider giving us a star! Every star helps open-source developers worldwide. 🚀
+If T-Zero helped you cut prompt tokens or saved your daily coding workflow, please consider supporting the project:
+
+- ⭐ **Star the Repository:** Every star helps independent open-source developers worldwide.
+- 🪙 **Ethereum / USDT / USDC (ERC-20 / BEP-20 / Arbitrum / Polygon):**
+  ```
+  0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5
+  ```
 
 <div align="center">
 
