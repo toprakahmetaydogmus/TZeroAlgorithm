@@ -1,79 +1,117 @@
 # -*- coding: utf-8 -*-
-"""Markdown Link and Anchor Verifier for T-Zero Documentation."""
+"""Markdown Link and Anchor Verifier for T-Zero Documentation.
 
-import re
+Validates all internal anchors, cross-document relative links, and anchor tags
+across English, Turkish, Japanese, and Chinese documentation suites.
+"""
+
 import pathlib
+import re
 import sys
 
-def check_file(path_str):
+
+def extract_anchors(content: str) -> set:
+    """Extract all explicit HTML anchors and GitHub slugified markdown header anchors."""
+    # 1. Explicit HTML anchors: <a id="..."> or <a name="...">
+    explicit_anchors = set(
+        re.findall(r'<a\s+[^>]*(?:id|name)=["\']([^"\']+)["\']', content, re.IGNORECASE)
+    )
+
+    # 2. Markdown headers (including callout/blockquote headers: > ### ...)
+    headers = re.findall(r'^(?:>\s*)?#{1,6}\s+(.+)$', content, re.MULTILINE)
+    slugified_headers = set()
+
+    for h in headers:
+        # Strip HTML tags
+        clean_h = re.sub(r'<[^>]+>', '', h)
+        # Strip markdown images and links
+        clean_h = re.sub(r'!\[[^\]]*\]\([^)]+\)', '', clean_h)
+        clean_h = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', clean_h)
+        # Strip formatting marks (bold, italic, backticks)
+        clean_h = re.sub(r'[`*_~]', '', clean_h).strip()
+
+        # GitHub slugify: remove punctuation except hyphens/underscores/spaces
+        slug = re.sub(r'[^\w\s-]', '', clean_h.lower())
+        slug = re.sub(r'[\s_]+', '-', slug).strip('-')
+        if slug:
+            slugified_headers.add(slug)
+
+    return explicit_anchors | slugified_headers
+
+
+def extract_links(content: str) -> list:
+    """Extract all markdown links (including nested badge image links) and HTML href targets."""
+    targets = []
+
+    # 1. Markdown links: [label](target) or [![alt](img)](target)
+    md_links = re.findall(r'\[(?:!\[[^\]]*\]\([^)]+\)|[^\]]+)\]\(([^)]+)\)', content)
+    for t in md_links:
+        targets.append(t.strip())
+
+    # 2. HTML hrefs: <a href="target">
+    html_hrefs = re.findall(r'<a\s+[^>]*href=["\']([^"\']+)["\']', content, re.IGNORECASE)
+    for t in html_hrefs:
+        targets.append(t.strip())
+
+    return targets
+
+
+def check_file(path_str: str) -> bool:
+    """Verify all internal and relative links in a documentation file."""
     p = pathlib.Path(path_str)
     if not p.is_file():
-        print(f"File not found: {path_str}")
+        print(f"[FAIL] File not found: {path_str}")
         return False
 
     content = p.read_text(encoding="utf-8")
     base_dir = p.parent
+    all_anchors = extract_anchors(content)
+    lower_anchors = {a.lower() for a in all_anchors}
 
-    # 1. Collect HTML anchors: <a id="..."></a> or <a name="..."></a>
-    explicit_anchors = set(re.findall(r'<a\s+(?:id|name)=["\']([^"\']+)["\']', content, re.IGNORECASE))
-
-    # 2. Collect Markdown headers: # Header Name
-    headers = re.findall(r'^#{1,6}\s+(.+)$', content, re.MULTILINE)
-    # GitHub markdown slugification rule:
-    # lowercase, remove punctuation except hyphens, spaces to hyphens
-    slugified_headers = set()
-    for h in headers:
-        clean_h = re.sub(r'<[^>]+>', '', h).strip()
-        slug = re.sub(r'[^\w\s-]', '', clean_h.lower())
-        slug = re.sub(r'[\s_]+', '-', slug).strip('-')
-        slugified_headers.add(slug)
-
-    all_anchors = explicit_anchors | slugified_headers
-
+    raw_targets = extract_links(content)
     has_errors = False
+    checked_count = 0
+
     print(f"\nVerifying: {path_str}")
 
-    # Check internal anchor links: [label](#anchor)
-    internal_links = re.findall(r'\[([^\]]+)\]\(#([^\)]+)\)', content)
-    for label, anchor in internal_links:
-        # Also clean any query params if present
-        clean_anchor = anchor.split('?')[0].lower()
-        if anchor not in all_anchors and clean_anchor not in {a.lower() for a in all_anchors}:
-            print(f"  [BROKEN ANCHOR] [{label}](#{anchor})")
-            has_errors = True
-
-    # Check file links: [label](path)
-    # Match markdown links that do not start with http, mailto, tel, #
-    raw_links = re.findall(r'\[([^\]]+)\]\(([^)]+)\)', content)
-    for label, url in raw_links:
-        if url.startswith(('http://', 'https://', 'mailto:', '#', 'tel:', 'data:')):
+    for target in raw_targets:
+        # Ignore external web links and non-file schemes
+        if target.startswith(('http://', 'https://', 'mailto:', 'tel:', 'data:', 'javascript:')):
             continue
-        file_part = url.split('#')[0].split('?')[0]
-        anchor_part = url.split('#')[1] if '#' in url else None
+
+        checked_count += 1
+
+        # Case A: Pure internal anchor link (#anchor)
+        if target.startswith('#'):
+            anchor = target[1:].split('?')[0]
+            if anchor not in all_anchors and anchor.lower() not in lower_anchors:
+                print(f"  [BROKEN ANCHOR] #{anchor}")
+                has_errors = True
+            continue
+
+        # Case B: Relative file path with optional anchor (file.md#anchor)
+        file_part = target.split('#')[0].split('?')[0]
+        anchor_part = target.split('#')[1].split('?')[0] if '#' in target else None
+
         if file_part:
             target_path = (base_dir / file_part).resolve()
             if not target_path.exists():
-                print(f"  [BROKEN FILE LINK] [{label}]({url}) -> missing file: {target_path}")
+                print(f"  [BROKEN FILE LINK] {target} -> missing: {target_path}")
                 has_errors = True
-            elif anchor_part and target_path.is_file():
-                # check anchor in target file
+                continue
+
+            if anchor_part and target_path.is_file():
                 target_content = target_path.read_text(encoding="utf-8", errors="ignore")
-                target_explicit = set(re.findall(r'<a\s+(?:id|name)=["\']([^"\']+)["\']', target_content, re.IGNORECASE))
-                target_headers = re.findall(r'^#{1,6}\s+(.+)$', target_content, re.MULTILINE)
-                target_slugs = set()
-                for th in target_headers:
-                    cth = re.sub(r'<[^>]+>', '', th).strip()
-                    tslug = re.sub(r'[^\w\s-]', '', cth.lower())
-                    tslug = re.sub(r'[\s_]+', '-', tslug).strip('-')
-                    target_slugs.add(tslug)
-                target_all = target_explicit | target_slugs
-                if anchor_part not in target_all and anchor_part.lower() not in {a.lower() for a in target_all}:
-                    print(f"  [BROKEN REMOTE ANCHOR] [{label}]({url}) -> anchor #{anchor_part} not in {target_path.name}")
+                target_anchors = extract_anchors(target_content)
+                target_lower = {a.lower() for a in target_anchors}
+                if anchor_part not in target_anchors and anchor_part.lower() not in target_lower:
+                    print(f"  [BROKEN REMOTE ANCHOR] {target} -> #{anchor_part} missing in {target_path.name}")
                     has_errors = True
 
     if not has_errors:
-        print("  [OK] All internal anchors and relative file links are valid.")
+        print(f"  [OK] All {checked_count} internal anchors and relative file links are valid.")
     return not has_errors
+
 
 if __name__ == "__main__":
     files = ["README.md", "docs/README.tr.md", "docs/README.ja.md", "docs/README.zh.md"]

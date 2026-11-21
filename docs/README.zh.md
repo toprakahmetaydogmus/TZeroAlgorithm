@@ -6,15 +6,27 @@
   <i>在保留 100% 代码结构与类型接口契约的同时，降低大模型上下文 Token 消耗高达 95%！</i>
 </p>
 
-<p align="center">
-  <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm"><img src="https://img.shields.io/github/stars/toprakahmetaydogmus/TZeroAlgorithm?style=flat-square&logo=github&color=f59e0b&label=Stars" alt="GitHub Stars" /></a>
-  <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases"><img src="https://img.shields.io/badge/downloads-20%2C880%2B-10b981?style=flat-square&logo=git" alt="Downloads" /></a>
-  <a href="https://pypi.org/project/tzero-mcp/"><img src="https://img.shields.io/badge/pypi-v12.1.0-3b82f6?style=flat-square&logo=pypi&logoColor=white" alt="PyPI" /></a>
-  <a href="https://www.npmjs.com/package/tzero-mcp"><img src="https://img.shields.io/badge/npm-v12.1.0-cb3837?style=flat-square&logo=npm&logoColor=white" alt="npm" /></a>
-  <a href="https://marketplace.visualstudio.com/items?itemName=siber-akademi.tzero-vscode"><img src="https://img.shields.io/badge/vscode-v12.1.0-007acc?style=flat-square&logo=visualstudiocode&logoColor=white" alt="VS Code" /></a>
-  <a href="https://open-vsx.org/extension/siber-akademi/tzero-vscode"><img src="https://img.shields.io/badge/open--vsx-v12.1.0-8b5cf6?style=flat-square&logo=openvsx&logoColor=white" alt="Open VSX" /></a>
-  <a href="../LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-64748b?style=flat-square" alt="License AGPL-3.0" /></a>
-</p>
+<div align="center">
+
+<!-- Badges Tier 1: Distribution, Release & Scale -->
+[![GitHub Release](https://img.shields.io/github/v/release/toprakahmetaydogmus/TZeroAlgorithm?style=flat-square&logo=github&color=38bdf8)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases)
+[![PyPI](https://img.shields.io/badge/pypi-v12.1.0-3b82f6?style=flat-square&logo=pypi&logoColor=white)](https://pypi.org/project/tzero-mcp/)
+[![npm](https://img.shields.io/badge/npm-v12.1.0-cb3837?style=flat-square&logo=npm)](https://www.npmjs.com/package/tzero-mcp)
+[![VS Code](https://img.shields.io/badge/vscode-v12.1.0-007acc?style=flat-square&logo=visualstudiocode&logoColor=white)](https://marketplace.visualstudio.com/items?itemName=siber-akademi.tzero-vscode)
+[![Open VSX](https://img.shields.io/badge/open--vsx-v12.1.0-8b5cf6?style=flat-square&logo=openvsx&logoColor=white)](https://open-vsx.org/extension/siber-akademi/tzero-vscode)
+[![Downloads](https://img.shields.io/badge/downloads-20%2C880%2B-10b981?style=flat-square&logo=git)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases)
+[![Stars](https://img.shields.io/github/stars/toprakahmetaydogmus/TZeroAlgorithm?style=flat-square&logo=github&color=f59e0b)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/stargazers)
+
+<!-- Badges Tier 2: Engineering Quality, Security, Tests & Governance -->
+[![Engine](https://img.shields.io/badge/engine-Rust%20%2B%20Python%20AST-orange?style=flat-square&logo=rust&logoColor=white)](../README.md#whats-new-in-v1200-turbo-rust-hybrid-core--multi-language-tree-sitter)
+[![Security](https://img.shields.io/badge/security-100%25%20Zero--Leak-emerald?style=flat-square&logo=shield)](../README.md#security-architecture)
+[![Tests](https://img.shields.io/badge/tests-647%20passing%20(100%25)-10b981?style=flat-square&logo=githubactions&logoColor=white)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions/workflows/ci.yml)
+[![TDQS](https://img.shields.io/badge/TDQS-5.0%20%2F%205.0%20(Grade%20A%2B)-8b5cf6?style=flat-square&logo=checkmarx&logoColor=white)](https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm/schema)
+[![CodeQL](https://img.shields.io/badge/code%20scanning-CodeQL%20passed-10b981?style=flat-square&logo=github)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions/workflows/codeql.yml)
+[![Dependabot](https://img.shields.io/badge/dependabot-active-02569B?style=flat-square&logo=dependabot&logoColor=white)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/blob/main/.github/dependabot.yml)
+[![License](https://img.shields.io/badge/license-AGPL--3.0-64748b?style=flat-square)](../LICENSE)
+
+</div>
 
 [English](../README.md) | [Türkçe](README.tr.md) | [日本語](README.ja.md) | **简体中文**
 

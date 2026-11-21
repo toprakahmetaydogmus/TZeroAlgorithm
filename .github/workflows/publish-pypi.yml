@@ -39,8 +39,19 @@ jobs:
       - name: Build package distribution
         run: python -m build
 
+      - name: Check PyPI publishing credentials
+        id: pypi_auth
+        env:
+          PYPI_TOKEN: ${{ secrets.PYPI_API_TOKEN || secrets.PYPI_TOKEN }}
+        run: |
+          if [ -n "$PYPI_TOKEN" ]; then
+            echo "auth_mode=token" >> "$GITHUB_OUTPUT"
+          else
+            echo "auth_mode=oidc" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Publish distribution to PyPI (Token)
-        if: ${{ secrets.PYPI_API_TOKEN != '' || secrets.PYPI_TOKEN != '' }}
+        if: steps.pypi_auth.outputs.auth_mode == 'token'
         uses: pypa/gh-action-pypi-publish@release/v1
         continue-on-error: true
         with:
@@ -49,7 +60,7 @@ jobs:
           skip-existing: true
 
       - name: Publish distribution to PyPI (Trusted Publishing / OIDC)
-        if: ${{ secrets.PYPI_API_TOKEN == '' && secrets.PYPI_TOKEN == '' }}
+        if: steps.pypi_auth.outputs.auth_mode == 'oidc'
         uses: pypa/gh-action-pypi-publish@release/v1
         continue-on-error: true
         with:

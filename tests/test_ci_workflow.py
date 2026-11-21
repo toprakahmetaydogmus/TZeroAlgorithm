@@ -60,6 +60,21 @@ class TestCIWorkflow(unittest.TestCase):
         self.assertIn("VSCE_PAT", ext_text)
         self.assertIn("OVSX_PAT", ext_text)
         self.assertIn("continue-on-error", ext_text)
+        self.assertIn("inputs.publish_openvsx", ext_text)
+        self.assertIn("inputs.publish_vscode", ext_text)
+
+    def test_ci_workflow_runs_for_dependabot_and_bots(self):
+        ci_path = ROOT_DIR / ".github" / "workflows" / "ci.yml"
+        ci_text = ci_path.read_text(encoding="utf-8")
+        self.assertNotIn("github.actor != 'dependabot'", ci_text, "CI should not exclude dependabot PRs")
+        self.assertNotIn("endsWith(github.actor, '[bot]')", ci_text, "CI should not exclude bot PRs")
+
+    def test_funding_yaml_exists_and_valid(self):
+        funding_path = ROOT_DIR / ".github" / "FUNDING.yml"
+        self.assertTrue(funding_path.exists(), "FUNDING.yml must exist")
+        data = yaml.safe_load(funding_path.read_text(encoding="utf-8"))
+        self.assertIn("github", data)
+        self.assertIn("toprakahmetaydogmus", data["github"])
 
     def test_publish_npm_workflow_handles_npm_token(self):
         npm_path = ROOT_DIR / ".github" / "workflows" / "publish-npm.yml"
@@ -96,6 +111,16 @@ class TestCIWorkflow(unittest.TestCase):
             with open(path, "r", encoding="utf-8") as f:
                 data = yaml.safe_load(f)
                 self.assertIsInstance(data, dict, f"{path} did not parse to a valid dict")
+
+    def test_no_workflow_uses_secrets_in_if_conditional(self):
+        import re
+        for path in (ROOT_DIR / ".github" / "workflows").glob("*.yml"):
+            content = path.read_text(encoding="utf-8")
+            # GitHub rejects workflow if: conditions that reference secrets directly
+            for line_no, line in enumerate(content.splitlines(), start=1):
+                stripped = line.strip()
+                if stripped.startswith("if:") and "secrets." in stripped:
+                    self.fail(f"Invalid GitHub Actions syntax in {path.name}:{line_no}: secrets cannot be referenced in if: conditions. Line: {line}")
 
 
 if __name__ == "__main__":
