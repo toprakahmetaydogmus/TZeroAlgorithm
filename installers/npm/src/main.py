@@ -50,6 +50,12 @@ def _setup_windows_streams():
                 sys.stderr = io.StringIO()
 
 
+try:
+    from tzero.tzero_terminal import init_terminal
+    init_terminal()
+except Exception:
+    pass
+
 _setup_windows_streams()
 
 from tzero.tzero_v3 import main

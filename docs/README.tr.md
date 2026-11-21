@@ -13,7 +13,7 @@
 [![npm](https://img.shields.io/npm/v/tzero-mcp?color=cb3837&style=flat-square&logo=npm)](https://www.npmjs.com/package/tzero-mcp)
 [![npm Toplam](https://img.shields.io/npm/dt/tzero-mcp?color=cb3837&style=flat-square&logo=npm)](https://www.npmjs.com/package/tzero-mcp)
 [![npm Aylık](https://img.shields.io/npm/dm/tzero-mcp?color=cb3837&style=flat-square&logo=npm)](https://www.npmjs.com/package/tzero-mcp)
-[![VS Code](https://img.shields.io/badge/VS%20Code-v11.15.5-007ACC?style=flat-square&logo=visualstudiocode&logoColor=white)](https://marketplace.visualstudio.com/items?itemName=siber-akademi.tzero-vscode)
+[![VS Code](https://img.shields.io/badge/VS%20Code-v12.0.0-007ACC?style=flat-square&logo=visualstudiocode&logoColor=white)](https://marketplace.visualstudio.com/items?itemName=siber-akademi.tzero-vscode)
 [![Open VSX](https://img.shields.io/open-vsx/dt/siber-akademi/tzero-vscode?style=flat-square&logo=openvsx&color=purple)](https://open-vsx.org/extension/siber-akademi/tzero-vscode)
 
 <br>
@@ -92,7 +92,7 @@ tzero init
 tzero share
 
 # 🧩 VS Code / Cursor Eklentisini (.vsix) Yükle:
-code --install-extension dist/tzero-vscode-11.15.5.vsix
+code --install-extension dist/tzero-vscode-12.0.0.vsix
 
 # ⚡ Yerel CI ve Pre-Push Korumasını Çalıştır ($0 Kota):
 tzero local-ci --quick

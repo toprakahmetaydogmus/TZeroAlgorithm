@@ -7,7 +7,7 @@
 
 from importlib import import_module
 
-__version__ = "11.15.5"
+__version__ = "12.0.0"
 __author__ = "Toprak Ahmet Aydoğmuş"
 __license__ = "AGPL-3.0-only"
 
