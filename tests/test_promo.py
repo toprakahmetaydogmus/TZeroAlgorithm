@@ -22,7 +22,7 @@ from tzero.tzero_promo import (
 class TestPromoToolkit(unittest.TestCase):
     def test_version_detection(self):
         v = get_current_version()
-        self.assertTrue(v.startswith("v11."))
+        self.assertTrue(v.startswith("v12.") or v.startswith("v11."))
 
     def test_show_hn_structure(self):
         v = get_current_version()

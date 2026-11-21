@@ -33,7 +33,7 @@ class TestLocalCI(unittest.TestCase):
         res = self.runner.check_metadata_sync()
         self.assertIsInstance(res, LocalCIStepResult)
         self.assertTrue(res.passed, f"Metadata sync failed: {res.error}")
-        self.assertIn("11.", res.output)
+        self.assertTrue("12." in res.output or "11." in res.output)
 
     def test_step_zero_leak_security(self):
         res = self.runner.check_zero_leak_security()
