@@ -10,8 +10,10 @@
 //! License: AGPL-3.0-only
 
 pub mod ast_pruner;
+pub mod bm25_search;
 pub mod entropy_guard;
 pub mod python_bindings;
+pub mod symbol_graph;
 pub mod tokenizer;
 
 pub use ast_pruner::{detect_language, prune_code, prune_code_with_stats, SupportedLanguage};

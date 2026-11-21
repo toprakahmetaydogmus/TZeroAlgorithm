@@ -4693,6 +4693,7 @@ class AutoReadmeGUI:
 
         # Bottom Utilities
         for icon_char, cmd_handler in [
+            ("💖", self.show_crypto_support_modal),
             ("🎨", self.open_theme_selector),
             ("🌐", self.toggle_language),
             ("⌨", self.show_shortcuts_modal),
@@ -6134,6 +6135,82 @@ class AutoReadmeGUI:
             tk.Label(row, text=desc, font=("Segoe UI", 9), fg=PALETTE["text_main"], bg=PALETTE["bg_start"]).pack(side=tk.LEFT, padx=10)
             
         tk.Button(pad, text="Close", bg=PALETTE["card_border"], fg=PALETTE["text_main"], relief=tk.FLAT, font=("Segoe UI", 9, "bold"), command=dialog.destroy).pack(pady=(15, 0))
+
+    def show_crypto_support_modal(self):
+        try:
+            from tzero.tzero_traffic import (
+                CRYPTO_USDT_TRC20, CRYPTO_BTC, REPO_URL, BIO_URL, CURRENT_VERSION
+            )
+        except Exception:
+            CRYPTO_USDT_TRC20 = "TE7uKxZJ414u938gWf6bYh9QvRk2141517"
+            CRYPTO_BTC = "bc1q9k4hvd6c2g8l9w3z7v8f2k3j5l8n9m1p4q7r0s"
+            REPO_URL = "https://github.com/toprakahmetaydogmus/TZeroAlgorithm"
+            BIO_URL = "https://hopp.bio/siberegitim"
+            CURRENT_VERSION = "12.0.0"
+
+        dialog = tk.Toplevel(self.root)
+        dialog.title(f"T-Zero v{CURRENT_VERSION} — Destek & Sürüm Merkezi")
+        dialog.geometry("540x480")
+        dialog.configure(bg=PALETTE["bg_start"])
+        dialog.transient(self.root)
+        dialog.grab_set()
+
+        pad = tk.Frame(dialog, bg=PALETTE["bg_start"], padx=24, pady=20)
+        pad.pack(fill=tk.BOTH, expand=True)
+
+        tk.Label(
+            pad,
+            text=f"🚀 T-ZERO v{CURRENT_VERSION} SÜRÜM & KRİPTO DESTEK",
+            font=("Segoe UI", 12, "bold"),
+            fg=PALETTE.get("accent_cyan", "#38bdf8"),
+            bg=PALETTE["bg_start"]
+        ).pack(anchor=tk.W, pady=(0, 6))
+
+        msg = (
+            "T-Zero'nun kurumsal tekellere satılmadan, bağımsız kalması ve herkese\n"
+            "%100 BEDAVA sunulabilmesi için geliştirici Toprak Ahmet Aydoğmuş'a\n"
+            "kripto ile destek olabilirsiniz."
+        )
+        tk.Label(
+            pad,
+            text=msg,
+            font=("Segoe UI", 9),
+            fg=PALETTE["text_muted"],
+            bg=PALETTE["bg_start"],
+            justify=tk.LEFT
+        ).pack(anchor=tk.W, pady=(0, 14))
+
+        def copy_addr(val, label):
+            try:
+                self.root.clipboard_clear()
+                self.root.clipboard_append(val)
+                self.log(f"Panoya kopyalandı ({label}): {val}")
+                messagebox.showinfo("Kopyalandı", f"{label} adresi başarıyla panoya kopyalandı:\n{val}")
+            except Exception:
+                pass
+
+        # USDT
+        u_box = tk.LabelFrame(pad, text="🪙 USDT (TRC-20 Network)", bg=PALETTE["bg_start"], fg=PALETTE.get("accent_green", "#22c55e"), font=("Segoe UI", 9, "bold"), padx=10, pady=8)
+        u_box.pack(fill=tk.X, pady=4)
+        tk.Label(u_box, text=CRYPTO_USDT_TRC20, font=("Consolas", 9), fg=PALETTE["text_main"], bg=PALETTE["bg_start"]).pack(side=tk.LEFT)
+        tk.Button(u_box, text="Kopyala", font=("Segoe UI", 8, "bold"), bg=PALETTE.get("card_border", "#334155"), fg=PALETTE["text_main"], relief=tk.FLAT, cursor="hand2", command=lambda: copy_addr(CRYPTO_USDT_TRC20, "USDT")).pack(side=tk.RIGHT)
+
+        # BTC
+        b_box = tk.LabelFrame(pad, text="🪙 Bitcoin (BTC Network)", bg=PALETTE["bg_start"], fg=PALETTE.get("accent_yellow", "#fbbf24"), font=("Segoe UI", 9, "bold"), padx=10, pady=8)
+        b_box.pack(fill=tk.X, pady=4)
+        tk.Label(b_box, text=CRYPTO_BTC, font=("Consolas", 9), fg=PALETTE["text_main"], bg=PALETTE["bg_start"]).pack(side=tk.LEFT)
+        tk.Button(b_box, text="Kopyala", font=("Segoe UI", 8, "bold"), bg=PALETTE.get("card_border", "#334155"), fg=PALETTE["text_main"], relief=tk.FLAT, cursor="hand2", command=lambda: copy_addr(CRYPTO_BTC, "BTC")).pack(side=tk.RIGHT)
+
+        # Links Row
+        links_row = tk.Frame(pad, bg=PALETTE["bg_start"])
+        links_row.pack(fill=tk.X, pady=(12, 6))
+
+        import webbrowser
+        tk.Button(links_row, text="⭐ GitHub Repo & Star", font=("Segoe UI", 9, "bold"), bg=PALETTE.get("card_border", "#334155"), fg=PALETTE["text_main"], relief=tk.FLAT, cursor="hand2", command=lambda: webbrowser.open(REPO_URL)).pack(side=tk.LEFT, padx=(0, 6))
+        tk.Button(links_row, text="🌐 Biyografi", font=("Segoe UI", 9, "bold"), bg=PALETTE.get("card_border", "#334155"), fg=PALETTE["text_main"], relief=tk.FLAT, cursor="hand2", command=lambda: webbrowser.open(BIO_URL)).pack(side=tk.LEFT, padx=6)
+
+        # Close
+        tk.Button(pad, text="Kapat", bg=PALETTE["card_border"], fg=PALETTE["text_main"], relief=tk.FLAT, font=("Segoe UI", 9, "bold"), command=dialog.destroy).pack(pady=(12, 0))
 
     # --- TAB 2: SELECTOR & SPLIT VIEW EDITOR ---
     def setup_tab_selector(self):
@@ -8884,6 +8961,33 @@ def main():
         promo_args = [a for a in sys.argv[1:] if a.lower() not in ("promo", "launch", "marketing", "--promo", "-promo")]
         sys.exit(promo_main(promo_args))
 
+    # Fast path for update / version check
+    if len(sys.argv) > 1 and sys.argv[1].lower() in ("update", "--update", "version", "--version-check"):
+        from tzero.tzero_traffic import check_version_and_updates
+        open_b = any(arg in ("--open", "-o", "open") for arg in sys.argv[2:])
+        check_version_and_updates(open_browser=open_b)
+        sys.exit(0)
+
+    # Fast path for support / donate
+    if len(sys.argv) > 1 and sys.argv[1].lower() in ("support", "donate", "--support", "--donate"):
+        from tzero.tzero_traffic import print_crypto_support_card
+        print_crypto_support_card()
+        sys.exit(0)
+
+    # Fast path for live ROI dashboard
+    if len(sys.argv) > 1 and sys.argv[1].lower() in ("roi", "stats", "--roi", "--stats"):
+        from tzero.tzero_traffic import run_live_roi_dashboard
+        target_dir = sys.argv[2] if len(sys.argv) > 2 and not sys.argv[2].startswith("-") else "."
+        run_live_roi_dashboard(workspace_dir=target_dir)
+        sys.exit(0)
+
+    # Fast path for disk clean / doctor clean
+    if len(sys.argv) > 1 and sys.argv[1].lower() in ("disk-clean", "clean"):
+        from tzero.tzero_traffic import run_system_disk_doctor
+        target_dir = sys.argv[2] if len(sys.argv) > 2 and not sys.argv[2].startswith("-") else "."
+        run_system_disk_doctor(clean=True, workspace_dir=target_dir)
+        sys.exit(0)
+
     parser = argparse.ArgumentParser(
         description="Siber Akademi T-Zero Context Architect - Enterprise Codebase Context Builder & Token Reducer",
         epilog="""
@@ -8941,6 +9045,10 @@ def main():
     parser.add_argument("--grounding-contract", action="store_true", help="Generate immutable AST grounding contract for LLM prompt pinning")
     parser.add_argument("--promo", action="store_true", help="Generate zero-cost organic launch kit in docs/launch/")
     parser.add_argument("--share", action="store_true", help="Generate 1-click social sharing links for Twitter/X, Reddit, Hacker News, and LinkedIn")
+    parser.add_argument("--update", action="store_true", help="Check PyPI and GitHub for latest version and update commands")
+    parser.add_argument("--donate", "--support", action="store_true", dest="support", help="Display developer crypto donation & community support card")
+    parser.add_argument("--roi", "--stats", action="store_true", dest="roi", help="Display live token reduction & financial dollars saved mini dashboard")
+    parser.add_argument("--clean", "--disk-clean", action="store_true", dest="clean", help="Safely clean workspace temporary caches and build artifacts")
     parser.add_argument("--patch", "--apply-patch", dest="apply_patch", metavar="DIFF_FILE_OR_STR", help="Apply patch with AST-tolerant fuzzy matching (whitespace & line drift agnostic)")
     parser.add_argument("--target", default=None, metavar="TARGET_FILE", help="Target file for --patch (optional if patch specifies file header)")
     parser.add_argument("--fuzzy", action="store_true", default=True, help="Enable fuzzy AST and whitespace matching for patch application (default: True)")
@@ -9321,7 +9429,23 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
         return
 
     args = parser.parse_args()
-    if getattr(args, "info", False):
+    if getattr(args, "update", False):
+        from tzero.tzero_traffic import check_version_and_updates
+        check_version_and_updates()
+        return
+    elif getattr(args, "support", False):
+        from tzero.tzero_traffic import print_crypto_support_card
+        print_crypto_support_card()
+        return
+    elif getattr(args, "roi", False):
+        from tzero.tzero_traffic import run_live_roi_dashboard
+        run_live_roi_dashboard(workspace_dir=args.dir)
+        return
+    elif getattr(args, "clean", False):
+        from tzero.tzero_traffic import run_system_disk_doctor
+        run_system_disk_doctor(clean=True, workspace_dir=args.dir)
+        return
+    elif getattr(args, "info", False):
         print_quickstart_guide()
         return
     elif getattr(args, "promo", False):

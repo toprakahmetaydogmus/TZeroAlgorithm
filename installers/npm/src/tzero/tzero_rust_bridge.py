@@ -170,6 +170,90 @@ def _pure_count_bpe_tokens(text: str, model_name: str = "gpt-4o") -> int:
         return max(1, len(text) // 4) if text else 0
 
 
+def _pure_tokenize_code(text: str) -> List[str]:
+    import re
+    s = re.sub(r"([a-z])([A-Z])", r"\1 \2", text or "")
+    tokens = re.findall(r"[a-zA-Z0-9]{2,}", s)
+    return [t.lower() for t in tokens]
+
+
+def _pure_bm25_search(
+    documents: List[Dict[str, str]],
+    query: str,
+    top_k: int = 10,
+    k1: float = 1.2,
+    b: float = 0.75,
+) -> List[Dict[str, Any]]:
+    query_terms = _pure_tokenize_code(query)
+    if not query_terms or not documents:
+        return []
+
+    doc_tokens = [_pure_tokenize_code(d.get("content", "")) for d in documents]
+    doc_lens = [len(dt) for dt in doc_tokens]
+    avg_len = sum(doc_lens) / max(1, len(doc_lens))
+    num_docs = len(documents)
+
+    df: Dict[str, int] = collections.defaultdict(int)
+    for dt in doc_tokens:
+        for t in set(dt):
+            df[t] += 1
+
+    idfs: Dict[str, float] = {}
+    for t in set(query_terms):
+        df_t = df.get(t, 0)
+        idfs[t] = math.log(((num_docs - df_t + 0.5) / (df_t + 0.5)) + 1.0) if df_t else 0.0
+
+    scores = []
+    for idx, (doc, dt, d_len) in enumerate(zip(documents, doc_tokens, doc_lens)):
+        tf_map = collections.Counter(dt)
+        score = 0.0
+        for q in set(query_terms):
+            tf = tf_map.get(q, 0)
+            if tf > 0:
+                idf = idfs.get(q, 0.0)
+                denom = tf + k1 * (1.0 - b + b * (d_len / (avg_len or 1.0)))
+                score += idf * (tf * (k1 + 1.0)) / (denom or 1.0)
+        if score > 0:
+            content = doc.get("content", "")
+            first_pos = 0
+            low = content.lower()
+            for q in query_terms:
+                pos = low.find(q)
+                if pos >= 0:
+                    first_pos = pos
+                    break
+            snippet = content[max(0, first_pos - 40):first_pos + 160].replace("\n", " ")
+            scores.append({
+                "id": doc.get("id", str(idx)),
+                "path": doc.get("path", ""),
+                "score": round(score, 4),
+                "snippet": snippet,
+            })
+
+    scores.sort(key=lambda x: x["score"], reverse=True)
+    return scores[:top_k]
+
+
+def _pure_extract_symbols(path: str, content: str) -> Dict[str, Any]:
+    symbols = []
+    edges = []
+    file_stem = os.path.splitext(os.path.basename(path))[0] if path else "module"
+    for idx, line in enumerate((content or "").splitlines(), 1):
+        tr = line.strip()
+        if tr.startswith("def ") and "(" in tr:
+            name = tr[4:].split("(")[0].strip()
+            symbols.append({"name": name, "kind": "function", "line": idx, "path": path, "signature": tr})
+        elif tr.startswith("class ") and (":" in tr or "(" in tr or " " in tr[6:]):
+            name = tr[6:].split(":")[0].split("(")[0].split()[0].strip()
+            symbols.append({"name": name, "kind": "class", "line": idx, "path": path, "signature": tr})
+        elif tr.startswith("import ") or tr.startswith("from "):
+            parts = tr.split()
+            if len(parts) >= 2:
+                mod = parts[1] if parts[0] == "from" else parts[1].split(".")[0]
+                edges.append({"source": file_stem, "target": mod, "kind": "import"})
+    return {"symbols": symbols, "edges": edges}
+
+
 class RustCoreBridge:
     """Adaptive FFI/subprocess/PyO3 bridge to crates/tzero_core with pure-Python fallback."""
 
@@ -345,6 +429,23 @@ class RustCoreBridge:
         if self._pyo3_mod is not None and hasattr(self._pyo3_mod, "count_bpe_tokens"):
             return int(self._pyo3_mod.count_bpe_tokens(text, model_name))
         return _pure_count_bpe_tokens(text, model_name=model_name)
+
+    def bm25_search(
+        self,
+        documents: List[Dict[str, str]],
+        query: str,
+        top_k: int = 10,
+    ) -> List[Dict[str, Any]]:
+        if self._pyo3_mod is not None and hasattr(self._pyo3_mod, "bm25_search"):
+            return list(self._pyo3_mod.bm25_search(documents, query, top_k))
+        return _pure_bm25_search(documents, query, top_k=top_k)
+
+    def extract_symbols(self, path: str, content: str) -> Dict[str, Any]:
+        if self._pyo3_mod is not None and hasattr(self._pyo3_mod, "extract_symbols"):
+            res = self._pyo3_mod.extract_symbols(path, content)
+            if isinstance(res, dict):
+                return res
+        return _pure_extract_symbols(path, content)
 
 
 _GLOBAL_BRIDGE: Optional[RustCoreBridge] = None
