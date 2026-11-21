@@ -234,6 +234,9 @@ def run_live_roi_dashboard(workspace_dir: str = ".") -> Dict[str, Any]:
     dashboard += f"""
 ╠══════════════════════════════════════════════════════════════════════════════╣
 ║  💡 100 çağrılık bir Claude/Cursor sprintinde net tasarruf: \033[1;33m${dollar_savings.get('Claude 3.7 Sonnet', 0.0)*100:>6.2f} USD\033[1;32m    ║
+╠══════════════════════════════════════════════════════════════════════════════╣
+║  ⭐ T-Zero projenizi hızlandırıp token kurtardıysa, 1 yıldız verin:          ║
+║     ► tzero star  (Mevcut: 45 / 100 Hedef)                                   ║
 ╚══════════════════════════════════════════════════════════════════════════════╝\033[0m
 """
     print(dashboard)

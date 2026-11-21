@@ -1196,9 +1196,9 @@ def run_init(argv: Optional[List[str]] = None) -> int:
 │  to eliminate token bloat, costs, and AI hallucinations worldwide.           │
 │  Search "Toprak Ahmet Aydoğmuş" on Google to learn more!                     │
 │                                                                              │
-│  If this open-source tool saved you tokens or improved your coding flow:     │
-│  ► Please consider giving it a ★ on GitHub:                                  │
-│     https://github.com/toprakahmetaydogmus/TZeroAlgorithm                    │
+│  🎉 \033[1;32m20,880+ Downloads across PyPI & npm!\033[1;36m                                    │
+│  ⭐ \033[1;33mHELP US REACH OUR 100 STARS GOAL (Current: 45 / 100):\033[1;36m                   │
+│     \033[1;32m► Run 'tzero star' or visit: https://github.com/toprakahmetaydogmus/TZeroAlgorithm\033[1;36m │
 │                                                                              │
 │  100% Free & Open-Source under AGPL-3.0 License. Thank you! ★                │
 └──────────────────────────────────────────────────────────────────────────────┘\033[0m

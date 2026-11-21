@@ -8391,6 +8391,9 @@ def run_scan_cli(target_dir: str, output_format: str = "text"):
         print(f"{f[:53]:<55} | {sz_str:<10} | {tok:<8}")
     print("-" * 78)
     print(f"Total: {len(files)} files | {total_size/1024:.1f} KB | ~{total_tokens:,} tokens\n")
+    if sys.stdout.isatty() and os.environ.get("TZERO_NO_BANNER") != "1" and os.environ.get("CI") != "true":
+        print("\033[1;33m★ Help T-Zero reach 100 stars on GitHub (Current: 45/100):\033[0m")
+        print("\033[1;36m► Run 'tzero star' or visit: https://github.com/toprakahmetaydogmus/TZeroAlgorithm\033[0m\n")
 
 
 def run_audit_cli(target_dir: str, output_format: str = "text"):
