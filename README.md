@@ -2,7 +2,7 @@
 <!-- mcp-name: io.github.toprakahmetaydogmus/tzero -->
 <div align="center">
 
-# 🧠 T-Zero: Deterministic AST Context Compressor & MCP Server
+# T-Zero: Deterministic AST Context Compressor & MCP Server
 
 ### *Empirically Proven Token Optimization Engine, 21 Canonical MCP Tools (58 Runtime Tools), Real BPE Tokenizer Benchmarks & Pre-Flight Reality-Lock for AI Coding Assistants.*
 
@@ -29,7 +29,7 @@
 
 <br>
 
-### 🌟 Road to 100 GitHub Stars: Help Keep T-Zero 100% Free & Open-Source
+### Road to 100 GitHub Stars: Help Keep T-Zero 100% Free & Open-Source
 *Empirically proven token optimization engine for Cursor, Claude Code, Windsurf & Antigravity IDE.*
 
 [![Star on GitHub](https://img.shields.io/badge/%E2%AD%90%20Star%20on%20GitHub-Goal%3A%20100-f59e0b?style=for-the-badge&logo=github&logoColor=white)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)
@@ -45,7 +45,7 @@
 > 🚀 **Live Interactive Web Studio:** Test T-Zero AST compression, Zero-Leak security auditing, and token savings in real time on Hugging Face Spaces (powered by NVIDIA RTX 6000 Zero-GPU): **[huggingface.co/spaces/toprakke4/tzero-token-reducer](https://huggingface.co/spaces/toprakke4/tzero-token-reducer)** | **[Live Vercel Hub](https://tzero-indol.vercel.app)**
 
 > [!TIP]
-> ### 🤖 Ingesting or Inspecting This Project as an AI Agent?
+> ### Ingesting or Inspecting This Project as an AI Agent?
 > If a developer asks you to **"inspect this repository"**, **"summarize T-Zero"**, or **"how to use this"**:
 > - Read the standardized machine-readable summary: **[`llms.txt`](llms.txt)**
 > - Read the full autonomous agent inspection manual: **[`AI_INSPECTION.md`](AI_INSPECTION.md)**
@@ -55,7 +55,7 @@
 
 <a id="whats-new-in-v1200-turbo-rust-hybrid-core--multi-language-tree-sitter"></a>
 > [!NOTE]
-> ### 🦀 What's New in v12.0.0: Turbo Rust Hybrid Core & Multi-Language Tree-Sitter
+> ### What's New in v12.0.0: Turbo Rust Hybrid Core & Multi-Language Tree-Sitter
 > T-Zero now runs on a high-performance **dual-engine hybrid architecture**:
 > - **Native Rust Core (`crates/tzero_core`):** Zero-copy Tree-sitter AST pruning for Python, TypeScript, Rust, and Go; sub-millisecond BPE token counting with `tiktoken-rs` (>940,000 tokens/sec); and bitwise Shannon entropy secret scanning ($H \ge 4.75$ in <4.4ms).
 > - **Zero-Fail Pure-Python Fallback:** When native `.pyd` / `.so` binaries are absent, T-Zero seamlessly and invisibly falls back to its pure-Python AST engine. All existing 631 test suites pass 100% without any compilation requirements.
@@ -66,46 +66,46 @@
   </a>
 </p>
 
-### ⚡ 30-Second Quickstart
+### 30-Second Quickstart
 
 ```bash
-# 📦 Option A: Node.js / npx (Zero-Config Instant MCP Runner):
+# Option A: Node.js / npx (Zero-Config Instant MCP Runner):
 # Run directly in Claude Desktop, Cursor, Antigravity, Copilot:
 npx -y tzero-mcp@latest
 
 # Global CLI installation via npm:
 npm install -g tzero-mcp
 
-# 🐍 Option B: Python PyPI Package:
+# Option B: Python PyPI Package:
 pip install --upgrade tzero-mcp
 
-# 🌟 Option C: 1-Line Native Shell Installers:
+# Option C: 1-Line Native Shell Installers:
 # Linux / macOS / WSL:
 curl -fsSL https://raw.githubusercontent.com/toprakahmetaydogmus/TZeroAlgorithm/main/install.sh | bash
 # Windows (PowerShell):
 irm https://raw.githubusercontent.com/toprakahmetaydogmus/TZeroAlgorithm/main/install.ps1 | iex
 
-# 🐙 Option E: Git Clone & Source Checkout:
+# Option E: Git Clone & Source Checkout:
 git clone https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git
 cd TZeroAlgorithm
 python scripts/welcome.py    # Turnkey community welcome & git star reminder
 pip install -e .             # Editable dev install (auto-configures .githooks)
 
-# 🚀 1-Click Configure MCP in Cursor, Claude, Antigravity, Windsurf:
+# 1-Click Configure MCP in Cursor, Claude, Antigravity, Windsurf:
 tzero init
 
-# 📢 1-Click Viral Community Share Hub (Twitter, Reddit, Hacker News):
+# 1-Click Viral Community Share Hub (Twitter, Reddit, Hacker News):
 tzero share
 
-# 🖥️ Option D: Standalone Windows 64-Bit Executable Suite (Zero Dependencies):
+# Option D: Standalone Windows 64-Bit Executable Suite (Zero Dependencies):
 # Download all-in-one suite (.ZIP) with GUI, CLI, MCP Server & 1-Click Configurator:
 # https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/download/v12.1.0/TZero-v12.1.0-Windows-x64.zip
 
-# 🧩 Install VS Code / Cursor Extension (.vsix):
+# Install VS Code / Cursor Extension (.vsix):
 code --install-extension dist/tzero-vscode-12.1.0.vsix
 ```
 
-### 🧭 Navigation & Interactive Jump Stations
+### Navigation & Interactive Jump Stations
 
 [![Technical Whitepaper](https://img.shields.io/badge/%F0%9F%93%91%20Scientific%20Whitepaper-v10.7%20Specification-0284c7?style=for-the-badge&logo=googledocs&logoColor=white)](docs/WHITE_PAPER_TZERO_V10.md)
 [![T-Zero PC-Fixer](https://img.shields.io/badge/T--Zero%20PC--Fixer-12%2C200%2B%20Lines%20Doctor-purple?style=for-the-badge&logo=shield&logoColor=white)](https://github.com/toprakahmetaydogmus/tzero-pc-fixer)
@@ -136,13 +136,13 @@ code --install-extension dist/tzero-vscode-12.1.0.vsix
 ---
 
 <a id="why-t-zero"></a>
-## ⚡ Executive Summary: What is T-Zero?
+## Executive Summary: What is T-Zero?
 
 **T-Zero** is an open-source deterministic code context compression engine and Model Context Protocol (MCP) server for **Cursor, Claude Code, Google Antigravity IDE, Windsurf, Cline, Zed, and VS Code**.
 
 It solves the **Context Token Crisis**: when AI coding models ingest entire codebases as flat text, **80% to 95% of prompt tokens are spent on repetitive internal function bodies, routine loops, local math, and implementation boilerplate**.
 
-### 🥊 Context Architecture & Tool Comparison Matrix
+### Context Architecture & Tool Comparison Matrix
 
 | Dimension | Raw Prompt Ingestion (Cursor Composer / Claude) | Vector DB / Embedding RAG | Repomix (Packed File Concat) | Aider (Tree-Sitter Repo-Map) | T-Zero Deterministic AST Engine |
 | :--- | :---: | :---: | :---: | :---: | :---: |
@@ -160,7 +160,7 @@ It solves the **Context Token Crisis**: when AI coding models ingest entire code
 ---
 
 <a id="task-completion-benchmark"></a>
-## 🧪 Empirical Task-Completion & BPE Tokenizer Benchmark
+## Empirical Task-Completion & BPE Tokenizer Benchmark
 
 > **Key Architectural Question:** *Does signature-only context allow an AI coding agent to complete real-world tasks correctly, or does it cause hallucination?*
 
@@ -199,7 +199,7 @@ python tzero_task_benchmark.py
 ---
 
 <a id="language-support-breakdown"></a>
-## 🌐 Language Support Breakdown: AST vs. Heuristic Extraction
+## Language Support Breakdown: AST vs. Heuristic Extraction
 
 We believe in radical engineering transparency:
 
@@ -214,7 +214,7 @@ We believe in radical engineering transparency:
 ---
 
 <a id="universal-1-click-ide-setup"></a>
-## 🚀 Universal 1-Click IDE Setup (All Editors)
+## Universal 1-Click IDE Setup (All Editors)
 
 T-Zero automatically configures your editor in **1 second** using native Model Context Protocol (MCP) standards:
 
@@ -282,7 +282,7 @@ code --install-extension dist/tzero-vscode-12.1.0.vsix
 ---
 
 <a id="the-21-canonical-mcp-tools"></a>
-## 🛠️ The 21 Canonical MCP Tools (58 Runtime Tools)
+## The 21 Canonical MCP Tools (58 Runtime Tools)
 
 All 21 canonical tools (and 58 runtime tools) are audited and verified against the Model Context Protocol specifications (tested by `tests.test_mcp` and `tests.test_tdqs_anchor5`):
 
@@ -313,7 +313,7 @@ All 21 canonical tools (and 58 runtime tools) are audited and verified against t
 ---
 
 <a id="turbo-overdrive-burst-accelerator"></a>
-## ⚡🔥 Turbo Overdrive Burst Accelerator ("Kamçılama Modu")
+## Turbo Overdrive Burst Accelerator ("Kamçılama Modu")
 
 When scanning large codebases or generating deep AST context trees, disk latency or large file volumes can introduce processing delays.
 T-Zero features **Turbo Overdrive** — an adaptive latency sensor that detects slowdowns (>150ms or $\ge 15$ source files) and automatically engages burst acceleration:
@@ -336,7 +336,7 @@ tzero turbo clear
 ---
 
 <a id="autonomous-dynamic-subagent-swarm"></a>
-## 🐝 Autonomous Dynamic Subagent Decomposer & Swarm
+## Autonomous Dynamic Subagent Decomposer & Swarm
 
 When given a complex mission (e.g. *"Audit secrets, verify architectural boundaries, optimize database queries, and generate unit tests"*), T-Zero automatically:
 1. **Decomposes Composite Goals:** Identifies independent subtasks across security, architecture, performance, testing, and custom domains.
@@ -390,7 +390,7 @@ python scripts/comprehensive_tdqs_audit.py
 ---
 
 <a id="huggingface-space"></a>
-## 🤗 Hugging Face Spaces Live Web Application
+## Hugging Face Spaces Live Web Application
 
 Test T-Zero directly in your browser without installing anything locally via our official Gradio application:
 
@@ -412,7 +412,7 @@ tzero space
 ---
 
 <a id="pre-flight-reality-lock"></a>
-## ⚖️ Pre-Flight Reality-Lock (Static AST Verification & 0.0% Hallucination Proof)
+## Pre-Flight Reality-Lock (Static AST Verification & 0.0% Hallucination Proof)
 
 AI coding assistants frequently hallucinate non-existent methods (e.g., `math.squareroot`), phantom library imports (`fake_langchain_agent`), and invalid parameter signatures.
 
@@ -441,7 +441,7 @@ tzero --fix "import math; x = math.squareroot(25)"
 ---
 
 <a id="security-architecture"></a>
-## 🔒 Security Architecture: Deterministic Secret Scanner
+## Security Architecture: Deterministic Secret Scanner
 
 ### OS-Native Credential Storage:
 T-Zero uses platform-native secret vaults:
@@ -459,7 +459,7 @@ T-Zero uses platform-native secret vaults:
 ---
 
 <a id="reproducible-benchmarks"></a>
-## 📊 Multi-Model Financial ROI Benchmarks
+## Multi-Model Financial ROI Benchmarks
 
 Empirical measurements conducted across real software repositories comparing raw prompt context injection against T-Zero AST-pruned context:
 
@@ -478,7 +478,7 @@ Empirical measurements conducted across real software repositories comparing raw
 
 <a id="global-ecosystem"></a>
 <a id="turkce"></a>
-## 🌐 Global Ecosystem & Multilingual Architecture
+## Global Ecosystem & Multilingual Architecture
 
 T-Zero is engineered from the ground up for global software engineering teams, supporting cross-platform operating systems and international coding standards.
 
@@ -508,7 +508,7 @@ tzero local-ci --install-hook
 ```
 
 <a id="tzero-local-ci"></a>
-## ⚡ T-Zero Local CI & Pre-Push Verification Shield ($0 Quota Burn)
+## T-Zero Local CI & Pre-Push Verification Shield ($0 Quota Burn)
 
 Stop burning GitHub Actions runner minutes and waiting minutes for remote build results. **T-Zero Local CI** executes a complete 7-gate verification pipeline locally in **<10 seconds** before code ever reaches remote repositories:
 
@@ -532,7 +532,7 @@ Stop burning GitHub Actions runner minutes and waiting minutes for remote build 
 ════════════════════════════════════════════════════════════════════════
 ```
 
-### 🛠️ CLI & Standalone Executable Usage
+### CLI & Standalone Executable Usage
 ```bash
 # Run fast verification battery (seconds):
 tzero local-ci --quick
@@ -552,7 +552,7 @@ tzero local-ci --install-hook
 ```
 
 <a id="tzero-pc-fixer"></a>
-## 🩺 T-Zero PC-Fixer & Codebase Doctor: The 12,600+ Line Autonomous Self-Healing Monolith
+## T-Zero PC-Fixer & Codebase Doctor: The 12,600+ Line Autonomous Self-Healing Monolith
 
 <div align="center">
 
@@ -568,7 +568,7 @@ tzero local-ci --install-hook
 
 **T-Zero PC-Fixer** is an autonomous, zero-dependency operating system doctor and static AST self-healing engine compiled into a single 12,600+ line Python monolith (`tzero_pc_fixer.py`). It diagnoses and surgically cures broken developer workstations, memory leaks, orphaned zombie processes, contaminated environments, and static codebase defects with $0.00 cloud cost.
 
-### 🚀 1-Click Zero-Dependency Installers
+### 1-Click Zero-Dependency Installers
 
 **Windows (PowerShell 5.1+ / 7+):**
 ```powershell
@@ -580,7 +580,7 @@ irm https://raw.githubusercontent.com/toprakahmetaydogmus/tzero-pc-fixer/main/in
 curl -fsSL https://raw.githubusercontent.com/toprakahmetaydogmus/tzero-pc-fixer/main/install.sh | bash
 ```
 
-### 🧰 Autonomous Healing Capabilities:
+### Autonomous Healing Capabilities:
 - **🖥️ Hardware & Process Surgeon:** Hunts runaway compiler/Node.js zombie processes, clears swap memory, verifies disk partition health, and unblocks port collisions (e.g. 8000, 3000, 5000, 8080).
 - **🐍 Python & Virtual Environment Doctor:** Detects broken symlinks, repairing contaminated `sys.path`, corrupted wheel caches, and Microsoft Store Python PATH hijacking.
 - **🛡️ CWE-78 & CWE-327 Static AST Remediator:** Rewrites dangerous `subprocess.Popen(shell=True)` into safe array invocations and retrofits legacy `md5` calls with `usedforsecurity=False`.
@@ -589,7 +589,7 @@ curl -fsSL https://raw.githubusercontent.com/toprakahmetaydogmus/tzero-pc-fixer/
 
 ---
 
-## 💖 Support Open-Source Innovation: Keep T-Zero 100% Free
+## Support Open-Source Innovation: Keep T-Zero 100% Free
 
 Hi! I'm **Toprak Ahmet Aydoğmuş** from Siber Akademi. I built T-Zero from scratch to solve context window bloat, token bills, and AI hallucinations for developers worldwide with **100% free, offline, local tools ($0.00 cloud cost)**.
 
@@ -612,7 +612,7 @@ T-Zero has no venture capital backing, no paywalls, and no telemetry tracking. I
 
 <div align="center">
 
-### 🚀 1-Click Community Share Hub
+### 1-Click Community Share Hub
 Help us reach our **100 Stars Milestone**! Share T-Zero with your network in one click:
 
 [![Share on X](https://img.shields.io/badge/Share%20on-X%20%2F%20Twitter-000000?style=for-the-badge&logo=x&logoColor=white)](https://twitter.com/intent/tweet?text=T-Zero%3A%20Deterministic%20AST%20Context%20Compressor%20%26%20MCP%20Server%20cutting%20AI%20prompt%20tokens%20by%20up%20to%2095%25.%20Built%20by%20Toprak%20Ahmet%20Aydo%C4%9Fmu%C5%9F%20(Siber%20Akademi).&url=https%3A%2F%2Fgithub.com%2Ftoprakahmetaydogmus%2FTZeroAlgorithm&hashtags=CursorAI,ClaudeAI,MCP,OpenSource)
@@ -630,7 +630,7 @@ Help us reach our **100 Stars Milestone**! Share T-Zero with your network in one
 
 ---
 
-## 📈 Star History
+## Star History
 
 Join the revolution in context engineering and deterministic token pruning!
 
@@ -644,7 +644,7 @@ Join the revolution in context engineering and deterministic token pruning!
 
 ---
 
-## 📜 License & Siberian Academy
+## License & Siberian Academy
 
 - **Author & Architect:** Toprak Ahmet Aydoğmuş (Lead Software Engineer & Architect, Siber Akademi)
 - **LinkedIn:** [Toprak Ahmet Aydoğmuş](https://linkedin.com/in/toprak-ahmet-aydo%C4%9Fmu%C5%9F-60462534b/)

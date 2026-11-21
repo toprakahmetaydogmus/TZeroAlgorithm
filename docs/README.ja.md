@@ -1,4 +1,4 @@
-# ⚡ T-Zero コンテキストアーキテクト & MCP サーバー (Token 削減エンジン)
+# T-Zero コンテキストアーキテクト & MCP サーバー (Token 削減エンジン)
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/toprakahmetaydogmus/TZeroAlgorithm/main/benchmark-site/favicon.svg" width="128" height="128" alt="T-Zero Logo" /><br>
@@ -32,7 +32,7 @@
 
 ---
 
-## 🌟 主な機能と特長
+## 主な機能と特長
 
 1. **決定的 AST 構文木プルーニング (DAG-AC):**
    - 従来のプロンプトでは関数の実装やループなどの余分なコードでトークン枠を浪費します。
@@ -49,7 +49,7 @@
 
 ---
 
-## ⚡ 30 秒クイックスタート
+## 30 秒クイックスタート
 
 ### 選択肢 A: npx による即時起動（インストール不要・推奨）
 ```bash
@@ -81,7 +81,7 @@ tzero init
 
 ---
 
-## 🔌 Cursor & Claude Desktop 設定方法
+## Cursor & Claude Desktop 設定方法
 
 設定ファイルに以下を追記するだけで即座に連携可能です：
 
@@ -111,7 +111,7 @@ tzero init
 
 ---
 
-## 📊 ベンチマーク検証 (Claude 3.5 Sonnet / GPT-4o / DeepSeek)
+## ベンチマーク検証 (Claude 3.5 Sonnet / GPT-4o / DeepSeek)
 
 | 検証項目 (10,000 行コードベース) | 生のコード | T-Zero 圧縮後 | 削減率 | 1リクエストあたりの節約コスト |
 | :--- | :---: | :---: | :---: | :---: |
@@ -122,7 +122,7 @@ tzero init
 
 ---
 
-## 🛠️ よく使う CLI コマンド
+## よく使う CLI コマンド
 
 | コマンド | 説明 |
 | :--- | :--- |
@@ -136,7 +136,7 @@ tzero init
 
 ---
 
-## 🤝 開発者 & ライセンス
+## 開発者 & ライセンス
 
 - **作者:** Toprak Ahmet Aydoğmuş ([Siber Akademi](https://github.com/toprakahmetaydogmus))
 - **ライセンス:** AGPL-3.0-only
@@ -144,7 +144,7 @@ tzero init
 
 ---
 
-## 📈 スター推移 (Star History)
+## スター推移 (Star History)
 
 <div align="center">
   <a href="https://star-history.com/#toprakahmetaydogmus/TZeroAlgorithm&Date">

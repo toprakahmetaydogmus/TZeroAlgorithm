@@ -10,7 +10,7 @@
 
 ---
 
-## 🏗 Mimari Genel Bakış
+## Mimari Genel Bakış
 
 T-Zero Context Architect, **tek dosya mimarisinde** (monolithic single-file) tasarlanmıştır. Bu yaklaşım:
 - Çift tıkla çalıştırmayı kolaylaştırır
@@ -54,7 +54,7 @@ T-Zero Context Architect, **tek dosya mimarisinde** (monolithic single-file) tas
 
 ---
 
-## 🎨 Tema Sistemi
+## Tema Sistemi
 
 3 önceden tanımlı tema paleti + özel renk seçici:
 
@@ -68,7 +68,7 @@ Her tema 11 renk değişkeni tanımlar: `bg_start`, `card_bg`, `card_border`, `c
 
 ---
 
-## 🔐 Güvenlik Mimarisi
+## Güvenlik Mimarisi
 
 ### Keyring Entegrasyonu
 - API anahtarları `keyring` kütüphanesi ile OS-native credential store'da saklanır
@@ -87,7 +87,7 @@ Her tema 11 renk değişkeni tanımlar: `bg_start`, `card_bg`, `card_border`, `c
 
 ---
 
-## 📊 Token Yönetimi
+## Token Yönetimi
 
 ### TokenReducer Stratejileri
 
@@ -105,7 +105,7 @@ Her tema 11 renk değişkeni tanımlar: `bg_start`, `card_bg`, `card_border`, `c
 
 ---
 
-## 🛠 Geliştirme Süreci
+## Geliştirme Süreci
 
 ### Aşama 1: Temel Altyapı
 - ConfigManager sınıfı (profil CRUD, JSON persistance)
@@ -137,7 +137,7 @@ Her tema 11 renk değişkeni tanımlar: `bg_start`, `card_bg`, `card_border`, `c
 
 ---
 
-## 📈 Proje İstatistikleri
+## Proje İstatistikleri
 
 | Metrik | Değer |
 |--------|-------|
@@ -151,7 +151,7 @@ Her tema 11 renk değişkeni tanımlar: `bg_start`, `card_bg`, `card_border`, `c
 
 ---
 
-## ✅ Test Kontrol Listesi
+## Test Kontrol Listesi
 
 - [x] Uygulama hatasız başlatılıyor
 - [x] Tema değişimi çalışıyor

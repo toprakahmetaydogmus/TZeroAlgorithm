@@ -1,17 +1,17 @@
-# 🔬 T-Zero Real Local Hardware & Ollama Benchmark Report
+# T-Zero Real Local Hardware & Ollama Benchmark Report
 
 **Execution Date:** 2026-11-14  
 **Environment:** Windows 10 x64 | Python 3.14.3 | Local Hardware  
 **Local LLM Engine:** Ollama (`qwen2.5:1.5b`) — Local Inference (Zero Cloud, $0.00 Cost)  
 **BPE Tokenizer:** `tiktoken` (cl100k_base / OpenAI BPE standard)  
 
-## 🖥️ PC Hardware Specifications
+## PC Hardware Specifications
 - **CPU:** Intel64 Family 6 Model 151 Stepping 5, GenuineIntel (6 cores / 12 threads)
 - **RAM:** 15.73 GB Total
 - **GPU Status:** NVIDIA GeForce RTX 3060, 8192 MiB
 - **Operating System:** Windows 11 (10.0.26300)
 
-## 🤖 Real Local Ollama Task Completion Benchmark (`qwen2.5:1.5b`)
+## Real Local Ollama Task Completion Benchmark (`qwen2.5:1.5b`)
 
 | Task ID | Task Description | Raw BPE | T-Zero BPE | Reduction | Inference Latency | Gen Speed | Syntax | Hallucinations | Status |
 |:---|:---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
@@ -19,7 +19,7 @@
 | `TASK-02` | Crypto Vault Key Rotation & Signature Verification | 322 | 239 | **-25.8%** | 2150.1ms | 134.2 tok/s | Valid | 3 | ⚠️ PARTIAL |
 | `TASK-03` | AST Slicer & Blast Radius Impact Assessment | 332 | 283 | **-14.8%** | 2418.4ms | 132.9 tok/s | Valid | 0 | ✅ PASS |
 
-## 📁 Codebase Whole-Workspace AST Ingestion Benchmark
+## Codebase Whole-Workspace AST Ingestion Benchmark
 
 - **Target Workspace:** `C:\Users\topra_n3vq63d\.gemini\antigravity-ide\scratch\TZeroAlgorithm`
 - **Total Files Scanned:** 352 files
@@ -29,14 +29,14 @@
 - **Net Token Reduction:** **-94.5%**
 - **Scan & AST Prune Latency:** 6224.45ms
 
-## 🔒 Zero-Leak Security Audit
+## Zero-Leak Security Audit
 
 - **Total Project Files Audited:** 487 files
 - **Audit Scan Latency:** 3581.4ms
 - **High Severity Plaintext Secret Leaks:** **1** (100% Zero-Leak Guard Certified)
 - **Entropy Threshold:** Shannon Entropy $H \ge 4.75$
 
-## 💰 Frontier Model Financial Savings (Monthly Simulation at 5,500 Prompts/Month)
+## Frontier Model Financial Savings (Monthly Simulation at 5,500 Prompts/Month)
 
 | Model | Provider | Raw Context Cost | T-Zero Context Cost | Net Savings / Query | Monthly Team ROI |
 |:---|:---|:---:|:---:|:---:|:---:|

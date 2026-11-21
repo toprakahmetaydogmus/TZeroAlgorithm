@@ -1,4 +1,4 @@
-# ⚡ T-Zero 语境架构师与 MCP 服务器 (Token 归零)
+# T-Zero 语境架构师与 MCP 服务器 (Token 归零)
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/toprakahmetaydogmus/TZeroAlgorithm/main/benchmark-site/favicon.svg" width="128" height="128" alt="T-Zero Logo" /><br>
@@ -32,7 +32,7 @@
 
 ---
 
-## 🌟 核心特性与优势
+## 核心特性与优势
 
 1. **确定性 AST 语法树剪枝 (DAG-AC):**
    - 传统大模型读取代码时会将循环体、实现细节、模板原封不动输入，浪费海量 Token。
@@ -49,7 +49,7 @@
 
 ---
 
-## ⚡ 30 秒极速上手
+## 30 秒极速上手
 
 ### 选项 A: 零安装通过 npx 即刻运行 (推荐 Cursor / Claude Desktop)
 ```bash
@@ -81,7 +81,7 @@ tzero init
 
 ---
 
-## 🔌 Cursor & Claude Desktop 配置说明
+## Cursor & Claude Desktop 配置说明
 
 直接将以下内容添加到你的配置文件中即可无缝使用：
 
@@ -111,7 +111,7 @@ tzero init
 
 ---
 
-## 📊 权威基准测试 (Claude 3.5 Sonnet / GPT-4o / DeepSeek)
+## 权威基准测试 (Claude 3.5 Sonnet / GPT-4o / DeepSeek)
 
 | 测试项目 (10,000 行代码库) | 原始上下文 | T-Zero 压缩后 | 节省比例 | 单次交互节省费用 |
 | :--- | :---: | :---: | :---: | :---: |
@@ -122,7 +122,7 @@ tzero init
 
 ---
 
-## 🛠️ CLI 常用指令速查
+## CLI 常用指令速查
 
 | 指令 | 作用 |
 | :--- | :--- |
@@ -136,7 +136,7 @@ tzero init
 
 ---
 
-## 🤝 开源与贡献
+## 开源与贡献
 
 - **项目作者:** Toprak Ahmet Aydoğmuş ([Siber Akademi](https://github.com/toprakahmetaydogmus))
 - **开源许可证:** AGPL-3.0-only
@@ -144,7 +144,7 @@ tzero init
 
 ---
 
-## 📈 Star History
+## Star History
 
 <div align="center">
   <a href="https://star-history.com/#toprakahmetaydogmus/TZeroAlgorithm&Date">

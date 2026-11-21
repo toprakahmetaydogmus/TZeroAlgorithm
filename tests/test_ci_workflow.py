@@ -153,6 +153,31 @@ class TestCIWorkflow(unittest.TestCase):
         self.assertTrue(hasattr(siber_akademi_icon, "apply_window_icon"))
         self.assertTrue(hasattr(siber_akademi_icon, "SIBER_AKADEMI_ICO_BASE64"))
 
+    def test_no_markdown_headings_start_with_emojis(self):
+        import re
+        from scripts.remove_heading_emojis import MD_HEADING_RE
+
+        target_files = [
+            ROOT_DIR / "README.md",
+            ROOT_DIR / "docs" / "README.tr.md",
+            ROOT_DIR / "docs" / "README.ja.md",
+            ROOT_DIR / "docs" / "README.zh.md",
+            ROOT_DIR / "AI_INSPECTION.md",
+            ROOT_DIR / "GEMINI.md",
+            ROOT_DIR / "AGENTS.md",
+        ]
+        violations = []
+        for p in target_files:
+            in_code = False
+            for line_no, line in enumerate(p.read_text(encoding="utf-8").splitlines(), start=1):
+                if line.strip().startswith("```"):
+                    in_code = not in_code
+                    continue
+                if not in_code and re.match(r"^\s*#{1,6}\s+", line):
+                    if MD_HEADING_RE.match(line):
+                        violations.append(f"{p.name}:{line_no} -> {line}")
+        self.assertEqual(violations, [], f"Found headings starting with emojis: {violations}")
+
     def test_all_github_yaml_files_are_valid(self):
         for path in (ROOT_DIR / ".github").rglob("*.yml"):
             content = path.read_text(encoding="utf-8")

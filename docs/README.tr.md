@@ -25,7 +25,7 @@
 
 <br>
 
-### 🌟 100 Yıldız Yolculuğu: T-Zero'yu %100 Ücretsiz ve Açık Kaynak Tutmamıza Destek Olun!
+### 100 Yıldız Yolculuğu: T-Zero'yu %100 Ücretsiz ve Açık Kaynak Tutmamıza Destek Olun!
 *Cursor, Claude Code, Windsurf ve Antigravity IDE için ampirik olarak kanıtlanmış deterministik AST token sıkıştırma motoru.*
 
 [![GitHub'da Yıldızla](https://img.shields.io/badge/%E2%AD%90%20GitHub'da%20Y%C4%B1ld%C4%B1zla-Hedef%3A%20100-f59e0b?style=for-the-badge&logo=github&logoColor=white)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)
@@ -41,7 +41,7 @@
 ---
 
 <a id="turkce"></a>
-## 🇹🇷 Türkçe Dokümantasyon
+## Türkçe Dokümantasyon
 
 T-Zero (Token Zero), yapay zeka kodlama asistanları (Cursor, Claude Desktop, Antigravity IDE, Windsurf, Cline, VS Code, Zed) için geliştirilmiş, **deterministik AST bağlam sıkıştırıcısı ve Model Context Protocol (MCP) sunucusudur**.
 
@@ -62,48 +62,48 @@ Yapay zeka modellerine tüm kaynak kodlar metin olarak verildiğinde, fonksiyon 
 - **Bilimsel ve Teknik Whitepaper:** [WHITE_PAPER_TZERO_V10.md](WHITE_PAPER_TZERO_V10.md) (Matematiksel ispatlar, DAG-AC sıkıştırma ve Reality-Lock analizi)
 - **Hugging Face Canlı Demo:** [https://huggingface.co/spaces/toprakke4/tzero-token-reducer](https://huggingface.co/spaces/toprakke4/tzero-token-reducer)
 
-### ⚡ 30 Saniyede Hızlı Kurulum
+### 30 Saniyede Hızlı Kurulum
 
 ```bash
-# 📦 Seçenek A: Node.js / npx ile Anında Çalıştırma (Sıfır Kurulum):
+# Seçenek A: Node.js / npx ile Anında Çalıştırma (Sıfır Kurulum):
 # Cursor, Claude Desktop, Antigravity, Copilot için:
 npx -y tzero-mcp@latest
 
 # Global NPM CLI Kurulumu:
 npm install -g tzero-mcp
 
-# 🐍 Seçenek B: Python pip ile Kurulum:
+# Seçenek B: Python pip ile Kurulum:
 pip install --upgrade tzero-mcp
 
-# 🌟 Seçenek C: Tek Satır Otomatik Yükleyici:
+# Seçenek C: Tek Satır Otomatik Yükleyici:
 # Linux / macOS: curl -fsSL https://raw.githubusercontent.com/toprakahmetaydogmus/TZeroAlgorithm/main/install.sh | bash
 # Windows:       irm https://raw.githubusercontent.com/toprakahmetaydogmus/TZeroAlgorithm/main/install.ps1 | iex
 
-# 🐙 Seçenek D: Git Clone ile Doğrudan Kaynak Koddan Çalışma:
+# Seçenek D: Git Clone ile Doğrudan Kaynak Koddan Çalışma:
 git clone https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git
 cd TZeroAlgorithm
 python scripts/welcome.py    # Hoş geldin & otomatik git hook yıldız hatırlatıcı
 pip install -e .             # Geliştirici modu (.githooks otomatik aktifleşir)
 
-# 🚀 Tek Tıkla IDE'leri (Cursor, Claude, Windsurf, VS Code) Bağla:
+# Tek Tıkla IDE'leri (Cursor, Claude, Windsurf, VS Code) Bağla:
 tzero init
 
-# 📢 Tek Tıkla Topluluk Paylaşım Merkezi (Twitter, Reddit, Hacker News):
+# Tek Tıkla Topluluk Paylaşım Merkezi (Twitter, Reddit, Hacker News):
 tzero share
 
-# 🧩 VS Code / Cursor Eklentisini (.vsix) Yükle:
+# VS Code / Cursor Eklentisini (.vsix) Yükle:
 code --install-extension dist/tzero-vscode-12.1.0.vsix
 
-# ⚡ Yerel CI ve Pre-Push Korumasını Çalıştır ($0 Kota):
+# Yerel CI ve Pre-Push Korumasını Çalıştır ($0 Kota):
 tzero local-ci --quick
 
-# 🛡️ Otomatik Git Pre-Push Hook Kur (Hatalı push'ları engeller):
+# Otomatik Git Pre-Push Hook Kur (Hatalı push'ları engeller):
 tzero local-ci --install-hook
 ```
 
 ---
 
-## ⚡ T-Zero Local CI: Sıfır Kota Tüketimiyle Yerel Doğrulama
+## T-Zero Local CI: Sıfır Kota Tüketimiyle Yerel Doğrulama
 
 GitHub Actions dakikalarını yakıp uzakta hata beklemenin önüne geçin! **T-Zero Local CI**, uzaktaki tüm testleri yerel makinenizde **<10 saniyede** çalıştırır:
 
@@ -114,7 +114,7 @@ GitHub Actions dakikalarını yakıp uzakta hata beklemenin önüne geçin! **T-
 
 ---
 
-## 💖 Açık Kaynak İnovasyonu Destekleyin: T-Zero'yu %100 Ücretsiz Tutun
+## Açık Kaynak İnovasyonu Destekleyin: T-Zero'yu %100 Ücretsiz Tutun
 
 Merhaba! Ben **Toprak Ahmet Aydoğmuş**, Siber Akademi'den. T-Zero'yu sıfırdan, yapay zeka kodlama araçlarındaki bağlam şişkinliğini, token maliyetlerini ve halüsinasyonları çözmek için **%100 yerel, çevrimdışı ve ücretsiz ($0 maliyet)** olarak geliştirdim.
 
@@ -137,7 +137,7 @@ T-Zero'nun hiçbir risk sermayesi fonu, ücretli aboneliği veya telemetri takib
 
 <div align="center">
 
-### 🚀 Tek Tıkla Topluluk Paylaşımı
+### Tek Tıkla Topluluk Paylaşımı
 **100 Yıldız Hedefimize** ulaşmamıza destek olun! T-Zero'yu tek tıkla paylaşın:
 
 [![X'te Paylaş](https://img.shields.io/badge/Payla%C5%9F-X%20%2F%20Twitter-000000?style=for-the-badge&logo=x&logoColor=white)](https://twitter.com/intent/tweet?text=T-Zero%3A%20Yapay%20zeka%20kodlama%20ara%C3%A7lar%C4%B1nda%20token%20israf%C4%B1n%C4%B1%20%2595%20azaltan%20yerel%20AST%20ba%C4%9Flam%20motoru.%20Geli%C5%9Ftirici%3A%20Toprak%20Ahmet%20Aydo%C4%9Fmu%C5%9F%20(Siber%20Akademi).&url=https%3A%2F%2Fgithub.com%2Ftoprakahmetaydogmus%2FTZeroAlgorithm&hashtags=CursorAI,ClaudeAI,MCP,OpenSource)
@@ -155,7 +155,7 @@ T-Zero'nun hiçbir risk sermayesi fonu, ücretli aboneliği veya telemetri takib
 
 ---
 
-## 📈 Yıldız Geçmişi (Star History)
+## Yıldız Geçmişi (Star History)
 
 <div align="center">
 

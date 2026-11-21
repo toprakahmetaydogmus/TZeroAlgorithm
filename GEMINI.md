@@ -4,7 +4,7 @@ Hoş geldiniz! Bu proje **T-Zero (Token Zero)** kurumsal seviye context mühendi
 
 ---
 
-## 📱 Uzaktan Erişim (Antigravity Remote / Telefon & Web)
+## Uzaktan Erişim (Antigravity Remote / Telefon & Web)
 
 Bu proje Google Antigravity için resmi workspace olarak yapılandırılmıştır:
 - **Web / Telefon Bağlantı Adresi:** [https://antigravity.google.com](https://antigravity.google.com)
@@ -17,7 +17,7 @@ Telefonunuzdan veya herhangi bir tarayıcıdan `https://antigravity.google.com` 
 
 ---
 
-## 🛠 Temel Komutlar ve Testler
+## Temel Komutlar ve Testler
 
 - **Tüm Testleri Çalıştırma (628 Test, 100% Pass):**
   ```powershell
@@ -48,7 +48,7 @@ Telefonunuzdan veya herhangi bir tarayıcıdan `https://antigravity.google.com` 
 
 ---
 
-## 🔒 Güvenlik ve Kurallar
+## Güvenlik ve Kurallar
 
 1. **%100 Ücretsiz:** Hiçbir harici ücretli API kullanılmaz; tüm AST, BM25 ve token hesaplama araçları yerel/çevrimdışı çalışır.
 2. **Sıfır-Sızıntı (Zero-Leak):** Gizli anahtarlar, tokenlar veya kimlik bilgileri commit edilmez veya dışarı sızdırılmaz.

@@ -1,10 +1,10 @@
-# ⚡ T-Zero GitHub Action & Pre-Commit Integration Guide
+# T-Zero GitHub Action & Pre-Commit Integration Guide
 
 Automate **100% Zero-Leak Security**, **Pre-Flight Reality-Lock (Anti-Hallucination)**, and **AST Context Pruning** in your CI/CD pipelines in seconds with **$0.00 cloud cost**.
 
 ---
 
-## 🚀 1. GitHub Action CI Pipeline (10 Seconds)
+## 1. GitHub Action CI Pipeline (10 Seconds)
 
 Add a new workflow to your repository at `.github/workflows/tzero-gate.yml`:
 
@@ -33,7 +33,7 @@ jobs:
           audit-level: strict
 ```
 
-### 🎯 What Happens on Every Pull Request:
+### What Happens on Every Pull Request:
 1. **Zero-Leak Security Scan:** Deterministically audits added lines against Shannon Entropy ($H \ge 4.75$) and 50+ API key signatures (OpenAI, Anthropic, Gemini, AWS, Stripe, Groq, OpenRouter, Perplexity, NPM, etc.).
 2. **Pre-Flight Reality-Lock:** Verifies that no ghost packages or hallucinated workspace symbols were introduced by AI coding tools or copy-paste.
 3. **Blast Radius Computation:** Calculates downstream caller impact (0-100 score) on modified classes and functions.
@@ -47,7 +47,7 @@ jobs:
 
 ---
 
-## 🔒 2. Pre-Commit Hook Integration
+## 2. Pre-Commit Hook Integration
 
 If you use the popular `pre-commit` framework in your repository, add T-Zero to `.pre-commit-config.yaml`:
 
@@ -71,7 +71,7 @@ Now, every `git commit` will automatically pass through the T-Zero Reality-Lock 
 
 ---
 
-## 🛠 3. Local CLI Usage
+## 3. Local CLI Usage
 
 Run manual review on uncommitted changes:
 ```bash

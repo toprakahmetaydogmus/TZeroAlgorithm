@@ -1,4 +1,4 @@
-# 🗺️ T-Zero Master Product & Innovation Roadmap (V10.2.0 Sovereign Edition)
+# T-Zero Master Product & Innovation Roadmap (V10.2.0 Sovereign Edition)
 
 *Engine: Siber Akademi T-Zero Context Architect*  
 *Lead Architect: Toprak Ahmet Aydoğmuş*  
@@ -6,7 +6,7 @@
 
 ---
 
-## 🚀 Milestone 1: Instant Productivity & DX ✅ [SHIPPED & PRODUCTION READY]
+## Milestone 1: Instant Productivity & DX ✅ [SHIPPED & PRODUCTION READY]
 
 ### 1. `tzero sync` — Autonomous Multi-IDE Rules & Context Synchronizer ✅
 - **Implemented in:** `tzero_sync.py` & CLI `tzero sync`
@@ -35,7 +35,7 @@
 
 ---
 
-## 🧠 Milestone 2: Instruction Drift & Pre-Flight Intelligence ✅ [SHIPPED & PRODUCTION READY]
+## Milestone 2: Instruction Drift & Pre-Flight Intelligence ✅ [SHIPPED & PRODUCTION READY]
 
 ### 4. `tzero drift` — Quantitative Instruction & Architecture Drift Scorer ✅
 - **Implemented in:** `tzero_drift.py` & CLI `tzero drift`
@@ -62,7 +62,7 @@
 
 ---
 
-## 🌐 Milestone 3: Ecosystem & Cross-Language Bridges ✅ [SHIPPED & PRODUCTION READY]
+## Milestone 3: Ecosystem & Cross-Language Bridges ✅ [SHIPPED & PRODUCTION READY]
 
 ### 7. `tzero pr-bot` — Turnkey GitHub PR Intelligence Reporter ✅
 - **Implemented in:** CLI `tzero --pr-report [REF]` & `.github/workflows/`
@@ -97,7 +97,7 @@
 
 ---
 
-## 🔮 Next Frontier: Milestone 4 (Autonomous Swarm & Deep Reasoning)
+## Next Frontier: Milestone 4 (Autonomous Swarm & Deep Reasoning)
 
 1. **`tzero agent-kernel`** — Direct WASM execution sandbox for offline AST transformations.
 2. **`tzero lsp`** — Standalone Language Server Protocol daemon for instant inline AST token hints in Neovim, Emacs, and Sublime Text.

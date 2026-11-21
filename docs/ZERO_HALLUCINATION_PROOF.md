@@ -1,4 +1,4 @@
-# 🧠 T-Zero Zero-Hallucination Formal Mathematical & Empirical Proof
+# T-Zero Zero-Hallucination Formal Mathematical & Empirical Proof
 
 > **Research & Engineering Report**  
 > **Author:** Toprak Ahmet Aydoğmuş (Siber Akademi)  

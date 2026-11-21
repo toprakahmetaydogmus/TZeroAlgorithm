@@ -1,4 +1,4 @@
-# 📑 T-ZERO (TOKEN ZERO): DETERMINISTIC AST CONTEXT ENGINEERING & ZERO-LEAK SECURITY MATRIX
+# T-ZERO (TOKEN ZERO): DETERMINISTIC AST CONTEXT ENGINEERING & ZERO-LEAK SECURITY MATRIX
 ### Technical Whitepaper & Architectural Specification — Version 10.7
 **Author:** Toprak Ahmet Aydoğmuş (Siber Akademi)  
 **Affiliation:** Siber Akademi Open-Source AI Research Lab  

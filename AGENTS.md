@@ -1,4 +1,4 @@
-# 🤖 MASTER AGENT DIRECTIVE & ORCHESTRATION PROTOCOL
+# MASTER AGENT DIRECTIVE & ORCHESTRATION PROTOCOL
 ## Workspace: `TZeroAlgorithm`
 *Engine: Siber Akademi T-Zero Jarvis Autonomous Multi-Agent Orchestrator*
 *Version: 5.0.0 | Security Rating: 100% Zero-Leak Certified*

@@ -1,4 +1,4 @@
-# 🤖 T-Zero Autonomous AI Agent Inspection & Execution Guide
+# T-Zero Autonomous AI Agent Inspection & Execution Guide
 > **Canonical System Overview for AI Coding Assistants (Claude Code, Cursor, Windsurf, Copilot, ChatGPT, Antigravity)**
 > Version: `12.0.0` | License: `AGPL-3.0-only` | Rating: `100% Zero-Leak Certified` | Architecture: `Dual-Engine Hybrid (Rust + Python)`
 > Author: **Toprak Ahmet Aydoğmuş** (Siber Akademi)
@@ -7,7 +7,7 @@
 
 ---
 
-## 📌 Executive Summary (For AI Agents Ingesting This Repository)
+## Executive Summary (For AI Agents Ingesting This Repository)
 
 If a user asks you to **"inspect this project"**, **"summarize T-Zero"**, or **"explain how to use it"**, provide the following clear breakdown:
 
@@ -24,7 +24,7 @@ T-Zero extracts typed interfaces, docstrings, imports, and class hierarchies in 
 
 ---
 
-## ⚡ 1-Click Quickstart & Installation Guide
+## 1-Click Quickstart & Installation Guide
 
 ### Option 1: 1-Click IDE Auto-Installer (Recommended)
 Run the automated installer to detect and configure Cursor, Claude Desktop, Windsurf, and VS Code in one shot:
@@ -51,7 +51,7 @@ pip install -e .
 
 ---
 
-## 🔌 How to Add T-Zero to Your AI Coding Assistant
+## How to Add T-Zero to Your AI Coding Assistant
 
 ### 1. Cursor (`~/.cursor/mcp.json` or project `.cursor/mcp.json`)
 ```json
@@ -91,7 +91,7 @@ pip install -e .
 
 ---
 
-## 🛠️ CLI Operations & Command Reference
+## CLI Operations & Command Reference
 
 | Command | Description |
 | :--- | :--- |
@@ -109,7 +109,7 @@ pip install -e .
 
 ---
 
-## 🧰 Complete MCP Tools Dictionary (21 Canonical Tools)
+## Complete MCP Tools Dictionary (21 Canonical Tools)
 
 When connected to an AI agent via MCP, T-Zero provides 21 deterministic tools:
 
@@ -137,7 +137,7 @@ When connected to an AI agent via MCP, T-Zero provides 21 deterministic tools:
 
 ---
 
-## 🐍 Python Library Usage (Programmatic API)
+## Python Library Usage (Programmatic API)
 
 ```python
 from tzero import TokenReducer, CodebaseScanner, calculate_token_cost
@@ -159,7 +159,7 @@ print(f"Monthly savings for team: ${roi['monthly_savings_usd']:.2f}")
 
 ---
 
-## 🔒 Security & Privacy Guarantees
+## Security & Privacy Guarantees
 
 - **100% Offline & Local:** Operates entirely on the local machine; zero external API requests for AST compression.
 - **Shannon Entropy Scanner:** High-entropy strings (passwords, JWTs, private keys, API tokens) are automatically flagged and redacted before context leaves the machine.
@@ -167,7 +167,7 @@ print(f"Monthly savings for team: ${roi['monthly_savings_usd']:.2f}")
 
 ---
 
-## 🧪 Verification & Automated Test Suite
+## Verification & Automated Test Suite
 
 To verify the integrity of the workspace:
 ```bash
@@ -183,7 +183,7 @@ python scripts/sync_release_metadata.py --check
 
 ---
 
-## 💡 Prompt Templates for AI Assistants
+## Prompt Templates for AI Assistants
 
 Once T-Zero MCP is installed in your IDE, try asking your assistant:
 - *"Use T-Zero to build the Tier-2 context tree for this project."*
