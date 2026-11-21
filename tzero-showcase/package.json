@@ -13,14 +13,14 @@
     "@remotion/shapes": "^4.0.537",
     "@remotion/zod-types": "4.0.537",
     "lucide-react": "^1.61.0",
-    "react": "19.2.3",
+    "react": "19.3.1",
     "react-dom": "19.2.3",
     "remotion": "4.0.537",
     "zod": "4.5.4"
   },
   "devDependencies": {
     "@remotion/eslint-config-flat": "4.0.537",
-    "@types/react": "19.2.7",
+    "@types/react": "19.3.0",
     "@types/web": "0.0.166",
     "eslint": "10.12.0",
     "prettier": "3.8.1",
