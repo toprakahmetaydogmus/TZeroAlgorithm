@@ -742,6 +742,10 @@ document.addEventListener("DOMContentLoaded", () => {
   safeInit(initAgentSetupTabs, "AgentSetupTabs");
   safeInit(initDownloadCenter, "DownloadCenter");
   safeInit(initNeuralCortex, "NeuralCortex");
+  safeInit(initLatestRelease, "LatestRelease");
+  safeInit(initGitHubStars, "GitHubStars");
+  safeInit(initViralShare, "ViralShare");
+  safeInit(initSupportModal, "SupportModal");
 });
 
 // ==========================================
@@ -2001,12 +2005,19 @@ function initAgentSetupTabs() {
 // 5. STANDALONE DOWNLOAD CENTER
 // ==========================================
 function initDownloadCenter() {
-  // Download button click feedback
+  // Download button click feedback + Star & Support Modal Trigger
   const dlButtons = document.querySelectorAll(".downloads-grid a.btn");
   dlButtons.forEach((btn) => {
     btn.addEventListener("click", () => {
       const name = btn.dataset.name || "Executable";
       showToast(`Initiating download for ${name}...`, "🚀");
+      
+      // Prompt downloader for GitHub Star & Open Source Support
+      if (typeof openSupportModal === "function") {
+        setTimeout(() => {
+          openSupportModal(name);
+        }, 500);
+      }
     });
   });
 
@@ -4592,26 +4603,37 @@ function initShadowCoW() {
 }
 
 // ============================================================================
-// 8. DYNAMIC GITHUB STARS & VIRAL COMMUNITY SHARING ENGINE
+// 8. DYNAMIC GITHUB STARS & VIRAL COMMUNITY SHARING ENGINE (15-MIN TTL CACHE)
 // ============================================================================
 function initGitHubStars() {
   const navStar = document.getElementById("nav-star-count");
   const heroStar = document.getElementById("hero-star-count");
   const progBar = document.getElementById("viral-progress-bar");
 
+  const CACHE_STARS_KEY = "tzero_cached_stars";
+  const CACHE_STARS_TIME_KEY = "tzero_cached_stars_time";
+  const TTL_MS = 15 * 60 * 1000; // 15-minute cache TTL
+
   function updateDisplay(stars) {
     if (navStar) navStar.textContent = "★ " + stars;
     if (heroStar) heroStar.textContent = stars;
     if (progBar) {
-      const pct = Math.min(100, Math.max(5, (stars / 100) * 100));
+      const target = 100;
+      const pct = Math.min(100, Math.max(5, (stars / target) * 100));
       progBar.style.width = pct + "%";
     }
   }
 
-  // Initial cached baseline
-  const cached = localStorage.getItem("tzero_cached_stars");
-  if (cached) {
-    updateDisplay(parseInt(cached, 10));
+  // Load from localStorage cache first
+  const cachedStars = localStorage.getItem(CACHE_STARS_KEY);
+  const cachedStarsTime = localStorage.getItem(CACHE_STARS_TIME_KEY);
+  const isFresh = cachedStarsTime && (Date.now() - parseInt(cachedStarsTime, 10) < TTL_MS);
+
+  if (cachedStars) {
+    updateDisplay(parseInt(cachedStars, 10));
+    if (isFresh) return; // Fresh cache, skip API query
+  } else {
+    updateDisplay(46); // Default baseline
   }
 
   // Fetch live star count from GitHub API
@@ -4625,7 +4647,8 @@ function initGitHubStars() {
     .then(data => {
       if (data && typeof data.stargazers_count === "number") {
         const count = data.stargazers_count;
-        localStorage.setItem("tzero_cached_stars", count);
+        localStorage.setItem(CACHE_STARS_KEY, count.toString());
+        localStorage.setItem(CACHE_STARS_TIME_KEY, Date.now().toString());
         updateDisplay(count);
       }
     })
@@ -4636,8 +4659,7 @@ function initGitHubStars() {
 
 function initViralShare() {
   const repoUrl = "https://github.com/toprakahmetaydogmus/TZeroAlgorithm";
-  const webUrl = "https://tzero-indol.vercel.app";
-  const shareText = "T-Zero: Cut AI coding context tokens by up to 95% using AST pruning! Open-source local MCP server for Cursor & Claude Desktop. Check it out: " + repoUrl;
+  const shareText = "T-Zero v12.1.0: Cut AI coding context tokens by up to 95% using deterministic AST pruning! Open-source local MCP server for Cursor & Claude. Check it out: " + repoUrl;
 
   const btnX = document.getElementById("share-x");
   const btnReddit = document.getElementById("share-reddit");
@@ -4654,7 +4676,7 @@ function initViralShare() {
 
   if (btnReddit) {
     btnReddit.addEventListener("click", () => {
-      const title = "T-Zero: Open-source local AST context pruning for Cursor & Claude (-88% to -95% tokens, $0, 100% offline)";
+      const title = "T-Zero v12.1.0: Open-source local AST context pruning for Cursor & Claude (-88% to -95% tokens, $0, 100% offline)";
       const url = "https://reddit.com/submit?url=" + encodeURIComponent(repoUrl) + "&title=" + encodeURIComponent(title);
       window.open(url, "_blank", "width=800,height=600");
     });
@@ -4669,7 +4691,7 @@ function initViralShare() {
 
   if (btnHN) {
     btnHN.addEventListener("click", () => {
-      const t = "Show HN: T-Zero – Local AST context pruning for LLMs with 88-95% token reduction";
+      const t = "Show HN: T-Zero v12.1.0 – Local AST context pruning for LLMs with 88-95% token reduction";
       const url = "https://news.ycombinator.com/submitlink?u=" + encodeURIComponent(repoUrl) + "&t=" + encodeURIComponent(t);
       window.open(url, "_blank", "width=700,height=500");
     });
@@ -4684,4 +4706,211 @@ function initViralShare() {
       });
     });
   }
+}
+
+// ============================================================================
+// 9. DYNAMIC GITHUB RELEASE DATA FETCHER (15-MIN CACHED WITH FALLBACK)
+// ============================================================================
+function initLatestRelease() {
+  const releaseTagEl = document.getElementById("live-release-tag");
+  const releaseDateEl = document.getElementById("live-release-date");
+  const releaseAssetsEl = document.getElementById("live-release-assets");
+  const releaseLinkEl = document.getElementById("live-release-link");
+  const releaseBodyEl = document.getElementById("live-release-body");
+
+  const CACHE_KEY = "tzero_cached_release_data";
+  const CACHE_TIME_KEY = "tzero_cached_release_time";
+  const TTL_MS = 15 * 60 * 1000; // 15 minutes TTL
+
+  function renderRelease(data) {
+    if (!data) return;
+    const tagName = data.tag_name || "v12.1.0";
+    if (releaseTagEl) releaseTagEl.textContent = tagName;
+    
+    if (releaseDateEl && data.published_at) {
+      try {
+        const d = new Date(data.published_at);
+        const formatted = d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+        releaseDateEl.textContent = formatted;
+      } catch (_) {
+        releaseDateEl.textContent = "Nov 21, 2026";
+      }
+    } else if (releaseDateEl) {
+      releaseDateEl.textContent = "Nov 21, 2026";
+    }
+
+    const assets = (data.assets && Array.isArray(data.assets) && data.assets.length > 0) ? data.assets : [];
+    const assetCount = assets.length > 0 ? assets.length : 6;
+    if (releaseAssetsEl) releaseAssetsEl.textContent = `${assetCount} Packages`;
+
+    if (releaseLinkEl && data.html_url) {
+      releaseLinkEl.href = data.html_url;
+    }
+
+    // Dynamically update download links if asset browser_download_url matches
+    assets.forEach(asset => {
+      if (asset && asset.name && asset.browser_download_url) {
+        const btn = document.querySelector(`.downloads-grid a[data-name="${asset.name}"]`);
+        if (btn) {
+          btn.href = asset.browser_download_url;
+        }
+      }
+    });
+
+    // Dynamically populate release body summary
+    if (releaseBodyEl) {
+      if (data.body && typeof data.body === "string" && data.body.trim()) {
+        const cleanBody = data.body.trim();
+        releaseBodyEl.textContent = cleanBody.length > 250 ? cleanBody.slice(0, 250) + "..." : cleanBody;
+      } else if (!releaseBodyEl.textContent.trim()) {
+        releaseBodyEl.textContent = "Production Sovereign Release: AST pruning, Zero-Leak OS security, multi-agent context optimization, and verified standalone executables.";
+      }
+    }
+  }
+
+  // Check cache first
+  const cachedTime = localStorage.getItem(CACHE_TIME_KEY);
+  const cachedDataStr = localStorage.getItem(CACHE_KEY);
+  const isCacheFresh = cachedTime && (Date.now() - parseInt(cachedTime, 10) < TTL_MS);
+
+  if (cachedDataStr) {
+    try {
+      const parsed = JSON.parse(cachedDataStr);
+      renderRelease(parsed);
+      if (isCacheFresh) {
+        return; // Fresh cache, skip network request
+      }
+    } catch (_) {
+      // Invalid cache, continue to fetch
+    }
+  } else {
+    // Default fallback baseline
+    renderRelease({
+      tag_name: "v12.1.0",
+      published_at: "2026-11-21T00:00:00Z",
+      assets: new Array(6),
+      body: "Production Sovereign Release: AST pruning, Zero-Leak OS security, multi-agent context optimization, and verified standalone executables.",
+      html_url: "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/latest"
+    });
+  }
+
+  // Live query to GitHub Releases API
+  fetch("https://api.github.com/repos/toprakahmetaydogmus/TZeroAlgorithm/releases/latest", {
+    headers: { "Accept": "application/vnd.github.v3+json" }
+  })
+    .then(r => {
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.json();
+    })
+    .then(data => {
+      if (data && data.tag_name) {
+        localStorage.setItem(CACHE_KEY, JSON.stringify(data));
+        localStorage.setItem(CACHE_TIME_KEY, Date.now().toString());
+        renderRelease(data);
+      }
+    })
+    .catch(err => {
+      console.log("[T-Zero] GitHub latest release live fetch skipped (using fallback):", err.message);
+    });
+}
+
+// Helper to escape HTML and prevent XSS injection
+function escapeHtml(str) {
+  if (!str) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+// ============================================================================
+// 10. DOWNLOAD THANK-YOU & CRYPTO SUPPORT MODAL SYSTEM
+// ============================================================================
+function openSupportModal(downloadName = null) {
+  const modal = document.getElementById("support-modal");
+  if (!modal) return;
+  const itemEl = document.getElementById("modal-downloaded-item");
+  const titleEl = document.getElementById("modal-title");
+  const descEl = document.getElementById("modal-desc");
+  
+  if (downloadName) {
+    const safeName = escapeHtml(downloadName);
+    if (itemEl) itemEl.textContent = downloadName;
+    if (titleEl) titleEl.textContent = "Thank You for Downloading T-Zero!";
+    if (descEl) descEl.innerHTML = `Your download of <strong>${safeName}</strong> has started. T-Zero is 100% free, offline, and zero-leak. Help us keep it alive and free for everyone!`;
+  } else {
+    if (itemEl) itemEl.textContent = "T-Zero v12.1.0";
+    if (titleEl) titleEl.textContent = "Support Open Source & Keep T-Zero Free";
+    if (descEl) descEl.innerHTML = "T-Zero is completely free, local-first, and zero-leak. You can support continuous development and cloud benchmark infrastructure with crypto donations or a GitHub star!";
+  }
+  
+  modal.classList.add("active");
+  modal.setAttribute("aria-hidden", "false");
+  document.body.style.overflow = "hidden";
+}
+
+function closeSupportModal() {
+  const modal = document.getElementById("support-modal");
+  if (!modal) return;
+  modal.classList.remove("active");
+  modal.setAttribute("aria-hidden", "true");
+  document.body.style.overflow = "";
+}
+
+function initSupportModal() {
+  const modal = document.getElementById("support-modal");
+  const closeBtn = document.getElementById("modal-close-btn");
+  const doneBtn = document.getElementById("modal-done-btn");
+  const navSupportBtn = document.getElementById("nav-support-btn");
+
+  if (closeBtn) {
+    closeBtn.addEventListener("click", closeSupportModal);
+  }
+  if (doneBtn) {
+    doneBtn.addEventListener("click", closeSupportModal);
+  }
+  if (modal) {
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) {
+        closeSupportModal();
+      }
+    });
+  }
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && modal && modal.classList.contains("active")) {
+      closeSupportModal();
+    }
+  });
+
+  if (navSupportBtn) {
+    navSupportBtn.addEventListener("click", () => {
+      openSupportModal(null);
+    });
+  }
+
+  // 1-Click crypto address copying across modal & cards
+  const copyCryptoButtons = document.querySelectorAll(".btn-copy-crypto");
+  copyCryptoButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const target = btn.dataset.target;
+      if (target) {
+        copyTextWithToast(target, "Crypto Address copied to clipboard! Thank you for supporting T-Zero 💖");
+      }
+    });
+  });
+
+  // Direct click-to-copy on crypto code text elements
+  const cryptoCodeEls = document.querySelectorAll(".crypto-code, .modal-crypto-code");
+  cryptoCodeEls.forEach((code) => {
+    code.style.cursor = "pointer";
+    code.setAttribute("title", "Click to copy address");
+    code.addEventListener("click", () => {
+      const addr = code.textContent.trim();
+      if (addr) {
+        copyTextWithToast(addr, "Crypto Address copied to clipboard! Thank you for supporting T-Zero 💖");
+      }
+    });
+  });
 }

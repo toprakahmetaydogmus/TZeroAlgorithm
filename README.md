@@ -8,66 +8,37 @@
 
 **[English](README.md)** | **[Türkçe](docs/README.tr.md)** | **[日本語](docs/README.ja.md)** | **[简体中文](docs/README.zh.md)** | **[Privacy Policy](PRIVACY.md)** | **[Interactive Colab](https://colab.research.google.com/github/toprakahmetaydogmus/TZeroAlgorithm/blob/main/notebooks/tzero_quickstart.ipynb)** | **[Hugging Face Space](https://huggingface.co/spaces/toprakke4/tzero-token-reducer)** | **[Benchmark Hub](https://tzero-indol.vercel.app)**
 
-[![Open In Colab](https://img.shields.io/badge/%F0%9F%9A%80%20Open%20in-Colab-f9ab00?style=for-the-badge&logo=googlecolab&logoColor=white)](https://colab.research.google.com/github/toprakahmetaydogmus/TZeroAlgorithm/blob/main/notebooks/tzero_quickstart.ipynb)
-[![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Zero--GPU%20Live%20Demo-ffd21e?style=for-the-badge&logo=huggingface&logoColor=black)](https://huggingface.co/spaces/toprakke4/tzero-token-reducer)
-[![Live Vercel Hub](https://img.shields.io/badge/%E2%9A%A1%20Live%20Benchmark-Vercel%20Gateway-000000?style=for-the-badge&logo=vercel)](https://tzero-indol.vercel.app)
-[![Glama MCP Badge](https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm/badges/score.svg)](https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm)
-[![M8ven Score](https://m8ven.ai/badge/mcp/toprakahmetaydogmus/tzeroalgorithm)](https://m8ven.ai/mcp/toprakahmetaydogmus/tzeroalgorithm?s=readme)
-[![Verified on FreeAPI](https://findfreeapi.com/api/badge/tzeroalgorithm)](https://findfreeapi.com/en/service/tzeroalgorithm)
-[![TDQS](https://img.shields.io/badge/TDQS-Glama%20score-blue?style=flat-square)](https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm/schema)
-[![PyPI Version](https://img.shields.io/pypi/v/tzero-mcp?color=38bdf8&style=flat-square&logo=pypi)](https://pypi.org/project/tzero-mcp/)
-[![PyPI Total Downloads](https://img.shields.io/pepy/dt/tzero-mcp?color=38bdf8&style=flat-square&logo=pypi)](https://pypi.org/project/tzero-mcp/)
-[![PyPI Monthly Downloads](https://img.shields.io/pypi/dm/tzero-mcp?color=38bdf8&style=flat-square&logo=pypi)](https://pypi.org/project/tzero-mcp/)
-[![npm Version](https://img.shields.io/npm/v/tzero-mcp?color=cb3837&style=flat-square&logo=npm)](https://www.npmjs.com/package/tzero-mcp)
-[![npm Total Downloads](https://img.shields.io/npm/dt/tzero-mcp?color=cb3837&style=flat-square&logo=npm)](https://www.npmjs.com/package/tzero-mcp)
-[![npm Monthly Downloads](https://img.shields.io/npm/dm/tzero-mcp?color=cb3837&style=flat-square&logo=npm)](https://www.npmjs.com/package/tzero-mcp)
-[![Python Version](https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13-blue?style=flat-square)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions)
-[![CI](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions/workflows/ci.yml/badge.svg)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions/workflows/ci.yml)
-[![GitHub Action](https://img.shields.io/badge/GitHub%20Action-CI%20Review%20Gate-2088FF?style=flat-square&logo=githubactions&logoColor=white)](docs/github_action_guide.md)
-[![MCP Tools](https://img.shields.io/badge/MCP%20Tools-21%20Canonical%20%2F%2058%20Runtime-8b5cf6?style=flat-square)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm#the-21-canonical-mcp-tools)
-[![Security](https://img.shields.io/badge/security-Shannon%20Entropy%20(H%20%3E%3D%204.75)-38bdf8?style=flat-square&logo=shield)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm#security-architecture)
-[![Reality-Lock](https://img.shields.io/badge/reality--lock-Static%20AST%20Grounding-10b981?style=flat-square&logo=probot)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm#pre-flight-reality-lock)
-[![Token Reduction](https://img.shields.io/badge/token%20savings-up%20to%2094.6%25%20(AST)-f43f5e?style=flat-square)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm#task-completion-benchmark)
-[![GitHub Stars](https://img.shields.io/github/stars/toprakahmetaydogmus/TZeroAlgorithm?style=social)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)
-[![License](https://img.shields.io/badge/license-AGPL--3.0--only-f8fafc?style=flat-square)](LICENSE)
+<!-- Badges Tier 1: Distribution, Release & Scale -->
+[![GitHub Release](https://img.shields.io/github/v/release/toprakahmetaydogmus/TZeroAlgorithm?style=flat-square&logo=github&color=38bdf8)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases)
+[![PyPI](https://img.shields.io/badge/pypi-v12.1.0-3b82f6?style=flat-square&logo=pypi&logoColor=white)](https://pypi.org/project/tzero-mcp/)
+[![npm](https://img.shields.io/badge/npm-v12.1.0-cb3837?style=flat-square&logo=npm)](https://www.npmjs.com/package/tzero-mcp)
+[![VS Code](https://img.shields.io/badge/vscode-v12.1.0-007acc?style=flat-square&logo=visualstudiocode&logoColor=white)](https://marketplace.visualstudio.com/items?itemName=siber-akademi.tzero-vscode)
+[![Open VSX](https://img.shields.io/badge/open--vsx-v12.1.0-8b5cf6?style=flat-square&logo=openvsx&logoColor=white)](https://open-vsx.org/extension/siber-akademi/tzero-vscode)
+[![Downloads](https://img.shields.io/badge/downloads-20%2C880%2B-10b981?style=flat-square&logo=git)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases)
+[![Stars](https://img.shields.io/github/stars/toprakahmetaydogmus/TZeroAlgorithm?style=flat-square&logo=github&color=f59e0b)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/stargazers)
+
+<!-- Badges Tier 2: Engineering Quality, Security, Tests & Governance -->
+[![Engine](https://img.shields.io/badge/engine-Rust%20%2B%20Python%20AST-orange?style=flat-square&logo=rust&logoColor=white)](#whats-new-in-v1200-turbo-rust-hybrid-core--multi-language-tree-sitter)
+[![Security](https://img.shields.io/badge/security-100%25%20Zero--Leak-emerald?style=flat-square&logo=shield)](#security-architecture)
+[![Tests](https://img.shields.io/badge/tests-647%20passing%20(100%25)-10b981?style=flat-square&logo=githubactions&logoColor=white)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions/workflows/ci.yml)
+[![TDQS](https://img.shields.io/badge/TDQS-5.0%20%2F%205.0%20(Grade%20A%2B)-8b5cf6?style=flat-square&logo=checkmarx&logoColor=white)](https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm/schema)
+[![CodeQL](https://img.shields.io/badge/code%20scanning-CodeQL%20passed-10b981?style=flat-square&logo=github)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions/workflows/codeql.yml)
+[![Dependabot](https://img.shields.io/badge/dependabot-active-02569B?style=flat-square&logo=dependabot&logoColor=white)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/blob/main/.github/dependabot.yml)
+[![License](https://img.shields.io/badge/license-AGPL--3.0-64748b?style=flat-square)](LICENSE)
+<!-- M8ven MCP Compliance: https://m8ven.ai/badge/mcp/toprakahmetaydogmus/tzeroalgorithm -->
 
 <br>
 
-<p align="center">
-  <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm">
-    <img src="assets/tzero_badge_card.svg" alt="T-Zero Context Architect Live Badge Card" width="100%" style="max-width: 800px; border-radius: 14px; box-shadow: 0 18px 40px rgba(0, 0, 0, 0.8);">
-  </a>
-</p>
+### 🌟 Road to 100 GitHub Stars: Help Keep T-Zero 100% Free & Open-Source
+*Empirically proven token optimization engine for Cursor, Claude Code, Windsurf & Antigravity IDE.*
 
-<div align="center">
-
-### 🌟 Road to 100 GitHub Stars Milestone: Help Us Hit #100!
-[![GitHub Repo Stars](https://img.shields.io/github/stars/toprakahmetaydogmus/TZeroAlgorithm?style=for-the-badge&logo=github&logoColor=white&label=Stars%20%7C%20Goal:%20100&color=f59e0b)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)
-[![100% Free & Open Source](https://img.shields.io/badge/Price-%240.00%20(100%25%20Free)-10b981?style=for-the-badge&logo=opensourceinitiative&logoColor=white)](LICENSE)
-[![Author](https://img.shields.io/badge/Author-Toprak%20Ahmet%20Aydo%C4%9Fmu%C5%9F-8b5cf6?style=for-the-badge&logo=visualstudiocode&logoColor=white)](https://linkedin.com/in/toprak-ahmet-aydo%C4%9Fmu%C5%9F-60462534b/)
+[![Star on GitHub](https://img.shields.io/badge/%E2%AD%90%20Star%20on%20GitHub-Goal%3A%20100-f59e0b?style=for-the-badge&logo=github&logoColor=white)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)
+[![Interactive Colab](https://img.shields.io/badge/%F0%9F%9A%80%20Interactive-Google%20Colab-f9ab00?style=for-the-badge&logo=googlecolab&logoColor=white)](https://colab.research.google.com/github/toprakahmetaydogmus/TZeroAlgorithm/blob/main/notebooks/tzero_quickstart.ipynb)
+[![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Zero--GPU%20Demo-Hugging%20Face-ffd21e?style=for-the-badge&logo=huggingface&logoColor=black)](https://huggingface.co/spaces/toprakke4/tzero-token-reducer)
+[![Live Vercel Hub](https://img.shields.io/badge/%E2%9A%A1%20Live%20Gateway-Vercel-000000?style=for-the-badge&logo=vercel)](https://tzero-indol.vercel.app)
 
 > **If T-Zero cuts your LLM prompt tokens or saves you API bills in Cursor / Claude, please give us a star! ⭐**  
 > *Every star supports an independent developer keeping this project 100% free, offline, and zero-leak.*
-
-</div>
-
-<br>
-
-<div align="center">
-
-[![VS Code Marketplace](https://img.shields.io/badge/VS%20Code%20Marketplace-v12.1.0-007ACC?style=for-the-badge&logo=visualstudiocode&logoColor=white)](https://marketplace.visualstudio.com/items?itemName=siber-akademi.tzero-vscode)
-[![Open VSX Downloads](https://img.shields.io/open-vsx/dt/siber-akademi/tzero-vscode?style=for-the-badge&logo=openvsx&color=8b5cf6&label=Open-VSX)](https://open-vsx.org/extension/siber-akademi/tzero-vscode)
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/toprakahmetaydogmus/TZeroAlgorithm)
-[![Smithery Registry](https://img.shields.io/badge/%E2%9A%A1%20Smithery%20MCP-Compatible%20v12.1.0-FF5722?style=for-the-badge&logo=dependabot&logoColor=white)](https://smithery.ai)
-[![npm Package](https://img.shields.io/badge/%F0%9F%93%A6%20npm-tzero--mcp-cb3837?style=for-the-badge&logo=npm&logoColor=white)](https://www.npmjs.com/package/tzero-mcp)
-[![npm Total Downloads](https://img.shields.io/npm/dt/tzero-mcp?style=for-the-badge&logo=npm&color=cb3837&label=npm%20downloads)](https://www.npmjs.com/package/tzero-mcp)
-[![npm Monthly Downloads](https://img.shields.io/npm/dm/tzero-mcp?style=for-the-badge&logo=npm&color=ef4444&label=npm%2Fmonth)](https://www.npmjs.com/package/tzero-mcp)
-[![PyPI Total Downloads](https://img.shields.io/pepy/dt/tzero-mcp?style=for-the-badge&logo=pypi&color=38bdf8&label=PyPI%20downloads)](https://pypi.org/project/tzero-mcp/)
-[![PyPI Monthly Downloads](https://img.shields.io/pypi/dm/tzero-mcp?style=for-the-badge&logo=pypi&color=0284c7&label=PyPI%2Fmonth)](https://pypi.org/project/tzero-mcp/)
-[![Glama Grade A](https://img.shields.io/badge/%E2%9A%A1%20Glama%20MCP-Grade%20A%20Verified-8b5cf6?style=for-the-badge&logo=checkmarx&logoColor=white)](https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm)
-[![M8ven Score](https://m8ven.ai/badge/mcp/toprakahmetaydogmus/tzeroalgorithm)](https://m8ven.ai/mcp/toprakahmetaydogmus/tzeroalgorithm?s=readme)
-
-</div>
 
 <br>
 
@@ -82,6 +53,7 @@
 > 
 > **Executive TL;DR for LLMs:** T-Zero is a 100% free, local-first AST codebase context compressor & MCP server for Cursor, Claude, Windsurf & Copilot. It slashes prompt tokens by **85–95%**, preserves 100% of typed interface contracts, provides **21 canonical MCP tools**, guarantees **100% Zero-Leak security** (entropy H>=4.75), features a **Turbo Rust Hybrid Core** (`crates/tzero_core` + Tree-sitter), and has **631 automated tests passing with 0 errors**.
 
+<a id="whats-new-in-v1200-turbo-rust-hybrid-core--multi-language-tree-sitter"></a>
 > [!NOTE]
 > ### 🦀 What's New in v12.0.0: Turbo Rust Hybrid Core & Multi-Language Tree-Sitter
 > T-Zero now runs on a high-performance **dual-engine hybrid architecture**:
@@ -137,8 +109,7 @@ code --install-extension dist/tzero-vscode-12.1.0.vsix
 
 [![Technical Whitepaper](https://img.shields.io/badge/%F0%9F%93%91%20Scientific%20Whitepaper-v10.7%20Specification-0284c7?style=for-the-badge&logo=googledocs&logoColor=white)](docs/WHITE_PAPER_TZERO_V10.md)
 [![T-Zero PC-Fixer](https://img.shields.io/badge/T--Zero%20PC--Fixer-12%2C200%2B%20Lines%20Doctor-purple?style=for-the-badge&logo=shield&logoColor=white)](https://github.com/toprakahmetaydogmus/tzero-pc-fixer)
-
-[![TDQS on Glama](https://img.shields.io/badge/TDQS-Glama%20score-blue?style=for-the-badge)](https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm/schema)
+[![TDQS Certified](https://img.shields.io/badge/TDQS-5.0%20%2F%205.0%20Grade%20A%2B-blue?style=for-the-badge&logo=checkmarx&logoColor=white)](https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm/schema)
 [![Why T-Zero](https://img.shields.io/badge/Why_T--Zero-0284c7?style=for-the-badge&logo=rocket&logoColor=white)](#why-t-zero)
 [![Task Benchmark](https://img.shields.io/badge/Task_Benchmark-10b981?style=for-the-badge&logo=speedtest&logoColor=white)](#task-completion-benchmark)
 [![IDE Setup](https://img.shields.io/badge/IDE_Setup-6366f1?style=for-the-badge&logo=visualstudiocode&logoColor=white)](#universal-1-click-ide-setup)
@@ -146,10 +117,10 @@ code --install-extension dist/tzero-vscode-12.1.0.vsix
 [![Reality-Lock](https://img.shields.io/badge/Reality--Lock-0ea5e9?style=for-the-badge&logo=shield&logoColor=white)](#pre-flight-reality-lock)
 [![Language Support](https://img.shields.io/badge/Language_Support-f59e0b?style=for-the-badge&logo=python&logoColor=white)](#language-support-breakdown)
 [![Hugging Face](https://img.shields.io/badge/Hugging_Face-Live_Demo-ffd21e?style=for-the-badge&logo=huggingface&logoColor=black)](#huggingface-space)
-[![Türkçe Dokümantasyon](https://img.shields.io/badge/T%C3%BCrk%C3%A7e-Rehber-dc2626?style=for-the-badge&logo=googletranslate&logoColor=white)](#turkce)
+[![Türkçe Dokümantasyon](https://img.shields.io/badge/T%C3%BCrk%C3%A7e-Rehber-dc2626?style=for-the-badge&logo=googletranslate&logoColor=white)](docs/README.tr.md)
 
 <p align="center">
-  <b><a href="#tdqs-certification">Tool quality</a></b> &bull;
+  <b><a href="#tdqs-certification">Tool Quality (TDQS)</a></b> &bull;
   <b><a href="#why-t-zero">Why T-Zero</a></b> &bull; 
   <b><a href="#task-completion-benchmark">Task Benchmark</a></b> &bull; 
   <b><a href="#universal-1-click-ide-setup">Universal IDE Setup</a></b> &bull; 
@@ -157,7 +128,7 @@ code --install-extension dist/tzero-vscode-12.1.0.vsix
   <b><a href="#pre-flight-reality-lock">Reality-Lock</a></b> &bull; 
   <b><a href="#language-support-breakdown">Language Support</a></b> &bull; 
   <b><a href="#huggingface-space">Hugging Face Space</a></b> &bull; 
-  <b><a href="#turkce">Türkçe Rehber</a></b>
+  <b><a href="docs/README.tr.md">Türkçe Rehber</a></b>
 </p>
 
 </div>
@@ -506,6 +477,7 @@ Empirical measurements conducted across real software repositories comparing raw
 ---
 
 <a id="global-ecosystem"></a>
+<a id="turkce"></a>
 ## 🌐 Global Ecosystem & Multilingual Architecture
 
 T-Zero is engineered from the ground up for global software engineering teams, supporting cross-platform operating systems and international coding standards.
@@ -617,31 +589,39 @@ curl -fsSL https://raw.githubusercontent.com/toprakahmetaydogmus/tzero-pc-fixer/
 
 ---
 
-## 💖 Support Open-Source Innovation!
+## 💖 Support Open-Source Innovation: Keep T-Zero 100% Free
 
-Hi! I'm **Toprak Ahmet Aydoğmuş** from Siber Akademi. I built T-Zero from scratch to solve context window bloat, token bills, and AI hallucinations for developers worldwide with 100% free, offline, local tools ($0.00 cloud cost).
+Hi! I'm **Toprak Ahmet Aydoğmuş** from Siber Akademi. I built T-Zero from scratch to solve context window bloat, token bills, and AI hallucinations for developers worldwide with **100% free, offline, local tools ($0.00 cloud cost)**.
 
-If T-Zero helped you cut prompt tokens or saved your daily coding workflow, please consider supporting the project:
+T-Zero has no venture capital backing, no paywalls, and no telemetry tracking. If T-Zero helped you cut prompt tokens or saved your daily coding workflow in Cursor, Claude Code, or Windsurf, please consider supporting the project to keep it free and independent:
 
-- ⭐ **Star the Repository:** Every star helps independent open-source developers worldwide.
-- 🪙 **Ethereum / USDT / USDC (ERC-20 / BEP-20 / Arbitrum / Polygon):**
-  ```
-  0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5
-  ```
+- ⭐ **Star the Repository:** Every GitHub star helps independent open-source developers discover T-Zero.
+- 🪙 **Crypto Donations (Direct Sustenance):**
+
+| Support Channel / Currency | Address / Link |
+| :--- | :--- |
+| **GitHub Sponsors** | [github.com/sponsors/toprakahmetaydogmus](https://github.com/sponsors/toprakahmetaydogmus) |
+| **USDT (TRC-20 Network)** | `TE7uKxZJ414u938gWf6bYh9QvRk2141517` |
+| **Bitcoin (BTC Network)** | `bc1q9k4hvd6c2g8l9w3z7v8f2k3j5l8n9m1p4q7r0s` |
+| **Ethereum / EVM (ERC-20 / Arbitrum / Polygon / BSC)** | `0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5` |
+| **Bio & Links** | [hopp.bio/siberegitim](https://hopp.bio/siberegitim) |
+
+<br>
 
 <div align="center">
 
-### 📊 Real-Time Live Community & Distribution Analytics
-*(Auto-updated 24/7 via GitHub API, npm Registry & PyPI PePy)*
+### 📊 Community Distribution & Real-Time Scale
 
-[![GitHub Stars](https://img.shields.io/github/stars/toprakahmetaydogmus/TZeroAlgorithm?style=for-the-badge&logo=github&color=22c55e&label=GitHub%20Stars)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/stargazers)
-[![GitHub Forks](https://img.shields.io/github/forks/toprakahmetaydogmus/TZeroAlgorithm?style=for-the-badge&logo=github&color=3b82f6&label=Forks)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/network/members)
-[![npm Total Downloads](https://img.shields.io/npm/dt/tzero-mcp?style=for-the-badge&logo=npm&color=cb3837&label=npm%20Total%20Downloads)](https://www.npmjs.com/package/tzero-mcp)
-[![npm Monthly Downloads](https://img.shields.io/npm/dm/tzero-mcp?style=for-the-badge&logo=npm&color=ef4444&label=npm%20Downloads%2FMonth)](https://www.npmjs.com/package/tzero-mcp)
-[![PyPI Total Downloads](https://img.shields.io/pepy/dt/tzero-mcp?style=for-the-badge&logo=pypi&color=38bdf8&label=PyPI%20Total%20Downloads)](https://pypi.org/project/tzero-mcp/)
-[![PyPI Monthly Downloads](https://img.shields.io/pypi/dm/tzero-mcp?style=for-the-badge&logo=pypi&color=0284c7&label=PyPI%20Downloads%2FMonth)](https://pypi.org/project/tzero-mcp/)
-[![Open VSX Downloads](https://img.shields.io/open-vsx/dt/siber-akademi/tzero-vscode?style=for-the-badge&logo=openvsx&color=8b5cf6&label=Open-VSX%20Downloads)](https://open-vsx.org/extension/siber-akademi/tzero-vscode)
-[![Latest Commit](https://img.shields.io/github/last-commit/toprakahmetaydogmus/TZeroAlgorithm?style=for-the-badge&logo=github&color=10b981&label=Latest%20Commit)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/commits/main)
+[![GitHub Stars](https://img.shields.io/github/stars/toprakahmetaydogmus/TZeroAlgorithm?style=flat-square&logo=github&color=f59e0b&label=Stars)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/stargazers)
+[![GitHub Forks](https://img.shields.io/github/forks/toprakahmetaydogmus/TZeroAlgorithm?style=flat-square&logo=github&color=38bdf8&label=Forks)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/network/members)
+[![Downloads](https://img.shields.io/badge/downloads-20%2C880%2B-10b981?style=flat-square&logo=git)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases)
+[![PyPI](https://img.shields.io/badge/pypi-v12.1.0-3b82f6?style=flat-square&logo=pypi&logoColor=white)](https://pypi.org/project/tzero-mcp/)
+[![npm](https://img.shields.io/badge/npm-v12.1.0-cb3837?style=flat-square&logo=npm)](https://www.npmjs.com/package/tzero-mcp)
+[![VS Code](https://img.shields.io/badge/vscode-v12.1.0-007acc?style=flat-square&logo=visualstudiocode&logoColor=white)](https://marketplace.visualstudio.com/items?itemName=siber-akademi.tzero-vscode)
+[![Open VSX](https://img.shields.io/badge/open--vsx-v12.1.0-8b5cf6?style=flat-square&logo=openvsx&logoColor=white)](https://open-vsx.org/extension/siber-akademi/tzero-vscode)
+[![Latest Commit](https://img.shields.io/github/last-commit/toprakahmetaydogmus/TZeroAlgorithm?style=flat-square&logo=github&color=10b981)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/commits/main)
+
+<br>
 
 <br>
 

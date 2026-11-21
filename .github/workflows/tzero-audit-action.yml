@@ -5,7 +5,7 @@ concurrency:
   cancel-in-progress: true
 
 # Local-first security auditing: run via `tzero local-ci` or `python main.py --audit .`.
-on:
+'on':
   workflow_dispatch:
 
 jobs:

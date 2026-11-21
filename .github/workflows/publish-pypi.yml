@@ -4,9 +4,10 @@ concurrency:
   group: pypi-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-on:
+'on':
   push:
     tags:
+      - 'v*'
       - 'v[0-9]*'
   workflow_dispatch:
 
@@ -28,7 +29,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: '3.11'
+          python-version: '3.12'
 
       - name: Install build tools
         run: |
@@ -38,8 +39,19 @@ jobs:
       - name: Build package distribution
         run: python -m build
 
-      - name: Publish distribution to PyPI
+      - name: Publish distribution to PyPI (Token)
+        if: ${{ secrets.PYPI_API_TOKEN != '' || secrets.PYPI_TOKEN != '' }}
         uses: pypa/gh-action-pypi-publish@release/v1
+        continue-on-error: true
+        with:
+          password: ${{ secrets.PYPI_API_TOKEN || secrets.PYPI_TOKEN }}
+          packages-dir: dist/
+          skip-existing: true
+
+      - name: Publish distribution to PyPI (Trusted Publishing / OIDC)
+        if: ${{ secrets.PYPI_API_TOKEN == '' && secrets.PYPI_TOKEN == '' }}
+        uses: pypa/gh-action-pypi-publish@release/v1
+        continue-on-error: true
         with:
           packages-dir: dist/
           skip-existing: true

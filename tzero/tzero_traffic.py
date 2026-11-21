@@ -43,7 +43,7 @@ def fetch_latest_pypi_version() -> Optional[str]:
     """Fetches the latest published release version from PyPI JSON API."""
     try:
         url = "https://pypi.org/pypi/tzero-mcp/json"
-        req = urllib.request.Request(url, headers={"User-Agent": "T-Zero-Update-Engine/12.0.0"})
+        req = urllib.request.Request(url, headers={"User-Agent": f"T-Zero-Update-Engine/{CURRENT_VERSION}"})
         with urllib.request.urlopen(req, timeout=4) as resp:
             data = json.loads(resp.read().decode("utf-8"))
             return str(data.get("info", {}).get("version", CURRENT_VERSION))
@@ -55,7 +55,7 @@ def fetch_latest_github_version() -> Optional[str]:
     """Fetches the latest release tag from GitHub API."""
     try:
         url = "https://api.github.com/repos/toprakahmetaydogmus/TZeroAlgorithm/releases/latest"
-        req = urllib.request.Request(url, headers={"User-Agent": "T-Zero-Update-Engine/12.0.0"})
+        req = urllib.request.Request(url, headers={"User-Agent": f"T-Zero-Update-Engine/{CURRENT_VERSION}"})
         with urllib.request.urlopen(req, timeout=4) as resp:
             data = json.loads(resp.read().decode("utf-8"))
             tag = str(data.get("tag_name", f"v{CURRENT_VERSION}"))

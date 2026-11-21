@@ -6253,7 +6253,7 @@ class AutoReadmeGUI:
             from tzero.tzero_traffic import REPO_URL, CURRENT_VERSION
         except Exception:
             REPO_URL = "https://github.com/toprakahmetaydogmus/TZeroAlgorithm"
-            CURRENT_VERSION = "12.0.0"
+            CURRENT_VERSION = "12.1.0"
 
         # On first launch, automatically open the GitHub repo in browser and ask to star!
         first_launch = not profile.get("first_launch_repo_opened_v12", False)

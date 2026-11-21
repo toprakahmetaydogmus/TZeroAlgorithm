@@ -1,0 +1,64 @@
+version: 2
+updates:
+  # Maintain dependencies for GitHub Actions workflows
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "chore(deps)"
+
+  # Maintain dependencies for Python (pip / pyproject.toml / requirements)
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "chore(deps-python)"
+
+  # Maintain dependencies for npm installer package
+  - package-ecosystem: "npm"
+    directory: "/installers/npm"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "chore(deps-npm)"
+
+  # Maintain dependencies for VS Code Extension
+  - package-ecosystem: "npm"
+    directory: "/extensions/vscode"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "chore(deps-vscode)"
+
+  # Maintain dependencies for Showcase web app
+  - package-ecosystem: "npm"
+    directory: "/tzero-showcase"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "chore(deps-showcase)"
+
+  # Maintain dependencies for Rust Core crate
+  - package-ecosystem: "cargo"
+    directory: "/crates/tzero_core"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "chore(deps-cargo)"
+
+  # Maintain dependencies for Rust Jarvis Core crate
+  - package-ecosystem: "cargo"
+    directory: "/crates/tzero_jarvis_core"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "chore(deps-cargo)"

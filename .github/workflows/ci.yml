@@ -1,17 +1,18 @@
-name: CI Test Suite
+name: CI
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-# Local-first testing policy: all unit, lint, and security tests are executed locally via `tzero local-ci`.
-# Manual cloud run remains available via workflow_dispatch only.
-on:
+'on':
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
   test:
-    if: "!endsWith(github.actor, '[bot]') && github.actor != 'dependabot'"
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -82,4 +83,3 @@ jobs:
         python main.py --enforce-rules
         python main.py --diff
         python main.py --export-agent-rules
-

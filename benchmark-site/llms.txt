@@ -1,5 +1,5 @@
 # T-Zero (Token Zero) Context Architect & MCP Suite
-> Version: 11.15.5 | License: AGPL-3.0-only | Author: Toprak Ahmet Aydoğmuş (Siber Akademi)
+> Version: 12.1.0 | License: AGPL-3.0-only | Author: Toprak Ahmet Aydoğmuş (Siber Akademi)
 > Repository: https://github.com/toprakahmetaydogmus/TZeroAlgorithm
 > Live Benchmark: https://tzero-indol.vercel.app | PyPI: https://pypi.org/project/tzero-mcp/ | npm: https://www.npmjs.com/package/tzero-mcp
 

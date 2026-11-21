@@ -609,9 +609,9 @@ def create_mcp_server():
             "Generates a comprehensive system architecture specification document (ARCHITECTURE.md) with automated Mermaid topology diagrams, distinguishing from 'enforce_architecture_rules' and 'analyze_code_dependencies' by producing complete architectural documentation rather than validating boundary rules or tracing raw calls.\n"
             "\n"
             "Parameters:\n"
-            "- `project_root`: Repository root directory path to analyze and document (default: current working directory).\n"
-            "- `use_ai`: When False (default), generates 100% offline deterministic AST component topologies and Mermaid diagrams; when True, synthesizes natural language architectural narratives.\n"
-            "- `model`: Optional AI model identifier override (e.g. 'claude-3-5-sonnet', 'gpt-4o') when use_ai is True; ignored in default offline AST mode.\n"
+            "- `project_root` (optional, default='.'): Repository root directory path to analyze and document (default: current working directory).\n"
+            "- `use_ai` (optional, default=False): When False (default: False), generates 100% offline deterministic AST component topologies and Mermaid diagrams; when True, synthesizes natural language architectural narratives.\n"
+            "- `model` (optional, default=''): Optional LLM model identifier string when use_ai is True; ignored in default offline AST mode.\n"
             "\n"
             "Behavior:\n"
             "- Mutability: Strictly read-only; returns formatted Markdown text without writing files to disk.\n"
@@ -952,9 +952,9 @@ def create_mcp_server():
             "Calculates exact token counts, comparative API billing costs across major model families, and cumulative financial ROI savings, distinguishing from 'build_project_context' and 'prune_code_snippet' by evaluating financial costs and token metrics rather than constructing context trees or pruning code.\n"
             "\n"
             "Parameters:\n"
-            "- `text`: Raw text string, prompt payload, or code snippet to calculate token metrics and dollar costs for.\n"
-            "- `project_root`: Directory path of the repository to calculate cumulative workspace token reduction and monthly financial ROI for.\n"
-            "- `reduction_mode`: AST reduction tier ('ultra', 'balanced', 'none') applied when scanning project_root.\n"
+            "- `text` (optional, default=''): Raw text string, prompt payload, or code snippet to calculate token metrics and dollar costs for.\n"
+            "- `project_root` (optional, default='.'): Directory path of the repository to calculate cumulative workspace token reduction and monthly financial ROI for.\n"
+            "- `reduction_mode` (optional, default='ultra'): AST reduction tier ('ultra', 'balanced', 'none') applied when scanning project_root.\n"
             "\n"
             "Behavior:\n"
             "- Mutability: Strictly read-only; computes token counts and financial metrics without altering files or configurations.\n"
@@ -1031,12 +1031,12 @@ def create_mcp_server():
         name="analyze_change_impact",
         title="Calculate Symbol Modification Blast Radius",
         description=(
-            "Calculates the change blast radius score (0-100) and identifies downstream dependents before modifying or deleting a target symbol, distinguishing from 'analyze_code_dependencies' and 'audit_code_quality' by calculating targeted refactoring risk scores rather than mapping overall import graphs or profiling code complexity.\n"
+            "Calculates the change blast radius score (0-100) and identifies downstream dependents before modifying or refactoring a target symbol, distinguishing from 'analyze_code_dependencies' and 'audit_code_quality' by calculating targeted refactoring risk scores rather than mapping overall import graphs or profiling code complexity.\n"
             "\n"
             "Parameters:\n"
-            "- `target_symbol`: Name of the function, class, or method scheduled for modification, renaming, or deletion.\n"
-            "- `project_root`: Root directory of the repository to trace dependent symbols across.\n"
-            "- `file_path`: Optional relative or absolute path of the file defining target_symbol to disambiguate overloaded or common names across modules.\n"
+            "- `target_symbol` (required): Name of the function, class, or method scheduled for modification or refactoring.\n"
+            "- `project_root` (optional, default='.'): Root directory of the repository to trace dependent symbols across.\n"
+            "- `file_path` (optional, default=''): Optional relative or absolute path of the file defining target_symbol to disambiguate overloaded or common names across modules.\n"
             "\n"
             "Behavior:\n"
             "- Mutability: Strictly read-only; analyzes workspace dependency graphs without modifying disk state.\n"
@@ -1048,7 +1048,7 @@ def create_mcp_server():
             "- Error Handling: Gracefully reports score 0 and a helpful diagnostic notice if the specified symbol is not found in the codebase AST.\n"
             "\n"
             "Usage Guidelines:\n"
-            "- When to use: Run prior to editing, refactoring, or deleting a core function, interface, or shared utility to gauge downstream blast radius and identify required regression test targets.\n"
+            "- When to use: Run prior to editing, refactoring, or updating a core function, interface, or shared utility to gauge downstream blast radius and identify required regression test targets.\n"
             "- When NOT to use: Do not use for whole-repository import dependency mapping or PageRank centrality (use 'analyze_code_dependencies' instead); do not use for checking static code smells and cyclomatic complexity (use 'audit_code_quality' instead).\n"
             "\n"
             "Returns: Markdown report with quantitative blast radius score (0-100), risk tier (LOW/MEDIUM/HIGH/CRITICAL), affected downstream modules, and test recommendations.\n"
@@ -1057,13 +1057,17 @@ def create_mcp_server():
     )
     def _legacy_analyze_change_impact(
         target_symbol: Annotated[str, Field(description="Name of the function, class, or method to analyze for change blast radius.")],
-        project_root: Annotated[str, Field(default=".", description="Workspace root directory containing target symbols (default: current directory).")] = "."
+        project_root: Annotated[str, Field(default=".", description="Workspace root directory containing target symbols (default: current directory).")] = ".",
+        file_path: Annotated[str, Field(default="", description="Optional file path to disambiguate target symbol.")] = ""
     ) -> str:
         """Traces symbol references, inbound dependents, and calculates blast radius score."""
         from tzero.tzero_features import ChangeImpactAnalyzer
         analyzer = ChangeImpactAnalyzer(project_root)
         analysis = analyzer.analyze_symbol(target_symbol)
-        return analyzer.format_report(analysis)
+        res = analyzer.format_report(analysis)
+        if file_path:
+            return f"*(Focus file: `{file_path}`)*\n\n{res}"
+        return res
 
     # -------------------------------------------------------------------------
     # TOOL 10: enforce_architecture_boundaries
@@ -1317,9 +1321,9 @@ def create_mcp_server():
             "Prunes implementation bodies from in-memory source code strings, API schemas, or unified diffs while preserving type signatures and AST interfaces, distinguishing from 'build_project_context' and 'audit_code_quality' by stripping bodies from memory buffers rather than scanning disk files or checking code smells.\n"
             "\n"
             "Parameters:\n"
-            "- `code`: Raw source code string, OpenAPI/JSON schema, or git diff text buffer to compress in memory.\n"
-            "- `file_path_or_ext`: File name or extension (e.g. 'service.ts', '.go', '.rs', 'schema.json') used to select the language-specific AST parser; defaults to Python grammar.\n"
-            "- `reduction_mode`: Pruning strategy: 'ultra' preserves class/function signatures, argument types, and docstrings; 'balanced' retains signatures and branch control headers; 'micro_patch' surgically compacts unified diff blocks down to changed AST symbols.\n"
+            "- `code` (required): Raw source code string, OpenAPI/JSON schema, or git diff text buffer to compress in memory.\n"
+            "- `file_path_or_ext` (optional, default='snippet.py'): File name or extension (e.g. 'service.ts', '.go', '.rs', 'schema.json') used to select the language-specific AST parser; defaults to Python grammar.\n"
+            "- `reduction_mode` (optional, default='ultra'): Pruning strategy: 'ultra' preserves class/function signatures, argument types, and docstrings; 'balanced' retains signatures and branch control headers; 'micro_patch' surgically compacts unified diff blocks down to changed AST symbols.\n"
             "\n"
             "Behavior:\n"
             "- Mutability: Strictly read-only; processes in-memory string buffers with zero filesystem access or disk writes.\n"
@@ -4258,7 +4262,7 @@ def create_mcp_server():
             "\n"
             "Parameters:\n"
             "- `workspace_dir` (str, optional, default='.'): Target repository root directory containing source code and environment configurations to diagnose.\n"
-            "- `auto_repair` (bool, optional, default=True): When True, applies surgical AST syntax patches, BOM sanitization, and cache purges to disk.\n"
+            "- `auto_repair` (bool, optional, default=True): When True, applies surgical AST syntax patches, BOM sanitization, and cache cleanup to disk.\n"
             "- `dry_run` (bool, optional, default=False): When True, evaluates diagnostics and previews repair diffs without modifying files on disk.\n"
             "\n"
             "Behavior:\n"
@@ -4271,7 +4275,7 @@ def create_mcp_server():
             "- Error Handling: Continues diagnostic sweep across entire workspace if individual files contain unrecoverable binary corruption.\n"
             "\n"
             "Usage Guidelines:\n"
-            "- When to use: Use when diagnosing overall workspace health, repairing Python syntax breakages (missing colons, Python 2 print), resolving missing standard imports, fixing virtualenv paths, or purging stale cache bloat.\n"
+            "- When to use: Use when diagnosing overall workspace health, repairing Python syntax breakages (missing colons, Python 2 print), resolving missing standard imports, fixing virtualenv paths, or clearing stale cache bloat.\n"
             "- When NOT to use: Do not use for repairing hallucinated LLM method names in isolated code snippets (use 'heal_hallucinated_code' instead); do not use for static cyclomatic complexity code smell audits (use 'audit_code_quality' instead).\n"
             "\n"
             "Returns: Formatted Markdown report detailing initial health score, detected defects, surgical patch actions, and final post-healing health score."
@@ -4367,10 +4371,10 @@ def create_mcp_server():
             "Compatibility router for combined reports, distinguishing from 'build_project_context' and 'audit_code_quality' by combining analyses when action='auto'; for individual tasks use the dedicated tools directly.\n"
             "\n"
             "Parameters:\n"
-            "- `action`: Workflow operation: 'auto' runs comprehensive all-in-one audit & context pipeline; 'context' builds AST context tree; 'audit' checks code quality & smells; 'security' runs Zero-Leak secret scan; 'blueprint' generates Mermaid architecture; 'dependencies' maps import topology; 'impact' evaluates blast radius of modified symbols; 'search' performs hybrid BM25 code search; 'prune' strips in-memory AST bodies; 'heal' runs AST self-healing; 'memory' manages episodic memory; 'swarm' coordinates multi-agent consensus.\n"
-            "- `target`: Target repository root path, file path, git diff text buffer, or raw source code snippet to process.\n"
-            "- `query`: Free-text search term, focus symbol name, or goal prompt depending on selected action.\n"
-            "- `options`: Optional JSON string specifying extra configuration parameters (e.g. {\"reduction_mode\": \"ultra\", \"max_tokens\": 32000, \"depth\": 4}).\n"
+            "- `action` (optional, default='auto'): Workflow operation: 'auto' runs comprehensive all-in-one audit & context pipeline; 'context' builds AST context tree; 'audit' checks code quality & smells; 'security' runs Zero-Leak secret scan; 'blueprint' generates Mermaid architecture; 'dependencies' maps import topology; 'impact' evaluates blast radius of modified symbols; 'search' performs hybrid BM25 code search; 'prune' strips in-memory AST bodies; 'heal' runs AST self-healing; 'memory' manages episodic memory; 'swarm' coordinates multi-agent consensus.\n"
+            "- `target` (optional, default='.'): Target repository root path, file path, git diff text buffer, or raw source code snippet to process.\n"
+            "- `query` (optional, default=''): Free-text search term, focus symbol name, or goal prompt depending on selected action.\n"
+            "- `options` (optional, default=''): Optional JSON string specifying extra configuration parameters (e.g. {\"reduction_mode\": \"ultra\", \"max_tokens\": 32000, \"depth\": 4}).\n"
             "\n"
             "Behavior:\n"
             "- Mutability: Depends on action and options. Security may install hooks; rules, memory, sync, healing, merge, and generated tests can modify files.\n"
@@ -4815,12 +4819,11 @@ def create_mcp_server():
         name="search_tools",
         title="Progressive T-Zero MCP Tool Discovery Catalog",
         description=(
-            "Progressively discover and search registered T-Zero tools by keyword or domain category rather than loading all 58 schemas at once "
-            "(unlike codebase searches; use 'search_codebase' for searching repository source files instead).\n\n"
+            "Progressively discover and search registered T-Zero tools by keyword or domain category rather than loading all schemas at once, distinguishing from 'search_codebase' by discovering server tools and capabilities rather than searching repository source files.\n\n"
             "Parameters:\n"
-            "- `query`: Optional keyword query (e.g., 'secret audit', 'pagerank', 'diff', 'merge').\n"
-            "- `category`: Domain filter (`all`, `context`, `security`, `ast`, `memory`, `swarm`, `design`).\n"
-            "- `limit`: Maximum tool entries returned (integer 1-30; defaults to 10).\n\n"
+            "- `query` (optional, default=''): Optional keyword query (e.g., 'secret audit', 'pagerank', 'diff', 'merge').\n"
+            "- `category` (optional, default='all'): Domain filter category: 'all', 'context', 'security', 'ast', 'memory', 'swarm', 'design'.\n"
+            "- `limit` (optional, default=10): Maximum tool entries returned (integer 1-30; default: 10).\n\n"
             "Behavior:\n"
             "- Mutability & Speed: Read-only, idempotent catalog lookup executing in <5ms.\n"
             "- Auth & Boundaries: Zero authentication, external credentials, or network access required.\n\n"

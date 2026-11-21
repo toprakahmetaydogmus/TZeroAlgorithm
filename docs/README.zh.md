@@ -7,11 +7,13 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm"><img src="https://img.shields.io/github/stars/toprakahmetaydogmus/TZeroAlgorithm?style=for-the-badge&logo=github&color=22c55e&label=GitHub%20Stars" alt="GitHub Stars" /></a>
-  <a href="https://www.npmjs.com/package/tzero-mcp"><img src="https://img.shields.io/npm/dt/tzero-mcp?style=for-the-badge&logo=npm&color=cb3837&label=npm%20Downloads" alt="npm Downloads" /></a>
-  <a href="https://pypi.org/project/tzero-mcp/"><img src="https://img.shields.io/pepy/dt/tzero-mcp?style=for-the-badge&logo=pypi&color=38bdf8&label=PyPI%20Downloads" alt="PyPI Downloads" /></a>
-  <a href="https://open-vsx.org/extension/siber-akademi/tzero-vscode"><img src="https://img.shields.io/open-vsx/dt/siber-akademi/tzero-vscode?style=for-the-badge&logo=openvsx&color=8b5cf6&label=Open-VSX" alt="Open VSX Downloads" /></a>
-  <a href="../LICENSE"><img src="https://img.shields.io/badge/License-AGPL--3.0--only-blue?style=for-the-badge" alt="License AGPL-3.0-only" /></a>
+  <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm"><img src="https://img.shields.io/github/stars/toprakahmetaydogmus/TZeroAlgorithm?style=flat-square&logo=github&color=f59e0b&label=Stars" alt="GitHub Stars" /></a>
+  <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases"><img src="https://img.shields.io/badge/downloads-20%2C880%2B-10b981?style=flat-square&logo=git" alt="Downloads" /></a>
+  <a href="https://pypi.org/project/tzero-mcp/"><img src="https://img.shields.io/badge/pypi-v12.1.0-3b82f6?style=flat-square&logo=pypi&logoColor=white" alt="PyPI" /></a>
+  <a href="https://www.npmjs.com/package/tzero-mcp"><img src="https://img.shields.io/badge/npm-v12.1.0-cb3837?style=flat-square&logo=npm&logoColor=white" alt="npm" /></a>
+  <a href="https://marketplace.visualstudio.com/items?itemName=siber-akademi.tzero-vscode"><img src="https://img.shields.io/badge/vscode-v12.1.0-007acc?style=flat-square&logo=visualstudiocode&logoColor=white" alt="VS Code" /></a>
+  <a href="https://open-vsx.org/extension/siber-akademi/tzero-vscode"><img src="https://img.shields.io/badge/open--vsx-v12.1.0-8b5cf6?style=flat-square&logo=openvsx&logoColor=white" alt="Open VSX" /></a>
+  <a href="../LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-64748b?style=flat-square" alt="License AGPL-3.0" /></a>
 </p>
 
 [English](../README.md) | [Türkçe](README.tr.md) | [日本語](README.ja.md) | **简体中文**
