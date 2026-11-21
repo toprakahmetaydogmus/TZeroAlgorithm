@@ -16,16 +16,14 @@
 <!-- Rozetler 2. Kademe: Mühendislik Kalitesi, Güvenlik, Testler ve Yönetişim -->
 [![Motor](https://img.shields.io/badge/motor-Rust%20%2B%20Python%20AST-orange?style=flat-square&logo=rust&logoColor=white)](../README.md#whats-new-in-v1200-turbo-rust-hybrid-core--multi-language-tree-sitter)
 [![Güvenlik](https://img.shields.io/badge/g%C3%BCvenlik-%25100%20S%C4%B1f%C4%B1r--S%C4%B1z%C4%B1nt%C4%B1-emerald?style=flat-square&logo=shield)](../README.md#security-architecture)
-[![Testler](https://img.shields.io/badge/testler-647%20ge%C3%A7ti%20(%25100)-10b981?style=flat-square&logo=githubactions&logoColor=white)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions)
+[![CI](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions/workflows/ci.yml/badge.svg)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions/workflows/ci.yml)
 [![TDQS](https://img.shields.io/badge/TDQS-5.0%20%2F%205.0%20(Derece%20A%2B)-8b5cf6?style=flat-square&logo=checkmarx&logoColor=white)](https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm/schema)
-[![CodeQL Analizi](https://img.shields.io/badge/code%20scanning-CodeQL%20ba%C5%9Far%C4%B1l%C4%B1-10b981?style=flat-square&logo=github)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions/workflows/codeql.yml)
+[![CodeQL Analizi](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions/workflows/codeql.yml/badge.svg)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions/workflows/codeql.yml)
 [![Dependabot](https://img.shields.io/badge/dependabot-aktif-02569B?style=flat-square&logo=dependabot&logoColor=white)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/blob/main/.github/dependabot.yml)
 [![Lisans](https://img.shields.io/badge/lisans-AGPL--3.0-64748b?style=flat-square)](../LICENSE)
 <!-- m8ven.ai/badge/mcp/toprakahmetaydogmus/tzeroalgorithm -->
 
 <br>
-
-<div align="center">
 
 ### 🌟 100 Yıldız Yolculuğu: T-Zero'yu %100 Ücretsiz ve Açık Kaynak Tutmamıza Destek Olun!
 *Cursor, Claude Code, Windsurf ve Antigravity IDE için ampirik olarak kanıtlanmış deterministik AST token sıkıştırma motoru.*
@@ -37,8 +35,6 @@
 
 > **T-Zero LLM bağlam boyutunuzu küçülttüyse veya token faturalarınızı düşürdüyse lütfen GitHub'da bize bir yıldız verin! ⭐**  
 > *Her bir yıldız, bağımsız geliştiricinin bu projeyi %100 ücretsiz, çevrimdışı ve sıfır sızıntılı olarak sürdürmesini destekler.*
-
-</div>
 
 </div>
 

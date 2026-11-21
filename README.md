@@ -598,32 +598,19 @@ T-Zero has no venture capital backing, no paywalls, and no telemetry tracking. I
 - ⭐ **Star the Repository:** Every GitHub star helps independent open-source developers discover T-Zero.
 - 🪙 **Crypto Donations (Direct Sustenance):**
 
-| Support Channel / Currency | Address / Link |
-| :--- | :--- |
-| **GitHub Sponsors** | [github.com/sponsors/toprakahmetaydogmus](https://github.com/sponsors/toprakahmetaydogmus) |
-| **USDT (TRC-20 Network)** | `TE7uKxZJ414u938gWf6bYh9QvRk2141517` |
-| **Bitcoin (BTC Network)** | `bc1q9k4hvd6c2g8l9w3z7v8f2k3j5l8n9m1p4q7r0s` |
-| **Ethereum / EVM (ERC-20 / Arbitrum / Polygon / BSC)** | `0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5` |
-| **Bio & Links** | [hopp.bio/siberegitim](https://hopp.bio/siberegitim) |
+| Network / Currency | Address / Link | Details & Purpose |
+| :--- | :--- | :--- |
+| 🟢 **USDT (TRC-20)** | `TE7uKxZJ414u938gWf6bYh9QvRk2141517` | Zero/low-fee TRC-20 transfer network |
+| 🟠 **Bitcoin (BTC)** | `bc1q9k4hvd6c2g8l9w3z7v8f2k3j5l8n9m1p4q7r0s` | Native SegWit address (bech32) |
+| 🔷 **Ethereum / EVM** | `0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5` | ERC-20, Arbitrum, Polygon, Optimism & BSC |
+| 💖 **GitHub Sponsors** | [github.com/sponsors/toprakahmetaydogmus](https://github.com/sponsors/toprakahmetaydogmus) | Recurring or one-time open source sponsorship |
+| 🌐 **Creator Hub** | [hopp.bio/siberegitim](https://hopp.bio/siberegitim) | Developer profile, socials, and direct contact |
+
+> 💡 *100% of community contributions directly sustain CI/CD matrix runners, PyPI/npm automated releases, benchmark hosting, and guarantee T-Zero remains permanently free, offline, and zero-leak for all developers globally.*
 
 <br>
 
 <div align="center">
-
-### 📊 Community Distribution & Real-Time Scale
-
-[![GitHub Stars](https://img.shields.io/github/stars/toprakahmetaydogmus/TZeroAlgorithm?style=flat-square&logo=github&color=f59e0b&label=Stars)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/stargazers)
-[![GitHub Forks](https://img.shields.io/github/forks/toprakahmetaydogmus/TZeroAlgorithm?style=flat-square&logo=github&color=38bdf8&label=Forks)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/network/members)
-[![Downloads](https://img.shields.io/badge/downloads-20%2C880%2B-10b981?style=flat-square&logo=git)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases)
-[![PyPI](https://img.shields.io/badge/pypi-v12.1.0-3b82f6?style=flat-square&logo=pypi&logoColor=white)](https://pypi.org/project/tzero-mcp/)
-[![npm](https://img.shields.io/badge/npm-v12.1.0-cb3837?style=flat-square&logo=npm)](https://www.npmjs.com/package/tzero-mcp)
-[![VS Code](https://img.shields.io/badge/vscode-v12.1.0-007acc?style=flat-square&logo=visualstudiocode&logoColor=white)](https://marketplace.visualstudio.com/items?itemName=siber-akademi.tzero-vscode)
-[![Open VSX](https://img.shields.io/badge/open--vsx-v12.1.0-8b5cf6?style=flat-square&logo=openvsx&logoColor=white)](https://open-vsx.org/extension/siber-akademi/tzero-vscode)
-[![Latest Commit](https://img.shields.io/github/last-commit/toprakahmetaydogmus/TZeroAlgorithm?style=flat-square&logo=github&color=10b981)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/commits/main)
-
-<br>
-
-<br>
 
 ### 🚀 1-Click Community Share Hub
 Help us reach our **100 Stars Milestone**! Share T-Zero with your network in one click:
