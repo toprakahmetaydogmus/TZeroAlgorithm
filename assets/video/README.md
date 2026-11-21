@@ -1,8 +1,8 @@
-# 🎬 T-Zero Official Launch Video & Multimedia Showcase
+# T-Zero Official Launch Video & Multimedia Showcase
 
 This directory documents the official launch video assets produced via the `/brag` framework.
 
-## 📦 Video Deliverables
+## Video Deliverables
 
 | Asset | Description | Path |
 |---|---|---|
@@ -14,7 +14,7 @@ This directory documents the official launch video assets produced via the `/bra
 | **Single Share Caption** | Canonical 3-sentence viral launch copy | [`brag-output/share-copy.txt`](../../brag-output/share-copy.txt) |
 | **Multi-Platform Copy** | Threads & posts for X/Twitter, LinkedIn, Reddit, Show HN | [`brag-output/share-copy-variants.md`](../../brag-output/share-copy-variants.md) |
 
-## 🌟 5-Scene Video Architecture
+## 5-Scene Video Architecture
 
 1. **Act 01 (0.0s – 4.5s): The AI Context Bloat Crisis** — 90k+ raw tokens in Cursor & Claude burning budgets and degrading model reasoning.
 2. **Act 02 (4.5s – 9.0s): Deterministic AST Compression** — 94,370 ➔ 4,820 tokens (-94.9% reduction) with zero typed signature loss.

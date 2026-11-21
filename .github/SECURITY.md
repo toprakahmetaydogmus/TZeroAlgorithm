@@ -18,7 +18,7 @@ We provide security updates and patches for the following versions:
 
 ---
 
-## 🔒 100% Zero-Leak Architectural Guarantees
+## 100% Zero-Leak Architectural Guarantees
 
 T-Zero is intentionally designed to be **safe by construction**:
 

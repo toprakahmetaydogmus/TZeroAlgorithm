@@ -4,7 +4,7 @@ Thank you for using **T-Zero**! Whether you are integrating T-Zero into Cursor, 
 
 ---
 
-## ⚡ Self-Service & Quick Solutions
+## Self-Service & Quick Solutions
 
 Before opening an issue or reaching out, check these resources:
 
@@ -31,7 +31,7 @@ Before opening an issue or reaching out, check these resources:
 
 ---
 
-## 💬 Community Channels & Discussions
+## Community Channels & Discussions
 
 - **GitHub Discussions:**
   Ask general questions, share configurations, and propose new features:
@@ -46,7 +46,7 @@ Before opening an issue or reaching out, check these resources:
 
 ---
 
-## 📬 Direct Contact & Enterprise Support
+## Direct Contact & Enterprise Support
 
 - **Lead Developer & Maintainer:** Toprak Ahmet Aydoğmuş (Siber Akademi)
 - **Email:** `siberakademi@org.tr`

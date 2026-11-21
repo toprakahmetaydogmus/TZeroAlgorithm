@@ -4,7 +4,7 @@ Thank you for your interest in contributing to **T-Zero**! We welcome community 
 
 ---
 
-## 🛠 Local Development Setup
+## Local Development Setup
 
 1. **Clone the repository:**
    ```bash
@@ -28,7 +28,7 @@ Thank you for your interest in contributing to **T-Zero**! We welcome community 
 
 ---
 
-## 🧪 Verification Pipeline Before Submitting a PR
+## Verification Pipeline Before Submitting a PR
 
 Before opening a pull request, ensure all verification gates pass locally:
 
@@ -55,7 +55,7 @@ Before opening a pull request, ensure all verification gates pass locally:
 
 ---
 
-## 📐 Code Style & Architecture Guidelines
+## Code Style & Architecture Guidelines
 
 - **Determinism First:** All AST parsing, BM25 searching, and token reduction must run 100% locally with zero external network telemetry.
 - **Inward Dependencies:** Core modules (`tzero_packer`, `tzero_guard`) must not depend on outer presentation layers (`tzero_tui`, `tzero_gui`).
@@ -64,7 +64,7 @@ Before opening a pull request, ensure all verification gates pass locally:
 
 ---
 
-## 💬 Community & Discussions
+## Community & Discussions
 
 - **GitHub Issues:** [Bug Reports & Feature Requests](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/issues)
 - **Hugging Face Space:** [Interactive Web Demo](https://huggingface.co/spaces/toprakke4/tzero-token-reducer)

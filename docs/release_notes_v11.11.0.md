@@ -7,7 +7,7 @@
 
 ---
 
-## ⚡ What's New in v11.11.0
+## What's New in v11.11.0
 
 ### 1. 🤖 AI Supervisor & Godfather Auto-Corrector Engine (`tzero/tzero_fix.py`)
 - **AST Hallucination Auto-Corrector:** Deep AST static inspection engine that catches AI coding hallucinations before they cause runtime exceptions or build failures.

@@ -8,7 +8,7 @@ def generate_readme():
     return r"""<a id="top"></a>
 <div align="center">
 
-# 🧠 T-Zero: Deterministic AST Context Compressor & MCP Server
+# T-Zero: Deterministic AST Context Compressor & MCP Server
 
 ### *Empirically Proven Token Optimization Engine, 14 Canonical MCP Tools, Real BPE Tokenizer Benchmarks & Pre-Flight Reality-Lock for AI Coding Assistants.*
 
@@ -37,7 +37,7 @@ def generate_readme():
   </a>
 </p>
 
-### ⚡ 30-Second Quickstart
+### 30-Second Quickstart
 
 ```bash
 # 1. Install via pip:
@@ -50,7 +50,7 @@ tzero --tree . --out context.txt
 tzero init
 ```
 
-### 🧭 Navigation & Interactive Jump Stations
+### Navigation & Interactive Jump Stations
 
 [![Why T-Zero](https://img.shields.io/badge/Why_T--Zero-0284c7?style=for-the-badge&logo=rocket&logoColor=white)](#why-t-zero)
 [![Task Benchmark](https://img.shields.io/badge/Task_Benchmark-10b981?style=for-the-badge&logo=speedtest&logoColor=white)](#task-completion-benchmark)
@@ -77,13 +77,13 @@ tzero init
 ---
 
 <a id="why-t-zero"></a>
-## ⚡ Executive Summary: What is T-Zero?
+## Executive Summary: What is T-Zero?
 
 **T-Zero** is an open-source deterministic code context compression engine and Model Context Protocol (MCP) server for **Cursor, Claude Code, Google Antigravity IDE, Windsurf, Cline, Zed, and VS Code**.
 
 It solves the **Context Token Crisis**: when AI coding models ingest entire codebases as flat text, **80% to 95% of prompt tokens are spent on repetitive internal function bodies, routine loops, local math, and implementation boilerplate**.
 
-### 🥊 Context Architecture Comparison Matrix
+### Context Architecture Comparison Matrix
 
 | Dimension | Raw Prompt Ingestion | Vector DB / Embedding RAG | Repomix (Raw Concat) | Aider (Repo-Map) | T-Zero Deterministic AST Engine |
 | :--- | :---: | :---: | :---: | :---: | :---: |
@@ -97,7 +97,7 @@ It solves the **Context Token Crisis**: when AI coding models ingest entire code
 ---
 
 <a id="task-completion-benchmark"></a>
-## 🧪 Empirical Task-Completion & BPE Tokenizer Benchmark
+## Empirical Task-Completion & BPE Tokenizer Benchmark
 
 > **Key Architectural Question:** *Does signature-only context allow an AI coding agent to complete real-world tasks correctly, or does it cause hallucination?*
 
@@ -136,7 +136,7 @@ python tzero_task_benchmark.py
 ---
 
 <a id="language-support-breakdown"></a>
-## 🌐 Language Support Breakdown: AST vs. Heuristic Extraction
+## Language Support Breakdown: AST vs. Heuristic Extraction
 
 We believe in radical engineering transparency:
 
@@ -151,7 +151,7 @@ We believe in radical engineering transparency:
 ---
 
 <a id="universal-1-click-ide-setup"></a>
-## 🚀 Universal 1-Click IDE Setup (All Editors)
+## Universal 1-Click IDE Setup (All Editors)
 
 T-Zero automatically configures your editor in **1 second** using native Model Context Protocol (MCP) standards:
 
@@ -216,7 +216,7 @@ tzero init --zed           # Zed Editor
 ---
 
 <a id="the-14-canonical-mcp-tools"></a>
-## 🛠️ The 14 Canonical MCP Tools
+## The 14 Canonical MCP Tools
 
 All 14 tools are audited and verified against the Model Context Protocol specifications (tested by `tests.test_mcp`):
 
@@ -240,7 +240,7 @@ All 14 tools are audited and verified against the Model Context Protocol specifi
 ---
 
 <a id="huggingface-space"></a>
-## 🤗 Hugging Face Spaces Live Web Application
+## Hugging Face Spaces Live Web Application
 
 Test T-Zero directly in your browser without installing anything locally via our official Gradio application:
 
@@ -262,7 +262,7 @@ tzero space
 ---
 
 <a id="pre-flight-reality-lock"></a>
-## ⚖️ Pre-Flight Reality-Lock (Static AST Verification)
+## Pre-Flight Reality-Lock (Static AST Verification)
 
 AI coding assistants frequently hallucinate non-existent methods (e.g., `math.quantum_fast_inverse_sqrt`) or phantom library imports.
 
@@ -283,7 +283,7 @@ tzero --hallucination-check "import math; x = math.non_existent_fake_method()"
 ---
 
 <a id="security-architecture"></a>
-## 🔒 Security Architecture: Deterministic Secret Scanner
+## Security Architecture: Deterministic Secret Scanner
 
 ### OS-Native Credential Storage:
 T-Zero uses platform-native secret vaults:
@@ -301,7 +301,7 @@ T-Zero uses platform-native secret vaults:
 ---
 
 <a id="reproducible-benchmarks"></a>
-## 📊 Multi-Model Financial ROI Benchmarks
+## Multi-Model Financial ROI Benchmarks
 
 Empirical measurements conducted across real software repositories comparing raw prompt context injection against T-Zero AST-pruned context:
 
@@ -317,7 +317,7 @@ Empirical measurements conducted across real software repositories comparing raw
 ---
 
 <a id="turkce"></a>
-## 🇹🇷 Türkçe Dokümantasyon
+## Türkçe Dokümantasyon
 
 T-Zero (Token Zero), yapay zeka kodlama asistanları (Cursor, Claude Desktop, Antigravity IDE, Windsurf, Cline, VS Code, Zed) için geliştirilmiş, **deterministik AST bağlam sıkıştırıcısı ve Model Context Protocol (MCP) sunucusudur**.
 
@@ -349,7 +349,7 @@ tzero space
 
 ---
 
-## 📜 License & Siberian Academy
+## License & Siberian Academy
 
 - **Author & Architect:** Toprak Ahmet Aydoğmuş (Siber Akademi)
 - **LinkedIn:** [Toprak Ahmet Aydoğmuş](https://linkedin.com/in/toprak-ahmet-aydo%C4%9Fmu%C5%9F-60462534b/)

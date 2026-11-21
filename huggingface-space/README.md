@@ -11,7 +11,7 @@ license: agpl-3.0
 short_description: Enterprise AST Context Architect, Token Reducer & AgentOS for LLMs
 ---
 
-# 🧠 T-Zero: Enterprise AST Context Architect & Token Reducer
+# T-Zero: Enterprise AST Context Architect & Token Reducer
 
 Live Hugging Face Space demonstration for **T-Zero (v11.15.2 Sovereign Edition - TDQS 5.0 Anchor Certified)**.
 - **Up to 95.8% Context Token Reduction** via Deterministic AST Skeletonization & Symbol Topology

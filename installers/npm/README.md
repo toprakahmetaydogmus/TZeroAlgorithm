@@ -9,7 +9,7 @@
 
 ---
 
-### ⭐ Open-Source Engineering (Please Star Our Repo!)
+### Open-Source Engineering (Please Star Our Repo!)
 
 Hi! I'm **Toprak Ahmet Aydoğmuş** from **Siber Akademi**. I created T-Zero from scratch to eliminate token limits, reduce prompt costs by up to 95%, and stop AI coding hallucinations using deterministic Abstract Syntax Tree (AST) analysis.
 
@@ -20,7 +20,7 @@ If this package helps your engineering team or AI workflows:
 
 ---
 
-## ⚡ Instant MCP Execution (Zero Install Needed)
+## Instant MCP Execution (Zero Install Needed)
 
 Run directly via `npx` in your `claude_desktop_config.json`, Cursor MCP settings, or Windsurf / Antigravity config:
 
@@ -35,7 +35,7 @@ Run directly via `npx` in your `claude_desktop_config.json`, Cursor MCP settings
 }
 ```
 
-## 🚀 CLI Installation & Usage
+## CLI Installation & Usage
 
 ```bash
 # Global installation via npm
@@ -51,7 +51,7 @@ tzero-mcp
 tzero-add-mcp
 ```
 
-## 🛠 Key Capabilities
+## Key Capabilities
 
 - **95% Deterministic Token Reduction:** Compresses source code into AST skeletons preserving function signatures, type annotations, and docstrings while pruning redundant logic bodies.
 - **100% Zero-Leak Security Guard:** Deep Shannon Entropy ($H \ge 4.75$) scanner for API keys and secrets before LLM context ingestion.
@@ -59,6 +59,6 @@ tzero-add-mcp
 - **20 Native Developer Tools:** AST PageRank, call-chain tracer, BM25 semantic hybrid search, change blast radius analyzer, and system doctor.
 - **100% Private, Local & Free:** Pure offline operation — $0 API cost, zero cloud lock-in.
 
-## 📄 License
+## License
 
 AGPL-3.0-only © [Toprak Ahmet Aydoğmuş](https://github.com/toprakahmetaydogmus)

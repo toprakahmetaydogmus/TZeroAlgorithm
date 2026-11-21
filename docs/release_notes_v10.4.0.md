@@ -1,4 +1,4 @@
-# 🚀 T-Zero v10.4.0 Master Edition: The 10,000+ Line Autonomous PC-Fixer & Codebase Doctor
+# T-Zero v10.4.0 Master Edition: The 10,000+ Line Autonomous PC-Fixer & Codebase Doctor
 
 **Release Date:** November 2026  
 **License:** 100% Free & Open Source (MIT)  
@@ -8,7 +8,7 @@
 
 ---
 
-## 🌟 Executive Milestone Summary
+## Executive Milestone Summary
 T-Zero v10.4.0 marks an unprecedented milestone in developer tooling:
 - **10,615 Lines Monolithic Single-File Masterpiece (`tzero_pc_fixer.py`)**: A fully unified, zero-dependency, self-healing operating system and codebase doctor.
 - **33 Modular Self-Healing Sub-Engines (`tzero_fixer/`)**: 11,400+ lines of specialized diagnostic, repair, and orchestration packages.
@@ -16,7 +16,7 @@ T-Zero v10.4.0 marks an unprecedented milestone in developer tooling:
 
 ---
 
-## 🩺 1. Encyclopedic PC & Codebase Doctor Capabilities
+## 1. Encyclopedic PC & Codebase Doctor Capabilities
 
 ### A. Operating System, Registry, & File Lock Healer
 - **NTFS LongPaths Policies**: Detects and alerts on Windows 260-character `MAX_PATH` limitations (`LongPathsEnabled` in registry) and Developer Mode configurations.
@@ -55,7 +55,7 @@ T-Zero v10.4.0 marks an unprecedented milestone in developer tooling:
 
 ---
 
-## 🛠️ CLI Usage & Quickstart
+## CLI Usage & Quickstart
 
 ```bash
 # 1. Run Complete Workspace Health Diagnosis
@@ -74,7 +74,7 @@ python tzero_pc_fixer.py --format junit --out test_results.xml
 
 ---
 
-## 📦 Distribution Packages
+## Distribution Packages
 
 Install or integrate T-Zero v10.4.0:
 - **PyPI Wheel:** `pip install dist/tzero_mcp-10.4.0-py3-none-any.whl`

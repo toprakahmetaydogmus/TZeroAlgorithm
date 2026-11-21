@@ -1,10 +1,10 @@
-# 🚀 T-Zero v10.2.0 Sovereign Release — Sub-10ms Snapshot, Self-Healing AST & Polyglot Bridge
+# T-Zero v10.2.0 Sovereign Release — Sub-10ms Snapshot, Self-Healing AST & Polyglot Bridge
 
 We are thrilled to introduce **T-Zero v10.2.0 Sovereign Edition**, expanding our enterprise AST context reduction engine with breakthrough sub-8ms snapshot caching, self-healing AI hallucination auto-correction, and cross-language polyglot type transpilation!
 
 ---
 
-### 🌟 What's New in v10.2.0
+### What's New in v10.2.0
 
 1. **⚡ Sub-10ms AST Context Snapshot Engine (`tzero snapshot` / `SnapshotEngine`):**
    - Pre-computes and caches high-speed AST symbols, module dependency graphs, and token metrics into `.tzero/snapshot.json`.
@@ -32,7 +32,7 @@ We are thrilled to introduce **T-Zero v10.2.0 Sovereign Edition**, expanding our
 
 ---
 
-### 📦 Release Assets & Checksums
+### Release Assets & Checksums
 
 | File | Type | SHA-256 Checksum |
 | :--- | :--- | :--- |
@@ -45,7 +45,7 @@ We are thrilled to introduce **T-Zero v10.2.0 Sovereign Edition**, expanding our
 
 ---
 
-### ⚡ Quick Start
+### Quick Start
 
 ```bash
 # PyPI Installation

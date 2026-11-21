@@ -1,10 +1,10 @@
-# 🚀 T-Zero v10.1.0 Sovereign Release — TDQS 5.0/5.0 Anchor-Certified Edition
+# T-Zero v10.1.0 Sovereign Release — TDQS 5.0/5.0 Anchor-Certified Edition
 
 We are proud to announce **T-Zero v10.1.0**, achieving a **flawless 5.0/5.0 Grade A Tool Definition Quality Score (TDQS)** across all tools according to the official [tdqs.dev](https://tdqs.dev) evaluation specification!
 
 ---
 
-### 🌟 What's New in v10.1.0
+### What's New in v10.1.0
 
 1. **🏆 100% Flawless TDQS 5.0/5.0 Grade A Certification:**
    - **Purpose Clarity (5/5):** Clear active verbs, exact operational distinctions, and zero sibling shadowing.
@@ -27,7 +27,7 @@ We are proud to announce **T-Zero v10.1.0**, achieving a **flawless 5.0/5.0 Grad
 
 ---
 
-### 📦 Release Assets & Checksums
+### Release Assets & Checksums
 
 | File | Type | SHA-256 Checksum |
 | :--- | :--- | :--- |
@@ -40,7 +40,7 @@ We are proud to announce **T-Zero v10.1.0**, achieving a **flawless 5.0/5.0 Grad
 
 ---
 
-### ⚡ Quick Start
+### Quick Start
 
 ```bash
 # PyPI Installation

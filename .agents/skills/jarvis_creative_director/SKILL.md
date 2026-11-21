@@ -5,7 +5,7 @@ description: >-
   Activate when the user asks to generate video prompts, image prompts, launch storyboards, promotional media, or types "/creative" or "/storyboard".
 ---
 
-# 🎬 /creative — T-Zero Jarvis Multi-Modal Creative Director
+# /creative — T-Zero Jarvis Multi-Modal Creative Director
 
 Synthesizes high-fidelity AI video generation prompts, photorealistic visual prompts, and complete 5-scene product launch storyboards directly from source code, technical features, or system architecture.
 
@@ -15,7 +15,7 @@ License: AGPL-3.0-only
 
 ---
 
-## 🚀 Capabilities
+## Capabilities
 
 1. **Cinematic Video Generation Prompts:**
    - Engineered for **OpenAI Sora**, **Kling 1.5**, **Runway Gen-3 Alpha**, and **Luma Dream Machine**.
@@ -37,7 +37,7 @@ License: AGPL-3.0-only
 
 ---
 
-## 🛠️ Usage
+## Usage
 
 ### A. Via MCP Tool (`execute_codebase_workflow`)
 ```json

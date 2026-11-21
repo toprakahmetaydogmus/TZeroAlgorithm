@@ -110,29 +110,48 @@ def process_file(path: pathlib.Path) -> int:
     return count
 
 
-if __name__ == "__main__":
-    target_files = [
-        pathlib.Path("README.md"),
-        pathlib.Path("docs/README.tr.md"),
-        pathlib.Path("docs/README.ja.md"),
-        pathlib.Path("docs/README.zh.md"),
-        pathlib.Path("AI_INSPECTION.md"),
-        pathlib.Path("GEMINI.md"),
-        pathlib.Path("AGENT.md"),
-        pathlib.Path("AGENTS.md"),
-        pathlib.Path("benchmark-site/index.html"),
-        pathlib.Path("docs/ARCHITECTURE.md"),
-        pathlib.Path("docs/github_action_guide.md"),
-        pathlib.Path("docs/ROADMAP.md"),
-        pathlib.Path("docs/WHITE_PAPER_TZERO_V10.md"),
-        pathlib.Path("docs/REAL_PC_BENCHMARK_REPORT.md"),
-        pathlib.Path("docs/ZERO_HALLUCINATION_PROOF.md"),
-        pathlib.Path("docs/WALKTHROUGH.md"),
-        pathlib.Path("docs/WORKSPACE_ORCHESTRATION.md"),
-    ]
+def discover_target_files(root: pathlib.Path) -> list[pathlib.Path]:
+    ignored_dirs = {".git", ".venv", "venv", "node_modules", "build", "dist", "__pycache__"}
+    targets = []
+    for p in root.rglob("*"):
+        if any(part in ignored_dirs for part in p.parts):
+            continue
+        if p.is_file() and p.suffix.lower() in {".md", ".html"}:
+            targets.append(p)
+    return sorted(targets)
 
-    total = 0
+
+if __name__ == "__main__":
+    import sys
+    check_mode = "--check" in sys.argv
+    root = pathlib.Path(__file__).resolve().parent.parent
+
+    target_files = discover_target_files(root)
+    total_cleaned = 0
+    violations = []
+
     for p in target_files:
-        if p.is_file():
-            total += process_file(p)
-    print(f"\nCompleted! Total headings cleaned: {total}")
+        content = p.read_text(encoding="utf-8", errors="ignore")
+        if check_mode:
+            in_code = False
+            for line_no, line in enumerate(content.splitlines(), start=1):
+                if line.strip().startswith("```"):
+                    in_code = not in_code
+                    continue
+                if not in_code and re.match(r"^\s*#{1,6}\s+", line):
+                    if MD_HEADING_RE.match(line):
+                        violations.append(f"{p.relative_to(root)}:{line_no} -> {line.strip()}")
+        else:
+            total_cleaned += process_file(p)
+
+    if check_mode:
+        if violations:
+            print(f"Found {len(violations)} headings starting with emojis:")
+            for v in violations:
+                print(f"  {v}")
+            sys.exit(1)
+        else:
+            print("Check passed: 0 headings start with emojis.")
+            sys.exit(0)
+    else:
+        print(f"\nCompleted! Total headings cleaned: {total_cleaned}")

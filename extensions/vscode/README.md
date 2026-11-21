@@ -1,4 +1,4 @@
-# ⚡ T-Zero Context Architect & MCP (VS Code & Cursor Extension)
+# T-Zero Context Architect & MCP (VS Code & Cursor Extension)
 
 <p align="center">
   <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm">
@@ -26,7 +26,7 @@
 
 ---
 
-## ⚡ Features
+## Features
 
 - **🚀 1-Click MCP Initialize:** Automatically configures Cursor (`.cursor/mcp.json`), Claude Desktop, Windsurf, and VS Code Copilot with zero manual setup.
 - **✂️ Focus-Aware AST Pruner:** Compress large Python, TypeScript, Rust, Go, and C++ files down to minimal interface signatures before passing to AI.
@@ -36,7 +36,7 @@
 
 ---
 
-## 🖥️ Terminal Benchmark Preview
+## Terminal Benchmark Preview
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/toprakahmetaydogmus/TZeroAlgorithm/main/assets/tzero_terminal_benchmark.png" width="100%" alt="T-Zero Autonomous Benchmark Terminal" style="border-radius: 12px;" />
@@ -44,7 +44,7 @@
 
 ---
 
-## 📦 Instant Setup
+## Instant Setup
 
 Run directly with zero installation via `npx` or install globally:
 
@@ -60,7 +60,7 @@ pip install --upgrade tzero-mcp
 
 ---
 
-## 🛠 Commands
+## Commands
 
 Open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`):
 - `T-Zero: Initialize MCP in Workspace`: 1-Click install MCP server into Cursor & VS Code.

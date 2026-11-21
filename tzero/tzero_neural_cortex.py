@@ -1244,7 +1244,7 @@ name: {role_clean}
 description: Autonomous T-Zero Subagent specialized in {task}
 ---
 
-# 🤖 Subagent Persona: {role}
+# Subagent Persona: {role}
 **Mission Objective:** {task}
 **Context Tier:** {tier_level} (Ultra-compact AST Signatures)
 **Security Rating:** 100% Zero-Leak Certified

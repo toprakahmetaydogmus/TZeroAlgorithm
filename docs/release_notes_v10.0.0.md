@@ -1,4 +1,4 @@
-# 🧠 T-Zero v10.0.0 Sovereign Decade Milestone — 100% TDQS 5.0/5.0 Anchor Certified
+# T-Zero v10.0.0 Sovereign Decade Milestone — 100% TDQS 5.0/5.0 Anchor Certified
 
 ### Empirically Proven Token Optimization Engine, 52 Model Context Protocol Tools & Pre-Flight Reality-Lock for AI Coding Assistants
 
@@ -6,7 +6,7 @@ We are thrilled to announce the official release of **T-Zero v10.0.0 (The Sovere
 
 ---
 
-### 🌟 Key Release Highlights
+### Key Release Highlights
 
 - **🏆 100% TDQS 5.0 / 5.0 Anchor Certification across All 52 Tools:**
   Every single MCP tool has been audited and certified across all 6 mathematical dimensions (Purpose Clarity with sibling differentiation, Usage Guidelines with explicit 'When to use' / 'When NOT to use' routing, Behavioral Transparency matching annotations, Parameter Semantics, Structured Layout, and Contextual Completeness). Zero tool hallucinations.
@@ -23,7 +23,7 @@ We are thrilled to announce the official release of **T-Zero v10.0.0 (The Sovere
 
 ---
 
-### 📦 Quickstart
+### Quickstart
 
 ```bash
 # 1. Install CLI via pip:
@@ -39,5 +39,5 @@ tzero --tree . --out context.txt
 tzero space
 ```
 
-### 🌐 Live Web Demo
+### Live Web Demo
 Try T-Zero directly in your browser: [https://huggingface.co/spaces/toprakke4/tzero-token-reducer](https://huggingface.co/spaces/toprakke4/tzero-token-reducer)

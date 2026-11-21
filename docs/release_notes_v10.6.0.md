@@ -1,4 +1,4 @@
-# 🚀 T-Zero v10.6.0 Sovereign Master Release: 1-Click Auto-Vault, Pre-Flight Reality-Lock & Blast Radius Intelligence
+# T-Zero v10.6.0 Sovereign Master Release: 1-Click Auto-Vault, Pre-Flight Reality-Lock & Blast Radius Intelligence
 
 > **Release Version:** `v10.6.0`  
 > **Release Date:** November 5, 2026  
@@ -10,13 +10,13 @@
 
 ---
 
-## 🌟 Executive Summary
+## Executive Summary
 
 **T-Zero v10.6.0** is the definitive sovereign intelligence milestone for AI coding assistants (Cursor, Claude Desktop, Antigravity IDE, Windsurf, Cline, VS Code, and Zed). This release introduces four ground-breaking developer tools beyond token compression: **1-Click Auto-Vault Secret Migrator**, **Pre-Flight AI Reality-Lock**, **AST Change Impact & Blast Radius Analyzer**, and **Autonomous PC-Fixer Doctor**, wrapped in an authentic 8-Tab Zero-GPU Web Studio and a 100% Canonical English documentation suite.
 
 ---
 
-## ⚡ The 4 Core Breakthroughs in v10.6.0
+## The 4 Core Breakthroughs in v10.6.0
 
 ### 1. 🔐 1-Click Auto-Vault Secret Migrator (`tzero --vault --migrate`)
 - **Automated Credential Extraction:** Scans codebases for hardcoded secrets across 13 major providers (OpenAI, Anthropic, AWS, Stripe, Google Gemini, Database URLs, Slack, JWT, PKI private keys).
@@ -53,7 +53,7 @@
 
 ---
 
-## 🌐 8-Tab Zero-GPU Web Studio (Hugging Face Spaces)
+## 8-Tab Zero-GPU Web Studio (Hugging Face Spaces)
 
 The official live web app at [https://huggingface.co/spaces/toprakke4/tzero-token-reducer](https://huggingface.co/spaces/toprakke4/tzero-token-reducer) has been modernized to v10.6.0 with 8 dedicated interactive tabs:
 
@@ -68,20 +68,20 @@ The official live web app at [https://huggingface.co/spaces/toprakke4/tzero-toke
 
 ---
 
-## 📦 Canonical English Documentation
+## Canonical English Documentation
 - **Primary [README.md](README.md):** Re-architected as a 100% English reference standard matching PyTorch and LangChain.
 - **Turkish Guide [README.tr.md](README.tr.md):** Dedicated native Turkish documentation linked via top language switcher badges.
 - **Zero Mojibake:** 100% pure ASCII across CLI reports, web UI tabs, and terminal banners.
 
 ---
 
-## 🛠️ Verification & Test Suite
+## Verification & Test Suite
 - **Unit Tests:** 86/86 automated unit tests passed with 100% green integrity (`python -m unittest discover tests`).
 - **Deterministic:** Pure Python AST parsing with zero network transmission.
 
 ---
 
-## 🚀 Installation & Quickstart
+## Installation & Quickstart
 
 ```bash
 # 1. Install via PyPI
