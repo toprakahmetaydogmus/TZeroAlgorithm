@@ -129,6 +129,29 @@ class TestCIWorkflow(unittest.TestCase):
 
         self.assertIn("compile.py", rel_text)
         self.assertIn("softprops/action-gh-release", rel_text)
+        self.assertIn("TZeroCI.exe", rel_text)
+        self.assertIn("dist/*.tgz", rel_text)
+
+    def test_all_release_workflows_trigger_on_published_releases(self):
+        workflows = [
+            ROOT_DIR / ".github" / "workflows" / "release.yml",
+            ROOT_DIR / ".github" / "workflows" / "publish-pypi.yml",
+            ROOT_DIR / ".github" / "workflows" / "publish-npm.yml",
+            ROOT_DIR / ".github" / "workflows" / "publish-extension.yml",
+        ]
+        for wf_path in workflows:
+            self.assertTrue(wf_path.exists(), f"{wf_path.name} must exist")
+            text = wf_path.read_text(encoding="utf-8")
+            self.assertIn("release:", text, f"{wf_path.name} must have release trigger")
+            self.assertIn("published", text, f"{wf_path.name} must trigger on published release")
+
+    def test_siber_akademi_icon_root_wrapper_importable(self):
+        icon_path = ROOT_DIR / "siber_akademi_icon.py"
+        self.assertTrue(icon_path.exists(), "Root siber_akademi_icon.py must exist")
+        import siber_akademi_icon
+        self.assertTrue(hasattr(siber_akademi_icon, "get_icon_file_path"))
+        self.assertTrue(hasattr(siber_akademi_icon, "apply_window_icon"))
+        self.assertTrue(hasattr(siber_akademi_icon, "SIBER_AKADEMI_ICO_BASE64"))
 
     def test_all_github_yaml_files_are_valid(self):
         for path in (ROOT_DIR / ".github").rglob("*.yml"):

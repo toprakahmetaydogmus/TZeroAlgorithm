@@ -9,6 +9,8 @@ concurrency:
     tags:
       - 'v*'
       - 'v[0-9]*'
+  release:
+    types: [published]
   workflow_dispatch:
 
 jobs:

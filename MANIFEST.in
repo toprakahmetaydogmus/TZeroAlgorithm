@@ -15,6 +15,7 @@ include AGENTS.md
 include docs/README.tr.md
 include tzero.py
 include tzero_mcp.py
+include siber_akademi_icon.py
 include docs/VIRAL_GROWTH_100_STARS.md
 include docs/REAL_PC_BENCHMARK_REPORT.md
 include docs/ZERO_HALLUCINATION_PROOF.md

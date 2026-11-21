@@ -13,6 +13,8 @@ concurrency:
     tags:
       - 'v*'
       - 'v[0-9]*'
+  release:
+    types: [published]
   workflow_dispatch:
     inputs:
       tag_name:
@@ -70,13 +72,14 @@ jobs:
           if (-not (Test-Path dist\TZeroMCP.exe)) { throw "dist\TZeroMCP.exe was not built" }
           if (-not (Test-Path dist\AddMCP.exe)) { throw "dist\AddMCP.exe was not built" }
           if (-not (Test-Path dist\TZeroCLI.exe)) { throw "dist\TZeroCLI.exe was not built" }
-          foreach ($name in @("TZeroAlgorithm.exe", "TZeroMCP.exe", "AddMCP.exe", "TZeroCLI.exe")) {
+          if (-not (Test-Path dist\TZeroCI.exe)) { throw "dist\TZeroCI.exe was not built" }
+          foreach ($name in @("TZeroAlgorithm.exe", "TZeroMCP.exe", "AddMCP.exe", "TZeroCLI.exe", "TZeroCI.exe")) {
             $p = Start-Process -FilePath "dist\$name" -ArgumentList "--version" -Wait -PassThru
             if ($p.ExitCode -ne 0) { throw "$name --version exited with code $($p.ExitCode)" }
             Write-Host "$name OK, size: $((Get-Item "dist\$name").Length) bytes"
           }
 
-      - name: Set up Node.js for VS Code Extension
+      - name: Set up Node.js for Packages
         uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -94,6 +97,18 @@ jobs:
             sha256sum "$VSIX" | awk '{print $1 "  " $2}' > "${VSIX}.sha256"
             echo "VSIX Packaged: $VSIX"
           fi
+
+      - name: Build npm Package Tarball (.tgz)
+        shell: pwsh
+        run: |
+          cd installers/npm
+          npm pack --pack-destination ../../dist
+          cd ../..
+          Get-ChildItem dist\*.tgz | ForEach-Object {
+            $hash = (Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLower()
+            "$hash  $($_.Name)" | Out-File -Encoding ascii "$($_.FullName).sha256"
+            Write-Host "$($_.Name) SHA-256: $hash"
+          }
 
       - name: Compute SHA-256 checksums
         shell: pwsh
@@ -115,6 +130,8 @@ jobs:
             dist/TZeroCLI.exe.sha256
             dist/TZeroMCP.exe
             dist/TZeroMCP.exe.sha256
+            dist/TZeroCI.exe
+            dist/TZeroCI.exe.sha256
             dist/AddMCP.exe
             dist/AddMCP.exe.sha256
             dist/TZero-*.zip
@@ -125,9 +142,11 @@ jobs:
             dist/*.whl.sha256
             dist/*.tar.gz
             dist/*.tar.gz.sha256
+            dist/*.tgz
+            dist/*.tgz.sha256
 
       - name: Publish GitHub Release
-        if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+        if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'release' || github.event_name == 'workflow_dispatch'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || inputs.tag_name || 'v12.1.0' }}
@@ -139,6 +158,8 @@ jobs:
             dist/TZeroCLI.exe.sha256
             dist/TZeroMCP.exe
             dist/TZeroMCP.exe.sha256
+            dist/TZeroCI.exe
+            dist/TZeroCI.exe.sha256
             dist/AddMCP.exe
             dist/AddMCP.exe.sha256
             dist/TZero-*.zip
@@ -149,4 +170,6 @@ jobs:
             dist/*.whl.sha256
             dist/*.tar.gz
             dist/*.tar.gz.sha256
+            dist/*.tgz
+            dist/*.tgz.sha256
           generate_release_notes: false

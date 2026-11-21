@@ -9,6 +9,8 @@ concurrency:
     tags:
       - 'v*'
       - 'v[0-9]*'
+  release:
+    types: [published]
   workflow_dispatch:
     inputs:
       publish_openvsx:
@@ -58,7 +60,7 @@ jobs:
           path: dist/*.vsix
 
       - name: Publish to Open VSX Registry
-        if: ${{ (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')) || (github.event_name == 'workflow_dispatch' && inputs.publish_openvsx) }}
+        if: ${{ (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')) || github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.publish_openvsx) }}
         continue-on-error: true
         env:
           OVSX_PAT: ${{ secrets.OVSX_PAT }}
@@ -98,7 +100,7 @@ jobs:
           fi
 
       - name: Publish to VS Code Marketplace
-        if: ${{ (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')) || (github.event_name == 'workflow_dispatch' && inputs.publish_vscode) }}
+        if: ${{ (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')) || github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.publish_vscode) }}
         continue-on-error: true
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
