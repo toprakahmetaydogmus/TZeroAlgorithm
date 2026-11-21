@@ -123,32 +123,19 @@ T-Zero'nun hiçbir risk sermayesi fonu, ücretli aboneliği veya telemetri takib
 - ⭐ **Repoya Yıldız Verin:** Her GitHub yıldızı açık kaynak ekosistemini güçlendirir ve T-Zero'nun keşfedilmesini sağlar.
 - 🪙 **Kripto ile Destek (Doğrudan Katkı):**
 
-| Destek Kanalı / Ağ | Adres / Bağlantı |
-| :--- | :--- |
-| **GitHub Sponsors** | [github.com/sponsors/toprakahmetaydogmus](https://github.com/sponsors/toprakahmetaydogmus) |
-| **USDT (TRC-20 Ağı)** | `TE7uKxZJ414u938gWf6bYh9QvRk2141517` |
-| **Bitcoin (BTC Ağı)** | `bc1q9k4hvd6c2g8l9w3z7v8f2k3j5l8n9m1p4q7r0s` |
-| **Ethereum / EVM (ERC-20 / Arbitrum / Polygon / BSC)** | `0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5` |
-| **Tüm Bağlantılar** | [hopp.bio/siberegitim](https://hopp.bio/siberegitim) |
+| Ağ / Platform | Cüzdan Adresi / Bağlantı | Açıklama ve Amaç |
+| :--- | :--- | :--- |
+| 🟢 **USDT (TRC-20)** | `TE7uKxZJ414u938gWf6bYh9QvRk2141517` | Sıfır/çok düşük transfer komisyonlu USDT ağı |
+| 🟠 **Bitcoin (BTC)** | `bc1q9k4hvd6c2g8l9w3z7v8f2k3j5l8n9m1p4q7r0s` | Native SegWit cüzdan adresi (bech32) |
+| 🔷 **Ethereum / EVM** | `0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5` | ERC-20, Arbitrum, Polygon, Optimism & BSC |
+| 💖 **GitHub Sponsors** | [github.com/sponsors/toprakahmetaydogmus](https://github.com/sponsors/toprakahmetaydogmus) | Aylık düzenli veya tek seferlik açık kaynak desteği |
+| 🌐 **Geliştirici İletişim** | [hopp.bio/siberegitim](https://hopp.bio/siberegitim) | Tüm sosyal medya ve geliştirici profil bağlantıları |
+
+> 💡 *Tüm topluluk bağışları, T-Zero'nun sürekli entegrasyon (CI/CD) matrislerini, otomatik paket yayınlarını, açık kaynak test altyapısını ve araçların tüm geliştiriciler için daima %100 ücretsiz, çevrimdışı ve sıfır-sızıntılı kalmasını finanse etmek için kullanılır.*
 
 <br>
 
 <div align="center">
-
-### 📊 Topluluk Ölçeği ve Dağıtım Metrikleri
-
-[![GitHub Yıldızları](https://img.shields.io/github/stars/toprakahmetaydogmus/TZeroAlgorithm?style=flat-square&logo=github&color=f59e0b&label=Yıldızlar)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/stargazers)
-[![GitHub Forklar](https://img.shields.io/github/forks/toprakahmetaydogmus/TZeroAlgorithm?style=flat-square&logo=github&color=38bdf8&label=Forklar)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/network/members)
-[![İndirmeler](https://img.shields.io/badge/downloads-20%2C880%2B-10b981?style=flat-square&logo=git)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases)
-[![PyPI](https://img.shields.io/badge/pypi-v12.1.0-3b82f6?style=flat-square&logo=pypi&logoColor=white)](https://pypi.org/project/tzero-mcp/)
-[![npm](https://img.shields.io/badge/npm-v12.1.0-cb3837?style=flat-square&logo=npm)](https://www.npmjs.com/package/tzero-mcp)
-[![VS Code](https://img.shields.io/badge/vscode-v12.1.0-007acc?style=flat-square&logo=visualstudiocode&logoColor=white)](https://marketplace.visualstudio.com/items?itemName=siber-akademi.tzero-vscode)
-[![Open VSX](https://img.shields.io/badge/open--vsx-v12.1.0-8b5cf6?style=flat-square&logo=openvsx&logoColor=white)](https://open-vsx.org/extension/siber-akademi/tzero-vscode)
-[![Son Commit](https://img.shields.io/github/last-commit/toprakahmetaydogmus/TZeroAlgorithm?style=flat-square&logo=github&color=10b981)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/commits/main)
-
-<br>
-
-<br>
 
 ### 🚀 Tek Tıkla Topluluk Paylaşımı
 **100 Yıldız Hedefimize** ulaşmamıza destek olun! T-Zero'yu tek tıkla paylaşın:
