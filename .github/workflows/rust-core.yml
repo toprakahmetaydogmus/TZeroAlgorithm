@@ -1,0 +1,97 @@
+name: Rust Hybrid Core (PyO3 & Maturin)
+
+concurrency:
+  group: rust-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    tags:
+      - 'v[0-9]*'
+  workflow_dispatch:
+    inputs:
+      upload_release:
+        description: 'Upload wheels to GitHub Release'
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+jobs:
+  test-rust:
+    name: Rust Core Tests (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cargo Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            crates/tzero_core/target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('crates/tzero_core/Cargo.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      - name: Cargo Check & Test
+        shell: bash
+        run: |
+          cargo check --manifest-path crates/tzero_core/Cargo.toml --no-default-features
+          cargo test --manifest-path crates/tzero_core/Cargo.toml --no-default-features
+
+  build-wheels:
+    name: Build Native Wheels (${{ matrix.target }})
+    runs-on: ${{ matrix.os }}
+    needs: [test-rust]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            target: x86_64-unknown-linux-gnu
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+          - os: macos-14
+            target: aarch64-apple-darwin
+          - os: macos-13
+            target: x86_64-apple-darwin
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Build Wheels via Maturin
+        uses: PyO3/maturin-action@v1
+        with:
+          target: ${{ matrix.target }}
+          args: --release --out dist --manifest-path crates/tzero_core/Cargo.toml
+          sccache: 'true'
+
+      - name: Upload Wheels Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels-${{ matrix.target }}
+          path: dist/*.whl
+
+      - name: Upload to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v') || inputs.upload_release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'v12.0.0' }}
+          files: dist/*.whl
+          fail_on_unmatched_files: false
