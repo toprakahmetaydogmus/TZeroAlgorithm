@@ -120,5 +120,11 @@ Discussions = "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/discussions
 LinkedIn = "https://linkedin.com/in/toprak-ahmet-aydo%C4%9Fmu%C5%9F-60462534b/"
 Biography = "https://hopp.bio/siberegitim"
 
+[tool.maturin]
+manifest-path = "crates/tzero_core/Cargo.toml"
+module-name = "tzero.tzero_core"
+features = ["pyo3/extension-module"]
+python-source = "."
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
