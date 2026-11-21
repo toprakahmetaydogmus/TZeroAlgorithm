@@ -23,6 +23,10 @@ if sys.platform == "win32":
 
 import argparse
 import pathlib
+import sys
+import time
+import urllib.parse
+import webbrowser
 from typing import Dict, List, Any, Optional
 
 ROOT_DIR = pathlib.Path(__file__).resolve().parent.parent
@@ -33,7 +37,7 @@ AUTHOR = "Toprak Ahmet Aydoğmuş"
 ORGANIZATION = "Siber Akademi"
 PYPI_PKG = "tzero-mcp"
 NPM_PKG = "tzero-mcp"
-CANONICAL_VERSION = "v11.15.5"
+CANONICAL_VERSION = "v12.1.0"
 
 
 def get_current_version() -> str:
@@ -140,6 +144,58 @@ tzero-mcp --stdio
 - WinGet: `winget install SiberAkademi.TZero`
 
 Looking forward to hearing feedback from the local model community on how this performs on your local coding setups!
+"""
+    return {"subreddit": subreddit, "title": title, "body": body}
+
+
+def build_reddit_cursor(version: str) -> Dict[str, str]:
+    """Generates unslop Reddit r/Cursor post with clear affiliation disclosure."""
+    subreddit = "r/Cursor"
+    title = f"T-Zero: Local-first AST context pruning & MCP server for Cursor Composer (-90% prompt tokens) [Disclosure: Author]"
+    body = f"""**Affiliation Disclosure:** I am the author of T-Zero, an open-source project maintained at Siber Akademi. The software is 100% free under the MIT license; local stdio MCP runs completely offline on your CPU with zero telemetry or API keys.
+
+---
+
+### Why AST Pruning in Cursor Composer & Chat?
+When working on large multi-file repositories with Cursor Composer or Chat:
+- **Context Window Pollution:** Mentioning `@Codebase` or adding dozens of files dumps hundreds of thousands of tokens of function implementation bodies into the prompt.
+- **Attention Degradation:** Models (Claude 3.7 Sonnet, GPT-4o, o3-mini) suffer from "lost-in-the-middle" attention blur when reading repetitive implementation bodies instead of typed interfaces and architectural contracts.
+- **Fast Token Exhaustion:** Prompting with full file contents quickly consumes 50k-150k context tokens per turn.
+
+### How T-Zero Fixes This
+**T-Zero** ({version}) exposes 21 canonical MCP tools to Cursor:
+1. **Dynamic AST Skeletons (`get_smart_skeleton_context`):** Keeps full implementation of your active edit target, but prunes all 1st-degree dependencies to typed interfaces (`...`), classes, and docstrings.
+2. **Context Tree (`get_project_context_tree`):** Hierarchical 4-tier overview of the whole repo (88% to 95% token reduction).
+3. **In-Memory Secret Guard:** Shannon entropy ($H \\ge 4.75$) scans every emitted chunk to stop accidental `.env` leaks.
+4. **Universal Rules Generator (`tzero rules`):** Generates `.cursorrules` and modular `.cursor/rules/*.mdc` tailored to your repo's AST layers.
+
+### 1-Click Cursor Setup:
+```bash
+# Via pip:
+pip install {PYPI_PKG}
+
+# 1-Click install into ~/.cursor/mcp.json:
+tzero init --cursor
+```
+
+Or manually in `~/.cursor/mcp.json`:
+```json
+{{
+  "mcpServers": {{
+    "tzero": {{
+      "command": "tzero-mcp",
+      "args": ["--stdio"]
+    }}
+  }}
+}}
+```
+
+- Repository: {REPO_URL}
+- Live Interactive Benchmark: {BENCHMARK_URL}
+- WinGet: `winget install SiberAkademi.TZero`
+- Homebrew: `brew install toprakahmetaydogmus/tap/tzero`
+
+Would love to hear thoughts and feedback from the Cursor community!
 """
     return {"subreddit": subreddit, "title": title, "body": body}
 
@@ -327,6 +383,7 @@ All materials strictly adhere to:
 | :--- | :--- | :--- |
 | **Hacker News** | [`show_hn.md`](file:///{ROOT_DIR.as_posix()}/docs/launch/show_hn.md) | Show HN title, URL, and technical first comment |
 | **Reddit r/LocalLLaMA** | [`reddit_localllama.md`](file:///{ROOT_DIR.as_posix()}/docs/launch/reddit_localllama.md) | Local LLM community post with affiliation disclosure & VRAM analysis |
+| **Reddit r/Cursor** | [`reddit_cursor.md`](file:///{ROOT_DIR.as_posix()}/docs/launch/reddit_cursor.md) | Cursor community post with 1-click MCP setup & Composer guide |
 | **Twitter / X** | [`twitter_thread.md`](file:///{ROOT_DIR.as_posix()}/docs/launch/twitter_thread.md) | 7-tweet viral technical breakdown thread |
 | **Product Hunt** | [`product_hunt.md`](file:///{ROOT_DIR.as_posix()}/docs/launch/product_hunt.md) | Listing title, tagline, description, and maker launch comment |
 | **Discord MCP** | [`discord_mcp_showcase.md`](file:///{ROOT_DIR.as_posix()}/docs/launch/discord_mcp_showcase.md) | Server showcase listing with client configuration JSONs |
@@ -376,7 +433,13 @@ def generate_all_launch_files(output_dir: pathlib.Path) -> Dict[str, pathlib.Pat
     reddit_path.write_text(f"# {reddit['title']}\n\n{reddit['body']}\n", encoding="utf-8")
     results["reddit_localllama"] = reddit_path
 
-    # 3. Twitter / X Thread
+    # 3. Reddit r/Cursor
+    cursor = build_reddit_cursor(version)
+    cursor_path = output_dir / "reddit_cursor.md"
+    cursor_path.write_text(f"# {cursor['title']}\n\n{cursor['body']}\n", encoding="utf-8")
+    results["reddit_cursor"] = cursor_path
+
+    # 4. Twitter / X Thread
     x_thread = build_twitter_thread(version)
     x_path = output_dir / "twitter_thread.md"
     x_content = [f"# Twitter / X Launch Thread ({version})\n"]
@@ -385,7 +448,7 @@ def generate_all_launch_files(output_dir: pathlib.Path) -> Dict[str, pathlib.Pat
     x_path.write_text("\n".join(x_content), encoding="utf-8")
     results["twitter_thread"] = x_path
 
-    # 4. Product Hunt
+    # 5. Product Hunt
     ph = build_product_hunt(version)
     ph_path = output_dir / "product_hunt.md"
     ph_content = f"""# Product Hunt Launch Kit ({version})
@@ -405,18 +468,72 @@ def generate_all_launch_files(output_dir: pathlib.Path) -> Dict[str, pathlib.Pat
     ph_path.write_text(ph_content, encoding="utf-8")
     results["product_hunt"] = ph_path
 
-    # 5. Discord MCP Showcase
+    # 6. Discord MCP Showcase
     discord = build_discord_showcase(version)
     discord_path = output_dir / "discord_mcp_showcase.md"
     discord_path.write_text(f"# {discord['title']}\n\n{discord['content']}\n", encoding="utf-8")
     results["discord_mcp_showcase"] = discord_path
 
-    # 6. Master README index
+    # 7. Master README index
     readme_path = output_dir / "README.md"
     readme_path.write_text(build_readme_index(version), encoding="utf-8")
     results["readme"] = readme_path
 
     return results
+
+
+def launch_interactive_browser_hub(
+    channel: Optional[str] = None,
+    open_all: bool = False,
+    open_browser: bool = True,
+) -> Dict[str, Any]:
+    """1-Click launch hub that opens pre-filled submission URLs or prints them."""
+    version = get_current_version()
+    hn = build_show_hn(version)
+    reddit = build_reddit_localllama(version)
+    cursor = build_reddit_cursor(version)
+    x_thread = build_twitter_thread(version)
+
+    urls = {
+        "hn": f"https://news.ycombinator.com/submitlink?u={urllib.parse.quote_plus(REPO_URL)}&t={urllib.parse.quote_plus(hn['title'])}",
+        "reddit": f"https://www.reddit.com/r/LocalLLaMA/submit?title={urllib.parse.quote_plus(reddit['title'])}&text={urllib.parse.quote_plus(reddit['body'])}",
+        "cursor": f"https://www.reddit.com/r/Cursor/submit?title={urllib.parse.quote_plus(cursor['title'])}&text={urllib.parse.quote_plus(cursor['body'])}",
+        "twitter": f"https://twitter.com/intent/tweet?text={urllib.parse.quote_plus(x_thread[0])}",
+        "ph": "https://www.producthunt.com/posts/new",
+        "github": f"{REPO_URL}/stargazers",
+    }
+
+    opened: List[str] = []
+    ch_key = (channel or "").lower().strip()
+
+    if open_all or ch_key in ("all", "*"):
+        targets = ["hn", "reddit", "cursor", "twitter", "ph", "github"]
+    elif ch_key in urls:
+        targets = [ch_key]
+    else:
+        # Default: open github star page and major developer communities
+        targets = ["github", "hn", "cursor"]
+
+    print("\n\033[36m================================================================================")
+    print(f"🚀 T-ZERO ORGANIC VIRAL LAUNCH HUB ({version})")
+    print("================================================================================\033[0m")
+    print("Opening pre-filled submission links in your default web browser...\n")
+
+    for t in targets:
+        url = urls.get(t)
+        if url:
+            print(f"  ⚡ [{t.upper():<7}] -> {url[:70]}...")
+            if open_browser:
+                try:
+                    webbrowser.open(url)
+                    opened.append(t)
+                    time.sleep(0.3)
+                except Exception as exc:
+                    print(f"     (Browser launch warning: {exc})")
+
+    print("\n\033[32m✔ Launched community submission tabs! Star, upvote, and share with developers.\033[0m")
+    print(f"⭐ Target GitHub Repository: {REPO_URL}\n")
+    return {"version": version, "urls": urls, "opened": opened}
 
 
 def main(argv: Optional[List[str]] = None) -> int:
@@ -443,14 +560,29 @@ def main(argv: Optional[List[str]] = None) -> int:
         "--print",
         "-p",
         dest="print_channel",
-        choices=["hn", "reddit", "twitter", "ph", "discord", "all"],
+        choices=["hn", "reddit", "cursor", "twitter", "ph", "discord", "all"],
         help="Print launch copy directly to console stdout",
+    )
+    parser.add_argument(
+        "--channel",
+        "-ch",
+        choices=["hn", "reddit", "cursor", "twitter", "ph", "discord", "github", "all"],
+        help="Target channel for launch or browser opening",
     )
     parser.add_argument(
         "--check",
         "-c",
         action="store_true",
         help="Verify all launch files exist and contain valid non-empty markdown",
+    )
+    parser.add_argument(
+        "--open",
+        "--launch",
+        "-b",
+        "--browser",
+        action="store_true",
+        dest="open_browser",
+        help="Open pre-filled submission tabs in default web browser",
     )
     parser.add_argument(
         "--promo",
@@ -461,9 +593,23 @@ def main(argv: Optional[List[str]] = None) -> int:
     args, _ = parser.parse_known_args(argv)
     version = get_current_version()
 
+    if args.open_browser:
+        ch = args.channel or args.print_channel
+        open_all = (ch == "all")
+        launch_interactive_browser_hub(channel=ch, open_all=open_all, open_browser=True)
+        return 0
+
     if args.check:
         out = args.output_dir
-        expected = ["README.md", "show_hn.md", "reddit_localllama.md", "twitter_thread.md", "product_hunt.md", "discord_mcp_showcase.md"]
+        expected = [
+            "README.md",
+            "show_hn.md",
+            "reddit_localllama.md",
+            "reddit_cursor.md",
+            "twitter_thread.md",
+            "product_hunt.md",
+            "discord_mcp_showcase.md",
+        ]
         missing = [f for f in expected if not (out / f).is_file() or (out / f).stat().st_size == 0]
         if missing:
             print(f"[FAIL] Missing or empty launch files in {out}: {', '.join(missing)}")
@@ -482,6 +628,11 @@ def main(argv: Optional[List[str]] = None) -> int:
             print("REDDIT r/LocalLLaMA:")
             print("=" * 60)
             print(build_reddit_localllama(version)["body"])
+        if args.print_channel in ("cursor", "all"):
+            print("=" * 60)
+            print("REDDIT r/Cursor:")
+            print("=" * 60)
+            print(build_reddit_cursor(version)["body"])
         if args.print_channel in ("twitter", "all"):
             print("=" * 60)
             print("TWITTER THREAD:")

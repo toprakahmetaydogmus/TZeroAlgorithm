@@ -70,13 +70,13 @@ class TestTrafficAndSupport(unittest.TestCase):
             def __exit__(self, *args):
                 pass
             def read(self):
-                return b'{"info": {"version": "12.0.0"}, "tag_name": "v12.0.0"}'
+                return f'{{"info": {{"version": "{CURRENT_VERSION}"}}, "tag_name": "v{CURRENT_VERSION}"}}'.encode("utf-8")
 
         mock_urlopen.return_value = MockResp()
         res = check_version_and_updates(open_browser=False)
-        self.assertEqual(res["current_version"], "12.0.0")
-        self.assertEqual(res["pypi_version"], "12.0.0")
-        self.assertEqual(res["github_version"], "12.0.0")
+        self.assertEqual(res["current_version"], CURRENT_VERSION)
+        self.assertEqual(res["pypi_version"], CURRENT_VERSION)
+        self.assertEqual(res["github_version"], CURRENT_VERSION)
         self.assertFalse(res["is_outdated"])
 
     def test_live_roi_dashboard_execution(self):
@@ -113,6 +113,27 @@ class TestTrafficAndSupport(unittest.TestCase):
         self.assertIn("edges", syms)
         self.assertEqual(len(syms["symbols"]), 2)
         self.assertEqual(len(syms["edges"]), 1)
+
+    def test_agent_rules_export_all(self):
+        import tempfile
+        from tzero.tzero_features import AgentRulesGenerator
+        with tempfile.TemporaryDirectory() as tmpdir:
+            created = AgentRulesGenerator.export_all(tmpdir)
+            self.assertGreaterEqual(len(created), 7)
+            self.assertTrue(os.path.isfile(os.path.join(tmpdir, ".cursorrules")))
+            self.assertTrue(os.path.isfile(os.path.join(tmpdir, ".clinerules")))
+            self.assertTrue(os.path.isfile(os.path.join(tmpdir, ".windsurfrules")))
+            self.assertTrue(os.path.isfile(os.path.join(tmpdir, "CLAUDE.md")))
+            self.assertTrue(os.path.isfile(os.path.join(tmpdir, ".github", "copilot-instructions.md")))
+            self.assertTrue(os.path.isfile(os.path.join(tmpdir, ".cursor", "rules", "architecture.mdc")))
+            self.assertTrue(os.path.isfile(os.path.join(tmpdir, "AGENTS.md")))
+
+    @patch("webbrowser.open")
+    def test_launch_hub_mocked(self, mock_webopen):
+        from tzero.tzero_promo import launch_interactive_browser_hub
+        res = launch_interactive_browser_hub(channel="cursor", open_browser=True)
+        self.assertIn("cursor", res["opened"])
+        mock_webopen.assert_called_once()
 
 
 if __name__ == "__main__":

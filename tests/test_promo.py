@@ -5,16 +5,19 @@ import io
 import pathlib
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from tzero.tzero_promo import (
     get_current_version,
     build_show_hn,
     build_reddit_localllama,
+    build_reddit_cursor,
     build_twitter_thread,
     build_product_hunt,
     build_discord_showcase,
     build_readme_index,
     generate_all_launch_files,
+    launch_interactive_browser_hub,
     main as promo_main,
 )
 
@@ -43,6 +46,16 @@ class TestPromoToolkit(unittest.TestCase):
         self.assertIn("PageRank", reddit["body"])
         self.assertIn("Limitations & Trade-Offs", reddit["body"])
 
+    def test_reddit_cursor_structure(self):
+        v = get_current_version()
+        cursor = build_reddit_cursor(v)
+        self.assertEqual(cursor["subreddit"], "r/Cursor")
+        self.assertIn("Disclosure:", cursor["title"])
+        self.assertIn("Affiliation Disclosure", cursor["body"])
+        self.assertIn("Composer", cursor["body"])
+        self.assertIn("~/.cursor/mcp.json", cursor["body"])
+        self.assertIn("get_smart_skeleton_context", cursor["body"])
+
     def test_twitter_thread_structure(self):
         v = get_current_version()
         thread = build_twitter_thread(v)
@@ -69,10 +82,29 @@ class TestPromoToolkit(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             out_dir = pathlib.Path(td)
             results = generate_all_launch_files(out_dir)
-            self.assertEqual(len(results), 6)
+            self.assertEqual(len(results), 7)
+            self.assertIn("reddit_cursor", results)
             for key, path in results.items():
                 self.assertTrue(path.is_file(), f"Missing file: {path}")
                 self.assertGreater(path.stat().st_size, 100, f"File too small: {path}")
+
+    @patch("webbrowser.open")
+    def test_launch_interactive_browser_hub(self, mock_webopen):
+        res = launch_interactive_browser_hub(channel="cursor", open_browser=True)
+        self.assertIn("cursor", res["opened"])
+        self.assertIn("r/Cursor", res["urls"]["cursor"])
+        mock_webopen.assert_called_once()
+
+        mock_webopen.reset_mock()
+        res_all = launch_interactive_browser_hub(channel="all", open_browser=True)
+        self.assertEqual(len(res_all["opened"]), 6)
+        self.assertEqual(mock_webopen.call_count, 6)
+
+    @patch("webbrowser.open")
+    def test_promo_cli_handles_open_flag(self, mock_webopen):
+        rc = promo_main(["--open", "--channel", "hn"])
+        self.assertEqual(rc, 0)
+        mock_webopen.assert_called_once()
 
     def test_promo_cli_check_mode(self):
         with tempfile.TemporaryDirectory() as td:

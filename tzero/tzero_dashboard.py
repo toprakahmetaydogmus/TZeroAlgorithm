@@ -457,7 +457,7 @@ HTML_PAGE = """<!DOCTYPE html>
       <div class="brand-logo">T0</div>
       <div>
         <div class="brand-title">T-Zero Developer Console</div>
-        <div class="brand-sub" id="headerBrandSub">Enterprise AST Context Architect &bull; v12.0.0</div>
+        <div class="brand-sub" id="headerBrandSub">Enterprise AST Context Architect &bull; v12.1.0</div>
       </div>
     </div>
     <div class="header-actions">
@@ -850,7 +850,7 @@ x = 2
   </main>
 
   <footer>
-    <span id="footerBrand">T-Zero Context Architect v12.0.0</span> &bull; Developer: Toprak Ahmet Aydoğmuş &bull; Siber Akademi
+    <span id="footerBrand">T-Zero Context Architect v12.1.0</span> &bull; Developer: Toprak Ahmet Aydoğmuş &bull; Siber Akademi
   </footer>
 
   <script>
@@ -1481,7 +1481,7 @@ def compute_live_dashboard_stats(workspace_dir: str = ".") -> Dict[str, Any]:
     if cached is not None and (now - _DASHBOARD_STATS_CACHE["ts"]) < 60.0:
         return cached
 
-    version = "12.0.0"
+    version = "12.1.0"
     tools_count = 57
     try:
         from tzero import tzero_mcp

@@ -119,12 +119,39 @@ def sync_release_metadata(target_version: str, check_only: bool = False) -> Dict
         rf'\1"{target_version}"',
         check_only,
     )
+    results["tzero/__init__.py"] = _regex_replace(
+        ROOT_DIR / "tzero" / "__init__.py",
+        r'(?m)^(__version__\s*=\s*)"[^"]+"',
+        rf'\1"{target_version}"',
+        check_only,
+    )
     results["tzero_welcome.py"] = _regex_replace(
         ROOT_DIR / "tzero" / "tzero_welcome.py",
         r'(?m)^(VERSION\s*=\s*)"[^"]+"',
         rf'\1"{target_version}"',
         check_only,
     )
+    results["tzero_traffic.py"] = _regex_replace(
+        ROOT_DIR / "tzero" / "tzero_traffic.py",
+        r'(?m)^(CURRENT_VERSION\s*=\s*)"[^"]+"',
+        rf'\1"{target_version}"',
+        check_only,
+    )
+    results["tzero_promo.py"] = _regex_replace(
+        ROOT_DIR / "tzero" / "tzero_promo.py",
+        r'(?m)^(CANONICAL_VERSION\s*=\s*)"[^"]+"',
+        rf'\1"v{target_version}"',
+        check_only,
+    )
+
+    cargo_p = ROOT_DIR / "crates" / "tzero_core" / "Cargo.toml"
+    if cargo_p.is_file():
+        results["crates/tzero_core/Cargo.toml"] = _regex_replace(
+            cargo_p,
+            r'(?m)^(version\s*=\s*)"[^"]+"',
+            rf'\1"{target_version}"',
+            check_only,
+        )
 
     addmcp_p = ROOT_DIR / "addmcp.py"
     c_app = _regex_replace(addmcp_p, r'(?m)^(APP_VERSION\s*=\s*)"[^"]+"', rf'\1"{target_version}"', check_only)
