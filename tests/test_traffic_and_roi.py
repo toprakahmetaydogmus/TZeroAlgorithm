@@ -47,6 +47,21 @@ class TestTrafficAndSupport(unittest.TestCase):
         self.assertEqual(res["target_stars"], 100)
         self.assertFalse(res["opened_browser"])
 
+    @patch("webbrowser.open")
+    def test_first_launch_repo_open(self, mock_webopen):
+        import tempfile
+        from tzero.tzero_welcome import check_first_launch_repo_open
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp_state = Path(tmpdir) / "state.json"
+            opened = check_first_launch_repo_open(force_open=True, state_path=tmp_state)
+            self.assertTrue(opened)
+            mock_webopen.assert_called_once()
+
+            mock_webopen.reset_mock()
+            opened_second = check_first_launch_repo_open(force_open=False, state_path=tmp_state)
+            self.assertFalse(opened_second)
+            mock_webopen.assert_not_called()
+
     @patch("urllib.request.urlopen")
     def test_check_version_and_updates_mocked(self, mock_urlopen):
         class MockResp:

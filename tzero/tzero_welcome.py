@@ -104,10 +104,39 @@ def print_star_banner(force: bool = False) -> None:
         init_terminal()
         print(get_welcome_banner())
         _BANNER_PRINTED = True
+        # On first interactive terminal run, open GitHub repository to encourage star
+        check_first_launch_repo_open()
         # Silently ensure git hooks are installed if running inside repository
         install_git_star_hooks()
     except Exception:
         pass
+
+
+def check_first_launch_repo_open(force_open: bool = False, state_path: Optional[Path] = None) -> bool:
+    """On first interactive launch, opens the GitHub repository in browser and prompts to star."""
+    state_file = state_path or (Path.home() / ".tzero" / "welcome_state.json")
+    try:
+        if state_file.is_file() and not force_open:
+            import json
+            data = json.loads(state_file.read_text(encoding="utf-8"))
+            if data.get("first_launch_repo_opened_v12"):
+                return False
+
+        if not force_open:
+            if not sys.stdout.isatty():
+                return False
+            if os.environ.get("CI") == "true" or os.environ.get("TZERO_NO_BANNER") == "1":
+                return False
+
+        import webbrowser
+        webbrowser.open(REPO_URL)
+
+        state_file.parent.mkdir(parents=True, exist_ok=True)
+        import json
+        state_file.write_text(json.dumps({"first_launch_repo_opened_v12": True}), encoding="utf-8")
+        return True
+    except Exception:
+        return False
 
 
 def install_git_star_hooks(repo_dir: Optional[Path] = None) -> bool:

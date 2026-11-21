@@ -520,27 +520,47 @@ function activate(context) {
         }
     }
 
-    // High-impact gentle GitHub Star prompt after activation
-    const hasPromptedStar = context.globalState.get('tzero.hasPromptedStar_v12', false);
-    if (!hasPromptedStar) {
+    // First-launch repository auto-open & GitHub Star prompt
+    const hasOpenedRepo = context.globalState.get('tzero.hasOpenedRepoOnFirstLaunch_v12', false);
+    if (!hasOpenedRepo) {
         const starTimer = setTimeout(async () => {
             try {
+                // Open repo in browser on first launch as requested
+                vscode.env.openExternal(vscode.Uri.parse('https://github.com/toprakahmetaydogmus/TZeroAlgorithm'));
+                context.globalState.update('tzero.hasOpenedRepoOnFirstLaunch_v12', true);
+                context.globalState.update('tzero.hasPromptedStar_v12', true);
+
                 const choice = await vscode.window.showInformationMessage(
-                    '⭐ T-Zero v12.0.0 is active! 20,880+ downloads & 1,120,000+ tokens saved. Help us reach our 100 stars milestone (Current: 45/100)!',
+                    '⭐ Welcome to T-Zero! We opened our GitHub repository in your browser. Please drop a star to help us reach our 100-star goal! (Current: 45/100)',
                     '⭐ Star on GitHub (1-Click)',
                     'Later'
                 );
                 if (choice === '⭐ Star on GitHub (1-Click)') {
                     vscode.env.openExternal(vscode.Uri.parse('https://github.com/toprakahmetaydogmus/TZeroAlgorithm'));
-                    context.globalState.update('tzero.hasPromptedStar_v12', true);
-                } else if (choice === 'Later') {
-                    // Do not permanently set to true so user gets reminded once more later
                 }
             } catch (_) {
                 // Ignore if window is disposed
             }
-        }, 4000);
+        }, 2000);
         context.subscriptions.push({ dispose: () => clearTimeout(starTimer) });
+    } else {
+        const hasPromptedStar = context.globalState.get('tzero.hasPromptedStar_v12', false);
+        if (!hasPromptedStar) {
+            const starTimer = setTimeout(async () => {
+                try {
+                    const choice = await vscode.window.showInformationMessage(
+                        '⭐ T-Zero v12.0.0 is active! 20,880+ downloads & 1,120,000+ tokens saved. Help us reach our 100 stars milestone (Current: 45/100)!',
+                        '⭐ Star on GitHub (1-Click)',
+                        'Later'
+                    );
+                    if (choice === '⭐ Star on GitHub (1-Click)') {
+                        vscode.env.openExternal(vscode.Uri.parse('https://github.com/toprakahmetaydogmus/TZeroAlgorithm'));
+                        context.globalState.update('tzero.hasPromptedStar_v12', true);
+                    }
+                } catch (_) {}
+            }, 4000);
+            context.subscriptions.push({ dispose: () => clearTimeout(starTimer) });
+        }
     }
 }
 

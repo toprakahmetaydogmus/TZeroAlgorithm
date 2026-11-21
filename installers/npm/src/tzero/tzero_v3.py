@@ -6246,7 +6246,7 @@ class AutoReadmeGUI:
             if profile.get("star_popup_dismissed_v12", False):
                 return
         except Exception:
-            pass
+            profile = {}
 
         try:
             import webbrowser
@@ -6255,23 +6255,39 @@ class AutoReadmeGUI:
             REPO_URL = "https://github.com/toprakahmetaydogmus/TZeroAlgorithm"
             CURRENT_VERSION = "12.0.0"
 
+        # On first launch, automatically open the GitHub repo in browser and ask to star!
+        first_launch = not profile.get("first_launch_repo_opened_v12", False)
+        if first_launch:
+            try:
+                webbrowser.open(REPO_URL)
+                profile["first_launch_repo_opened_v12"] = True
+                _config_mgr.save_profile(profile)
+            except Exception:
+                pass
+
         dialog = tk.Toplevel(self.root)
-        dialog.title(f"⭐ T-Zero v{CURRENT_VERSION} — 100 Yıldız Hedefi!")
-        dialog.geometry("560x420")
+        dialog_title = f"⭐ T-Zero v{CURRENT_VERSION} — Lütfen Star Verin!" if first_launch else f"⭐ T-Zero v{CURRENT_VERSION} — 100 Yıldız Hedefi!"
+        dialog.title(dialog_title)
+        dialog.geometry("560x430")
         dialog.configure(bg=PALETTE["bg_start"])
         dialog.transient(self.root)
         dialog.resizable(False, False)
 
-        pad = tk.Frame(dialog, bg=PALETTE["bg_start"], padx=26, pady=22)
+        pad = tk.Frame(dialog, bg=PALETTE["bg_start"], padx=26, pady=20)
         pad.pack(fill=tk.BOTH, expand=True)
 
         # Header Badge
         h_frame = tk.Frame(pad, bg=PALETTE["bg_start"])
         h_frame.pack(fill=tk.X, pady=(0, 10))
+        header_text = (
+            "🚀 TARAYICINIZDA GITHUB AÇILDI: LÜTFEN STAR VERİN! ⭐"
+            if first_launch
+            else "⭐ 100 YILDIZ HEDEFİ: TOPLULUĞA KATILIN!"
+        )
         tk.Label(
             h_frame,
-            text="⭐ 100 YILDIZ HEDEFİ: TOPLULUĞA KATILIN!",
-            font=("Segoe UI", 13, "bold"),
+            text=header_text,
+            font=("Segoe UI", 12, "bold"),
             fg=PALETTE.get("warning", "#fbbf24"),
             bg=PALETTE["bg_start"]
         ).pack(side=tk.LEFT)
@@ -6296,13 +6312,23 @@ class AutoReadmeGUI:
         bar_fill.place(x=0, y=0, relheight=1.0, relwidth=0.45)
 
         # Message
-        msg = (
-            "Merhaba! Ben Toprak Ahmet Aydoğmuş (Siber Akademi).\n"
-            "T-Zero'yu yapay zeka araçlarındaki token maliyetini ve context israfını\n"
-            "önlemek için sıfırdan geliştirdim ve herkese %100 BEDAVA sunuyorum.\n\n"
-            "Projemizin bağımsız kalabilmesi ve daha fazla geliştiriciye ulaşabilmesi için\n"
-            "GitHub depomuza vereceğiniz TEK BİR YILDIZ çok büyük bir fark yaratıyor!"
-        )
+        if first_launch:
+            msg = (
+                "Merhaba! Ben Toprak Ahmet Aydoğmuş (Siber Akademi).\n"
+                "T-Zero'yu başlattığınız için GitHub depomuz tarayıcınızda açıldı!\n\n"
+                "Projemizin bağımsız kalabilmesi ve herkese %100 BEDAVA sunulabilmesi için\n"
+                "lütfen açılan GitHub sayfasında sağ üstteki ★ STAR butonuna tıklayarak\n"
+                "projemize destek olun! ⭐ (100 Yıldız Hedefi: 45/100)\n\n"
+                "Yıldızınız projemizin büyümesi ve daha fazla geliştiriciye ulaşması için çok değerli!"
+            )
+        else:
+            msg = (
+                "Merhaba! Ben Toprak Ahmet Aydoğmuş (Siber Akademi).\n"
+                "T-Zero'yu yapay zeka araçlarındaki token maliyetini ve context israfını\n"
+                "önlemek için sıfırdan geliştirdim ve herkese %100 BEDAVA sunuyorum.\n\n"
+                "Projemizin bağımsız kalabilmesi ve daha fazla geliştiriciye ulaşabilmesi için\n"
+                "GitHub depomuza vereceğiniz TEK BİR YILDIZ çok büyük bir fark yaratıyor!"
+            )
         tk.Label(
             pad,
             text=msg,
@@ -6327,16 +6353,17 @@ class AutoReadmeGUI:
             except Exception:
                 pass
 
+        btn_txt = "⭐ GITHUB DEPOSUNDA YILDIZ VER (AÇILDI)" if first_launch else "⭐ GITHUB'DA 1-TIKLA YILDIZ VER"
         star_btn = CanvasPillButton(
             pad,
-            text="⭐ GITHUB'DA 1-TIKLA YILDIZ VER",
+            text=btn_txt,
             command=on_star_click,
             height=38,
             radius=19,
             bg_color=PALETTE.get("warning", "#eab308"),
             text_color="#000000",
             font=("Segoe UI", 10, "bold"),
-            width=320
+            width=340
         )
         star_btn.pack(pady=(0, 8))
 
