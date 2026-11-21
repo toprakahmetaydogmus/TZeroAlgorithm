@@ -19,6 +19,7 @@ from tzero.tzero_traffic import (
     LLM_PRICING,
     check_version_and_updates,
     print_crypto_support_card,
+    open_github_star_page,
     run_live_roi_dashboard,
     run_system_disk_doctor,
 )
@@ -38,6 +39,13 @@ class TestTrafficAndSupport(unittest.TestCase):
         self.assertEqual(res["btc"], CRYPTO_BTC)
         self.assertEqual(res["repo"], REPO_URL)
         self.assertEqual(res["bio"], BIO_URL)
+
+    def test_open_github_star_page(self):
+        res = open_github_star_page(open_browser=False)
+        self.assertEqual(res["repo_url"], REPO_URL)
+        self.assertEqual(res["current_stars"], 45)
+        self.assertEqual(res["target_stars"], 100)
+        self.assertFalse(res["opened_browser"])
 
     @patch("urllib.request.urlopen")
     def test_check_version_and_updates_mocked(self, mock_urlopen):

@@ -303,3 +303,39 @@ def run_system_disk_doctor(clean: bool = False, workspace_dir: str = ".") -> Dic
         "total_mb": round(total_mb, 2),
         "cleaned": cleaned,
     }
+
+
+def open_github_star_page(open_browser: bool = True) -> Dict[str, Any]:
+    """Displays 100-star milestone encouragement and opens GitHub repository in browser."""
+    banner = f"""
+\033[1;33m╔══════════════════════════════════════════════════════════════════════════════╗
+║  ⭐ T-ZERO 100 YILDIZ HEDEFİ: TOPLULUĞA KATILIN!                              ║
+╠══════════════════════════════════════════════════════════════════════════════╣
+║                                                                              ║
+║  🎉 20,880+ İndirme & 1,120,000+ Kurtarılan Token!                           ║
+║  ⭐ Mevcut Yıldız Sayısı: 45 / 100 Hedef (Topluluk Desteği)                   ║
+║                                                                              ║
+║  T-Zero'nun bağımsız, reklamsız ve %100 BEDAVA kalabilmesi için              ║
+║  GitHub depomuza 1 yıldız (Star) vererek bize güç katın!                     ║
+║                                                                              ║
+║  🌐 GitHub: \033[1;34m{REPO_URL}\033[1;33m                        ║
+║                                                                              ║
+║  Tarayıcınız açılıyor... Sağ üst köşedeki '★ Star' butonuna tıklayınız!     ║
+╚══════════════════════════════════════════════════════════════════════════════╝\033[0m
+"""
+    print(banner)
+    opened = False
+    if open_browser:
+        try:
+            webbrowser.open(REPO_URL)
+            opened = True
+        except Exception:
+            pass
+    return {
+        "repo_url": REPO_URL,
+        "current_stars": 45,
+        "target_stars": 100,
+        "downloads": "20,880+",
+        "opened_browser": opened,
+    }
+

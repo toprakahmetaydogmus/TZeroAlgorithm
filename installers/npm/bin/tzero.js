@@ -32,6 +32,23 @@ if (!isQuiet) {
   console.log(banner);
 }
 
+if (process.argv.includes("star") || process.argv.includes("--star")) {
+  console.log(`\x1b[33m
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  ⭐ T-ZERO 100 STARS GOAL: JOIN THE COMMUNITY!                               ║
+╠══════════════════════════════════════════════════════════════════════════════╣
+║  🎉 20,880+ Downloads across PyPI & npm!                                     ║
+║  ⭐ Current Stars: 45 / 100 Target                                           ║
+║  ► Opening GitHub: https://github.com/toprakahmetaydogmus/TZeroAlgorithm    ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+\x1b[0m`);
+  const openCmd = process.platform === "win32" ? "start" : process.platform === "darwin" ? "open" : "xdg-open";
+  try {
+    const { exec } = require("child_process");
+    exec(`${openCmd} https://github.com/toprakahmetaydogmus/TZeroAlgorithm`);
+  } catch (e) {}
+}
+
 function findPython() {
   if (process.env.PYTHON) return process.env.PYTHON;
   const candidates = ["python3", "python", "py"];

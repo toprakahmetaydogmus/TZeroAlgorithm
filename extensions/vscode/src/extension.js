@@ -158,12 +158,21 @@ function activate(context) {
         }
     };
 
+    const starCmd = vscode.commands.registerCommand('tzero.star', async () => {
+        try {
+            await vscode.env.openExternal(vscode.Uri.parse('https://github.com/toprakahmetaydogmus/TZeroAlgorithm'));
+            context.globalState.update('tzero.hasPromptedStar_v12', true);
+            vscode.window.showInformationMessage('⭐ Thank you for supporting T-Zero on GitHub!');
+        } catch (_) {}
+    });
+
     const refreshMetricsCmd = vscode.commands.registerCommand('tzero.refreshMetrics', async () => {
         await refreshWorkspaceMetrics();
     });
 
     const openMenuCmd = vscode.commands.registerCommand('tzero.openMenu', async () => {
         const items = [
+            { label: '$(star-full) ⭐ Star on GitHub (45/100 Goal)', command: 'tzero.star' },
             { label: '$(sync) Refresh Live AST Telemetry', command: 'tzero.refreshMetrics' },
             { label: '$(rocket) Initialize Workspace (tzero --init)', command: 'tzero.init' },
             { label: '$(list-tree) View Workspace Context Tree', command: 'tzero.showTree' },
@@ -475,6 +484,7 @@ function activate(context) {
         }),
         refreshMetricsCmd,
         openMenuCmd,
+        starCmd,
         initCmd,
         compressFileCmd,
         compressSelCmd,
@@ -510,26 +520,26 @@ function activate(context) {
         }
     }
 
-    // One-time gentle GitHub Star prompt after positive activation
-    const hasPromptedStar = context.globalState.get('tzero.hasPromptedStar', false);
+    // High-impact gentle GitHub Star prompt after activation
+    const hasPromptedStar = context.globalState.get('tzero.hasPromptedStar_v12', false);
     if (!hasPromptedStar) {
         const starTimer = setTimeout(async () => {
             try {
                 const choice = await vscode.window.showInformationMessage(
-                    '⭐ Enjoying T-Zero Context Architect? Support our open-source project with a star on GitHub!',
-                    '⭐ Star on GitHub',
-                    'Dismiss'
+                    '⭐ T-Zero v12.0.0 is active! 20,880+ downloads & 1,120,000+ tokens saved. Help us reach our 100 stars milestone (Current: 45/100)!',
+                    '⭐ Star on GitHub (1-Click)',
+                    'Later'
                 );
-                if (choice === '⭐ Star on GitHub') {
+                if (choice === '⭐ Star on GitHub (1-Click)') {
                     vscode.env.openExternal(vscode.Uri.parse('https://github.com/toprakahmetaydogmus/TZeroAlgorithm'));
-                    context.globalState.update('tzero.hasPromptedStar', true);
-                } else if (choice === 'Dismiss') {
-                    context.globalState.update('tzero.hasPromptedStar', true);
+                    context.globalState.update('tzero.hasPromptedStar_v12', true);
+                } else if (choice === 'Later') {
+                    // Do not permanently set to true so user gets reminded once more later
                 }
             } catch (_) {
                 // Ignore if window is disposed
             }
-        }, 30000);
+        }, 4000);
         context.subscriptions.push({ dispose: () => clearTimeout(starTimer) });
     }
 }

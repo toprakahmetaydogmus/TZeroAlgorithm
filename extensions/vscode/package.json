@@ -60,6 +60,10 @@
     },
     "commands": [
       {
+        "command": "tzero.star",
+        "title": "T-Zero: ⭐ Star on GitHub (45/100 Goal)"
+      },
+      {
         "command": "tzero.openMenu",
         "title": "T-Zero: Open Command Center"
       },

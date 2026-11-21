@@ -4612,6 +4612,7 @@ class AutoReadmeGUI:
         self.load_saved_credentials()
         self.setup_keyboard_shortcuts()
         self.start_system_telemetry()
+        self.safe_after(1200, self.check_and_show_star_welcome_popup)
         
     def safe_after(self, ms: int, func, *args):
         """Thread-safe and lifecycle-safe wrapper around root.after."""
@@ -4793,6 +4794,19 @@ class AutoReadmeGUI:
             width=115
         )
         self.web_console_btn.pack(side=tk.LEFT, padx=3)
+
+        self.star_header_btn = CanvasPillButton(
+            header_controls,
+            text="★ STAR (45★)",
+            command=self.open_star_action,
+            height=28,
+            radius=14,
+            bg_color=PALETTE.get("warning", "#eab308"),
+            text_color="#000000",
+            font=("Segoe UI", 7, "bold"),
+            width=100
+        )
+        self.star_header_btn.pack(side=tk.LEFT, padx=3)
 
         # 3. MAIN CONTENT FRAME
         self.content = tk.Frame(self.bg_canvas, bg=PALETTE["bg_start"], bd=0)
@@ -6211,6 +6225,155 @@ class AutoReadmeGUI:
 
         # Close
         tk.Button(pad, text="Kapat", bg=PALETTE["card_border"], fg=PALETTE["text_main"], relief=tk.FLAT, font=("Segoe UI", 9, "bold"), command=dialog.destroy).pack(pady=(12, 0))
+
+    def open_star_action(self):
+        """Opens GitHub repository directly and shows thank-you toast."""
+        try:
+            import webbrowser
+            from tzero.tzero_traffic import REPO_URL
+        except Exception:
+            REPO_URL = "https://github.com/toprakahmetaydogmus/TZeroAlgorithm"
+        try:
+            webbrowser.open(REPO_URL)
+            self.show_toast("⭐ GitHub depomuz açıldı! Yıldızınız için teşekkür ederiz!", "success")
+        except Exception:
+            pass
+
+    def check_and_show_star_welcome_popup(self):
+        """Displays a high-impact, sleek GitHub Star goal popup on startup."""
+        try:
+            profile = _config_mgr.get_profile()
+            if profile.get("star_popup_dismissed_v12", False):
+                return
+        except Exception:
+            pass
+
+        try:
+            import webbrowser
+            from tzero.tzero_traffic import REPO_URL, CURRENT_VERSION
+        except Exception:
+            REPO_URL = "https://github.com/toprakahmetaydogmus/TZeroAlgorithm"
+            CURRENT_VERSION = "12.0.0"
+
+        dialog = tk.Toplevel(self.root)
+        dialog.title(f"⭐ T-Zero v{CURRENT_VERSION} — 100 Yıldız Hedefi!")
+        dialog.geometry("560x420")
+        dialog.configure(bg=PALETTE["bg_start"])
+        dialog.transient(self.root)
+        dialog.resizable(False, False)
+
+        pad = tk.Frame(dialog, bg=PALETTE["bg_start"], padx=26, pady=22)
+        pad.pack(fill=tk.BOTH, expand=True)
+
+        # Header Badge
+        h_frame = tk.Frame(pad, bg=PALETTE["bg_start"])
+        h_frame.pack(fill=tk.X, pady=(0, 10))
+        tk.Label(
+            h_frame,
+            text="⭐ 100 YILDIZ HEDEFİ: TOPLULUĞA KATILIN!",
+            font=("Segoe UI", 13, "bold"),
+            fg=PALETTE.get("warning", "#fbbf24"),
+            bg=PALETTE["bg_start"]
+        ).pack(side=tk.LEFT)
+
+        # Stats Badge
+        stats_frame = tk.Frame(pad, bg=PALETTE["card_bg"], highlightthickness=1, highlightbackground=PALETTE["card_border"], padx=14, pady=10)
+        stats_frame.pack(fill=tk.X, pady=(0, 12))
+        tk.Label(
+            stats_frame,
+            text="🚀 20,880+ İndirme (PyPI & npm)   |   ⚡ 1,120,000+ Kurtarılan Token\n⭐ Mevcut Yıldız: 45 / 100 Hedef  (İlerleme: %45)",
+            font=("Segoe UI", 9, "bold"),
+            fg=PALETTE.get("accent_cyan", "#38bdf8"),
+            bg=PALETTE["card_bg"],
+            justify=tk.CENTER
+        ).pack()
+
+        # Visual Progress Bar
+        bar_container = tk.Frame(pad, bg=PALETTE["card_border"], height=14)
+        bar_container.pack(fill=tk.X, pady=(0, 14))
+        bar_container.pack_propagate(False)
+        bar_fill = tk.Frame(bar_container, bg=PALETTE.get("warning", "#fbbf24"), width=int(508 * 0.45), height=14)
+        bar_fill.place(x=0, y=0, relheight=1.0, relwidth=0.45)
+
+        # Message
+        msg = (
+            "Merhaba! Ben Toprak Ahmet Aydoğmuş (Siber Akademi).\n"
+            "T-Zero'yu yapay zeka araçlarındaki token maliyetini ve context israfını\n"
+            "önlemek için sıfırdan geliştirdim ve herkese %100 BEDAVA sunuyorum.\n\n"
+            "Projemizin bağımsız kalabilmesi ve daha fazla geliştiriciye ulaşabilmesi için\n"
+            "GitHub depomuza vereceğiniz TEK BİR YILDIZ çok büyük bir fark yaratıyor!"
+        )
+        tk.Label(
+            pad,
+            text=msg,
+            font=("Segoe UI", 9),
+            fg=PALETTE["text_main"],
+            bg=PALETTE["bg_start"],
+            justify=tk.LEFT
+        ).pack(anchor=tk.W, pady=(0, 16))
+
+        # Star Action Button (Big Golden Button)
+        def on_star_click():
+            try:
+                webbrowser.open(REPO_URL)
+                try:
+                    profile = _config_mgr.get_profile()
+                    profile["star_popup_dismissed_v12"] = True
+                    _config_mgr.save_profile(profile)
+                except Exception:
+                    pass
+                dialog.destroy()
+                self.show_toast("⭐ Harikasınız! Yıldızınız için yürekten teşekkürler!", "success")
+            except Exception:
+                pass
+
+        star_btn = CanvasPillButton(
+            pad,
+            text="⭐ GITHUB'DA 1-TIKLA YILDIZ VER",
+            command=on_star_click,
+            height=38,
+            radius=19,
+            bg_color=PALETTE.get("warning", "#eab308"),
+            text_color="#000000",
+            font=("Segoe UI", 10, "bold"),
+            width=320
+        )
+        star_btn.pack(pady=(0, 8))
+
+        # Buttons row (Dismiss & Later)
+        b_row = tk.Frame(pad, bg=PALETTE["bg_start"])
+        b_row.pack(fill=tk.X, pady=(6, 0))
+
+        def on_dismiss():
+            try:
+                profile = _config_mgr.get_profile()
+                profile["star_popup_dismissed_v12"] = True
+                _config_mgr.save_profile(profile)
+            except Exception:
+                pass
+            dialog.destroy()
+
+        tk.Button(
+            b_row,
+            text="Daha Sonra Hatırlat",
+            font=("Segoe UI", 8),
+            bg=PALETTE["bg_start"],
+            fg=PALETTE["text_muted"],
+            relief=tk.FLAT,
+            cursor="hand2",
+            command=dialog.destroy
+        ).pack(side=tk.LEFT)
+
+        tk.Button(
+            b_row,
+            text="Bir Daha Gösterme",
+            font=("Segoe UI", 8),
+            bg=PALETTE["bg_start"],
+            fg=PALETTE["text_muted"],
+            relief=tk.FLAT,
+            cursor="hand2",
+            command=on_dismiss
+        ).pack(side=tk.RIGHT)
 
     # --- TAB 2: SELECTOR & SPLIT VIEW EDITOR ---
     def setup_tab_selector(self):
@@ -8961,6 +9124,12 @@ def main():
         promo_args = [a for a in sys.argv[1:] if a.lower() not in ("promo", "launch", "marketing", "--promo", "-promo")]
         sys.exit(promo_main(promo_args))
 
+    # Fast path for star / github star command
+    if len(sys.argv) > 1 and sys.argv[1].lower() in ("star", "--star", "-star", "github-star"):
+        from tzero.tzero_traffic import open_github_star_page
+        open_github_star_page(open_browser=True)
+        sys.exit(0)
+
     # Fast path for update / version check
     if len(sys.argv) > 1 and sys.argv[1].lower() in ("update", "--update", "version", "--version-check"):
         from tzero.tzero_traffic import check_version_and_updates
@@ -9045,6 +9214,7 @@ def main():
     parser.add_argument("--grounding-contract", action="store_true", help="Generate immutable AST grounding contract for LLM prompt pinning")
     parser.add_argument("--promo", action="store_true", help="Generate zero-cost organic launch kit in docs/launch/")
     parser.add_argument("--share", action="store_true", help="Generate 1-click social sharing links for Twitter/X, Reddit, Hacker News, and LinkedIn")
+    parser.add_argument("--star", action="store_true", help="1-Click open GitHub repo in browser to give a star towards the 100 stars goal")
     parser.add_argument("--update", action="store_true", help="Check PyPI and GitHub for latest version and update commands")
     parser.add_argument("--donate", "--support", action="store_true", dest="support", help="Display developer crypto donation & community support card")
     parser.add_argument("--roi", "--stats", action="store_true", dest="roi", help="Display live token reduction & financial dollars saved mini dashboard")
@@ -9407,6 +9577,7 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
             "card": "--card",
             "badge": "--card",
             "showcase": "--showcase",
+            "star": "--star",
         }
         if sub in sub_map:
             sys.argv[1] = sub_map[sub]
@@ -9429,7 +9600,11 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
         return
 
     args = parser.parse_args()
-    if getattr(args, "update", False):
+    if getattr(args, "star", False):
+        from tzero.tzero_traffic import open_github_star_page
+        open_github_star_page(open_browser=True)
+        return
+    elif getattr(args, "update", False):
         from tzero.tzero_traffic import check_version_and_updates
         check_version_and_updates()
         return

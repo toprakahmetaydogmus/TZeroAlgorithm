@@ -17,7 +17,7 @@ const banner = `\x1b[36m
 │  ⚡ T-ZERO MCP SERVER v${pkg.version} (Model Context Protocol)                       │
 │  Enterprise AST Context Compressor, Zero-Leak Guard & 20 Canonical Tools     │
 │                                                                              │
-│  ⭐ Star on GitHub: https://github.com/toprakahmetaydogmus/TZeroAlgorithm    │
+│  ⭐ Help Reach 100 Stars: https://github.com/toprakahmetaydogmus/TZeroAlgorithm │
 │  🔌 Connected to:   Cursor, Claude Desktop, Antigravity, Windsurf & Cline    │
 └──────────────────────────────────────────────────────────────────────────────┘
 \x1b[0m`;

@@ -57,18 +57,19 @@ def get_welcome_banner(version: str = VERSION) -> str:
 ├──────────────────────────────────────────────────────────────────────────────┤
 │                                                                              │
 │  Hi! I'm Toprak Ahmet Aydoğmuş (independent engineer at Siber Akademi).      │
-│  Thank you for cloning & checking out T-Zero!                                │
+│  T-Zero has reached \033[1;32m20,880+ downloads\033[1;36m across PyPI & npm!                   │
 │                                                                              │
 │  T-Zero slashes AI coding prompt tokens by 85–95% using deterministic AST    │
 │  signature extraction with 100% Zero-Leak security and 20 MCP tools.         │
 │                                                                              │
-│  ★ \033[1;33mIf this saves your context window, please drop a star on GitHub:\033[1;36m        │
-│     \033[1;32m► {REPO_URL}\033[1;36m                     │
+│  ★ \033[1;33mHELP US REACH OUR 100 STARS GOAL (Current: 45/100):\033[1;36m                      │
+│     \033[1;32m► Run 'tzero star' or visit: {REPO_URL}\033[1;36m       │
 │                                                                              │
-│  • Quick Start:                                                              │
+│  • Quick Commands:                                                           │
+│     \033[1;37mtzero star\033[1;36m               1-Click open GitHub & star the project          │
 │     \033[1;37mtzero install-ide\033[1;36m        1-Click install into Cursor, Claude, Windsurf   │
 │     \033[1;37mtzero-mcp\033[1;36m                Start local Model Context Protocol server       │
-│     \033[1;37mtzero --benchmark\033[1;36m        Run multi-model token savings benchmark        │
+│     \033[1;37mtzero roi\033[1;36m                View live token & dollar ($) savings dashboard  │
 └──────────────────────────────────────────────────────────────────────────────┘\033[0m"""
     return sanitize_terminal_text(raw_banner)
 
