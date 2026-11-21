@@ -284,16 +284,6 @@ class PathGuard:
         if ".." in parts_str:
             return False, "Path traversal ('..') detected.", None
 
-        # Check symlinks on target and parents
-        try:
-            test_path = path
-            while test_path != test_path.parent:
-                if test_path.is_symlink():
-                    return False, f"Symlink path forbidden: {test_path}", None
-                test_path = test_path.parent
-        except (OSError, RuntimeError):
-            pass
-
         try:
             resolved = path.resolve(strict=for_write)
         except FileNotFoundError:
@@ -308,6 +298,22 @@ class PathGuard:
             relative = resolved.relative_to(root)
         except ValueError:
             return False, f"Path escapes workspace boundary: {resolved} is outside {root}", None
+
+        # Check symlinks on target and parents within workspace boundary
+        try:
+            test_path = path
+            while test_path != test_path.parent:
+                try:
+                    if test_path == root or test_path.resolve() == root:
+                        break
+                except (OSError, RuntimeError):
+                    if test_path == root:
+                        break
+                if test_path.is_symlink():
+                    return False, f"Symlink path forbidden: {test_path}", None
+                test_path = test_path.parent
+        except (OSError, RuntimeError):
+            pass
 
         # Check every component of relative path for symlinks or protected directories
         current = root
