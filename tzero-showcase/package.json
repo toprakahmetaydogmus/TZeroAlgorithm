@@ -15,7 +15,7 @@
     "lucide-react": "^1.61.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
-    "remotion": "4.0.537",
+    "remotion": "4.0.545",
     "zod": "4.5.4"
   },
   "devDependencies": {
