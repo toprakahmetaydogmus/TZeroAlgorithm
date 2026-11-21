@@ -153,6 +153,13 @@ class TestCIWorkflow(unittest.TestCase):
         self.assertTrue(hasattr(siber_akademi_icon, "apply_window_icon"))
         self.assertTrue(hasattr(siber_akademi_icon, "SIBER_AKADEMI_ICO_BASE64"))
 
+        gen_icon_path = ROOT_DIR / "_gen_icon.py"
+        self.assertTrue(gen_icon_path.exists(), "_gen_icon.py generator must exist")
+
+        pkg_ico = ROOT_DIR / "tzero" / "siber_akademi.ico"
+        self.assertTrue(pkg_ico.exists(), "tzero/siber_akademi.ico must exist")
+        self.assertGreater(pkg_ico.stat().st_size, 10000, "ICO file must be high-DPI multi-resolution bundle")
+
     def test_no_markdown_headings_start_with_emojis(self):
         import re
         from scripts.remove_heading_emojis import MD_HEADING_RE
