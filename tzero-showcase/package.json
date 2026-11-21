@@ -9,7 +9,7 @@
   },
   "private": true,
   "dependencies": {
-    "@remotion/cli": "4.0.537",
+    "@remotion/cli": "4.0.545",
     "@remotion/shapes": "^4.0.537",
     "@remotion/zod-types": "4.0.537",
     "lucide-react": "^1.61.0",
