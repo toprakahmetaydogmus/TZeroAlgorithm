@@ -4,7 +4,7 @@
 // or https://github.com/toprakahmetaydogmus/TZeroAlgorithm/blob/main/NOTICE.
 
 // -*- coding: utf-8 -*-
-//! T-Zero Turbo Rust Hybrid Core Engine (v12.1.0)
+//! T-Zero Turbo Rust Hybrid Core Engine (v12.1.4)
 //! Ultra-High Performance Multi-Language AST Pruning, Shannon Entropy Zero-Leak Guard & BPE Tokenizer.
 //! Developer: Toprak Ahmet Aydoğmuş (Siber Akademi)
 //! License: AGPL-3.0-only

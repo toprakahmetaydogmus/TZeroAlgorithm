@@ -18,7 +18,7 @@ use tzero_core::entropy_guard::scan_entropy_secrets;
 
 fn print_usage() {
     println!(r#"
-T-Zero Turbo Rust Hybrid Core CLI (v12.1.0)
+T-Zero Turbo Rust Hybrid Core CLI (v12.1.4)
 Developer: Toprak Ahmet Aydoğmuş (Siber Akademi)
 License: AGPL-3.0-only
 
@@ -44,7 +44,7 @@ fn main() {
 
     match args[1].as_str() {
         "version" | "--version" | "-v" => {
-            println!("tzero-core v12.1.0 (x86_64 native AGPL-3.0)");
+            println!("tzero-core v12.1.4 (x86_64 native AGPL-3.0)");
             println!("Features: AST-Pruning, Shannon-Entropy, BM25, PageRank, Complexity, Contracts, Duplicity");
         }
         "prune" => {

@@ -408,7 +408,7 @@ pub fn py_is_native() -> PyResult<bool> {
 #[pyfunction]
 #[pyo3(name = "core_version")]
 pub fn py_core_version() -> PyResult<&'static str> {
-    Ok("12.1.0")
+    Ok("12.1.4")
 }
 
 /// Registers all Python functions onto the target PyModule bound handle.
@@ -434,7 +434,7 @@ pub fn register_python_bindings(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(py_fuzzy_similarity, m)?)?;
     m.add_function(wrap_pyfunction!(py_is_native, m)?)?;
     m.add_function(wrap_pyfunction!(py_core_version, m)?)?;
-    m.add("__version__", "12.1.0")?;
+    m.add("__version__", "12.1.4")?;
     m.add("__doc__", "T-Zero Turbo Rust Hybrid Core Native Extension Module")?;
     Ok(())
 }

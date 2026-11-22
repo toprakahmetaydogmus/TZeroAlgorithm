@@ -36,7 +36,7 @@ except ImportError:
             return False
 
 REPO_URL = "https://github.com/toprakahmetaydogmus/TZeroAlgorithm"
-VERSION = "12.1.0"
+VERSION = "12.1.4"
 _BANNER_PRINTED = False
 
 
@@ -64,6 +64,9 @@ def get_welcome_banner(version: str = VERSION) -> str:
 │                                                                              │
 │  ★ \033[1;33mHELP US REACH OUR 100 STARS GOAL (Current: 45/100):\033[1;36m                      │
 │     \033[1;32m► Run 'tzero star' or visit: {REPO_URL}\033[1;36m       │
+│                                                                              │
+│  💖 \033[1;35mSPONSOR & KEEP T-ZERO 100% FREE:\033[1;36m                                     │
+│     \033[1;32m► https://github.com/sponsors/toprakahmetaydogmus\033[1;36m                     │
 │                                                                              │
 │  • Quick Commands:                                                           │
 │     \033[1;37mtzero star\033[1;36m               1-Click open GitHub & star the project          │

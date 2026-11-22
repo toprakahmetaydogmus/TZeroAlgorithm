@@ -13,7 +13,7 @@ Capabilities:
 - 100% Offline, $0 cost, zero cloud dependencies (Python standard library only).
 
 Author: Toprak Ahmet Aydoğmuş (Siber Akademi)
-Part of T-Zero Context Architect v12.1.0 Master Edition.
+Part of T-Zero Context Architect v12.1.4 Master Edition.
 """
 
 import ast

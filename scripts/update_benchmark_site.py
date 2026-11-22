@@ -1,7 +1,7 @@
 # scripts/update_benchmark_site.py
 """
 Updates benchmark-site/index.html, style.css, and app.js:
-1. Synchronizes all asset downloads and SHA-256 checksums with v12.1.0.
+1. Synchronizes all asset downloads and SHA-256 checksums with v12.1.4.
 2. Adds dynamic 100-Stars Road progress tracker and live GitHub star count with 15-min TTL cache.
 3. Adds 1-click viral social sharing for Twitter/X, Reddit, LinkedIn, Hacker News.
 4. Injects live dynamic latest release fetching and download thank-you crypto support modal.
@@ -17,7 +17,7 @@ STYLE_CSS = SITE_DIR / "style.css"
 
 DOWNLOADS_V12_GRID = '''    <!-- Live Dynamic Release Banner -->
     <div class="latest-release-banner animate-on-scroll" id="latest-release-banner">
-      <div class="rel-banner-tag"><span class="rel-pulse"></span> Latest GitHub Release: <strong id="live-release-tag">v12.1.0</strong></div>
+      <div class="rel-banner-tag"><span class="rel-pulse"></span> Latest GitHub Release: <strong id="live-release-tag">v12.1.4</strong></div>
       <div class="rel-banner-meta">
         <span>Published: <strong id="live-release-date">Nov 21, 2026</strong></span>
         <span class="rel-divider">•</span>
@@ -34,19 +34,19 @@ DOWNLOADS_V12_GRID = '''    <!-- Live Dynamic Release Banner -->
       <div class="download-card highlight-card" style="border-color: rgba(168, 85, 247, 0.6); background: rgba(20, 15, 38, 0.95);">
         <div class="dl-badge" style="background: linear-gradient(135deg, #a855f7, #6366f1); color: #fff;">Complete 4-Binary Suite (.ZIP)</div>
         <div class="dl-icon">📦</div>
-        <h3 class="dl-name">TZero-v12.1.0-Windows-x64.zip</h3>
+        <h3 class="dl-name">TZero-v12.1.4-Windows-x64.zip</h3>
         <p class="dl-desc">Master offline release archive containing TZeroAlgorithm.exe (GUI), TZeroCLI.exe (Console), TZeroMCP.exe (MCP), and AddMCP.exe (Installer).</p>
         <div class="dl-meta">
           <span>Size: <strong>351.16 MB</strong></span>
-          <span>Version: <strong>v12.1.0</strong></span>
+          <span>Version: <strong>v12.1.4</strong></span>
         </div>
-        <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/download/v12.1.0/TZero-v12.1.0-Windows-x64.zip" target="_blank" rel="noopener noreferrer" download class="btn btn-hero-primary" style="background: linear-gradient(135deg, #9333ea, #6366f1);" data-name="TZero-v12.1.0-Windows-x64.zip">
+        <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/download/v12.1.4/TZero-v12.1.4-Windows-x64.zip" target="_blank" rel="noopener noreferrer" download class="btn btn-hero-primary" style="background: linear-gradient(135deg, #9333ea, #6366f1);" data-name="TZero-v12.1.4-Windows-x64.zip">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Download Master Suite (.ZIP)
         </a>
         <div class="dl-sha">
           <span>SHA-256: <code class="sha-copy" data-sha="271f45ea3a6d9a475d37e7919c6926fdfc9fa618822b91ffa154184320464e20" title="Click to copy full SHA-256">271f45ea3a6d... 📋</code></span>
-          <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/tag/v12.1.0" target="_blank" rel="noopener noreferrer" class="sha-link">Verify</a>
+          <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/tag/v12.1.4" target="_blank" rel="noopener noreferrer" class="sha-link">Verify</a>
         </div>
       </div>
 
@@ -58,15 +58,15 @@ DOWNLOADS_V12_GRID = '''    <!-- Live Dynamic Release Banner -->
         <p class="dl-desc">Standalone GUI, Codebase Scanner, Token Reducer &amp; offline AST audit dashboard suite. High-performance desktop cockpit.</p>
         <div class="dl-meta">
           <span>Size: <strong>64.92 MB</strong></span>
-          <span>Version: <strong>v12.1.0</strong></span>
+          <span>Version: <strong>v12.1.4</strong></span>
         </div>
-        <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/download/v12.1.0/TZeroAlgorithm.exe" target="_blank" rel="noopener noreferrer" download class="btn btn-hero-primary" data-name="TZeroAlgorithm.exe">
+        <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/download/v12.1.4/TZeroAlgorithm.exe" target="_blank" rel="noopener noreferrer" download class="btn btn-hero-primary" data-name="TZeroAlgorithm.exe">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Download Desktop GUI
         </a>
         <div class="dl-sha">
           <span>SHA-256: <code class="sha-copy" data-sha="933294888e94519d04e15d5bea19d45ca74bce9f248d402028a6b34ab2f4372d" title="Click to copy full SHA-256">933294888e94... 📋</code></span>
-          <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/tag/v12.1.0" target="_blank" rel="noopener noreferrer" class="sha-link">Verify</a>
+          <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/tag/v12.1.4" target="_blank" rel="noopener noreferrer" class="sha-link">Verify</a>
         </div>
       </div>
 
@@ -78,15 +78,15 @@ DOWNLOADS_V12_GRID = '''    <!-- Live Dynamic Release Banner -->
         <p class="dl-desc">Console command-line tool with live AST token pruner, multi-tier context tree generator, and interactive terminal cockpit.</p>
         <div class="dl-meta">
           <span>Size: <strong>64.76 MB</strong></span>
-          <span>Version: <strong>v12.1.0</strong></span>
+          <span>Version: <strong>v12.1.4</strong></span>
         </div>
-        <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/download/v12.1.0/TZeroCLI.exe" target="_blank" rel="noopener noreferrer" download class="btn btn-hero-primary" data-name="TZeroCLI.exe">
+        <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/download/v12.1.4/TZeroCLI.exe" target="_blank" rel="noopener noreferrer" download class="btn btn-hero-primary" data-name="TZeroCLI.exe">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Download CLI Executable
         </a>
         <div class="dl-sha">
           <span>SHA-256: <code class="sha-copy" data-sha="ef3ab0735265feaac3a18e2a5e90b29ca678726fcf3c8e563fc0c5cbdd84279b" title="Click to copy full SHA-256">ef3ab0735265... 📋</code></span>
-          <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/tag/v12.1.0" target="_blank" rel="noopener noreferrer" class="sha-link">Verify</a>
+          <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/tag/v12.1.4" target="_blank" rel="noopener noreferrer" class="sha-link">Verify</a>
         </div>
       </div>
 
@@ -98,15 +98,15 @@ DOWNLOADS_V12_GRID = '''    <!-- Live Dynamic Release Banner -->
         <p class="dl-desc">Model Context Protocol stdio server exposing 52 canonical tools directly to Cursor, Claude Desktop, Antigravity, and Copilot.</p>
         <div class="dl-meta">
           <span>Size: <strong>63.17 MB</strong></span>
-          <span>Version: <strong>v12.1.0</strong></span>
+          <span>Version: <strong>v12.1.4</strong></span>
         </div>
-        <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/download/v12.1.0/TZeroMCP.exe" target="_blank" rel="noopener noreferrer" download class="btn btn-dl" data-name="TZeroMCP.exe">
+        <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/download/v12.1.4/TZeroMCP.exe" target="_blank" rel="noopener noreferrer" download class="btn btn-dl" data-name="TZeroMCP.exe">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Download MCP Server
         </a>
         <div class="dl-sha">
           <span>SHA-256: <code class="sha-copy" data-sha="d0903a0621cb21b39dd33fb37150c0eec09677a9404b26d5b23b9e36af3bc42f" title="Click to copy full SHA-256">d0903a0621cb... 📋</code></span>
-          <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/tag/v12.1.0" target="_blank" rel="noopener noreferrer" class="sha-link">Verify</a>
+          <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/tag/v12.1.4" target="_blank" rel="noopener noreferrer" class="sha-link">Verify</a>
         </div>
       </div>
 
@@ -118,15 +118,15 @@ DOWNLOADS_V12_GRID = '''    <!-- Live Dynamic Release Banner -->
         <p class="dl-desc">1-Click configuration installer that discovers Cursor, VS Code, Claude Desktop, Antigravity, Windsurf &amp; Zed to inject T-Zero automatically.</p>
         <div class="dl-meta">
           <span>Size: <strong>98.80 MB</strong></span>
-          <span>Version: <strong>v12.1.0</strong></span>
+          <span>Version: <strong>v12.1.4</strong></span>
         </div>
-        <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/download/v12.1.0/AddMCP.exe" target="_blank" rel="noopener noreferrer" download class="btn btn-dl" data-name="AddMCP.exe">
+        <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/download/v12.1.4/AddMCP.exe" target="_blank" rel="noopener noreferrer" download class="btn btn-dl" data-name="AddMCP.exe">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Download Auto Installer
         </a>
         <div class="dl-sha">
           <span>SHA-256: <code class="sha-copy" data-sha="bd78e5a1b393e92a8534da259e23f48a731d26d2c0c342b63c1c9824de59806d" title="Click to copy full SHA-256">bd78e5a1b393... 📋</code></span>
-          <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/tag/v12.1.0" target="_blank" rel="noopener noreferrer" class="sha-link">Verify</a>
+          <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/tag/v12.1.4" target="_blank" rel="noopener noreferrer" class="sha-link">Verify</a>
         </div>
       </div>
 
@@ -134,19 +134,19 @@ DOWNLOADS_V12_GRID = '''    <!-- Live Dynamic Release Banner -->
       <div class="download-card">
         <div class="dl-badge">VS Code &amp; Cursor</div>
         <div class="dl-icon">🧩</div>
-        <h3 class="dl-name">tzero-vscode-12.1.0.vsix</h3>
+        <h3 class="dl-name">tzero-vscode-12.1.4.vsix</h3>
         <p class="dl-desc">Official VS Code &amp; Cursor extension providing 1-click token pruning, AST architecture mapping, and real-time ROI savings.</p>
         <div class="dl-meta">
           <span>Size: <strong>122 KB</strong></span>
-          <span>Version: <strong>v12.1.0</strong></span>
+          <span>Version: <strong>v12.1.4</strong></span>
         </div>
-        <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/download/v12.1.0/tzero-vscode-12.1.0.vsix" target="_blank" rel="noopener noreferrer" download class="btn btn-dl" data-name="tzero-vscode-12.1.0.vsix">
+        <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/download/v12.1.4/tzero-vscode-12.1.4.vsix" target="_blank" rel="noopener noreferrer" download class="btn btn-dl" data-name="tzero-vscode-12.1.4.vsix">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Download Extension (.VSIX)
         </a>
         <div class="dl-sha">
           <span>SHA-256: <code class="sha-copy" data-sha="ab446d62bf7fdbc93617ad29d5bd011d882fe1a8a29488e0cf3ff302dc897f24" title="Click to copy full SHA-256">ab446d62bf7f... 📋</code></span>
-          <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/tag/v12.1.0" target="_blank" rel="noopener noreferrer" class="sha-link">Verify</a>
+          <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/tag/v12.1.4" target="_blank" rel="noopener noreferrer" class="sha-link">Verify</a>
         </div>
       </div>
     </div>
@@ -202,10 +202,10 @@ DOWNLOADS_V12_GRID = '''    <!-- Live Dynamic Release Banner -->
 
 
 def update_downloads_section(html: str) -> str:
-    # Update downloads section title to v12.1.0
+    # Update downloads section title to v12.1.4
     html = re.sub(
       r'Official Standalone Downloads &amp; Extensions \(v\d+\.\d+\.\d+\)',
-      'Official Standalone Downloads &amp; Extensions (v12.1.0)',
+      'Official Standalone Downloads &amp; Extensions (v12.1.4)',
       html
     )
 
@@ -217,13 +217,13 @@ def update_downloads_section(html: str) -> str:
 
 
 def update_navbar_and_hero(html: str) -> str:
-    # 1. Update version badges and titles to v12.1.0
-    html = re.sub(r'T-Zero v\d+\.\d+\.\d+', 'T-Zero v12.1.0', html)
-    html = re.sub(r'T-ZERO v\d+\.\d+\.\d+', 'T-ZERO v12.1.0', html)
-    html = re.sub(r'PyPI v\d+\.\d+\.\d+', 'PyPI v12.1.0', html)
-    html = re.sub(r'"softwareVersion": "\d+\.\d+\.\d+"', '"softwareVersion": "12.1.0"', html)
-    html = re.sub(r'style\.css\?v=\d+\.\d+\.\d+', 'style.css?v=12.1.0', html)
-    html = re.sub(r'app\.js\?v=\d+\.\d+\.\d+', 'app.js?v=12.1.0', html)
+    # 1. Update version badges and titles to v12.1.4
+    html = re.sub(r'T-Zero v\d+\.\d+\.\d+', 'T-Zero v12.1.4', html)
+    html = re.sub(r'T-ZERO v\d+\.\d+\.\d+', 'T-ZERO v12.1.4', html)
+    html = re.sub(r'PyPI v\d+\.\d+\.\d+', 'PyPI v12.1.4', html)
+    html = re.sub(r'"softwareVersion": "\d+\.\d+\.\d+"', '"softwareVersion": "12.1.4"', html)
+    html = re.sub(r'style\.css\?v=\d+\.\d+\.\d+', 'style.css?v=12.1.4', html)
+    html = re.sub(r'app\.js\?v=\d+\.\d+\.\d+', 'app.js?v=12.1.4', html)
 
     # 2. Add support link to nav if not present
     if '<a href="#support"' not in html:
@@ -249,7 +249,7 @@ def main():
     html = update_downloads_section(html)
     html = update_navbar_and_hero(html)
     INDEX_HTML.write_text(html, encoding="utf-8")
-    print("Updated index.html successfully with v12.1.0 release & support hub!")
+    print("Updated index.html successfully with v12.1.4 release & support hub!")
 
 
 if __name__ == "__main__":

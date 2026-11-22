@@ -254,6 +254,303 @@ def _pure_extract_symbols(path: str, content: str) -> Dict[str, Any]:
     return {"symbols": symbols, "edges": edges}
 
 
+def _pure_calculate_cyclomatic_complexity(code: str, language: str = "python") -> int:
+    try:
+        from tzero.tzero_debt import calculate_cyclomatic_complexity
+        return int(calculate_cyclomatic_complexity(code))
+    except Exception:
+        cc = 1
+        for line in (code or "").splitlines():
+            tr = line.strip()
+            if tr.startswith("#") or tr.startswith("//"):
+                continue
+            for pat in ("if ", "elif ", "else if ", "for ", "while ", "case ", "match ", "catch ", "except ", " && ", " || ", " and ", " or "):
+                cc += tr.count(pat)
+        return cc
+
+
+def _pure_calculate_cognitive_complexity(code: str) -> int:
+    try:
+        from tzero.tzero_debt import calculate_cognitive_complexity
+        return int(calculate_cognitive_complexity(code))
+    except Exception:
+        cog = 0
+        nesting = 0
+        for line in (code or "").splitlines():
+            tr = line.strip()
+            if not tr or tr.startswith("#") or tr.startswith("//"):
+                continue
+            if any(tr.startswith(p) for p in ("if ", "elif ", "else if ", "for ", "while ", "match ", "switch ")):
+                cog += (1 + nesting)
+                nesting += 1
+            elif any(tr.startswith(p) for p in ("else", "except", "catch")):
+                cog += 1
+            if tr.startswith("}") or tr.endswith("}"):
+                nesting = max(0, nesting - 1)
+        return cog
+
+
+def _pure_analyze_file_complexity(path: str, code: str, language: str = "python") -> Dict[str, Any]:
+    lines = (code or "").splitlines()
+    loc = len([l for l in lines if l.strip()])
+    cc = _pure_calculate_cyclomatic_complexity(code, language=language)
+    cog = _pure_calculate_cognitive_complexity(code)
+    loc_f = max(1.0, float(loc))
+    v_f = loc_f * math.log2(max(8.0, loc_f))
+    raw_mi = 171.0 - 5.2 * math.log(v_f) - 0.23 * float(cc) - 16.2 * math.log(loc_f)
+    mi = round(max(0.0, min(100.0, (raw_mi / 171.0) * 100.0)), 1)
+    rating = "A" if mi >= 85 else ("B" if mi >= 65 else ("C" if mi >= 50 else "D"))
+    todo_count = sum(1 for l in lines if any(k in l.upper() for k in ("TODO", "FIXME", "HACK", "BUG")))
+    debt_hours = round(max(0.0, (cc - 10) * 0.5) + max(0.0, (cog - 15) * 0.75) + todo_count * 0.25, 1)
+    debt_usd = round(debt_hours * 75.0, 2)
+    return {
+        "file_path": path,
+        "lines_of_code": loc,
+        "maintainability_index": mi,
+        "rating": rating,
+        "cyclomatic_complexity": cc,
+        "cognitive_complexity": cog,
+        "debt_hours": debt_hours,
+        "debt_cost_usd": debt_usd,
+        "todo_count": todo_count,
+    }
+
+
+def _pure_compute_pagerank(
+    edges: List[Dict[str, Any]],
+    damping: float = 0.85,
+    max_iter: int = 100,
+    tolerance: float = 1e-6,
+) -> List[Dict[str, Any]]:
+    all_nodes: Set[str] = set()
+    in_neighbors: Dict[str, List[str]] = collections.defaultdict(list)
+    out_degrees: Dict[str, int] = collections.defaultdict(int)
+    in_degrees: Dict[str, int] = collections.defaultdict(int)
+
+    for e in edges:
+        s = str(e.get("source", ""))
+        t = str(e.get("target", ""))
+        all_nodes.add(s)
+        all_nodes.add(t)
+        in_neighbors[t].append(s)
+        out_degrees[s] += 1
+        in_degrees[t] += 1
+
+    n = len(all_nodes)
+    if not n:
+        return []
+
+    initial = 1.0 / n
+    current_pr: Dict[str, float] = {node: initial for node in all_nodes}
+
+    for _ in range(max_iter):
+        dangling_sum = sum(pr for node, pr in current_pr.items() if out_degrees[node] == 0)
+        base = (1.0 - damping) / n + damping * (dangling_sum / n)
+        diff = 0.0
+        next_pr: Dict[str, float] = {}
+
+        for node in all_nodes:
+            in_sum = sum(current_pr[in_node] / max(1, out_degrees[in_node]) for in_node in in_neighbors[node])
+            new_val = base + damping * in_sum
+            diff += abs(new_val - current_pr[node])
+            next_pr[node] = new_val
+
+        current_pr = next_pr
+        if diff < tolerance:
+            break
+
+    results = []
+    for node, score in current_pr.items():
+        results.append({
+            "node": node,
+            "score": round(score, 4),
+            "rank": 0,
+            "in_degree": in_degrees[node],
+            "out_degree": out_degrees[node],
+        })
+
+    results.sort(key=lambda x: x["score"], reverse=True)
+    for idx, r in enumerate(results, 1):
+        r["rank"] = idx
+    return results
+
+
+def _pure_analyze_reachability(
+    symbols: List[Dict[str, Any]],
+    invocations: List[Tuple[str, str]],
+    entrypoints: List[str],
+) -> Dict[str, Any]:
+    call_graph: Dict[str, List[str]] = collections.defaultdict(list)
+    all_symbols = {s["name"] for s in symbols if "name" in s}
+
+    for caller, callee in invocations:
+        call_graph[caller].append(callee)
+
+    queue = collections.deque()
+    visited: Set[str] = set()
+
+    for ep in entrypoints:
+        if ep in all_symbols and ep not in visited:
+            visited.add(ep)
+            queue.append(ep)
+
+    if not queue:
+        for name in all_symbols:
+            low = name.lower()
+            if low == "main" or low.startswith(("run", "cli", "test")):
+                if name not in visited:
+                    visited.add(name)
+                    queue.append(name)
+
+    while queue:
+        curr = queue.popleft()
+        for callee in call_graph.get(curr, []):
+            if callee in all_symbols and callee not in visited:
+                visited.add(callee)
+                queue.append(callee)
+
+    dead = sorted(list(all_symbols - visited))
+    reachable = sorted(list(visited))
+    total = len(symbols)
+    ratio = round((len(dead) / total) * 100.0, 1) if total else 0.0
+
+    return {
+        "total_symbols": total,
+        "reachable_count": len(reachable),
+        "dead_symbol_count": len(dead),
+        "dead_code_ratio": ratio,
+        "reachable_symbols": reachable,
+        "dead_symbols": dead,
+    }
+
+
+def _pure_compare_api_contracts(old_code: str, new_code: str) -> Dict[str, Any]:
+    try:
+        from tzero.tzero_contracts import ASTContractExtractor
+        old_f, _ = ASTContractExtractor.extract_from_code(old_code)
+        new_f, _ = ASTContractExtractor.extract_from_code(new_code)
+        breaking = []
+        additions = []
+        for name in old_f:
+            if name not in new_f:
+                breaking.append({
+                    "severity": "BREAKING",
+                    "category": "REMOVED_SYMBOL",
+                    "symbol": name,
+                    "details": f"Function {name} was removed.",
+                })
+        for name in new_f:
+            if name not in old_f:
+                additions.append({
+                    "severity": "ADDITION",
+                    "category": "NEW_SYMBOL",
+                    "symbol": name,
+                    "details": f"New function {name} introduced.",
+                })
+        is_breaking = len(breaking) > 0
+        bump = "MAJOR" if is_breaking else ("MINOR" if additions else "PATCH")
+        return {
+            "recommended_bump": bump,
+            "is_breaking": is_breaking,
+            "breaking_changes": breaking,
+            "non_breaking_additions": additions,
+        }
+    except Exception:
+        return {"recommended_bump": "PATCH", "is_breaking": False, "breaking_changes": []}
+
+
+def _pure_find_code_duplicity(files: List[Tuple[str, str]], min_lines: int = 6) -> Dict[str, Any]:
+    window = max(3, int(min_lines))
+    hashes: Dict[int, Tuple[str, int, str]] = {}
+    duplicates = []
+    total_lines = 0
+
+    for path, content in files:
+        lines = (content or "").splitlines()
+        total_lines += len(lines)
+        if len(lines) < window:
+            continue
+        for i in range(len(lines) - window + 1):
+            block = [l.strip() for l in lines[i:i + window] if l.strip() and not l.strip().startswith(("#", "//"))]
+            if len(block) < window - 1:
+                continue
+            h = _pure_fnv1a_64("\n".join(block))
+            if h in hashes:
+                prev_path, prev_line, prev_snippet = hashes[h]
+                if prev_path != path or (i + 1) != prev_line:
+                    duplicates.append({
+                        "file_a": prev_path,
+                        "start_line_a": prev_line,
+                        "file_b": path,
+                        "start_line_b": i + 1,
+                        "line_count": window,
+                        "snippet": prev_snippet,
+                    })
+            else:
+                hashes[h] = (path, i + 1, "\n".join(lines[i:i + window]))
+
+    dup_lines = len(duplicates) * window
+    pct = round((dup_lines / total_lines) * 100.0, 1) if total_lines else 0.0
+    return {
+        "total_files_scanned": len(files),
+        "duplicate_block_count": len(duplicates),
+        "total_duplicate_lines": dup_lines,
+        "duplicate_percentage": min(100.0, pct),
+        "blocks": duplicates,
+    }
+
+
+def _pure_damerau_levenshtein(s1: str, s2: str) -> int:
+    len1, len2 = len(s1), len(s2)
+    if not len1:
+        return len2
+    if not len2:
+        return len1
+    d = [[0] * (len2 + 1) for _ in range(len1 + 1)]
+    for i in range(len1 + 1):
+        d[i][0] = i
+    for j in range(len2 + 1):
+        d[0][j] = j
+    for i in range(1, len1 + 1):
+        for j in range(1, len2 + 1):
+            cost = 0 if s1[i - 1] == s2[j - 1] else 1
+            d[i][j] = min(
+                d[i - 1][j] + 1,
+                d[i][j - 1] + 1,
+                d[i - 1][j - 1] + cost,
+            )
+            if i > 1 and j > 1 and s1[i - 1] == s2[j - 2] and s1[i - 2] == s2[j - 1]:
+                d[i][j] = min(d[i][j], d[i - 2][j - 2] + 1)
+    return d[len1][len2]
+
+
+def _pure_fuzzy_similarity(s1: str, s2: str) -> float:
+    max_len = max(len(s1), len(s2))
+    if not max_len:
+        return 1.0
+    dist = _pure_damerau_levenshtein(s1, s2)
+    return round(max(0.0, 1.0 - dist / max_len), 3)
+
+
+def _pure_fuzzy_symbol_search(
+    query: str,
+    candidates: List[str],
+    min_similarity: float = 0.6,
+    top_k: int = 5,
+) -> List[Dict[str, Any]]:
+    matches = []
+    for cand in candidates:
+        sim = _pure_fuzzy_similarity(query, cand)
+        if sim >= min_similarity:
+            matches.append({
+                "target": cand,
+                "distance": _pure_damerau_levenshtein(query, cand),
+                "similarity": sim,
+            })
+    matches.sort(key=lambda x: x["similarity"], reverse=True)
+    return matches[:top_k]
+
+
 class RustCoreBridge:
     """Adaptive FFI/subprocess/PyO3 bridge to crates/tzero_core with pure-Python fallback."""
 
@@ -447,6 +744,80 @@ class RustCoreBridge:
                 return res
         return _pure_extract_symbols(path, content)
 
+    def calculate_cyclomatic_complexity(self, code: str, language: str = "python") -> int:
+        if self._pyo3_mod is not None and hasattr(self._pyo3_mod, "calculate_cyclomatic_complexity"):
+            return int(self._pyo3_mod.calculate_cyclomatic_complexity(code, language))
+        return _pure_calculate_cyclomatic_complexity(code, language=language)
+
+    def calculate_cognitive_complexity(self, code: str) -> int:
+        if self._pyo3_mod is not None and hasattr(self._pyo3_mod, "calculate_cognitive_complexity"):
+            return int(self._pyo3_mod.calculate_cognitive_complexity(code))
+        return _pure_calculate_cognitive_complexity(code)
+
+    def analyze_file_complexity(self, path: str, code: str, language: str = "python") -> Dict[str, Any]:
+        if self._pyo3_mod is not None and hasattr(self._pyo3_mod, "analyze_file_complexity"):
+            res = self._pyo3_mod.analyze_file_complexity(path, code, language)
+            if isinstance(res, dict):
+                return res
+        return _pure_analyze_file_complexity(path, code, language=language)
+
+    def compute_pagerank(
+        self,
+        edges: List[Dict[str, Any]],
+        damping: float = 0.85,
+        max_iter: int = 100,
+    ) -> List[Dict[str, Any]]:
+        if self._pyo3_mod is not None and hasattr(self._pyo3_mod, "compute_pagerank"):
+            return list(self._pyo3_mod.compute_pagerank(edges, damping, max_iter))
+        return _pure_compute_pagerank(edges, damping=damping, max_iter=max_iter)
+
+    def analyze_reachability(
+        self,
+        symbols: List[Dict[str, Any]],
+        invocations: List[Tuple[str, str]],
+        entrypoints: List[str],
+    ) -> Dict[str, Any]:
+        if self._pyo3_mod is not None and hasattr(self._pyo3_mod, "analyze_reachability"):
+            res = self._pyo3_mod.analyze_reachability(symbols, invocations, entrypoints)
+            if isinstance(res, dict):
+                return res
+        return _pure_analyze_reachability(symbols, invocations, entrypoints)
+
+    def compare_api_contracts(self, old_code: str, new_code: str) -> Dict[str, Any]:
+        if self._pyo3_mod is not None and hasattr(self._pyo3_mod, "compare_api_contracts"):
+            res = self._pyo3_mod.compare_api_contracts(old_code, new_code)
+            if isinstance(res, dict):
+                return res
+        return _pure_compare_api_contracts(old_code, new_code)
+
+    def find_code_duplicity(self, files: List[Tuple[str, str]], min_lines: int = 6) -> Dict[str, Any]:
+        if self._pyo3_mod is not None and hasattr(self._pyo3_mod, "find_code_duplicity"):
+            res = self._pyo3_mod.find_code_duplicity(files, min_lines)
+            if isinstance(res, dict):
+                return res
+        return _pure_find_code_duplicity(files, min_lines=min_lines)
+
+    def damerau_levenshtein(self, s1: str, s2: str) -> int:
+        if self._pyo3_mod is not None and hasattr(self._pyo3_mod, "damerau_levenshtein"):
+            return int(self._pyo3_mod.damerau_levenshtein(s1, s2))
+        return _pure_damerau_levenshtein(s1, s2)
+
+    def fuzzy_similarity(self, s1: str, s2: str) -> float:
+        if self._pyo3_mod is not None and hasattr(self._pyo3_mod, "fuzzy_similarity"):
+            return float(self._pyo3_mod.fuzzy_similarity(s1, s2))
+        return _pure_fuzzy_similarity(s1, s2)
+
+    def fuzzy_symbol_search(
+        self,
+        query: str,
+        candidates: List[str],
+        min_similarity: float = 0.6,
+        top_k: int = 5,
+    ) -> List[Dict[str, Any]]:
+        if self._pyo3_mod is not None and hasattr(self._pyo3_mod, "fuzzy_symbol_search"):
+            return list(self._pyo3_mod.fuzzy_symbol_search(query, candidates, min_similarity, top_k))
+        return _pure_fuzzy_symbol_search(query, candidates, min_similarity=min_similarity, top_k=top_k)
+
 
 _GLOBAL_BRIDGE: Optional[RustCoreBridge] = None
 
@@ -500,6 +871,55 @@ def is_native_available() -> bool:
 
 def backend() -> str:
     return get_bridge().backend()
+
+
+def calculate_cyclomatic_complexity(code: str, language: str = "python") -> int:
+    return get_bridge().calculate_cyclomatic_complexity(code, language=language)
+
+
+def calculate_cognitive_complexity(code: str) -> int:
+    return get_bridge().calculate_cognitive_complexity(code)
+
+
+def analyze_file_complexity(path: str, code: str, language: str = "python") -> Dict[str, Any]:
+    return get_bridge().analyze_file_complexity(path, code, language=language)
+
+
+def compute_pagerank(edges: List[Dict[str, Any]], damping: float = 0.85, max_iter: int = 100) -> List[Dict[str, Any]]:
+    return get_bridge().compute_pagerank(edges, damping=damping, max_iter=max_iter)
+
+
+def analyze_reachability(
+    symbols: List[Dict[str, Any]],
+    invocations: List[Tuple[str, str]],
+    entrypoints: List[str],
+) -> Dict[str, Any]:
+    return get_bridge().analyze_reachability(symbols, invocations, entrypoints)
+
+
+def compare_api_contracts(old_code: str, new_code: str) -> Dict[str, Any]:
+    return get_bridge().compare_api_contracts(old_code, new_code)
+
+
+def find_code_duplicity(files: List[Tuple[str, str]], min_lines: int = 6) -> Dict[str, Any]:
+    return get_bridge().find_code_duplicity(files, min_lines=min_lines)
+
+
+def damerau_levenshtein(s1: str, s2: str) -> int:
+    return get_bridge().damerau_levenshtein(s1, s2)
+
+
+def fuzzy_similarity(s1: str, s2: str) -> float:
+    return get_bridge().fuzzy_similarity(s1, s2)
+
+
+def fuzzy_symbol_search(
+    query: str,
+    candidates: List[str],
+    min_similarity: float = 0.6,
+    top_k: int = 5,
+) -> List[Dict[str, Any]]:
+    return get_bridge().fuzzy_symbol_search(query, candidates, min_similarity=min_similarity, top_k=top_k)
 
 
 class AgentKernelSandbox:

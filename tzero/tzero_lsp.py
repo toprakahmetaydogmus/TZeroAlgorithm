@@ -513,7 +513,7 @@ class TZeroLSPServer:
                         "hoverProvider": True,
                         "codeActionProvider": True,
                     },
-                    "serverInfo": {"name": "tzero-lsp", "version": "12.1.0"},
+                    "serverInfo": {"name": "tzero-lsp", "version": "12.1.4"},
                 },
             }]
 
