@@ -8,6 +8,9 @@ concurrency:
 'on':
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   tzero-guard:
     if: "!endsWith(github.actor, '[bot]') && github.actor != 'dependabot'"
