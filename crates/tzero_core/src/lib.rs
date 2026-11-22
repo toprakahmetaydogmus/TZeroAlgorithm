@@ -11,22 +11,29 @@
 
 pub mod ast_pruner;
 pub mod bm25_search;
+pub mod boundary_guard;
 pub mod complexity;
+pub mod context_tree;
 pub mod contracts;
 pub mod duplicity;
 pub mod entropy_guard;
 pub mod fuzzy_matcher;
+pub mod hallucination_guard;
+pub mod mcp_server;
 pub mod pagerank;
 pub mod python_bindings;
 pub mod reachability;
 pub mod symbol_graph;
+pub mod token_cost;
 pub mod tokenizer;
 
 pub use ast_pruner::{detect_language, prune_code, prune_code_with_stats, SupportedLanguage};
+pub use boundary_guard::{enforce_boundaries, ArchLayer, BoundaryReport, BoundaryViolation, CircularDependency};
 pub use complexity::{
     analyze_file_complexity, calculate_cognitive_complexity, calculate_cyclomatic_complexity,
     calculate_maintainability_index, mi_to_rating, FileComplexityReport, FunctionComplexity,
 };
+pub use context_tree::{build_context_tree, ContextTier, ContextTreeResult, FileContextNode};
 pub use contracts::{compare_api_contracts, ContractDiff, ContractReport, SemVerBump};
 pub use duplicity::{find_code_duplicity, DuplicateBlock, DuplicityReport};
 pub use entropy_guard::{
@@ -37,8 +44,14 @@ pub use entropy_guard::{
 pub use fuzzy_matcher::{
     damerau_levenshtein_distance, fuzzy_similarity, fuzzy_symbol_search, FuzzyMatch,
 };
+pub use hallucination_guard::{verify_hallucinations, HallucinatedSymbol, HallucinationReport};
+pub use mcp_server::run_mcp_stdio_server;
 pub use pagerank::{compute_pagerank, PageRankResult};
 pub use reachability::{analyze_reachability, ReachabilityReport};
+pub use token_cost::{
+    compare_all_models, estimate_cost_for_model, get_standard_pricing,
+    ModelComparisonReport, ModelPricing, TokenCostEstimate,
+};
 pub use tokenizer::{count_tokens, count_tokens_by_encoding, resolve_encoding_name};
 
 use std::collections::HashSet;

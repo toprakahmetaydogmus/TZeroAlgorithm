@@ -12,20 +12,20 @@ Your objective is to execute all coding, debugging, refactoring, and orchestrati
 ## 2. Technical Stack & Environment Matrix
 - **Primary Language:** `Python`
 - **Active Frameworks:** `None / Core`
-- **Build & Packaging:** `poetry/uv/flit, pip`
-- **Architectural Style:** `Autonomous CLI / Tool Architecture`
-- **Estimated Code Volume:** `536 files` (~`89177 lines of code`)
-- **T-Zero Context Budget:** `1365864 virtual tokens` (vs `11382203` raw tokens, **88.0% context reduction**)
+- **Build & Packaging:** `poetry/uv/flit, pip, cargo`
+- **Architectural Style:** `Monorepo Multi-Package Workspace`
+- **Estimated Code Volume:** `542 files` (~`90803 lines of code`)
+- **T-Zero Context Budget:** `1368541 virtual tokens` (vs `11404510` raw tokens, **88.0% context reduction**)
 
 ## 3. Operational Protocols & Verification Gates
 Before marking any assignment, feature, or bugfix as complete, you MUST execute the following verification pipeline:
 
 ```bash
 # 1. Run Workspace Static Quality & Lint Check
-flake8 .
+cargo clippy
 
 # 2. Run Comprehensive Automated Test Suite
-python -m unittest discover -s tests -p "test_*.py"
+cargo test
 ```
 
 If tests fail, activate the **T-Zero Self-Healing Execution Protocol**: diagnose the traceback, identify the exact failing AST node, apply surgical patches, and re-run until 100% green.

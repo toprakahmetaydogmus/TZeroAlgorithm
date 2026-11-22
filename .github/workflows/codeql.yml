@@ -25,16 +25,37 @@ jobs:
       matrix:
         include:
           - language: python
+            build-mode: none
           - language: javascript-typescript
+            build-mode: none
+          - language: rust
+            build-mode: manual
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v5
 
+    - name: Set up Python
+      if: matrix.language == 'rust'
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.12'
+
+    - name: Install Rust toolchain
+      if: matrix.language == 'rust'
+      uses: dtolnay/rust-toolchain@stable
+
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v3
       with:
         languages: ${{ matrix.language }}
+        build-mode: ${{ matrix.build-mode }}
+
+    - name: Build Rust Code
+      if: matrix.language == 'rust'
+      run: |
+        cargo check --workspace --no-default-features
+        cargo build --workspace --no-default-features
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3

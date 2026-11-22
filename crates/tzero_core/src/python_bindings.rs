@@ -14,6 +14,8 @@ use crate::bm25_search::{Bm25Index, SearchDocument};
 use crate::complexity::{
     analyze_file_complexity, calculate_cognitive_complexity, calculate_cyclomatic_complexity,
 };
+use crate::boundary_guard::enforce_boundaries;
+use crate::context_tree::build_context_tree;
 use crate::contracts::compare_api_contracts;
 use crate::duplicity::find_code_duplicity;
 use crate::entropy_guard::{
@@ -25,9 +27,11 @@ use crate::entropy_guard::{
 use crate::fuzzy_matcher::{
     damerau_levenshtein_distance, fuzzy_similarity, fuzzy_symbol_search,
 };
+use crate::hallucination_guard::verify_hallucinations;
 use crate::pagerank::compute_pagerank;
 use crate::reachability::analyze_reachability;
 use crate::symbol_graph::{extract_symbols_from_source, DependencyEdge, SymbolRecord};
+use crate::token_cost::compare_all_models;
 use crate::tokenizer::count_tokens;
 use crate::{fnv1a_hash64_bytes, jaccard_shingles_bytes};
 
@@ -397,6 +401,148 @@ pub fn py_fuzzy_similarity(s1: &str, s2: &str) -> PyResult<f64> {
     Ok(fuzzy_similarity(s1, s2))
 }
 
+/// Builds a multi-tier hierarchical AST context tree from target directory.
+#[pyfunction]
+#[pyo3(name = "build_context_tree", signature = (root_dir, tier = None))]
+pub fn py_build_context_tree<'py>(
+    py: Python<'py>,
+    root_dir: &str,
+    tier: Option<u32>,
+) -> PyResult<Bound<'py, PyDict>> {
+    let t = tier.unwrap_or(3);
+    let res = build_context_tree(root_dir, t, None);
+    let dict = PyDict::new_bound(py);
+    dict.set_item("root_dir", res.root_dir)?;
+    dict.set_item("tier", res.tier)?;
+    dict.set_item("total_files", res.total_files)?;
+    dict.set_item("total_lines", res.total_lines)?;
+    dict.set_item("raw_tokens", res.raw_tokens)?;
+    dict.set_item("pruned_tokens", res.pruned_tokens)?;
+    dict.set_item("token_reduction_percent", res.token_reduction_percent)?;
+    dict.set_item("formatted_tree", res.formatted_tree)?;
+    Ok(dict)
+}
+
+/// Enforces architectural boundary layers and detects circular dependencies.
+#[pyfunction]
+#[pyo3(name = "enforce_boundaries", signature = (edges, banned = None))]
+pub fn py_enforce_boundaries<'py>(
+    py: Python<'py>,
+    edges: Bound<'py, PyList>,
+    banned: Option<Bound<'py, PyList>>,
+) -> PyResult<Bound<'py, PyDict>> {
+    let mut storage: Vec<(String, String)> = Vec::with_capacity(edges.len());
+    for item in edges.iter() {
+        if let Ok((src, dst)) = item.extract::<(String, String)>() {
+            storage.push((src, dst));
+        }
+    }
+    let edges_ref: Vec<(&str, &str)> = storage.iter().map(|(s, d)| (s.as_str(), d.as_str())).collect();
+
+    let mut banned_storage: Vec<String> = Vec::new();
+    if let Some(b) = banned {
+        for item in b.iter() {
+            if let Ok(s) = item.extract::<String>() {
+                banned_storage.push(s);
+            }
+        }
+    }
+    let banned_ref: Vec<&str> = banned_storage.iter().map(|s| s.as_str()).collect();
+    let banned_opt = if banned_storage.is_empty() { None } else { Some(banned_ref.as_slice()) };
+
+    let rep = enforce_boundaries(&edges_ref, banned_opt);
+    let dict = PyDict::new_bound(py);
+    dict.set_item("total_modules_checked", rep.total_modules_checked)?;
+    dict.set_item("total_edges_checked", rep.total_edges_checked)?;
+    dict.set_item("is_compliant", rep.is_compliant)?;
+
+    let viol_list = PyList::empty_bound(py);
+    for v in rep.violations {
+        let vd = PyDict::new_bound(py);
+        vd.set_item("source_module", v.source_module)?;
+        vd.set_item("source_layer", v.source_layer)?;
+        vd.set_item("target_module", v.target_module)?;
+        vd.set_item("target_layer", v.target_layer)?;
+        vd.set_item("violation_type", v.violation_type)?;
+        vd.set_item("description", v.description)?;
+        viol_list.append(vd)?;
+    }
+    dict.set_item("violations", viol_list)?;
+
+    let circ_list = PyList::empty_bound(py);
+    for c in rep.circular_dependencies {
+        let cd = PyDict::new_bound(py);
+        cd.set_item("cycle", c.cycle)?;
+        cd.set_item("length", c.length)?;
+        circ_list.append(cd)?;
+    }
+    dict.set_item("circular_dependencies", circ_list)?;
+    dict.set_item("banned_import_findings", rep.banned_import_findings)?;
+    Ok(dict)
+}
+
+/// Verifies code against known workspace symbols to detect AI coding hallucinations.
+#[pyfunction]
+#[pyo3(name = "verify_hallucinations", signature = (code, valid_symbols))]
+pub fn py_verify_hallucinations<'py>(
+    py: Python<'py>,
+    code: &str,
+    valid_symbols: Bound<'py, PyList>,
+) -> PyResult<Bound<'py, PyDict>> {
+    let mut sym_storage = Vec::new();
+    for item in valid_symbols.iter() {
+        if let Ok(s) = item.extract::<String>() {
+            sym_storage.push(s);
+        }
+    }
+    let sym_ref: Vec<&str> = sym_storage.iter().map(|s| s.as_str()).collect();
+
+    let rep = verify_hallucinations(code, &sym_ref);
+    let dict = PyDict::new_bound(py);
+    dict.set_item("total_symbols_checked", rep.total_symbols_checked)?;
+    dict.set_item("hallucination_count", rep.hallucination_count)?;
+    dict.set_item("hallucination_free", rep.hallucination_free)?;
+    dict.set_item("safety_score", rep.safety_score)?;
+
+    let hall_list = PyList::empty_bound(py);
+    for h in rep.hallucinations {
+        let hd = PyDict::new_bound(py);
+        hd.set_item("symbol", h.symbol)?;
+        hd.set_item("kind", h.kind)?;
+        hd.set_item("line", h.line)?;
+        hd.set_item("suggested_replacement", h.suggested_replacement)?;
+        hd.set_item("similarity_confidence", h.similarity_confidence)?;
+        hall_list.append(hd)?;
+    }
+    dict.set_item("hallucinations", hall_list)?;
+    Ok(dict)
+}
+
+/// Estimates multi-model token API costs and enterprise ROI savings.
+#[pyfunction]
+#[pyo3(name = "estimate_costs", signature = (raw_tokens, pruned_tokens, output_tokens = None, model = None))]
+pub fn py_estimate_costs<'py>(
+    py: Python<'py>,
+    raw_tokens: usize,
+    pruned_tokens: usize,
+    output_tokens: Option<usize>,
+    model: Option<&str>,
+) -> PyResult<Bound<'py, PyDict>> {
+    let out_toks = output_tokens.unwrap_or(2_000);
+    let rep = compare_all_models(raw_tokens, pruned_tokens, out_toks, model);
+    let dict = PyDict::new_bound(py);
+    dict.set_item("input_tokens", rep.input_tokens)?;
+    dict.set_item("output_tokens", rep.output_tokens)?;
+    dict.set_item("pruned_input_tokens", rep.pruned_input_tokens)?;
+    dict.set_item("baseline_model", rep.baseline_model)?;
+    dict.set_item("baseline_cost_usd", rep.baseline_cost_usd)?;
+    dict.set_item("optimized_cost_usd", rep.optimized_cost_usd)?;
+    dict.set_item("cost_savings_usd", rep.cost_savings_usd)?;
+    dict.set_item("cost_reduction_percent", rep.cost_reduction_percent)?;
+    dict.set_item("monthly_projected_savings_usd", rep.monthly_projected_savings_usd)?;
+    Ok(dict)
+}
+
 /// Returns True when running within native Rust compiled extension module.
 #[pyfunction]
 #[pyo3(name = "is_native")]
@@ -432,6 +578,10 @@ pub fn register_python_bindings(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(py_find_code_duplicity, m)?)?;
     m.add_function(wrap_pyfunction!(py_damerau_levenshtein, m)?)?;
     m.add_function(wrap_pyfunction!(py_fuzzy_similarity, m)?)?;
+    m.add_function(wrap_pyfunction!(py_build_context_tree, m)?)?;
+    m.add_function(wrap_pyfunction!(py_enforce_boundaries, m)?)?;
+    m.add_function(wrap_pyfunction!(py_verify_hallucinations, m)?)?;
+    m.add_function(wrap_pyfunction!(py_estimate_costs, m)?)?;
     m.add_function(wrap_pyfunction!(py_is_native, m)?)?;
     m.add_function(wrap_pyfunction!(py_core_version, m)?)?;
     m.add("__version__", "12.1.4")?;

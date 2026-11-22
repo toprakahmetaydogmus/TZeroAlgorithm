@@ -95,6 +95,12 @@ class TestLocalCI(unittest.TestCase):
             self.assertFalse(os.path.exists(hook_path))
 
     def test_cli_local_ci_flags(self):
+        # Run CLI with --version
+        cmd_ver = [sys.executable, "-m", "tzero.tzero_ci", "--version"]
+        proc_ver = subprocess.run(cmd_ver, cwd=str(ROOT_DIR), capture_output=True, text=True)
+        self.assertEqual(proc_ver.returncode, 0, f"--version failed:\n{proc_ver.stderr}\n{proc_ver.stdout}")
+        self.assertIn("12.1.4", proc_ver.stdout + proc_ver.stderr)
+
         # Run CLI with --quick and --json
         cmd = [sys.executable, "-m", "tzero.tzero_ci", "--quick", "--json"]
         proc = subprocess.run(cmd, cwd=str(ROOT_DIR), capture_output=True, text=True)

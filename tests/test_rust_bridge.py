@@ -265,6 +265,54 @@ class TestRustBridgeAndAgentKernel(unittest.TestCase):
         self.assertGreaterEqual(len(matches), 1)
         self.assertEqual(matches[0]["target"], "OrderController")
 
+    def test_build_context_tree(self):
+        bridge = tzero_rust_bridge.RustCoreBridge()
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            sample_file = f"{tmp_dir}/service.py"
+            with open(sample_file, "w", encoding="utf-8") as f:
+                f.write("def handle_request():\n    return 42\n")
+
+            tree = bridge.build_context_tree(tmp_dir, tier=3)
+            self.assertEqual(tree["tier"], 3)
+            self.assertGreaterEqual(tree["total_files"], 1)
+            self.assertIn("formatted_tree", tree)
+            self.assertIn("service.py", tree["formatted_tree"])
+
+    def test_enforce_boundaries(self):
+        bridge = tzero_rust_bridge.RustCoreBridge()
+        valid_edges = [
+            ("tzero_cli", "tzero_service"),
+            ("tzero_service", "tzero_model"),
+        ]
+        rep = bridge.enforce_boundaries(valid_edges)
+        self.assertTrue(rep["is_compliant"])
+        self.assertEqual(len(rep["violations"]), 0)
+
+        breach_edges = [
+            ("tzero_model", "tzero_cli"),
+        ]
+        rep_breach = bridge.enforce_boundaries(breach_edges)
+        self.assertFalse(rep_breach["is_compliant"])
+        self.assertGreaterEqual(len(rep_breach["violations"]), 1)
+
+    def test_verify_hallucinations(self):
+        bridge = tzero_rust_bridge.RustCoreBridge()
+        valid_symbols = ["calculate_total", "fetch_user"]
+        code = "def run():\n    total = calculate_totals()\n    print(total)\n"
+        rep = bridge.verify_hallucinations(code, valid_symbols)
+        self.assertFalse(rep["hallucination_free"])
+        self.assertEqual(rep["hallucination_count"], 1)
+        self.assertEqual(rep["hallucinations"][0]["symbol"], "calculate_totals")
+        self.assertEqual(rep["hallucinations"][0]["suggested_replacement"], "calculate_total")
+
+    def test_estimate_costs(self):
+        bridge = tzero_rust_bridge.RustCoreBridge()
+        rep = bridge.estimate_costs(raw_tokens=100_000, pruned_tokens=10_000, output_tokens=2000, model="gpt-4o")
+        self.assertGreater(rep["baseline_cost_usd"], rep["optimized_cost_usd"])
+        self.assertGreater(rep["cost_savings_usd"], 0.0)
+        self.assertGreaterEqual(rep["cost_reduction_percent"], 70.0)
+        self.assertGreater(rep["monthly_projected_savings_usd"], 0.0)
+
 
 if __name__ == "__main__":
     unittest.main()
