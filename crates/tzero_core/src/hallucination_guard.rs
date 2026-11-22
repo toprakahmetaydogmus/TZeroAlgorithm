@@ -53,13 +53,32 @@ pub fn verify_hallucinations(
     let mut detected = Vec::new();
     let mut checked_count: usize = 0;
 
-    let import_regex = Regex::new(r"(?m)^(?:from\s+([a-zA-Z0-9_\.]+)\s+import\s+([a-zA-Z0-9_,\s]+)|import\s+([a-zA-Z0-9_,\s]+))").unwrap();
     let call_regex = Regex::new(r"([a-zA-Z0-9_]+)\s*\(").unwrap();
 
-    // Check imports
-    for cap in import_regex.captures_iter(proposed_code) {
-        if let Some(m) = cap.get(2) {
-            for part in m.as_str().split(',') {
+    // Check imports line by line
+    for (line_idx, line) in proposed_code.lines().enumerate() {
+        let tr = line.trim();
+        if let Some(rest) = tr.strip_prefix("from ") {
+            if let Some((_mod, imports)) = rest.split_once(" import ") {
+                for part in imports.split(',') {
+                    let sym = part.trim();
+                    if !sym.is_empty() && !sym.contains('*') {
+                        checked_count += 1;
+                        if !valid_set.contains(sym) {
+                            let (best_match, score) = find_best_candidate(sym, valid_symbols);
+                            detected.push(HallucinatedSymbol {
+                                symbol: sym.to_string(),
+                                kind: "imported_symbol".to_string(),
+                                line: line_idx + 1,
+                                suggested_replacement: best_match,
+                                similarity_confidence: score,
+                            });
+                        }
+                    }
+                }
+            }
+        } else if let Some(rest) = tr.strip_prefix("import ") {
+            for part in rest.split(',') {
                 let sym = part.trim();
                 if !sym.is_empty() && !sym.contains('*') {
                     checked_count += 1;
@@ -68,7 +87,7 @@ pub fn verify_hallucinations(
                         detected.push(HallucinatedSymbol {
                             symbol: sym.to_string(),
                             kind: "imported_symbol".to_string(),
-                            line: 1,
+                            line: line_idx + 1,
                             suggested_replacement: best_match,
                             similarity_confidence: score,
                         });
@@ -88,6 +107,8 @@ pub fn verify_hallucinations(
             || trimmed.starts_with("class ")
             || trimmed.starts_with("fn ")
             || trimmed.starts_with("pub fn ")
+            || trimmed.starts_with("from ")
+            || trimmed.starts_with("import ")
         {
             continue;
         }
