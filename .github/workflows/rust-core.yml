@@ -44,6 +44,8 @@ jobs:
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
 
       - name: Cargo Cache
         uses: actions/cache@v4
@@ -58,10 +60,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-cargo-
 
-      - name: Cargo Check & Test
+      - name: Cargo Check, Clippy & Test
         shell: bash
         run: |
           cargo check --manifest-path crates/tzero_core/Cargo.toml --no-default-features
+          cargo clippy --manifest-path crates/tzero_core/Cargo.toml --all-targets --no-default-features -- -D warnings
           cargo test --manifest-path crates/tzero_core/Cargo.toml --no-default-features
 
   build-wheels:

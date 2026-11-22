@@ -89,7 +89,7 @@ Add this to your Cursor MCP settings (`~/.cursor/mcp.json`):
 - Zero external LLM calls or cloud telemetry.
 - Built-in Shannon Entropy scanner (H >= 4.75) detects and redacts hardcoded API keys and credentials locally.
 
-I'm 15 years old and building this as a solo open-source engineer at {ORGANIZATION}. Everything is 100% free under MIT.
+Building this as a solo open-source engineer at {ORGANIZATION}. Everything is 100% free under MIT.
 
 If this saves your Cursor context budget, **I'd genuinely appreciate a star on GitHub ⭐** — we are on the road to our first 100 stars!
 
@@ -150,10 +150,10 @@ Check it out and drop a star if you find it useful! ⭐
 """
         },
         "r/Turkey": {
-            "title": f"15 yaşındayım, Cursor ve Claude için geliştirdiğim açık kaynaklı context motoru {VERSION} ile yayında! 🇹🇷",
+            "title": f"Cursor ve Claude için geliştirdiğim açık kaynaklı context motoru {VERSION} ile yayında! 🇹🇷",
             "body": f"""Merhaba Türk yazılımcı topluluğu!
 
-Ben Toprak Ahmet Aydoğmuş, 15 yaşındayım ve {ORGANIZATION} bünyesinde bağımsız açık kaynaklı yazılımlar geliştiriyorum.
+Ben Toprak Ahmet Aydoğmuş, {ORGANIZATION} bünyesinde bağımsız açık kaynaklı yazılımlar geliştiriyorum.
 
 Yapay zeka kodlama araçlarıyla (Cursor, Claude Desktop, Antigravity, Windsurf) büyük projelerde çalışırken en büyük darboğaz **token sınırları ve yüksek context maliyetleri**. Tüm dosyaları yapay zekaya yüklediğinizde binlerce satır gereksiz gövde kodu yapay zekanın dikkatini dağıtıyor ve pencereyi tüketiyor.
 
@@ -181,7 +181,7 @@ def generate_show_hn() -> Dict[str, str]:
     return {
         "title": f"Show HN: T-Zero – Local AST context pruning for LLMs with 88-95% token reduction",
         "url": REPO_URL,
-        "first_comment": f"""Hi HN! I'm Toprak ({AUTHOR}), a 15-year-old software engineer from Turkey. I built T-Zero to solve a fundamental efficiency problem in AI-assisted software engineering: prompt context bloat.
+        "first_comment": f"""Hi HN! I'm Toprak ({AUTHOR}), a software engineer from Turkey. I built T-Zero to solve a fundamental efficiency problem in AI-assisted software engineering: prompt context bloat.
 
 ### The Problem:
 When developers feed large repositories into Cursor, Claude Desktop, or Claude Code, they either:
@@ -282,7 +282,7 @@ def generate_product_hunt() -> Dict[str, str]:
         "description": "T-Zero is a local Model Context Protocol (MCP) server for Cursor, Claude Desktop, Antigravity IDE, and Windsurf that deterministically prunes codebase bodies to typed AST skeletons, reducing LLM token consumption by 85–95% with 100% Zero-Leak security.",
         "maker_comment": f"""Hey Product Hunt community! 👋
 
-I'm Toprak ({AUTHOR}), 15 years old, and I've spent the past few months building **T-Zero** at {ORGANIZATION}.
+I'm Toprak ({AUTHOR}), and I've spent the past few months building **T-Zero** at {ORGANIZATION}.
 
 ### The Problem We Solved:
 AI coding assistants like Cursor and Claude are transformative, but as soon as you open a repository with 50+ files, you run into:

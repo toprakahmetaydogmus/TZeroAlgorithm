@@ -404,9 +404,9 @@ class TZeroShowcaseGenerator:
             Support Open-Source Local AI Tooling &bull; Yıldız Vererek Destekleyin!
         </p>
         <p style="font-size: 14px; line-height: 1.6; color: #cbd5e1; margin-bottom: 16px;">
-            15-year-old solo open-source developer (<strong>Toprak Ahmet Aydoğmuş</strong>, Siber Akademi).<br>
+            Solo open-source developer (<strong>Toprak Ahmet Aydoğmuş</strong>, Siber Akademi).<br>
             Built 100% free, offline, and zero-leak to eliminate AI prompt token bloat across Cursor, Claude, and local LLMs.<br>
-            <em>15 yaşında bağımsız açık kaynak geliştiricisiyim. Projeyi ücretsiz ve çevrimdışı tutabilmem için bir yıldızınız çok değerli.</em>
+            <em>Bağımsız açık kaynak geliştiricisiyim. Projeyi ücretsiz ve çevrimdışı tutabilmem için bir yıldızınız çok değerli.</em>
         </p>
         <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
             <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm" class="cta-btn" target="_blank">

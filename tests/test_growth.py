@@ -36,7 +36,7 @@ class TestTZeroGrowthEngine(unittest.TestCase):
         hn = generate_show_hn()
         self.assertTrue(hn["title"].startswith("Show HN:"))
         self.assertIn("Toprak", hn["first_comment"])
-        self.assertIn("15-year-old", hn["first_comment"])
+        self.assertIn("software engineer", hn["first_comment"])
 
     def test_twitter_thread(self):
         tweets = generate_twitter_thread()
