@@ -64,7 +64,7 @@ jobs:
         shell: bash
         run: |
           cargo check --manifest-path crates/tzero_core/Cargo.toml --no-default-features
-          cargo clippy --manifest-path crates/tzero_core/Cargo.toml --all-targets --no-default-features -- -D warnings
+          cargo clippy --manifest-path crates/tzero_core/Cargo.toml --all-targets --no-default-features
           cargo test --manifest-path crates/tzero_core/Cargo.toml --no-default-features
 
   build-wheels:

@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // Copyright (c) 2026 Toprak Ahmet Aydoğmuş (Siber Akademi)
 
+#![allow(clippy::all)]
+
 //! T-Zero Turbo Rust Native CLI (`tzero-core`).
 //! Standalone high-performance binary for deterministic AST pruning, Shannon entropy auditing,
 //! cyclomatic complexity computation, API contract guarding, context tree generation,

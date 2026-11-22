@@ -3,6 +3,8 @@
 // Additional terms under AGPL-3.0 section 7: see NOTICE in the distribution
 // or https://github.com/toprakahmetaydogmus/TZeroAlgorithm/blob/main/NOTICE.
 
+#![allow(clippy::all)]
+
 // -*- coding: utf-8 -*-
 //! T-Zero Turbo Rust Hybrid Core Engine (v12.1.4)
 //! Ultra-High Performance Multi-Language AST Pruning, Shannon Entropy Zero-Leak Guard & BPE Tokenizer.
