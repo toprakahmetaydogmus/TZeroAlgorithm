@@ -11,6 +11,10 @@ name = "tzero_core"
 path = "src/lib.rs"
 crate-type = ["cdylib", "rlib"]
 
+[[bin]]
+name = "tzero-core"
+path = "src/main.rs"
+
 [features]
 default = ["extension-module"]
 extension-module = ["pyo3/extension-module"]

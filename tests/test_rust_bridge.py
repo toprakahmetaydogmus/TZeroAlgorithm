@@ -185,6 +185,86 @@ class TestRustBridgeAndAgentKernel(unittest.TestCase):
             self.assertEqual(bridge.fnv1a_hash("test"), 99999)
             self.assertAlmostEqual(bridge.shingle_similarity("a", "b"), 0.95)
 
+    def test_cyclomatic_and_cognitive_complexity(self):
+        bridge = tzero_rust_bridge.RustCoreBridge()
+        code = (
+            "def evaluate(val: int) -> bool:\n"
+            "    if val > 10:\n"
+            "        for i in range(val):\n"
+            "            if i % 2 == 0:\n"
+            "                return True\n"
+            "    return False\n"
+        )
+        cc = bridge.calculate_cyclomatic_complexity(code, language="python")
+        cog = bridge.calculate_cognitive_complexity(code)
+        self.assertGreaterEqual(cc, 3)
+        self.assertGreaterEqual(cog, 2)
+
+        health = bridge.analyze_file_complexity("mod.py", code, language="python")
+        self.assertEqual(health["file_path"], "mod.py")
+        self.assertIn(health["rating"], ("A", "B", "C", "D"))
+        self.assertGreater(health["maintainability_index"], 0.0)
+
+    def test_pagerank_computation(self):
+        bridge = tzero_rust_bridge.RustCoreBridge()
+        edges = [
+            {"source": "cli", "target": "core"},
+            {"source": "api", "target": "core"},
+            {"source": "core", "target": "utils"},
+        ]
+        ranks = bridge.compute_pagerank(edges)
+        self.assertGreaterEqual(len(ranks), 3)
+        core_rank = next((r for r in ranks if r["node"] == "core"), None)
+        self.assertIsNotNone(core_rank)
+        self.assertGreater(core_rank["score"], 0.0)
+
+    def test_reachability_and_dead_code(self):
+        bridge = tzero_rust_bridge.RustCoreBridge()
+        symbols = [
+            {"name": "main", "kind": "function", "line": 1, "path": "app.py", "signature": "def main():"},
+            {"name": "helper", "kind": "function", "line": 5, "path": "app.py", "signature": "def helper():"},
+            {"name": "dead_func", "kind": "function", "line": 10, "path": "app.py", "signature": "def dead_func():"},
+        ]
+        invocations = [("main", "helper")]
+        entrypoints = ["main"]
+
+        res = bridge.analyze_reachability(symbols, invocations, entrypoints)
+        self.assertEqual(res["total_symbols"], 3)
+        self.assertEqual(res["reachable_count"], 2)
+        self.assertIn("dead_func", res["dead_symbols"])
+        self.assertIn("helper", res["reachable_symbols"])
+
+    def test_api_contract_comparison(self):
+        bridge = tzero_rust_bridge.RustCoreBridge()
+        old_code = "def process_payment(order_id: int): pass\n"
+        new_code = "def process_payment(order_id: int, new_flag: bool): pass\n"
+
+        res = bridge.compare_api_contracts(old_code, new_code)
+        self.assertIn("recommended_bump", res)
+        self.assertIn(res["recommended_bump"], ("MAJOR", "MINOR", "PATCH"))
+
+    def test_duplicity_detection(self):
+        bridge = tzero_rust_bridge.RustCoreBridge()
+        block = "a = 1\nb = 2\nc = 3\nd = 4\ne = 5\nf = 6\n"
+        file1 = f"def first():\n{block}"
+        file2 = f"def second():\n{block}"
+
+        rep = bridge.find_code_duplicity([("f1.py", file1), ("f2.py", file2)], min_lines=6)
+        self.assertEqual(rep["total_files_scanned"], 2)
+        self.assertGreaterEqual(rep["duplicate_block_count"], 1)
+
+    def test_damerau_levenshtein_and_fuzzy(self):
+        bridge = tzero_rust_bridge.RustCoreBridge()
+        dist = bridge.damerau_levenshtein("teh", "the")
+        self.assertEqual(dist, 1)  # transposition
+
+        sim = bridge.fuzzy_similarity("PaymentController", "PaymentControler")
+        self.assertGreater(sim, 0.9)
+
+        matches = bridge.fuzzy_symbol_search("OrderCtrl", ["OrderController", "UserAccount", "OrderService"], min_similarity=0.4)
+        self.assertGreaterEqual(len(matches), 1)
+        self.assertEqual(matches[0]["target"], "OrderController")
+
 
 if __name__ == "__main__":
     unittest.main()

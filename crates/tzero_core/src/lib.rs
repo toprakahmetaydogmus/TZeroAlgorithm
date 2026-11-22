@@ -4,24 +4,41 @@
 // or https://github.com/toprakahmetaydogmus/TZeroAlgorithm/blob/main/NOTICE.
 
 // -*- coding: utf-8 -*-
-//! T-Zero Turbo Rust Hybrid Core Engine (v12.0.0)
+//! T-Zero Turbo Rust Hybrid Core Engine (v12.1.0)
 //! Ultra-High Performance Multi-Language AST Pruning, Shannon Entropy Zero-Leak Guard & BPE Tokenizer.
 //! Developer: Toprak Ahmet Aydoğmuş (Siber Akademi)
 //! License: AGPL-3.0-only
 
 pub mod ast_pruner;
 pub mod bm25_search;
+pub mod complexity;
+pub mod contracts;
+pub mod duplicity;
 pub mod entropy_guard;
+pub mod fuzzy_matcher;
+pub mod pagerank;
 pub mod python_bindings;
+pub mod reachability;
 pub mod symbol_graph;
 pub mod tokenizer;
 
 pub use ast_pruner::{detect_language, prune_code, prune_code_with_stats, SupportedLanguage};
+pub use complexity::{
+    analyze_file_complexity, calculate_cognitive_complexity, calculate_cyclomatic_complexity,
+    calculate_maintainability_index, mi_to_rating, FileComplexityReport, FunctionComplexity,
+};
+pub use contracts::{compare_api_contracts, ContractDiff, ContractReport, SemVerBump};
+pub use duplicity::{find_code_duplicity, DuplicateBlock, DuplicityReport};
 pub use entropy_guard::{
     calculate_shannon_entropy, calculate_shannon_entropy_bytes, is_placeholder, is_whitelisted,
     redact_entropy_secrets, scan_entropy_secrets, EntropyFinding, MIN_ENTROPY_LENGTH,
     MIN_ENTROPY_THRESHOLD,
 };
+pub use fuzzy_matcher::{
+    damerau_levenshtein_distance, fuzzy_similarity, fuzzy_symbol_search, FuzzyMatch,
+};
+pub use pagerank::{compute_pagerank, PageRankResult};
+pub use reachability::{analyze_reachability, ReachabilityReport};
 pub use tokenizer::{count_tokens, count_tokens_by_encoding, resolve_encoding_name};
 
 use std::collections::HashSet;
@@ -109,6 +126,38 @@ pub unsafe extern "C" fn tzero_shannon_entropy(ptr: *const u8, len: usize) -> f6
         Ok(s) => calculate_shannon_entropy(s),
         Err(_) => calculate_shannon_entropy_bytes(data),
     }
+}
+
+/// C-ABI export for Damerau-Levenshtein distance.
+#[no_mangle]
+pub unsafe extern "C" fn tzero_damerau_levenshtein(
+    a_ptr: *const u8,
+    a_len: usize,
+    b_ptr: *const u8,
+    b_len: usize,
+) -> usize {
+    if a_ptr.is_null() || b_ptr.is_null() {
+        return 0;
+    }
+    let sa = String::from_utf8_lossy(slice::from_raw_parts(a_ptr, a_len));
+    let sb = String::from_utf8_lossy(slice::from_raw_parts(b_ptr, b_len));
+    damerau_levenshtein_distance(&sa, &sb)
+}
+
+/// C-ABI export for fuzzy similarity.
+#[no_mangle]
+pub unsafe extern "C" fn tzero_fuzzy_similarity_f64(
+    a_ptr: *const u8,
+    a_len: usize,
+    b_ptr: *const u8,
+    b_len: usize,
+) -> f64 {
+    if a_ptr.is_null() || b_ptr.is_null() {
+        return 0.0;
+    }
+    let sa = String::from_utf8_lossy(slice::from_raw_parts(a_ptr, a_len));
+    let sb = String::from_utf8_lossy(slice::from_raw_parts(b_ptr, b_len));
+    fuzzy_similarity(&sa, &sb)
 }
 
 // ==============================================================================

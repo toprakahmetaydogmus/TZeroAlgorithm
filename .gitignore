@@ -48,6 +48,7 @@ Desktop.ini
 node_modules/
 tzero-showcase/node_modules/
 tzero-showcase/package-lock.json
+scripts/opera_controller.py
 tzero-showcase/out/
 tzero-showcase/public/*.mp4
 *.mp4
