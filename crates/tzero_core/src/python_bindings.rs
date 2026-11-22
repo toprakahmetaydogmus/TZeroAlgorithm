@@ -55,9 +55,9 @@ pub fn py_scan_entropy_secrets<'py>(
     let ml = min_length.unwrap_or(MIN_ENTROPY_LENGTH);
     let findings = scan_secrets(text, Some(t), Some(ml));
 
-    let list = PyList::empty_bound(py);
+    let list = PyList::empty(py);
     for f in findings {
-        let dict = PyDict::new_bound(py);
+        let dict = PyDict::new(py);
         dict.set_item("token", f.token)?;
         dict.set_item("entropy", f.entropy)?;
         dict.set_item("line", f.line)?;
@@ -96,7 +96,7 @@ pub fn py_prune_ast_stats<'py>(
 ) -> PyResult<Bound<'py, PyDict>> {
     let lang = detect_language(language.unwrap_or("python"));
     let res = prune_code_with_stats(code, lang);
-    let dict = PyDict::new_bound(py);
+    let dict = PyDict::new(py);
     dict.set_item("pruned_code", res.pruned_code)?;
     dict.set_item("original_lines", res.original_lines)?;
     dict.set_item("pruned_lines", res.pruned_lines)?;
@@ -151,9 +151,9 @@ pub fn py_bm25_search<'py>(
     index.index_documents(docs);
     let results = index.search(query, top_k.unwrap_or(10));
 
-    let py_list = PyList::empty_bound(py);
+    let py_list = PyList::empty(py);
     for r in results {
-        let dict = PyDict::new_bound(py);
+        let dict = PyDict::new(py);
         dict.set_item("id", r.id)?;
         dict.set_item("path", r.path)?;
         dict.set_item("score", r.score)?;
@@ -172,11 +172,11 @@ pub fn py_extract_symbols<'py>(
     content: &str,
 ) -> PyResult<Bound<'py, PyDict>> {
     let (symbols, edges) = extract_symbols_from_source(path, content);
-    let out_dict = PyDict::new_bound(py);
+    let out_dict = PyDict::new(py);
 
-    let py_symbols = PyList::empty_bound(py);
+    let py_symbols = PyList::empty(py);
     for s in symbols {
-        let d = PyDict::new_bound(py);
+        let d = PyDict::new(py);
         d.set_item("name", s.name)?;
         d.set_item("kind", s.kind)?;
         d.set_item("line", s.line)?;
@@ -185,9 +185,9 @@ pub fn py_extract_symbols<'py>(
         py_symbols.append(d)?;
     }
 
-    let py_edges = PyList::empty_bound(py);
+    let py_edges = PyList::empty(py);
     for e in edges {
-        let d = PyDict::new_bound(py);
+        let d = PyDict::new(py);
         d.set_item("source", e.source)?;
         d.set_item("target", e.target)?;
         d.set_item("kind", e.kind)?;
@@ -225,7 +225,7 @@ pub fn py_analyze_file_complexity<'py>(
 ) -> PyResult<Bound<'py, PyDict>> {
     let lang = detect_language(language.unwrap_or("python"));
     let report = analyze_file_complexity(file_path, content, lang);
-    let dict = PyDict::new_bound(py);
+    let dict = PyDict::new(py);
     dict.set_item("file_path", report.file_path)?;
     dict.set_item("lines_of_code", report.lines_of_code)?;
     dict.set_item("maintainability_index", report.maintainability_index)?;
@@ -259,9 +259,9 @@ pub fn py_compute_pagerank<'py>(
     }
 
     let results = compute_pagerank(&rust_edges, damping, max_iter, tolerance);
-    let out = PyList::empty_bound(py);
+    let out = PyList::empty(py);
     for r in results {
-        let d = PyDict::new_bound(py);
+        let d = PyDict::new(py);
         d.set_item("node", r.node)?;
         d.set_item("score", r.score)?;
         d.set_item("rank", r.rank)?;
@@ -308,7 +308,7 @@ pub fn py_analyze_reachability<'py>(
     }
 
     let rep = analyze_reachability(&rust_symbols, &rust_invocations, &rust_entrypoints);
-    let dict = PyDict::new_bound(py);
+    let dict = PyDict::new(py);
     dict.set_item("total_symbols", rep.total_symbols)?;
     dict.set_item("reachable_count", rep.reachable_count)?;
     dict.set_item("dead_symbol_count", rep.dead_symbol_count)?;
@@ -327,13 +327,13 @@ pub fn py_compare_api_contracts<'py>(
     new_code: &str,
 ) -> PyResult<Bound<'py, PyDict>> {
     let rep = compare_api_contracts(old_code, new_code);
-    let dict = PyDict::new_bound(py);
+    let dict = PyDict::new(py);
     dict.set_item("recommended_bump", rep.recommended_bump)?;
     dict.set_item("is_breaking", rep.is_breaking)?;
 
-    let breaking_list = PyList::empty_bound(py);
+    let breaking_list = PyList::empty(py);
     for b in rep.breaking_changes {
-        let bd = PyDict::new_bound(py);
+        let bd = PyDict::new(py);
         bd.set_item("severity", b.severity)?;
         bd.set_item("category", b.category)?;
         bd.set_item("symbol", b.symbol)?;
@@ -366,15 +366,15 @@ pub fn py_find_code_duplicity<'py>(
     }
 
     let rep = find_code_duplicity(&file_tuples, min_lines);
-    let dict = PyDict::new_bound(py);
+    let dict = PyDict::new(py);
     dict.set_item("total_files_scanned", rep.total_files_scanned)?;
     dict.set_item("duplicate_block_count", rep.duplicate_block_count)?;
     dict.set_item("total_duplicate_lines", rep.total_duplicate_lines)?;
     dict.set_item("duplicate_percentage", rep.duplicate_percentage)?;
 
-    let blocks_list = PyList::empty_bound(py);
+    let blocks_list = PyList::empty(py);
     for b in rep.blocks {
-        let bd = PyDict::new_bound(py);
+        let bd = PyDict::new(py);
         bd.set_item("file_a", b.file_a)?;
         bd.set_item("start_line_a", b.start_line_a)?;
         bd.set_item("file_b", b.file_b)?;
@@ -411,7 +411,7 @@ pub fn py_build_context_tree<'py>(
 ) -> PyResult<Bound<'py, PyDict>> {
     let t = tier.unwrap_or(3);
     let res = build_context_tree(root_dir, t, None);
-    let dict = PyDict::new_bound(py);
+    let dict = PyDict::new(py);
     dict.set_item("root_dir", res.root_dir)?;
     dict.set_item("tier", res.tier)?;
     dict.set_item("total_files", res.total_files)?;
@@ -451,14 +451,14 @@ pub fn py_enforce_boundaries<'py>(
     let banned_opt = if banned_storage.is_empty() { None } else { Some(banned_ref.as_slice()) };
 
     let rep = enforce_boundaries(&edges_ref, banned_opt);
-    let dict = PyDict::new_bound(py);
+    let dict = PyDict::new(py);
     dict.set_item("total_modules_checked", rep.total_modules_checked)?;
     dict.set_item("total_edges_checked", rep.total_edges_checked)?;
     dict.set_item("is_compliant", rep.is_compliant)?;
 
-    let viol_list = PyList::empty_bound(py);
+    let viol_list = PyList::empty(py);
     for v in rep.violations {
-        let vd = PyDict::new_bound(py);
+        let vd = PyDict::new(py);
         vd.set_item("source_module", v.source_module)?;
         vd.set_item("source_layer", v.source_layer)?;
         vd.set_item("target_module", v.target_module)?;
@@ -469,9 +469,9 @@ pub fn py_enforce_boundaries<'py>(
     }
     dict.set_item("violations", viol_list)?;
 
-    let circ_list = PyList::empty_bound(py);
+    let circ_list = PyList::empty(py);
     for c in rep.circular_dependencies {
-        let cd = PyDict::new_bound(py);
+        let cd = PyDict::new(py);
         cd.set_item("cycle", c.cycle)?;
         cd.set_item("length", c.length)?;
         circ_list.append(cd)?;
@@ -498,15 +498,15 @@ pub fn py_verify_hallucinations<'py>(
     let sym_ref: Vec<&str> = sym_storage.iter().map(|s| s.as_str()).collect();
 
     let rep = verify_hallucinations(code, &sym_ref);
-    let dict = PyDict::new_bound(py);
+    let dict = PyDict::new(py);
     dict.set_item("total_symbols_checked", rep.total_symbols_checked)?;
     dict.set_item("hallucination_count", rep.hallucination_count)?;
     dict.set_item("hallucination_free", rep.hallucination_free)?;
     dict.set_item("safety_score", rep.safety_score)?;
 
-    let hall_list = PyList::empty_bound(py);
+    let hall_list = PyList::empty(py);
     for h in rep.hallucinations {
-        let hd = PyDict::new_bound(py);
+        let hd = PyDict::new(py);
         hd.set_item("symbol", h.symbol)?;
         hd.set_item("kind", h.kind)?;
         hd.set_item("line", h.line)?;
@@ -530,7 +530,7 @@ pub fn py_estimate_costs<'py>(
 ) -> PyResult<Bound<'py, PyDict>> {
     let out_toks = output_tokens.unwrap_or(2_000);
     let rep = compare_all_models(raw_tokens, pruned_tokens, out_toks, model);
-    let dict = PyDict::new_bound(py);
+    let dict = PyDict::new(py);
     dict.set_item("input_tokens", rep.input_tokens)?;
     dict.set_item("output_tokens", rep.output_tokens)?;
     dict.set_item("pruned_input_tokens", rep.pruned_input_tokens)?;

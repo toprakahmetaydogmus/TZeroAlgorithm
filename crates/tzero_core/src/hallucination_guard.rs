@@ -51,7 +51,7 @@ pub fn verify_hallucinations(
     }
 
     let mut detected = Vec::new();
-    let mut checked_count = 0;
+    let mut checked_count: usize = 0;
 
     let import_regex = Regex::new(r"(?m)^(?:from\s+([a-zA-Z0-9_\.]+)\s+import\s+([a-zA-Z0-9_,\s]+)|import\s+([a-zA-Z0-9_,\s]+))").unwrap();
     let call_regex = Regex::new(r"([a-zA-Z0-9_]+)\s*\(").unwrap();
@@ -125,9 +125,9 @@ pub fn verify_hallucinations(
         .filter(|d| seen.insert((d.symbol.clone(), d.kind.clone())))
         .collect();
 
-    let total = checked_count.max(1);
-    let hallucination_count = unique_detected.len();
-    let safety_score = ((total.saturating_sub(hallucination_count)) as f64 / total as f64) * 100.0;
+    let total: usize = checked_count.max(1);
+    let hallucination_count: usize = unique_detected.len();
+    let safety_score: f64 = ((total.saturating_sub(hallucination_count)) as f64 / total as f64) * 100.0_f64;
 
     HallucinationReport {
         total_symbols_checked: total,

@@ -40,6 +40,8 @@ SUBCOMMANDS:
     guard <edges_json>               Enforces architectural boundary layers and circular imports
     hallucination <file> <syms_csv>  Validates code against symbol map to stop hallucinations
     cost <raw_tok> <pruned_tok>      Calculates multi-model API costs and team financial ROI
+    pagerank <edges_json>            Computes PageRank architectural backbone centrality
+    search <query> [dir]             Okapi BM25 hybrid local code search
     mcp                              Runs embedded native stdio JSON-RPC 2.0 MCP server
     version                          Prints engine version and build metadata
 "#);
@@ -186,6 +188,48 @@ fn main() {
                 eprintln!("MCP server stopped with error: {}", e);
                 process::exit(1);
             }
+        }
+        "pagerank" => {
+            if args.len() < 3 {
+                eprintln!("Error: 'pagerank' requires an edges json file or 'source:target' list.");
+                process::exit(1);
+            }
+            let target = &args[2];
+            let mut dep_edges = Vec::new();
+            if let Ok(json_content) = fs::read_to_string(target) {
+                if let Ok(parsed) = serde_json::from_str::<Vec<tzero_core::symbol_graph::DependencyEdge>>(&json_content) {
+                    dep_edges = parsed;
+                }
+            }
+            let ranks = tzero_core::pagerank::compute_pagerank(&dep_edges, None, None, None);
+            println!("{}", serde_json::to_string_pretty(&ranks).unwrap());
+        }
+        "search" => {
+            if args.len() < 3 {
+                eprintln!("Error: 'search' requires <query> [file_or_dir].");
+                process::exit(1);
+            }
+            let query = &args[2];
+            let target_path = if args.len() > 3 { &args[3] } else { "." };
+            let mut docs = Vec::new();
+            if let Ok(entries) = fs::read_dir(target_path) {
+                for entry in entries.flatten() {
+                    let p = entry.path();
+                    if p.is_file() {
+                        if let Ok(content) = fs::read_to_string(&p) {
+                            docs.push(tzero_core::bm25_search::SearchDocument {
+                                id: p.to_string_lossy().to_string(),
+                                path: p.to_string_lossy().to_string(),
+                                content,
+                            });
+                        }
+                    }
+                }
+            }
+            let mut index = tzero_core::bm25_search::Bm25Index::new();
+            index.index_documents(docs);
+            let results = index.search(query, 5);
+            println!("{}", serde_json::to_string_pretty(&results).unwrap());
         }
         _ => {
             print_usage();

@@ -5,8 +5,3 @@ members = [
 ]
 resolver = "2"
 
-[workspace.package]
-version = "12.1.4"
-authors = ["Toprak Ahmet Aydoğmuş (Siber Akademi) <siberakademi@org.tr>"]
-license = "AGPL-3.0-only"
-edition = "2021"

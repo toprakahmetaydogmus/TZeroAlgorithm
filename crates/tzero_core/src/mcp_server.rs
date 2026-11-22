@@ -9,6 +9,7 @@ use std::io::{self, BufRead, Write};
 use serde_json::{json, Value};
 
 use crate::ast_pruner::{detect_language, prune_code_with_stats};
+use crate::bm25_search::{Bm25Index, SearchDocument};
 use crate::boundary_guard::enforce_boundaries;
 use crate::complexity::analyze_file_complexity;
 use crate::context_tree::build_context_tree;
@@ -16,6 +17,8 @@ use crate::contracts::compare_api_contracts;
 use crate::duplicity::find_code_duplicity;
 use crate::entropy_guard::scan_entropy_secrets;
 use crate::hallucination_guard::verify_hallucinations;
+use crate::pagerank::compute_pagerank;
+use crate::symbol_graph::DependencyEdge;
 use crate::token_cost::compare_all_models;
 
 pub fn run_mcp_stdio_server() -> io::Result<()> {
@@ -142,6 +145,100 @@ pub fn run_mcp_stdio_server() -> io::Result<()> {
                                     },
                                     "required": ["code", "valid_symbols"]
                                 }
+                            },
+                            {
+                                "name": "tzero_guard",
+                                "description": "Enforces architectural boundary rules and identifies cyclic module dependencies",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "edges": {
+                                            "type": "array",
+                                            "items": {"type": "array", "items": {"type": "string"}}
+                                        }
+                                    },
+                                    "required": ["edges"]
+                                }
+                            },
+                            {
+                                "name": "tzero_contracts",
+                                "description": "Compares API symbol contracts between versions and suggests SemVer bump",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "old_code": {"type": "string"},
+                                        "new_code": {"type": "string"}
+                                    },
+                                    "required": ["old_code", "new_code"]
+                                }
+                            },
+                            {
+                                "name": "tzero_duplicity",
+                                "description": "Detects duplicate code blocks across files using rolling window hashing",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "files": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "path": {"type": "string"},
+                                                    "content": {"type": "string"}
+                                                },
+                                                "required": ["path", "content"]
+                                            }
+                                        },
+                                        "min_lines": {"type": "integer"}
+                                    },
+                                    "required": ["files"]
+                                }
+                            },
+                            {
+                                "name": "tzero_pagerank",
+                                "description": "Computes PageRank architectural backbone centrality scores over dependency edges",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "edges": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "source": {"type": "string"},
+                                                    "target": {"type": "string"},
+                                                    "kind": {"type": "string"}
+                                                },
+                                                "required": ["source", "target"]
+                                            }
+                                        }
+                                    },
+                                    "required": ["edges"]
+                                }
+                            },
+                            {
+                                "name": "tzero_search",
+                                "description": "100% private local Okapi BM25 hybrid semantic search across code snippets",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "query": {"type": "string"},
+                                        "documents": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {"type": "string"},
+                                                    "path": {"type": "string"},
+                                                    "content": {"type": "string"}
+                                                },
+                                                "required": ["id", "path", "content"]
+                                            }
+                                        },
+                                        "top_k": {"type": "integer"}
+                                    },
+                                    "required": ["query", "documents"]
+                                }
                             }
                         ]
                     }
@@ -191,6 +288,83 @@ pub fn run_mcp_stdio_server() -> io::Result<()> {
                         let symbols: Vec<&str> = symbols_val.iter().filter_map(|v| v.as_str()).collect();
                         let rep = verify_hallucinations(code, &symbols);
                         serde_json::to_string_pretty(&rep).unwrap_or_default()
+                    }
+                    "tzero_guard" => {
+                        let empty_edges = Vec::new();
+                        let edges_arr = args.get("edges").and_then(|e| e.as_array()).unwrap_or(&empty_edges);
+                        let mut string_pairs = Vec::new();
+                        for item in edges_arr {
+                            if let Some(pair) = item.as_array() {
+                                if pair.len() >= 2 {
+                                    if let (Some(s), Some(d)) = (pair[0].as_str(), pair[1].as_str()) {
+                                        string_pairs.push((s.to_string(), d.to_string()));
+                                    }
+                                }
+                            }
+                        }
+                        let edges_ref: Vec<(&str, &str)> = string_pairs.iter().map(|(s, d)| (s.as_str(), d.as_str())).collect();
+                        let rep = enforce_boundaries(&edges_ref, None);
+                        serde_json::to_string_pretty(&rep).unwrap_or_default()
+                    }
+                    "tzero_contracts" => {
+                        let old_code = args.get("old_code").and_then(|c| c.as_str()).unwrap_or("");
+                        let new_code = args.get("new_code").and_then(|c| c.as_str()).unwrap_or("");
+                        let rep = compare_api_contracts(old_code, new_code);
+                        serde_json::to_string_pretty(&rep).unwrap_or_default()
+                    }
+                    "tzero_duplicity" => {
+                        let empty_files = Vec::new();
+                        let files_arr = args.get("files").and_then(|f| f.as_array()).unwrap_or(&empty_files);
+                        let min_lines = args.get("min_lines").and_then(|m| m.as_u64()).map(|m| m as usize);
+                        let mut file_data: Vec<(String, String)> = Vec::new();
+                        for item in files_arr {
+                            let path = item.get("path").and_then(|p| p.as_str()).unwrap_or("file");
+                            let content = item.get("content").and_then(|c| c.as_str()).unwrap_or("");
+                            file_data.push((path.to_string(), content.to_string()));
+                        }
+                        let file_refs: Vec<(&str, &str)> = file_data.iter().map(|(p, c)| (p.as_str(), c.as_str())).collect();
+                        let rep = find_code_duplicity(&file_refs, min_lines);
+                        serde_json::to_string_pretty(&rep).unwrap_or_default()
+                    }
+                    "tzero_pagerank" => {
+                        let empty_edges = Vec::new();
+                        let edges_arr = args.get("edges").and_then(|e| e.as_array()).unwrap_or(&empty_edges);
+                        let mut dep_edges = Vec::new();
+                        for item in edges_arr {
+                            let src = item.get("source").and_then(|s| s.as_str()).unwrap_or("");
+                            let tgt = item.get("target").and_then(|t| t.as_str()).unwrap_or("");
+                            let knd = item.get("kind").and_then(|k| k.as_str()).unwrap_or("import");
+                            if !src.is_empty() && !tgt.is_empty() {
+                                dep_edges.push(DependencyEdge {
+                                    source: src.to_string(),
+                                    target: tgt.to_string(),
+                                    kind: knd.to_string(),
+                                });
+                            }
+                        }
+                        let ranks = compute_pagerank(&dep_edges, None, None, None);
+                        serde_json::to_string_pretty(&ranks).unwrap_or_default()
+                    }
+                    "tzero_search" => {
+                        let query = args.get("query").and_then(|q| q.as_str()).unwrap_or("");
+                        let empty_docs = Vec::new();
+                        let docs_arr = args.get("documents").and_then(|d| d.as_array()).unwrap_or(&empty_docs);
+                        let top_k = args.get("top_k").and_then(|k| k.as_u64()).unwrap_or(5) as usize;
+                        let mut docs = Vec::new();
+                        for item in docs_arr {
+                            let id = item.get("id").and_then(|i| i.as_str()).unwrap_or("");
+                            let path = item.get("path").and_then(|p| p.as_str()).unwrap_or("");
+                            let content = item.get("content").and_then(|c| c.as_str()).unwrap_or("");
+                            docs.push(SearchDocument {
+                                id: id.to_string(),
+                                path: path.to_string(),
+                                content: content.to_string(),
+                            });
+                        }
+                        let mut index = Bm25Index::new();
+                        index.index_documents(docs);
+                        let results = index.search(query, top_k);
+                        serde_json::to_string_pretty(&results).unwrap_or_default()
                     }
                     _ => {
                         format!("Unknown tool: {}", tool_name)

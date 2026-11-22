@@ -275,19 +275,22 @@ pub fn build_context_tree(root_dir: &str, tier: u32, max_depth: Option<usize>) -
 mod tests {
     use super::*;
     use std::io::Write;
-    use tempfile::tempdir;
 
     #[test]
     fn test_build_context_tree_basic() {
-        let dir = tempdir().unwrap();
-        let file1 = dir.path().join("calc.py");
+        let unique_id = format!("tzero_test_{}", std::process::id());
+        let test_dir = std::env::temp_dir().join(unique_id);
+        fs::create_dir_all(&test_dir).unwrap();
+        let file1 = test_dir.join("calc.py");
         let mut f1 = fs::File::create(&file1).unwrap();
         writeln!(f1, "def add(a, b):\n    return a + b\n\ndef sub(a, b):\n    return a - b\n").unwrap();
 
-        let res = build_context_tree(dir.path().to_str().unwrap(), 3, None);
+        let res = build_context_tree(test_dir.to_str().unwrap(), 3, None);
         assert_eq!(res.total_files, 1);
         assert!(res.raw_tokens > 0);
         assert_eq!(res.tier, 3);
         assert!(res.formatted_tree.contains("calc.py"));
+
+        let _ = fs::remove_dir_all(test_dir);
     }
 }
