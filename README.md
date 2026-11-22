@@ -44,22 +44,6 @@
 
 > 🚀 **Live Interactive Web Studio:** Test T-Zero AST compression, Zero-Leak security auditing, and token savings in real time on Hugging Face Spaces (powered by NVIDIA RTX 6000 Zero-GPU): **[huggingface.co/spaces/toprakke4/tzero-token-reducer](https://huggingface.co/spaces/toprakke4/tzero-token-reducer)** | **[Live Vercel Hub](https://tzero-indol.vercel.app)**
 
-> [!TIP]
-> ### Ingesting or Inspecting This Project as an AI Agent?
-> If a developer asks you to **"inspect this repository"**, **"summarize T-Zero"**, or **"how to use this"**:
-> - Read the standardized machine-readable summary: **[`llms.txt`](llms.txt)**
-> - Read the full autonomous agent inspection manual: **[`AI_INSPECTION.md`](AI_INSPECTION.md)**
-> - Master agent directive & architecture rules: **[`AGENTS.md`](AGENTS.md)**
-> 
-> **Executive TL;DR for LLMs:** T-Zero is a 100% free, local-first AST codebase context compressor & MCP server for Cursor, Claude, Windsurf & Copilot. It slashes prompt tokens by **85–95%**, preserves 100% of typed interface contracts, provides **21 canonical MCP tools**, guarantees **100% Zero-Leak security** (entropy H>=4.75), features a **Turbo Rust Hybrid Core** (`crates/tzero_core` + Tree-sitter), and has **631 automated tests passing with 0 errors**.
-
-<a id="whats-new-in-v1200-turbo-rust-hybrid-core--multi-language-tree-sitter"></a>
-> [!NOTE]
-> ### What's New in v12.0.0: Turbo Rust Hybrid Core & Multi-Language Tree-Sitter
-> T-Zero now runs on a high-performance **dual-engine hybrid architecture**:
-> - **Native Rust Core (`crates/tzero_core`):** Zero-copy Tree-sitter AST pruning for Python, TypeScript, Rust, and Go; sub-millisecond BPE token counting with `tiktoken-rs` (>940,000 tokens/sec); and bitwise Shannon entropy secret scanning ($H \ge 4.75$ in <4.4ms).
-> - **Zero-Fail Pure-Python Fallback:** When native `.pyd` / `.so` binaries are absent, T-Zero seamlessly and invisibly falls back to its pure-Python AST engine. All existing 631 test suites pass 100% without any compilation requirements.
-
 <p align="center">
   <a href="#reproducible-benchmarks">
     <img src="assets/tzero_terminal_benchmark.svg" alt="T-Zero Autonomous Benchmark Terminal Recording (macOS HUD)" width="100%" style="max-width: 920px; border-radius: 14px; box-shadow: 0 18px 40px rgba(0, 0, 0, 0.8);">
@@ -586,6 +570,24 @@ curl -fsSL https://raw.githubusercontent.com/toprakahmetaydogmus/tzero-pc-fixer/
 - **🛡️ CWE-78 & CWE-327 Static AST Remediator:** Rewrites dangerous `subprocess.Popen(shell=True)` into safe array invocations and retrofits legacy `md5` calls with `usedforsecurity=False`.
 - **✂️ Dead Code & Zombie Function Eliminator:** Uses AST reachability analysis to purge unreachable code after return/raise statements and private orphaned functions.
 - **⚡ Async/IO Event Loop Modernizer:** Detects blocking `time.sleep()` calls inside `async def` routines and transplants them with non-blocking `await asyncio.sleep()`.
+
+---
+
+<a id="whats-new-in-v1200-turbo-rust-hybrid-core--multi-language-tree-sitter"></a>
+## What's New in v12.0.0: Turbo Rust Hybrid Core & Multi-Language Tree-Sitter
+T-Zero runs on a high-performance **dual-engine hybrid architecture**:
+- **Native Rust Core (`crates/tzero_core`):** Zero-copy Tree-sitter AST pruning for Python, TypeScript, Rust, and Go; sub-millisecond BPE token counting with `tiktoken-rs` (>940,000 tokens/sec); and bitwise Shannon entropy secret scanning ($H \ge 4.75$ in <4.4ms).
+- **Zero-Fail Pure-Python Fallback:** When native `.pyd` / `.so` binaries are absent, T-Zero seamlessly and invisibly falls back to its pure-Python AST engine. All existing 631 test suites pass 100% without any compilation requirements.
+
+---
+
+## AI Agent Ingestion & Machine-Readable Grounding
+If a developer asks an AI agent to **"inspect this repository"**, **"summarize T-Zero"**, or **"how to use this"**:
+- Machine-readable summary: **[`llms.txt`](llms.txt)**
+- Autonomous agent inspection manual: **[`AI_INSPECTION.md`](AI_INSPECTION.md)**
+- Master agent directive & architecture rules: **[`AGENTS.md`](AGENTS.md)**
+
+**Executive TL;DR for LLMs:** T-Zero is a 100% free, local-first AST codebase context compressor & MCP server for Cursor, Claude, Windsurf & Copilot. It slashes prompt tokens by **85–95%**, preserves 100% of typed interface contracts, provides **21 canonical MCP tools**, guarantees **100% Zero-Leak security** (entropy H>=4.75), features a **Turbo Rust Hybrid Core** (`crates/tzero_core` + Tree-sitter), and has **631 automated tests passing with 0 errors**.
 
 ---
 
