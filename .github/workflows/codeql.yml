@@ -30,6 +30,10 @@ jobs:
             build-mode: none
           - language: rust
             build-mode: none
+          - language: ruby
+            build-mode: none
+          - language: actions
+            build-mode: none
 
     steps:
     - name: Checkout repository
