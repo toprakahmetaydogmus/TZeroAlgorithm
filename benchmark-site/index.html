@@ -909,7 +909,7 @@ def compute_metrics(x):
       <p class="section-subtitle">No Python or virtual environment required. Download verified standalone .exe binaries with SHA-256 signatures.</p>
     </div>
 
-                                                                                                            <!-- Live Dynamic Release Banner -->
+                                                                                                                                    <!-- Live Dynamic Release Banner -->
     <div class="latest-release-banner animate-on-scroll" id="latest-release-banner">
       <div class="rel-banner-tag"><span class="rel-pulse"></span> Latest GitHub Release: <strong id="live-release-tag">v12.1.4</strong></div>
       <div class="rel-banner-meta">
@@ -1056,90 +1056,31 @@ def compute_metrics(x):
       </div>
 
       <div class="crypto-addresses-grid">
-        <!-- EVM / Ethereum / Polygon / Arbitrum / BSC -->
-        <div class="crypto-box">
-          <div class="crypto-coin">
-            <span class="crypto-badge badge-eth" style="background: rgba(99, 102, 241, 0.2); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.4);">ETH / EVM</span>
-            <span class="crypto-network">Ethereum, Polygon, Arbitrum, BSC, Optimism</span>
-          </div>
-          <div class="crypto-addr-row">
-            <code class="crypto-code" id="addr-eth">0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5</code>
-            <div class="crypto-actions-cluster">
-              <button class="btn btn-copy-crypto" data-target="0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5" title="Copy EVM Address">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-                Copy
-              </button>
-              <a href="ethereum:0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5" class="btn btn-send-crypto web3-send-trigger" data-addr="0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5" title="1-Click Send via Web3 Wallet">
-                ⚡ 1-Click Send
-              </a>
-              <a href="https://metamask.app.link/send/0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5" target="_blank" rel="noopener noreferrer" class="btn btn-wallet-link" title="Open in MetaMask App">
-                🦊 MetaMask
-              </a>
-              <button class="btn btn-qr-toggle" data-target-qr="qr-eth" title="Toggle QR Code">
-                📱 QR
-              </button>
-            </div>
-          </div>
-          <div id="qr-eth" class="crypto-qr-container" style="display: none;">
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=ethereum:0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5" alt="EVM QR Code" loading="lazy" width="160" height="160" />
-            <span class="qr-label">Scan with MetaMask, Trust Wallet, or Mobile Exchange</span>
-          </div>
-        </div>
-
-        <!-- Bitcoin -->
-        <div class="crypto-box">
-          <div class="crypto-coin">
-            <span class="crypto-badge badge-btc">BTC</span>
-            <span class="crypto-network">Bitcoin Network (Native SegWit)</span>
-          </div>
-          <div class="crypto-addr-row">
-            <code class="crypto-code" id="addr-btc">bc1q9k4hvd6c2g8l9w3z7v8f2k3j5l8n9m1p4q7r0s</code>
-            <div class="crypto-actions-cluster">
-              <button class="btn btn-copy-crypto" data-target="bc1q9k4hvd6c2g8l9w3z7v8f2k3j5l8n9m1p4q7r0s" title="Copy Bitcoin Address">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-                Copy
-              </button>
-              <a href="bitcoin:bc1q9k4hvd6c2g8l9w3z7v8f2k3j5l8n9m1p4q7r0s?label=T-Zero%20Sponsorship" class="btn btn-send-crypto" title="Open in Bitcoin Wallet">
-                ⚡ 1-Click Send
-              </a>
-              <button class="btn btn-qr-toggle" data-target-qr="qr-btc" title="Toggle QR Code">
-                📱 QR
-              </button>
-            </div>
-          </div>
-          <div id="qr-btc" class="crypto-qr-container" style="display: none;">
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=bitcoin:bc1q9k4hvd6c2g8l9w3z7v8f2k3j5l8n9m1p4q7r0s?label=T-Zero%20Sponsorship" alt="Bitcoin QR Code" loading="lazy" width="160" height="160" />
-            <span class="qr-label">Scan with BlueWallet, Electrum, or Exchange App</span>
-          </div>
-        </div>
-
-        <!-- USDT (TRC-20) -->
         <div class="crypto-box">
           <div class="crypto-coin">
             <span class="crypto-badge badge-usdt">USDT</span>
-            <span class="crypto-network">TRC20 Network (Tron)</span>
+            <span class="crypto-network">TRC20 Network</span>
           </div>
           <div class="crypto-addr-row">
             <code class="crypto-code" id="addr-usdt">TE7uKxZJ414u938gWf6bYh9QvRk2141517</code>
-            <div class="crypto-actions-cluster">
-              <button class="btn btn-copy-crypto" data-target="TE7uKxZJ414u938gWf6bYh9QvRk2141517" title="Copy USDT TRC20 Address">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-                Copy
-              </button>
-              <a href="tron:TE7uKxZJ414u938gWf6bYh9QvRk2141517" class="btn btn-send-crypto" title="Open in Tron Wallet">
-                ⚡ 1-Click Send
-              </a>
-              <a href="https://tronscan.org/#/address/TE7uKxZJ414u938gWf6bYh9QvRk2141517" target="_blank" rel="noopener noreferrer" class="btn btn-wallet-link" title="View on Tronscan">
-                🔍 Tronscan
-              </a>
-              <button class="btn btn-qr-toggle" data-target-qr="qr-usdt" title="Toggle QR Code">
-                📱 QR
-              </button>
-            </div>
+            <button class="btn btn-copy-crypto" data-target="TE7uKxZJ414u938gWf6bYh9QvRk2141517" title="Copy USDT TRC20 Address">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              Copy
+            </button>
           </div>
-          <div id="qr-usdt" class="crypto-qr-container" style="display: none;">
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=TE7uKxZJ414u938gWf6bYh9QvRk2141517" alt="USDT TRC20 QR Code" loading="lazy" width="160" height="160" />
-            <span class="qr-label">Scan with Binance, TronLink, or Trust Wallet</span>
+        </div>
+
+        <div class="crypto-box">
+          <div class="crypto-coin">
+            <span class="crypto-badge badge-btc">BTC</span>
+            <span class="crypto-network">Bitcoin Network</span>
+          </div>
+          <div class="crypto-addr-row">
+            <code class="crypto-code" id="addr-btc">bc1q9k4hvd6c2g8l9w3z7v8f2k3j5l8n9m1p4q7r0s</code>
+            <button class="btn btn-copy-crypto" data-target="bc1q9k4hvd6c2g8l9w3z7v8f2k3j5l8n9m1p4q7r0s" title="Copy Bitcoin Address">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              Copy
+            </button>
           </div>
         </div>
       </div>

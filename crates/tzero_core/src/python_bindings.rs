@@ -401,6 +401,36 @@ pub fn py_fuzzy_similarity(s1: &str, s2: &str) -> PyResult<f64> {
     Ok(fuzzy_similarity(s1, s2))
 }
 
+/// Searches candidate symbols and returns matches above threshold sorted by similarity.
+#[pyfunction]
+#[pyo3(name = "fuzzy_symbol_search", signature = (query, candidates, min_similarity = None, top_k = None))]
+pub fn py_fuzzy_symbol_search<'py>(
+    py: Python<'py>,
+    query: &str,
+    candidates: Bound<'py, PyList>,
+    min_similarity: Option<f64>,
+    top_k: Option<usize>,
+) -> PyResult<Bound<'py, PyList>> {
+    let mut cand_storage = Vec::with_capacity(candidates.len());
+    for item in candidates.iter() {
+        if let Ok(s) = item.extract::<String>() {
+            cand_storage.push(s);
+        }
+    }
+    let cand_refs: Vec<&str> = cand_storage.iter().map(|s| s.as_str()).collect();
+    let matches = fuzzy_symbol_search(query, &cand_refs, min_similarity, top_k);
+
+    let list = PyList::empty(py);
+    for m in matches {
+        let dict = PyDict::new(py);
+        dict.set_item("target", m.target)?;
+        dict.set_item("distance", m.distance)?;
+        dict.set_item("similarity", m.similarity)?;
+        list.append(dict)?;
+    }
+    Ok(list)
+}
+
 /// Builds a multi-tier hierarchical AST context tree from target directory.
 #[pyfunction]
 #[pyo3(name = "build_context_tree", signature = (root_dir, tier = None))]
@@ -578,6 +608,7 @@ pub fn register_python_bindings(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(py_find_code_duplicity, m)?)?;
     m.add_function(wrap_pyfunction!(py_damerau_levenshtein, m)?)?;
     m.add_function(wrap_pyfunction!(py_fuzzy_similarity, m)?)?;
+    m.add_function(wrap_pyfunction!(py_fuzzy_symbol_search, m)?)?;
     m.add_function(wrap_pyfunction!(py_build_context_tree, m)?)?;
     m.add_function(wrap_pyfunction!(py_enforce_boundaries, m)?)?;
     m.add_function(wrap_pyfunction!(py_verify_hallucinations, m)?)?;
