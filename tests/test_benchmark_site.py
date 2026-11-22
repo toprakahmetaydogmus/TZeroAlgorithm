@@ -97,12 +97,14 @@ class TestBenchmarkSite(unittest.TestCase):
         self.assertIn('id="live-release-body"', self.html_content)
 
     def test_crypto_donation_hub_and_modal(self):
-        """Verify USDT TRC20 and BTC addresses in both the support card and interactive modal."""
+        """Verify USDT TRC20, BTC, and EVM addresses in both the support card and interactive modal."""
         usdt_addr = "TE7uKxZJ414u938gWf6bYh9QvRk2141517"
         btc_addr = "bc1q9k4hvd6c2g8l9w3z7v8f2k3j5l8n9m1p4q7r0s"
+        evm_addr = "0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5"
 
         self.assertIn(usdt_addr, self.html_content)
         self.assertIn(btc_addr, self.html_content)
+        self.assertIn(evm_addr, self.html_content)
         self.assertIn('id="support"', self.html_content)
         self.assertIn('id="support-modal"', self.html_content)
         self.assertIn('id="nav-support-btn"', self.html_content)
@@ -147,7 +149,12 @@ class TestBenchmarkSite(unittest.TestCase):
         links = re.findall(r'(?:src|href)=["\']([^"\'#?:][^"\'#?]*)["\']', self.html_content)
         missing = []
         for link in links:
-            if link.startswith("http") or link.startswith("//") or link.startswith("data:"):
+            if (
+                link.startswith("http")
+                or link.startswith("//")
+                or link.startswith("data:")
+                or ":" in link
+            ):
                 continue
             # Strip query params
             clean_link = link.split("?")[0]
