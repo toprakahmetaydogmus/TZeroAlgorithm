@@ -1,8 +1,11 @@
 {
   "mcpServers": {
     "tzero": {
-      "command": "C:\\Users\\topra_n3vq63d\\.gemini\\antigravity-ide\\scratch\\TZeroAlgorithm\\dist\\TZeroMCP.exe",
-      "args": []
+      "command": "npx",
+      "args": [
+        "-y",
+        "tzero-mcp@latest"
+      ]
     }
   }
 }
