@@ -54,10 +54,10 @@ pub fn analyze_reachability(
     if queue.is_empty() {
         for name in &all_symbol_names {
             let lower = name.to_lowercase();
-            if lower == "main" || lower.starts_with("run") || lower.starts_with("cli") || lower.starts_with("test") {
-                if visited.insert(name.clone()) {
-                    queue.push_back(name.clone());
-                }
+            if (lower == "main" || lower.starts_with("run") || lower.starts_with("cli") || lower.starts_with("test"))
+                && visited.insert(name.clone())
+            {
+                queue.push_back(name.clone());
             }
         }
     }

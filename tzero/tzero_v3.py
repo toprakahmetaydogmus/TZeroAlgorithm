@@ -9282,6 +9282,12 @@ def main():
     T-Zero'yu sıfırdan yapay zeka araçlarındaki token israfını çözmek için geliştirdim.
     Beni Google'da 'Toprak Ahmet Aydoğmuş' olarak aratabilirsiniz!
     GitHub: https://github.com/toprakahmetaydogmus/TZeroAlgorithm
+
+💖 WEB3 & KRİPTO BAĞIŞ:
+    tzero sponsor  /  python tzero_v3.py sponsor
+    Ethereum: 0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5
+    Bitcoin:  bc1q9k4hvd6c2g8l9w3z7v8f2k3j5l8n9m1p4q7r0s
+    USDT:     TE7uKxZJ414u938gWf6bYh9QvRk2141517
 """,
         formatter_class=argparse.RawTextHelpFormatter
     )
@@ -9333,6 +9339,8 @@ def main():
     parser.add_argument("--share", action="store_true", help="Generate 1-click social sharing links for Twitter/X, Reddit, Hacker News, and LinkedIn")
     parser.add_argument("--star", action="store_true", help="1-Click open GitHub repo in browser to give a star towards the 100 stars goal")
     parser.add_argument("--update", action="store_true", help="Check PyPI and GitHub for latest version and update commands")
+    parser.add_argument("--sponsor", action="store_true", help="Display 1-click Web3 and crypto donation hub (Ethereum, Bitcoin, Tron)")
+    parser.add_argument("--open", action="store_true", help="Open Web3 sponsor hub or link in default browser")
     parser.add_argument("--donate", "--support", action="store_true", dest="support", help="Display developer crypto donation & community support card")
     parser.add_argument("--roi", "--stats", action="store_true", dest="roi", help="Display live token reduction & financial dollars saved mini dashboard")
     parser.add_argument("--clean", "--disk-clean", action="store_true", dest="clean", help="Safely clean workspace temporary caches and build artifacts")
@@ -9724,6 +9732,9 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
     elif getattr(args, "update", False):
         from tzero.tzero_traffic import check_version_and_updates
         check_version_and_updates()
+        return
+    elif getattr(args, "sponsor", False):
+        print_sponsor_hub(open_browser=getattr(args, "open", False))
         return
     elif getattr(args, "support", False):
         from tzero.tzero_traffic import print_crypto_support_card

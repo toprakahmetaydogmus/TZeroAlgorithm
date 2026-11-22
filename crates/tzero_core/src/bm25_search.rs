@@ -38,8 +38,8 @@ pub fn tokenize_code(text: &str) -> Vec<String> {
         if c.is_alphanumeric() {
             if c.is_uppercase() && !current.is_empty() {
                 // If previous was lowercase or next is lowercase, split camelCase
-                let prev_is_lower = chars.get(i.saturating_sub(1)).map_or(false, |p| p.is_lowercase());
-                let next_is_lower = chars.get(i + 1).map_or(false, |n| n.is_lowercase());
+                let prev_is_lower = chars.get(i.saturating_sub(1)).is_some_and(|p| p.is_lowercase());
+                let next_is_lower = chars.get(i + 1).is_some_and(|n| n.is_lowercase());
                 if prev_is_lower || (next_is_lower && current.len() > 1) {
                     tokens.push(current.to_lowercase());
                     current.clear();
@@ -173,6 +173,12 @@ impl Bm25Index {
         }
 
         results
+    }
+}
+
+impl Default for Bm25Index {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

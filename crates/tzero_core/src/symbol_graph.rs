@@ -52,9 +52,9 @@ pub fn extract_symbols_from_source(path: &str, content: &str) -> (Vec<SymbolReco
         let line_num = idx + 1;
 
         // Python def / class
-        if trimmed.starts_with("def ") {
-            if let Some(name_end) = trimmed[4..].find('(') {
-                let name = trimmed[4..4 + name_end].trim().to_string();
+        if let Some(stripped) = trimmed.strip_prefix("def ") {
+            if let Some(name_end) = stripped.find('(') {
+                let name = stripped[..name_end].trim().to_string();
                 symbols.push(SymbolRecord {
                     name,
                     kind: "function".to_string(),
@@ -63,9 +63,9 @@ pub fn extract_symbols_from_source(path: &str, content: &str) -> (Vec<SymbolReco
                     signature: trimmed.to_string(),
                 });
             }
-        } else if trimmed.starts_with("class ") {
-            if let Some(name_end) = trimmed[6..].find(|c: char| c == ':' || c == '(' || c.is_whitespace()) {
-                let name = trimmed[6..6 + name_end].trim().to_string();
+        } else if let Some(stripped) = trimmed.strip_prefix("class ") {
+            if let Some(name_end) = stripped.find(|c: char| c == ':' || c == '(' || c.is_whitespace()) {
+                let name = stripped[..name_end].trim().to_string();
                 symbols.push(SymbolRecord {
                     name,
                     kind: "class".to_string(),
@@ -90,7 +90,7 @@ pub fn extract_symbols_from_source(path: &str, content: &str) -> (Vec<SymbolReco
         // Rust fn / struct / trait / impl
         if trimmed.starts_with("pub fn ") || trimmed.starts_with("fn ") {
             let offset = if trimmed.starts_with("pub fn ") { 7 } else { 3 };
-            if let Some(name_end) = trimmed[offset..].find(|c: char| c == '(' || c == '<') {
+            if let Some(name_end) = trimmed[offset..].find(['(', '<']) {
                 let name = trimmed[offset..offset + name_end].trim().to_string();
                 symbols.push(SymbolRecord {
                     name,
@@ -112,8 +112,8 @@ pub fn extract_symbols_from_source(path: &str, content: &str) -> (Vec<SymbolReco
                     signature: trimmed.to_string(),
                 });
             }
-        } else if trimmed.starts_with("use ") {
-            let mod_part = trimmed[4..].trim_end_matches(';').trim();
+        } else if let Some(stripped) = trimmed.strip_prefix("use ") {
+            let mod_part = stripped.trim_end_matches(';').trim();
             edges.push(DependencyEdge {
                 source: file_stem.to_string(),
                 target: mod_part.to_string(),

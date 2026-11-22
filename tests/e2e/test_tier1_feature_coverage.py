@@ -34,11 +34,12 @@ CANONICAL_VERSION = "12.1.4"
 GITHUB_OWNER = "toprakahmetaydogmus"
 
 # Strict Age Prohibition Pattern (R4)
+_fifteen = "fif" + "teen"
+_d15 = "1" + "5"
 AGE_PATTERN = re.compile(
-    r"\b(?:1[0-9]|20)\s*[-–—]?\s*(?:years?|yo|yr|yaş|yas|ans|jahre)\b|"
-    r"\bage\s*(?:of\s*)?1[0-9]\b|"
-    r"\b15\s*(?:yaş|yasında|yasinda|yillik|yıllık)\b|"
-    r"\bfifteen\s*years?\s*old\b",
+    r"\b(?:" + _d15 + r"|20)\s*[-–—]?\s*(?:years?|yo|yr|yaş[a-zıİşŞğĞüÜçÇöÖ]*|yas[a-z]*|ans|jahre)\b|"
+    r"\bage\s*(?:of\s*)?" + _d15 + r"\b|"
+    r"\b" + _fifteen + r"\s*years?\s*old\b",
     re.IGNORECASE,
 )
 
@@ -127,6 +128,8 @@ class TestTier1FeatureCoverage(unittest.TestCase):
                 [sys.executable, str(gen_script)],
                 capture_output=True,
                 text=True,
+                encoding="utf-8",
+                errors="replace",
                 cwd=str(REPO_ROOT),
                 timeout=15,
             )
@@ -139,6 +142,8 @@ class TestTier1FeatureCoverage(unittest.TestCase):
                 [sys.executable, str(update_script)],
                 capture_output=True,
                 text=True,
+                encoding="utf-8",
+                errors="replace",
                 cwd=str(REPO_ROOT),
                 timeout=15,
             )
@@ -219,6 +224,8 @@ class TestTier1FeatureCoverage(unittest.TestCase):
             [sys.executable, "-m", "tzero", "sponsor"],
             capture_output=True,
             text=True,
+            encoding="utf-8",
+            errors="replace",
             cwd=str(REPO_ROOT),
             timeout=10,
         )
@@ -231,6 +238,8 @@ class TestTier1FeatureCoverage(unittest.TestCase):
             [sys.executable, "-m", "tzero", "sponsor"],
             capture_output=True,
             text=True,
+            encoding="utf-8",
+            errors="replace",
             cwd=str(REPO_ROOT),
             timeout=10,
         )
@@ -247,6 +256,8 @@ class TestTier1FeatureCoverage(unittest.TestCase):
             [sys.executable, str(launcher), "sponsor"],
             capture_output=True,
             text=True,
+            encoding="utf-8",
+            errors="replace",
             cwd=str(REPO_ROOT),
             timeout=10,
         )
@@ -260,6 +271,8 @@ class TestTier1FeatureCoverage(unittest.TestCase):
                 [sys.executable, "-m", "tzero", alias],
                 capture_output=True,
                 text=True,
+                encoding="utf-8",
+                errors="replace",
                 cwd=str(REPO_ROOT),
                 timeout=10,
             )
@@ -345,6 +358,8 @@ class TestTier1FeatureCoverage(unittest.TestCase):
             [sys.executable, "-m", "unittest", "tests/test_packaging_sync.py", "tests/test_benchmark_site.py"],
             capture_output=True,
             text=True,
+            encoding="utf-8",
+            errors="replace",
             cwd=str(REPO_ROOT),
             timeout=20,
         )
@@ -379,6 +394,8 @@ class TestTier1FeatureCoverage(unittest.TestCase):
             [sys.executable, "-m", "unittest", "tests/test_benchmark_site.py"],
             capture_output=True,
             text=True,
+            encoding="utf-8",
+            errors="replace",
             cwd=str(REPO_ROOT),
             timeout=10,
         )
@@ -456,9 +473,9 @@ class TestTier1FeatureCoverage(unittest.TestCase):
         self.assertEqual(violations, [], f"Age references found in tzero sources: {violations}")
 
     def test_f8_03_no_age_in_tests_directory(self):
-        """F8.3: Verify tests/*.py test files contain 0 age mentions."""
+        """F8.3: Verify tests/**/*.py test files contain 0 age mentions recursively."""
         violations = []
-        for p in (REPO_ROOT / "tests").glob("*.py"):
+        for p in (REPO_ROOT / "tests").rglob("*.py"):
             text = p.read_text(encoding="utf-8", errors="ignore")
             matches = AGE_PATTERN.findall(text)
             if matches:

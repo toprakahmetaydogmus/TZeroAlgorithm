@@ -8,6 +8,7 @@ import unittest
 from pathlib import Path
 import re
 import subprocess
+import sys
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SITE_DIR = REPO_ROOT / "benchmark-site"
@@ -165,7 +166,7 @@ class TestBenchmarkSite(unittest.TestCase):
 
     def test_update_script_idempotent(self):
         """Verify scripts/update_benchmark_site.py can run cleanly and produces valid output."""
-        res = subprocess.run(["python", str(UPDATE_SCRIPT)], capture_output=True, text=True)
+        res = subprocess.run([sys.executable, str(UPDATE_SCRIPT)], capture_output=True, text=True, encoding="utf-8", errors="replace")
         self.assertEqual(res.returncode, 0, f"Script failed: {res.stderr}")
         self.assertIn("Updated index.html successfully", res.stdout)
 

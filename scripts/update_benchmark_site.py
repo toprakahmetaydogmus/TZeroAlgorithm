@@ -162,20 +162,31 @@ DOWNLOADS_V12_GRID = '''    <!-- Live Dynamic Release Banner -->
       </div>
 
       <div class="crypto-addresses-grid">
+        <!-- EVM / Ethereum -->
         <div class="crypto-box">
           <div class="crypto-coin">
-            <span class="crypto-badge badge-usdt">USDT</span>
-            <span class="crypto-network">TRC20 Network</span>
+            <span class="crypto-badge badge-eth" style="background: rgba(99, 102, 241, 0.2); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.4);">ETH/EVM</span>
+            <span class="crypto-network">Ethereum / EVM Chains</span>
           </div>
           <div class="crypto-addr-row">
-            <code class="crypto-code" id="addr-usdt">TE7uKxZJ414u938gWf6bYh9QvRk2141517</code>
-            <button class="btn btn-copy-crypto" data-target="TE7uKxZJ414u938gWf6bYh9QvRk2141517" title="Copy USDT TRC20 Address">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-              Copy
-            </button>
+            <code class="crypto-code" id="addr-eth">0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5</code>
+            <div class="crypto-actions-cluster">
+              <button class="btn btn-copy-crypto" data-target="0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5" title="Copy Ethereum Address">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                Copy
+              </button>
+              <a href="ethereum:0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5" class="btn btn-send-crypto web3-send-trigger" data-addr="0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5" title="1-Click Send via Web3 Wallet">⚡ Send</a>
+              <a href="https://metamask.app.link/send/0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5" target="_blank" rel="noopener noreferrer" class="btn btn-wallet-link" title="Open in MetaMask">🦊 MetaMask</a>
+              <button class="btn btn-qr-toggle" data-target-qr="qr-eth-grid" title="Show QR Code">📱 QR</button>
+            </div>
+          </div>
+          <div class="crypto-qr-container" id="qr-eth-grid" style="display: none;">
+            <img src="assets/qr_ethereum.svg" alt="Ethereum QR Code" width="160" height="160">
+            <span class="qr-label">Scan with MetaMask / Web3 Wallet</span>
           </div>
         </div>
 
+        <!-- Bitcoin -->
         <div class="crypto-box">
           <div class="crypto-coin">
             <span class="crypto-badge badge-btc">BTC</span>
@@ -183,10 +194,41 @@ DOWNLOADS_V12_GRID = '''    <!-- Live Dynamic Release Banner -->
           </div>
           <div class="crypto-addr-row">
             <code class="crypto-code" id="addr-btc">bc1q9k4hvd6c2g8l9w3z7v8f2k3j5l8n9m1p4q7r0s</code>
-            <button class="btn btn-copy-crypto" data-target="bc1q9k4hvd6c2g8l9w3z7v8f2k3j5l8n9m1p4q7r0s" title="Copy Bitcoin Address">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-              Copy
-            </button>
+            <div class="crypto-actions-cluster">
+              <button class="btn btn-copy-crypto" data-target="bc1q9k4hvd6c2g8l9w3z7v8f2k3j5l8n9m1p4q7r0s" title="Copy Bitcoin Address">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                Copy
+              </button>
+              <a href="bitcoin:bc1q9k4hvd6c2g8l9w3z7v8f2k3j5l8n9m1p4q7r0s?label=T-Zero%20Sponsorship" class="btn btn-send-crypto" title="Open in Bitcoin Wallet">⚡ Send</a>
+              <button class="btn btn-qr-toggle" data-target-qr="qr-btc-grid" title="Show QR Code">📱 QR</button>
+            </div>
+          </div>
+          <div class="crypto-qr-container" id="qr-btc-grid" style="display: none;">
+            <img src="assets/qr_bitcoin.svg" alt="Bitcoin QR Code" width="160" height="160">
+            <span class="qr-label">Scan with Bitcoin Wallet</span>
+          </div>
+        </div>
+
+        <!-- USDT TRC20 -->
+        <div class="crypto-box">
+          <div class="crypto-coin">
+            <span class="crypto-badge badge-usdt">USDT</span>
+            <span class="crypto-network">TRC20 Network</span>
+          </div>
+          <div class="crypto-addr-row">
+            <code class="crypto-code" id="addr-usdt">TE7uKxZJ414u938gWf6bYh9QvRk2141517</code>
+            <div class="crypto-actions-cluster">
+              <button class="btn btn-copy-crypto" data-target="TE7uKxZJ414u938gWf6bYh9QvRk2141517" title="Copy USDT TRC20 Address">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                Copy
+              </button>
+              <a href="tron:TE7uKxZJ414u938gWf6bYh9QvRk2141517" class="btn btn-send-crypto" title="Open in Tron Wallet">⚡ Send</a>
+              <button class="btn btn-qr-toggle" data-target-qr="qr-usdt-grid" title="Show QR Code">📱 QR</button>
+            </div>
+          </div>
+          <div class="crypto-qr-container" id="qr-usdt-grid" style="display: none;">
+            <img src="assets/qr_tron.svg" alt="Tron USDT QR Code" width="160" height="160">
+            <span class="qr-label">Scan with Tron / TRC20 Wallet</span>
           </div>
         </div>
       </div>

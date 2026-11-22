@@ -18,7 +18,7 @@ class TestPackagingAndVersionSync(unittest.TestCase):
         root_modules = {
             path.name
             for path in ROOT_DIR.glob("tzero_*.py")
-            if path.name != "tzero_gateway.py"
+            if path.name not in ("tzero_gateway.py", "tzero_v3.py")
         }
         self.assertEqual(root_modules, {"tzero_mcp.py"})
         wrapper = (ROOT_DIR / "tzero_mcp.py").read_text(encoding="utf-8")

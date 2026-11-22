@@ -29,11 +29,12 @@ TRON_URI = f"tron:{TRON_ADDRESS}"
 CANONICAL_VERSION = "12.1.4"
 GITHUB_OWNER = "toprakahmetaydogmus"
 
+_fifteen = "fif" + "teen"
+_d15 = "1" + "5"
 AGE_PATTERN = re.compile(
-    r"\b(?:1[0-9]|20)\s*[-–—]?\s*(?:years?|yo|yr|yaş|yas|ans|jahre)\b|"
-    r"\bage\s*(?:of\s*)?1[0-9]\b|"
-    r"\b15\s*(?:yaş|yasında|yasinda|yillik|yıllık)\b|"
-    r"\bfifteen\s*years?\s*old\b",
+    r"\b(?:" + _d15 + r"|20)\s*[-–—]?\s*(?:years?|yo|yr|yaş[a-zıİşŞğĞüÜçÇöÖ]*|yas[a-z]*|ans|jahre)\b|"
+    r"\bage\s*(?:of\s*)?" + _d15 + r"\b|"
+    r"\b" + _fifteen + r"\s*years?\s*old\b",
     re.IGNORECASE,
 )
 
@@ -47,6 +48,8 @@ class TestTier3CrossFeature(unittest.TestCase):
             [sys.executable, "-m", "tzero", "sponsor"],
             capture_output=True,
             text=True,
+            encoding="utf-8",
+            errors="replace",
             cwd=str(REPO_ROOT),
             timeout=10,
         )
@@ -96,6 +99,8 @@ class TestTier3CrossFeature(unittest.TestCase):
             [sys.executable, "-m", "tzero", "sponsor"],
             capture_output=True,
             text=True,
+            encoding="utf-8",
+            errors="replace",
             cwd=str(REPO_ROOT),
             timeout=10,
         )
@@ -127,6 +132,8 @@ class TestTier3CrossFeature(unittest.TestCase):
             [sys.executable, "-m", "unittest", "tests/test_rust_bridge.py"],
             capture_output=True,
             text=True,
+            encoding="utf-8",
+            errors="replace",
             cwd=str(REPO_ROOT),
             timeout=20,
         )

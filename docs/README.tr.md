@@ -123,13 +123,28 @@ T-Zero'nun hiçbir risk sermayesi fonu, ücretli aboneliği veya telemetri takib
 - ⭐ **Repoya Yıldız Verin:** Her GitHub yıldızı açık kaynak ekosistemini güçlendirir ve T-Zero'nun keşfedilmesini sağlar.
 - 🪙 **Kripto ile Destek (Doğrudan Katkı):**
 
-| Ağ / Platform | Cüzdan Adresi / Bağlantı | Açıklama ve Amaç |
-| :--- | :--- | :--- |
-| 🟢 **USDT (TRC-20)** | `TE7uKxZJ414u938gWf6bYh9QvRk2141517` | Sıfır/çok düşük transfer komisyonlu USDT ağı |
-| 🟠 **Bitcoin (BTC)** | `bc1q9k4hvd6c2g8l9w3z7v8f2k3j5l8n9m1p4q7r0s` | Native SegWit cüzdan adresi (bech32) |
-| 🔷 **Ethereum / EVM** | `0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5` | ERC-20, Arbitrum, Polygon, Optimism & BSC |
-| 💖 **GitHub Sponsors** | [github.com/sponsors/toprakahmetaydogmus](https://github.com/sponsors/toprakahmetaydogmus) | Aylık düzenli veya tek seferlik açık kaynak desteği |
-| 🌐 **Geliştirici İletişim** | [hopp.bio/siberegitim](https://hopp.bio/siberegitim) | Tüm sosyal medya ve geliştirici profil bağlantıları |
+| Ağ / Platform | Cüzdan Adresi | 1-Tıkla Gönder (Deep Link) | Açıklama ve Doğrulama |
+| :--- | :--- | :--- | :--- |
+| 🔷 **Ethereum / EVM** | `0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5` | [⚡ **Web3 ile Gönder (EIP-681)**](ethereum:0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5)<br>[🦊 **MetaMask**](https://metamask.app.link/send/0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5) | [🔍 Etherscan](https://etherscan.io/address/0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5) &bull; ERC-20, Arbitrum, Polygon, Optimism, BSC |
+| 🟠 **Bitcoin (BTC)** | `bc1q9k4hvd6c2g8l9w3z7v8f2k3j5l8n9m1p4q7r0s` | [⚡ **Bitcoin ile Gönder (BIP-21)**](bitcoin:bc1q9k4hvd6c2g8l9w3z7v8f2k3j5l8n9m1p4q7r0s?label=T-Zero%20Sponsorship) | [🔍 Mempool Gezgini](https://mempool.space/address/bc1q9k4hvd6c2g8l9w3z7v8f2k3j5l8n9m1p4q7r0s) &bull; Native SegWit |
+| 🟢 **USDT (TRC-20)** | `TE7uKxZJ414u938gWf6bYh9QvRk2141517` | [⚡ **Tron ile Gönder**](tron:TE7uKxZJ414u938gWf6bYh9QvRk2141517) | [🔍 Tronscan](https://tronscan.org/#/address/TE7uKxZJ414u938gWf6bYh9QvRk2141517) &bull; Düşük komisyonlu TRC-20 ağı |
+| 💖 **GitHub Sponsors** | Toprak Ahmet Aydoğmuş | [💖 **GitHub'da Sponsor Ol**](https://github.com/sponsors/toprakahmetaydogmus) | Aylık düzenli veya tek seferlik açık kaynak desteği |
+| 🌐 **Geliştirici İletişim** | Siber Akademi | [🌐 **hopp.bio/siberegitim**](https://hopp.bio/siberegitim) | Tüm sosyal medya ve geliştirici profil bağlantıları |
+
+<details>
+<summary>📱 <b>1-Tıkla QR Kodları Görüntüle (Ethereum, Bitcoin, Tron)</b></summary>
+<br>
+
+<div align="center">
+
+| 🔷 Ethereum / EVM | 🟠 Bitcoin (BTC) | 🟢 USDT (TRC-20 Tron) |
+| :---: | :---: | :---: |
+| <img src="../assets/qr_ethereum.svg" width="180" height="180" alt="Ethereum QR Kodu"><br><br>[⚡ **Gönder (EIP-681)**](ethereum:0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5)<br>[🦊 **MetaMask**](https://metamask.app.link/send/0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5) | <img src="../assets/qr_bitcoin.svg" width="180" height="180" alt="Bitcoin QR Kodu"><br><br>[⚡ **Gönder (BIP-21)**](bitcoin:bc1q9k4hvd6c2g8l9w3z7v8f2k3j5l8n9m1p4q7r0s?label=T-Zero%20Sponsorship) | <img src="../assets/qr_tron.svg" width="180" height="180" alt="Tron QR Kodu"><br><br>[⚡ **Tron ile Gönder**](tron:TE7uKxZJ414u938gWf6bYh9QvRk2141517) |
+| `0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5` | `bc1q9k4hvd6c2g8l9w3z7v8f2k3j5l8n9m1p4q7r0s` | `TE7uKxZJ414u938gWf6bYh9QvRk2141517` |
+
+</div>
+
+</details>
 
 > 💡 *Tüm topluluk bağışları, T-Zero'nun sürekli entegrasyon (CI/CD) matrislerini, otomatik paket yayınlarını, açık kaynak test altyapısını ve araçların tüm geliştiriciler için daima %100 ücretsiz, çevrimdışı ve sıfır-sızıntılı kalmasını finanse etmek için kullanılır.*
 

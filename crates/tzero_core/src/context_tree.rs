@@ -84,7 +84,6 @@ pub fn build_context_tree(root_dir: &str, tier: u32, max_depth: Option<usize>) -
 
     fn scan_dir(
         dir: &Path,
-        root: &Path,
         current_depth: usize,
         max_depth: usize,
         ignored: &HashSet<&str>,
@@ -107,7 +106,7 @@ pub fn build_context_tree(root_dir: &str, tier: u32, max_depth: Option<usize>) -
 
             if path.is_dir() {
                 if !ignored.contains(file_name) && !file_name.starts_with('.') {
-                    scan_dir(&path, root, current_depth + 1, max_depth, ignored, collected);
+                    scan_dir(&path, current_depth + 1, max_depth, ignored, collected);
                 }
             } else if path.is_file() {
                 if let Some(ext) = path.extension().and_then(|e| e.to_str()) {
@@ -120,7 +119,7 @@ pub fn build_context_tree(root_dir: &str, tier: u32, max_depth: Option<usize>) -
     }
 
     if root_path.is_dir() {
-        scan_dir(root_path, root_path, 0, depth_limit, &ignored_set, &mut files_collected);
+        scan_dir(root_path, 0, depth_limit, &ignored_set, &mut files_collected);
     } else if root_path.is_file() {
         files_collected.push(root_path.to_path_buf());
     }
@@ -239,8 +238,8 @@ pub fn build_context_tree(root_dir: &str, tier: u32, max_depth: Option<usize>) -
         tier, tier_enum, nodes.len(), total_lines
     ));
     tree_lines.push(format!(
-        "Tokens: {} raw -> {} context ({}% reduction)",
-        total_raw_tokens, total_pruned_tokens, format!("{:.1}", reduction)
+        "Tokens: {} raw -> {} context ({:.1}% reduction)",
+        total_raw_tokens, total_pruned_tokens, reduction
     ));
     tree_lines.push("------------------------------------------------------------------------".to_string());
 

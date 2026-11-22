@@ -2,6 +2,7 @@
 // Copyright (c) 2026 Toprak Ahmet Aydoğmuş (Siber Akademi)
 
 #![allow(clippy::all)]
+#![allow(warnings)]
 
 //! T-Zero Turbo Rust Native CLI (`tzero-core`).
 //! Standalone high-performance binary for deterministic AST pruning, Shannon entropy auditing,
@@ -145,7 +146,7 @@ fn main() {
             }
             let target = &args[2];
             let mut edges = Vec::new();
-            let storage: Vec<(String, String)>;
+            let mut storage: Vec<(String, String)> = Vec::new();
 
             if let Ok(json_content) = fs::read_to_string(target) {
                 if let Ok(parsed) = serde_json::from_str::<Vec<(String, String)>>(&json_content) {

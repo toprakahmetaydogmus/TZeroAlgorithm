@@ -18,6 +18,7 @@ pub enum ArchLayer {
 }
 
 impl ArchLayer {
+    #[allow(clippy::should_implement_trait)]
     pub fn from_str(s: &str) -> Self {
         let lower = s.to_lowercase();
         if lower.contains("cli") || lower.contains("api") || lower.contains("ui") || lower.contains("mcp") || lower.contains("present") {
@@ -101,20 +102,18 @@ pub fn enforce_boundaries(
         let src_layer = ArchLayer::from_str(src);
         let dst_layer = ArchLayer::from_str(dst);
 
-        if src_layer != ArchLayer::Unknown && dst_layer != ArchLayer::Unknown {
-            if !src_layer.can_depend_on(dst_layer) {
-                violations.push(BoundaryViolation {
-                    source_module: src.to_string(),
-                    source_layer: format!("{:?}", src_layer),
-                    target_module: dst.to_string(),
-                    target_layer: format!("{:?}", dst_layer),
-                    violation_type: "LayerBreach".to_string(),
-                    description: format!(
-                        "Inward-only violation: {:?} module '{}' cannot depend on outer {:?} module '{}'",
-                        src_layer, src, dst_layer, dst
-                    ),
-                });
-            }
+        if src_layer != ArchLayer::Unknown && dst_layer != ArchLayer::Unknown && !src_layer.can_depend_on(dst_layer) {
+            violations.push(BoundaryViolation {
+                source_module: src.to_string(),
+                source_layer: format!("{:?}", src_layer),
+                target_module: dst.to_string(),
+                target_layer: format!("{:?}", dst_layer),
+                violation_type: "LayerBreach".to_string(),
+                description: format!(
+                    "Inward-only violation: {:?} module '{}' cannot depend on outer {:?} module '{}'",
+                    src_layer, src, dst_layer, dst
+                ),
+            });
         }
     }
 

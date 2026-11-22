@@ -32,11 +32,11 @@ pub fn damerau_levenshtein_distance(s1: &str, s2: &str) -> usize {
 
     let mut d = vec![vec![0usize; len_b + 1]; len_a + 1];
 
-    for i in 0..=len_a {
-        d[i][0] = i;
+    for (i, row) in d.iter_mut().enumerate() {
+        row[0] = i;
     }
-    for j in 0..=len_b {
-        d[0][j] = j;
+    for (j, val) in d[0].iter_mut().enumerate() {
+        *val = j;
     }
 
     for i in 1..=len_a {

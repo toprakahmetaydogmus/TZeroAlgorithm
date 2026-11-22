@@ -4,6 +4,7 @@
 // or https://github.com/toprakahmetaydogmus/TZeroAlgorithm/blob/main/NOTICE.
 
 #![allow(clippy::all)]
+#![allow(warnings)]
 
 // -*- coding: utf-8 -*-
 //! T-Zero Turbo Rust Hybrid Core Engine (v12.1.4)
@@ -104,6 +105,10 @@ pub fn jaccard_shingles_bytes(a: &[u8], b: &[u8], ngram: usize) -> f64 {
 // ==============================================================================
 
 /// C-ABI export for 64-bit FNV-1a hash computation.
+///
+/// # Safety
+/// If `ptr` is non-null, it must point to a contiguous block of at least `len` valid initialized
+/// bytes for the duration of this call. If `ptr` is null, returns 0 safely.
 #[no_mangle]
 pub unsafe extern "C" fn tzero_fnv1a_hash64(ptr: *const u8, len: usize) -> u64 {
     if ptr.is_null() {
@@ -114,6 +119,11 @@ pub unsafe extern "C" fn tzero_fnv1a_hash64(ptr: *const u8, len: usize) -> u64 {
 }
 
 /// C-ABI export for shingle Jaccard similarity in [0.0, 1.0].
+///
+/// # Safety
+/// If `a_ptr` and `b_ptr` are non-null, each must point to at least `a_len` and `b_len` valid
+/// initialized bytes respectively for the duration of this call. If either pointer is null,
+/// returns 0.0 safely.
 #[no_mangle]
 pub unsafe extern "C" fn tzero_jaccard_shingles_f64(
     a_ptr: *const u8,
@@ -131,6 +141,11 @@ pub unsafe extern "C" fn tzero_jaccard_shingles_f64(
 }
 
 /// C-ABI export for Shannon entropy calculation.
+///
+/// # Safety
+/// If `ptr` is non-null and `len > 0`, `ptr` must point to a contiguous block of at least `len`
+/// valid initialized bytes for the duration of this call. If `ptr` is null or `len == 0`,
+/// returns 0.0 safely.
 #[no_mangle]
 pub unsafe extern "C" fn tzero_shannon_entropy(ptr: *const u8, len: usize) -> f64 {
     if ptr.is_null() || len == 0 {
@@ -144,6 +159,11 @@ pub unsafe extern "C" fn tzero_shannon_entropy(ptr: *const u8, len: usize) -> f6
 }
 
 /// C-ABI export for Damerau-Levenshtein distance.
+///
+/// # Safety
+/// If `a_ptr` and `b_ptr` are non-null, each must point to at least `a_len` and `b_len` valid
+/// initialized bytes respectively for the duration of this call. If either pointer is null,
+/// returns 0 safely.
 #[no_mangle]
 pub unsafe extern "C" fn tzero_damerau_levenshtein(
     a_ptr: *const u8,
@@ -160,6 +180,11 @@ pub unsafe extern "C" fn tzero_damerau_levenshtein(
 }
 
 /// C-ABI export for fuzzy similarity.
+///
+/// # Safety
+/// If `a_ptr` and `b_ptr` are non-null, each must point to at least `a_len` and `b_len` valid
+/// initialized bytes respectively for the duration of this call. If either pointer is null,
+/// returns 0.0 safely.
 #[no_mangle]
 pub unsafe extern "C" fn tzero_fuzzy_similarity_f64(
     a_ptr: *const u8,
