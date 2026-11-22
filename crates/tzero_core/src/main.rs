@@ -7,7 +7,6 @@
 
 use std::env;
 use std::fs;
-use std::path::Path;
 use std::process;
 
 use tzero_core::ast_pruner::{detect_language, prune_code_with_stats};

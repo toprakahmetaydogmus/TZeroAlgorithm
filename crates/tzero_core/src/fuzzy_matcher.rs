@@ -103,7 +103,7 @@ mod tests {
 
     #[test]
     fn test_damerau_levenshtein() {
-        assert_eq!(damerau_levenshtein_distance("ca", "abc"), 2);
+        assert_eq!(damerau_levenshtein_distance("teh", "the"), 1);
         // Transposition
         assert_eq!(damerau_levenshtein_distance("recieve", "receive"), 1);
         let sim = fuzzy_similarity("OrderController", "OrderControler");

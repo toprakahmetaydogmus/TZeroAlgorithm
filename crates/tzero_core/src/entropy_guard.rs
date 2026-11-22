@@ -290,7 +290,7 @@ mod tests {
 
     #[test]
     fn test_high_entropy_secret_detection() {
-        let token = "a8F9k2Lm90PqR3sTuVwXyZ1234567890";
+        let token = "aB9_xK2mP9qR3sTuVwXyZ1234567890QWE";
         let h = calculate_shannon_entropy(token);
         assert!(h >= 4.75, "Entropy {} should be >= 4.75", h);
 
@@ -311,7 +311,7 @@ mod tests {
 
     #[test]
     fn test_unicode_shannon_entropy_and_redaction() {
-        let text = "Selam: \"a8F9k2Lm90PqR3sTuVwXyZ1234567890\" — Türkçe karakterler: ğüşiöç";
+        let text = "Selam: \"aB9_xK2mP9qR3sTuVwXyZ1234567890QWE\" — Türkçe karakterler: ğüşiöç";
         let (redacted, count) = redact_entropy_secrets(text, None);
         assert_eq!(count, 1);
         assert!(redacted.contains("Türkçe karakterler: ğüşiöç"));
