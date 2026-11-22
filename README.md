@@ -646,7 +646,7 @@ Join the revolution in context engineering and deterministic token pruning!
 
 ---
 
-## License & Siberian Academy
+## License & Siber Akademi
 
 - **Author & Architect:** Toprak Ahmet Aydoğmuş (Lead Software Engineer & Architect, Siber Akademi)
 - **LinkedIn:** [Toprak Ahmet Aydoğmuş](https://linkedin.com/in/toprak-ahmet-aydo%C4%9Fmu%C5%9F-60462534b/)
