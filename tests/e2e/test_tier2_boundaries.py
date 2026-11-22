@@ -66,7 +66,7 @@ class TestTier2Boundaries(unittest.TestCase):
 
     def test_f1_08_tron_base58_checksum_format(self):
         """F1.8: Validate Tron URI format: total length 39, base58 characters starting with T."""
-        tron_pattern = re.compile(r"^tron:T[1-9A-HJ-NP-za-km-z]{33}$")
+        tron_pattern = re.compile(r"^tron:T[1-9A-HJ-NP-Za-km-z]{33}$")
         self.assertRegex(TRON_URI, tron_pattern, "Tron URI must match base58 format starting with T")
         self.assertEqual(len(TRON_URI), 39, "Total Tron URI length must be exactly 39 characters")
 
@@ -437,9 +437,9 @@ class TestTier2Boundaries(unittest.TestCase):
         """F7.6: Verify all sidecar .sha256 files in dist/ contain valid 64-hex SHA-256 strings."""
         sha_files = list((REPO_ROOT / "dist").glob("*.sha256"))
         if not sha_files:
-            # If dist/ has not been built in this environment yet, verify compile.py logic exists
-            compile_code = (REPO_ROOT / "scripts" / "build" / "compile.py").read_text(encoding="utf-8")
-            self.assertIn(".sha256", compile_code)
+            # If dist/ has not been built in this environment yet, verify release.yml contains sha256 generation
+            rel_code = (REPO_ROOT / ".github" / "workflows" / "release.yml").read_text(encoding="utf-8")
+            self.assertIn("sha256", rel_code.lower())
             return
         hex64_pat = re.compile(r"^[0-9a-fA-F]{64}$")
         for f in sha_files:

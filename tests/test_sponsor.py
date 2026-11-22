@@ -25,7 +25,7 @@ class TestSponsorCLI(unittest.TestCase):
     def test_cli_sponsor_subcommand_via_subprocess(self):
         """Verify 'python tzero_v3.py sponsor' prints EVM, BTC, and Tron addresses."""
         cmd = [sys.executable, str(REPO_ROOT / "tzero_v3.py"), "sponsor"]
-        proc = subprocess.run(cmd, capture_output=True, text=True, cwd=str(REPO_ROOT))
+        proc = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace", cwd=str(REPO_ROOT))
         self.assertEqual(proc.returncode, 0, f"Command failed: {proc.stderr}")
         out = proc.stdout
         self.assertIn(EVM_ADDR, out)
@@ -38,7 +38,7 @@ class TestSponsorCLI(unittest.TestCase):
     def test_cli_sponsor_flag_via_subprocess(self):
         """Verify 'python tzero_v3.py --sponsor' prints EVM, BTC, and Tron addresses."""
         cmd = [sys.executable, str(REPO_ROOT / "tzero_v3.py"), "--sponsor"]
-        proc = subprocess.run(cmd, capture_output=True, text=True, cwd=str(REPO_ROOT))
+        proc = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace", cwd=str(REPO_ROOT))
         self.assertEqual(proc.returncode, 0, f"Command failed: {proc.stderr}")
         out = proc.stdout
         self.assertIn(EVM_ADDR, out)

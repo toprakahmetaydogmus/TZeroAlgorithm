@@ -7,8 +7,13 @@ T-Zero Offline Vector QR Code Generator for Web3 Sponsorship & Donations.
 from pathlib import Path
 import shutil
 import sys
-import qrcode
-import qrcode.image.svg
+
+try:
+    import qrcode
+    import qrcode.image.svg
+    HAS_QRCODE = True
+except ImportError:
+    HAS_QRCODE = False
 
 QR_CONFIGS = [
     {
@@ -39,6 +44,21 @@ def generate_qr_svgs(workspace_dir: Path = None):
 
     assets_dir.mkdir(parents=True, exist_ok=True)
     benchmark_assets_dir.mkdir(parents=True, exist_ok=True)
+
+    # If qrcode library is not installed in the current environment, fallback to existing pre-generated SVGs
+    if not HAS_QRCODE:
+        cached = []
+        for cfg in QR_CONFIGS:
+            out_path = assets_dir / cfg["filename"]
+            mirror_path = benchmark_assets_dir / cfg["filename"]
+            if out_path.is_file():
+                if not mirror_path.is_file() or mirror_path.stat().st_size != out_path.stat().st_size:
+                    shutil.copy2(out_path, mirror_path)
+                cached.append((out_path, mirror_path))
+        if len(cached) == len(QR_CONFIGS):
+            print(f"[NOTICE] Using {len(cached)} existing offline SVG QR codes (qrcode package not installed).")
+            return cached
+        raise ImportError("qrcode package is required to generate new SVG QR codes: pip install qrcode")
 
     generated_files = []
 
