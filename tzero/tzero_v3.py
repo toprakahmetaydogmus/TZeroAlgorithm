@@ -9102,6 +9102,71 @@ def print_viral_share_hub(open_browser: bool = False):
             pass
 
 
+def print_sponsor_hub(open_browser: bool = False):
+    """Prints 1-click Web3 and crypto donation deep links, addresses, and opens sponsor page."""
+    try:
+        from tzero.tzero_terminal import init_terminal, sanitize_terminal_text
+        init_terminal()
+    except ImportError:
+        try:
+            from tzero_terminal import init_terminal, sanitize_terminal_text
+            init_terminal()
+        except Exception:
+            def sanitize_terminal_text(t):
+                return t
+
+    evm_addr = "0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5"
+    btc_addr = "bc1q9k4hvd6c2g8l9w3z7v8f2k3j5l8n9m1p4q7r0s"
+    usdt_addr = "TE7uKxZJ414u938gWf6bYh9QvRk2141517"
+    metamask_link = f"https://metamask.app.link/send/{evm_addr}"
+    etherscan_link = f"https://etherscan.io/address/{evm_addr}"
+    tronscan_link = f"https://tronscan.org/#/address/{usdt_addr}"
+    mempool_link = f"https://mempool.space/address/{btc_addr}"
+    github_sponsors = "https://github.com/sponsors/toprakahmetaydogmus"
+    support_web = "https://tzero-indol.vercel.app/#support"
+
+    raw_hub = f"""
+┌────────────────────────────────────────────────────────────────────────┐
+│  💖 T-ZERO 1-CLICK WEB3 & CRYPTO DONATION HUB                          │
+│  Keeping T-Zero 100% Free, Offline & Zero-Leak Worldwide                │
+└────────────────────────────────────────────────────────────────────────┘
+
+[🔷 Ethereum / EVM] (ETH, ERC-20, Polygon, Arbitrum, BSC, Optimism):
+  Address:       {evm_addr}
+  Web3 URI:      ethereum:{evm_addr}
+  MetaMask App:  {metamask_link}
+  Explorer:      {etherscan_link}
+
+[🟠 Bitcoin] (Native SegWit bech32):
+  Address:       {btc_addr}
+  Bitcoin URI:   bitcoin:{btc_addr}?label=T-Zero%20Sponsorship
+  Explorer:      {mempool_link}
+
+[🟢 USDT] (TRC-20 Tron Network):
+  Address:       {usdt_addr}
+  Tron URI:      tron:{usdt_addr}
+  Explorer:      {tronscan_link}
+
+[💖 GitHub Sponsors]:
+  {github_sponsors}
+
+[🌐 Interactive Web3 & QR Code Hub]:
+  {support_web}
+
+════════════════════════════════════════════════════════════════════════
+✔ 100% of contributions directly sustain local-first open-source tooling!
+════════════════════════════════════════════════════════════════════════
+"""
+    print(sanitize_terminal_text(raw_hub))
+    if open_browser:
+        try:
+            import webbrowser
+            print(sanitize_terminal_text("\n\033[36m► Opening Web3 sponsor hub in default browser...\033[0m"))
+            webbrowser.open(support_web)
+        except Exception:
+            pass
+
+
 def main():
     import argparse
     import json
@@ -9146,6 +9211,12 @@ def main():
     if len(sys.argv) > 1 and sys.argv[1].lower() in ("share", "--share", "-share", "tweet", "social"):
         open_b = any(arg in ("--open", "-o", "open") for arg in sys.argv[2:])
         print_viral_share_hub(open_browser=open_b)
+        sys.exit(0)
+
+    # Fast path for sponsor / donate subcommands
+    if len(sys.argv) > 1 and sys.argv[1].lower() in ("sponsor", "donate", "funding", "--sponsor", "-sponsor"):
+        open_b = any(arg in ("--open", "-o", "open") for arg in sys.argv[2:])
+        print_sponsor_hub(open_browser=open_b)
         sys.exit(0)
 
     # Fast path for promo / launch subcommands

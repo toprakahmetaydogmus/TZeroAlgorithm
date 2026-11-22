@@ -598,15 +598,15 @@ Hi! I'm **Toprak Ahmet Aydoğmuş** from Siber Akademi. I built T-Zero from scra
 T-Zero has no venture capital backing, no paywalls, and no telemetry tracking. If T-Zero helped you cut prompt tokens or saved your daily coding workflow in Cursor, Claude Code, or Windsurf, please consider supporting the project to keep it free and independent:
 
 - ⭐ **Star the Repository:** Every GitHub star helps independent open-source developers discover T-Zero.
-- 🪙 **Crypto Donations (Direct Sustenance):**
+- 🪙 **1-Click Crypto Donations (Direct Sustenance & Wallet Deep Links):**
 
-| Network / Currency | Address / Link | Details & Purpose |
-| :--- | :--- | :--- |
-| 🟢 **USDT (TRC-20)** | `TE7uKxZJ414u938gWf6bYh9QvRk2141517` | Zero/low-fee TRC-20 transfer network |
-| 🟠 **Bitcoin (BTC)** | `bc1q9k4hvd6c2g8l9w3z7v8f2k3j5l8n9m1p4q7r0s` | Native SegWit address (bech32) |
-| 🔷 **Ethereum / EVM** | `0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5` | ERC-20, Arbitrum, Polygon, Optimism & BSC |
-| 💖 **GitHub Sponsors** | [github.com/sponsors/toprakahmetaydogmus](https://github.com/sponsors/toprakahmetaydogmus) | Recurring or one-time open source sponsorship |
-| 🌐 **Creator Hub** | [hopp.bio/siberegitim](https://hopp.bio/siberegitim) | Developer profile, socials, and direct contact |
+| Network / Asset | Address | 1-Click Send Link (Deep Link) | Explorer / Info |
+| :--- | :--- | :--- | :--- |
+| 🔷 **Ethereum / EVM**<br>*(ETH, ERC-20, Polygon, Arbitrum, BSC, Optimism)* | `0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5` | [⚡ **Send via Web3 Wallet (EIP-681)**](ethereum:0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5)<br>[🦊 **Open in MetaMask**](https://metamask.app.link/send/0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5) | [🔍 Etherscan](https://etherscan.io/address/0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5) &bull; [DeBank](https://debank.com/profile/0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5) |
+| 🟠 **Bitcoin (BTC)**<br>*(Native SegWit bech32)* | `bc1q9k4hvd6c2g8l9w3z7v8f2k3j5l8n9m1p4q7r0s` | [⚡ **Send via Bitcoin Wallet (BIP-21)**](bitcoin:bc1q9k4hvd6c2g8l9w3z7v8f2k3j5l8n9m1p4q7r0s?label=T-Zero%20Sponsorship) | [🔍 Mempool Explorer](https://mempool.space/address/bc1q9k4hvd6c2g8l9w3z7v8f2k3j5l8n9m1p4q7r0s) |
+| 🟢 **USDT (TRC-20)**<br>*(Tron Network)* | `TE7uKxZJ414u938gWf6bYh9QvRk2141517` | [⚡ **Send via Tron Wallet**](tron:TE7uKxZJ414u938gWf6bYh9QvRk2141517) | [🔍 Tronscan](https://tronscan.org/#/address/TE7uKxZJ414u938gWf6bYh9QvRk2141517) |
+| 💖 **GitHub Sponsors** | Direct GitHub Sponsorship | [💖 **Sponsor on GitHub**](https://github.com/sponsors/toprakahmetaydogmus) | Recurring or one-time |
+| 🌐 **Creator Hub** | Toprak Ahmet Aydoğmuş (Siber Akademi) | [🌐 **hopp.bio/siberegitim**](https://hopp.bio/siberegitim) | Direct developer hub & profiles |
 
 > 💡 *100% of community contributions directly sustain CI/CD matrix runners, PyPI/npm automated releases, benchmark hosting, and guarantee T-Zero remains permanently free, offline, and zero-leak for all developers globally.*
 

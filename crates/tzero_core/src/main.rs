@@ -42,6 +42,7 @@ SUBCOMMANDS:
     cost <raw_tok> <pruned_tok>      Calculates multi-model API costs and team financial ROI
     pagerank <edges_json>            Computes PageRank architectural backbone centrality
     search <query> [dir]             Okapi BM25 hybrid local code search
+    sponsor                          Prints 1-click Web3 and crypto donation deep links
     mcp                              Runs embedded native stdio JSON-RPC 2.0 MCP server
     version                          Prints engine version and build metadata
 "#);
@@ -230,6 +231,36 @@ fn main() {
             index.index_documents(docs);
             let results = index.search(query, 5);
             println!("{}", serde_json::to_string_pretty(&results).unwrap());
+        }
+        "sponsor" | "donate" | "--sponsor" => {
+            println!(r#"
+┌────────────────────────────────────────────────────────────────────────┐
+│  💖 T-ZERO 1-CLICK WEB3 & CRYPTO DONATION HUB                          │
+│  Keeping T-Zero 100% Free, Offline & Zero-Leak Worldwide                │
+└────────────────────────────────────────────────────────────────────────┘
+
+[🔷 Ethereum / EVM] (ETH, ERC-20, Polygon, Arbitrum, BSC, Optimism):
+  Address:       0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5
+  Web3 URI:      ethereum:0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5
+  MetaMask App:  https://metamask.app.link/send/0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5
+  Explorer:      https://etherscan.io/address/0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5
+
+[🟠 Bitcoin] (Native SegWit bech32):
+  Address:       bc1q9k4hvd6c2g8l9w3z7v8f2k3j5l8n9m1p4q7r0s
+  Bitcoin URI:   bitcoin:bc1q9k4hvd6c2g8l9w3z7v8f2k3j5l8n9m1p4q7r0s?label=T-Zero%20Sponsorship
+  Explorer:      https://mempool.space/address/bc1q9k4hvd6c2g8l9w3z7v8f2k3j5l8n9m1p4q7r0s
+
+[🟢 USDT] (TRC-20 Tron Network):
+  Address:       TE7uKxZJ414u938gWf6bYh9QvRk2141517
+  Tron URI:      tron:TE7uKxZJ414u938gWf6bYh9QvRk2141517
+  Explorer:      https://tronscan.org/#/address/TE7uKxZJ414u938gWf6bYh9QvRk2141517
+
+[💖 GitHub Sponsors]:
+  https://github.com/sponsors/toprakahmetaydogmus
+
+[🌐 Interactive Web3 Hub]:
+  https://tzero-indol.vercel.app/#support
+"#);
         }
         _ => {
             print_usage();
