@@ -188,17 +188,18 @@ The targeted input used **97.1% fewer code-only tokens** and **16.5% fewer total
 
 ### Gemini 3.8 Flash Low: diagnosing noisy pytest output
 
-We ran 26 existing T-Zero tests in a temporary copy. The baseline passed, then a deliberately introduced regression made the SQLite path reuse the JSON snapshot filename, causing four tests to fail. We supplied Gemini with the same prompt and three views of the failure, each in three fresh Antigravity CLI sessions. The focused summary was generated from pytest JUnit XML using only failed test names and short stack traces.
+We ran 26 existing T-Zero tests in a temporary copy. The baseline passed, then a deliberately introduced regression made the SQLite path reuse the JSON snapshot filename, causing four tests to fail. We used the same diagnosis prompt in three fresh Antigravity CLI sessions per condition. The focused summary uses failed test names and short stack traces from pytest JUnit XML. In a follow-up, we appended three manually selected T-Zero method definitions to that summary.
 
 | Evidence | Average CLI input tokens | Reduction vs. verbose | Runs finding all four failures | Runs finding the exact root cause |
 | :--- | ---: | ---: | ---: | ---: |
 | Verbose pytest (`-vv --tb=long`) | 34,707 | — | 3/3 | 0/3 |
 | Native short pytest (`-q --tb=short`) | 28,557 | 17.7% | 3/3 | 0/3 |
 | Focused JUnit summary | 27,807 | 19.9% | 3/3 | 0/3 |
+| Focused summary + three source methods | 28,600 | 17.6% | 3/3 | 3/3 |
 
-Every run found the SQLite error. None identified the specific JSON/SQLite filename collision. One verbose run suggested checking for a conflicting database path, and several responses suggested deleting a cache file without establishing the cause. No suggested fix was applied. The focused summary used **2.6% fewer total input tokens than pytest's own short output**. This is one controlled regression, and the XML filtering is part of the benchmark runner. Test logs were the only evidence supplied, so this does not measure an agent's ability to inspect code and repair the problem.
+Every run found the SQLite error. Only runs with the three source methods pinpointed the filename collision and proposed giving SQLite a separate file. The log-only focused summary used **2.6% fewer total CLI input tokens than pytest's short output**. The runner filtered the logs and T-Zero extracted the preselected methods. This experiment measures diagnosis of one seeded regression with supplied evidence. It does not measure automatic source selection or patch success.
 
-[Recorded responses and token counts](docs/benchmark-pytest-logs-2026-11-23.json) · [Runner](scripts/benchmark_pytest_logs_cli.py). To reproduce from the repository root with pytest and a signed-in Antigravity CLI, run `python -m scripts.benchmark_pytest_logs_cli <output-dir>`. The runner disables paid credit fallback.
+[Log-only trials](docs/benchmark-pytest-logs-2026-11-23.json) · [Follow-up trials](docs/benchmark-pytest-logs-with-source-2026-11-23.json) · [Runner](scripts/benchmark_pytest_logs_cli.py). From the repository root with pytest and a signed-in Antigravity CLI, run `python -m scripts.benchmark_pytest_logs_cli <output-dir> --revision 25fed66` for the log-only trials. Append `--focused-with-source-only` for the follow-up. The runner disables paid credit fallback.
 
 ### Whole-repository snapshot: 94.5% fewer context tokens
 

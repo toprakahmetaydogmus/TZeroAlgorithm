@@ -1,4 +1,4 @@
-"""Compare three views of a real pytest failure using Gemini 3.8 Flash Low."""
+"""Compare evidence for a pytest regression using Gemini 3.8 Flash Low."""
 import argparse
 from concurrent.futures import ThreadPoolExecutor
 import json
@@ -10,10 +10,16 @@ import sys
 import tempfile
 import xml.etree.ElementTree as ET
 
+from tzero.tzero_packer import pack_python_symbols
 from tzero.tzero_security import ZeroLeakEngine
 
 MODEL = "gemini-3.8-flash-low"
 SOURCE = Path("tzero/tzero_snapshot.py")
+FOCUS_SYMBOLS = [
+    "SnapshotEngine.get_cache_path",
+    "SnapshotEngine.get_sqlite_path",
+    "SnapshotEngine._save_snapshot",
+]
 SUITE = ["tests/test_snapshot_incremental.py", "tests/test_packer.py",
          "tests/test_task_benchmark.py", "tests/test_benchmark.py"]
 PROMPT = """Diagnose this pytest run using only the supplied output. Do not inspect any files, use tools, or modify anything. State which test or tests failed, the root cause, and the smallest fix. If the log does not support a conclusion, say what is missing. Keep your answer under 90 words.
@@ -77,6 +83,8 @@ def run(cli, condition, evidence, trial, workspace, settings):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("output", type=Path)
+    parser.add_argument("--revision", default="HEAD")
+    parser.add_argument("--focused-with-source-only", action="store_true")
     args = parser.parse_args()
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=True)
@@ -84,7 +92,10 @@ def main():
     if not cli:
         raise RuntimeError("Antigravity CLI not found")
     repo = Path.cwd()
-    revision = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
+    revision = subprocess.check_output(
+        ["git", "rev-parse", "--verify", "--end-of-options", f"{args.revision}^{{commit}}"],
+        text=True,
+    ).strip()
     with tempfile.TemporaryDirectory(prefix="tzero-pytest-ab-") as tmp:
         temp = Path(tmp)
         checkout = temp / "checkout"
@@ -100,8 +111,8 @@ def main():
         expression = "cls.CACHE_DIR, cls.SQLITE_FILENAME)"
         if source.count(expression) != 1:
             raise RuntimeError("Expected one SQLite path reference")
-        target.write_text(source.replace(expression, "cls.CACHE_DIR, cls.SNAPSHOT_FILENAME)"),
-                          encoding="utf-8")
+        source = source.replace(expression, "cls.CACHE_DIR, cls.SNAPSHOT_FILENAME)")
+        target.write_text(source, encoding="utf-8")
         logs = {}
         run_data = {}
         for condition, flags in (("full", ["-vv", "--tb=long"]), ("short", ["-q", "--tb=short"])):
@@ -120,6 +131,16 @@ def main():
                 f"{name}\n{trace or message}" for name, (message, trace) in failures.items()
             ), checkout,
         )
+        conditions = ("full", "short", "focused")
+        report_name = "results.json"
+        if args.focused_with_source_only:
+            context = pack_python_symbols(source, FOCUS_SYMBOLS, min_reduction=0)
+            logs["focused_plus_source"] = clean(
+                f"{logs['focused']}\n\nRELEVANT SOURCE ({SOURCE.as_posix()})\n{context.text}",
+                checkout,
+            )
+            conditions = ("focused_plus_source",)
+            report_name = "focused-plus-source.json"
         for condition, log in logs.items():
             (output / f"{condition}.txt").write_text(log + "\n", encoding="utf-8")
         # Use an empty workspace so the CLI cannot see the test checkout.
@@ -130,8 +151,8 @@ def main():
         results = []
         with ThreadPoolExecutor(max_workers=3) as pool:
             for trial in range(1, 4):
-                conditions = ("full", "short", "focused")
-                order = conditions[trial-1:] + conditions[:trial-1]
+                offset = (trial - 1) % len(conditions)
+                order = conditions[offset:] + conditions[:offset]
                 jobs = [pool.submit(run, cli, condition, logs[condition], trial, session, settings)
                         for condition in order]
                 results.extend(job.result() for job in jobs)
@@ -140,7 +161,9 @@ def main():
                   "test_cases": count, "failing_tests": sorted(failures),
                   "ai_credit_overages": False, "prompt": PROMPT,
                   "log_characters": {key: len(value) for key, value in logs.items()}, "trials": results}
-        (output / "results.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+        if args.focused_with_source_only:
+            report["symbols_selected_in_advance"] = FOCUS_SYMBOLS
+        (output / report_name).write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
         print(json.dumps(report, indent=2))
 
 

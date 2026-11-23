@@ -1,0 +1,52 @@
+{
+  "model": "gemini-3.8-flash-low",
+  "source_commit": "25fed66b07ba32b4edab18af1e7446ca81a7e2f5",
+  "prompt": "Diagnose this pytest run using only the supplied output. Do not inspect any files, use tools, or modify anything. State which test or tests failed, the root cause, and the smallest fix. If the log does not support a conclusion, say what is missing. Keep your answer under 90 words.\n\nPYTEST OUTPUT\n",
+  "symbols_selected_in_advance": [
+    "SnapshotEngine.get_cache_path",
+    "SnapshotEngine.get_sqlite_path",
+    "SnapshotEngine._save_snapshot"
+  ],
+  "ai_credit_overages": false,
+  "trials": [
+    {
+      "condition": "focused_plus_source",
+      "trial": 1,
+      "answer": "**Failed tests:** \n`test_incremental_update_reuses_untouched_files_and_deletes_stale`, `test_is_valid_detects_change_beyond_first_15_files`, `test_multilanguage_snapshot_and_sqlite_store`, and `test_watch_mode_incremental_snapshot_once`.\n\n**Root cause:**\n`get_sqlite_path` uses `cls.SNAPSHOT_FILENAME` (the JSON cache filename) instead of a database filename (e.g. `cls.SQLITE_FILENAME`). `_save_snapshot` first writes JSON text into that file, then tries to open it with SQLite, raising `sqlite3.DatabaseError: file is not a database`.\n\n**Smallest fix:**\nIn `get_sqlite_path`, replace `cls.SNAPSHOT_FILENAME` with the dedicated SQLite database filename (or `.sqlite`/`.db` extension).",
+      "usage": {
+        "input_tokens": 28918,
+        "output_tokens": 198,
+        "thinking_tokens": 0,
+        "cache_read_tokens": 0,
+        "total_tokens": 29116
+      },
+      "seconds": 8.2672764
+    },
+    {
+      "condition": "focused_plus_source",
+      "trial": 2,
+      "answer": "**Failed tests:**\n- `test_incremental_update_reuses_untouched_files_and_deletes_stale`\n- `test_is_valid_detects_change_beyond_first_15_files`\n- `test_multilanguage_snapshot_and_sqlite_store`\n- `test_watch_mode_incremental_snapshot_once`\n\n**Root cause:**\n`get_sqlite_path` returns `cls.SNAPSHOT_FILENAME` (the JSON cache file name). When `_save_snapshot` writes the JSON file first and then calls `sqlite3.connect(db_path)` on that same file, SQLite fails with `DatabaseError: file is not a database`.\n\n**Smallest fix:**\nIn `get_sqlite_path`, use the dedicated SQLite filename (e.g. `cls.SQLITE_FILENAME` or a `.db` extension) instead of `cls.SNAPSHOT_FILENAME`.",
+      "usage": {
+        "input_tokens": 28441,
+        "output_tokens": 203,
+        "thinking_tokens": 0,
+        "cache_read_tokens": 0,
+        "total_tokens": 28644
+      },
+      "seconds": 7.7640466
+    },
+    {
+      "condition": "focused_plus_source",
+      "trial": 3,
+      "answer": "**Failed tests:** \n`test_incremental_update_reuses_untouched_files_and_deletes_stale`, `test_is_valid_detects_change_beyond_first_15_files`, `test_multilanguage_snapshot_and_sqlite_store`, `test_watch_mode_incremental_snapshot_once`.\n\n**Root cause:** \n`get_sqlite_path` returns the exact same file path as `get_cache_path` (`cls.SNAPSHOT_FILENAME`). `_save_snapshot` writes JSON text into that file, then attempts to open and execute SQLite commands on it, causing `sqlite3.DatabaseError: file is not a database`.\n\n**Smallest fix:** \nIn `get_sqlite_path`, point to a dedicated database file (e.g., return `cls.SQLITE_FILENAME` or append `.db`) instead of `cls.SNAPSHOT_FILENAME`.",
+      "usage": {
+        "input_tokens": 28442,
+        "output_tokens": 200,
+        "thinking_tokens": 0,
+        "cache_read_tokens": 0,
+        "total_tokens": 28642
+      },
+      "seconds": 8.8192187
+    }
+  ]
+}
