@@ -104,13 +104,13 @@ code --install-extension dist/tzero-vscode-12.1.4.vsix
 [![Türkçe Dokümantasyon](https://img.shields.io/badge/T%C3%BCrk%C3%A7e-Rehber-dc2626?style=for-the-badge&logo=googletranslate&logoColor=white)](docs/README.tr.md)
 
 <p align="center">
-  <b><a href="#tdqs-certification">Tool Quality (TDQS)</a></b> &bull;
   <b><a href="#why-t-zero">Why T-Zero</a></b> &bull; 
-  <b><a href="#task-completion-benchmark">Task Benchmark</a></b> &bull; 
   <b><a href="#universal-1-click-ide-setup">Universal IDE Setup</a></b> &bull; 
   <b><a href="#the-21-canonical-mcp-tools">21 MCP Tools</a></b> &bull; 
-  <b><a href="#pre-flight-reality-lock">Reality-Lock</a></b> &bull; 
   <b><a href="#language-support-breakdown">Language Support</a></b> &bull; 
+  <b><a href="#task-completion-benchmark">Benchmarks</a></b> &bull; 
+  <b><a href="#tdqs-certification">Tool Quality (TDQS)</a></b> &bull;
+  <b><a href="#pre-flight-reality-lock">Reality-Lock</a></b> &bull; 
   <b><a href="#huggingface-space">Hugging Face Space</a></b> &bull; 
   <b><a href="docs/README.tr.md">Türkçe Rehber</a></b>
 </p>
@@ -140,106 +140,6 @@ T-Zero reduces code passed as context by keeping the target file intact and summ
 | **Zero-Leak Security** | Plaintext risk | Cloud embedding risk | Can dump `.env` files | None | **Shannon-Entropy Key Scrubber ($H \ge 4.75$, 100% Local)** |
 | **Architecture Boundaries** | None | None | None | None | **tzero.rules.json CI/CD Gate Enforcement** |
 | **Inference & Tool Cost** | $3.00 – $15.00+ / turn | Cloud Vector DB fees | $3.00 – $15.00+ / turn | API model fees | **$0.00 (100% Free & Open-Source, Local CPU)** |
-
----
-
-<a id="task-completion-benchmark"></a>
-## Current-model comparison: raw vs. pruned Python context
-
-On 2026-11-23, we ran six paired code-comprehension questions against NVIDIA Nemotron 3.5 Lightning (30B-A3B). Each question used the same model, settings, and wording with either the full Python dependency or its T-Zero AST skeleton. Input counts are the prompt tokens reported by NVIDIA NIM and include both code and question text.
-
-| Measure | Full dependency | AST skeleton |
-| :--- | ---: | ---: |
-| Input tokens across six prompts | 2,345 | 1,772 |
-| Interface questions correct | 3/3 | 3/3 |
-| Implementation-detail questions correct | 3/3 | 0/3 |
-
-**Result:** 24.4% fewer input tokens in this run. The model matched the full-code baseline on this small set of interface questions and answered all three implementation-detail questions incorrectly when the relevant bodies were omitted. Keep full source available when the task depends on behavior inside a function.
-
-These questions use two synthetic Python fixtures and one model. They do not measure end-to-end coding success, latency improvements, or how much context a modern agent would select on its own. A comparison against a current agent's native retrieval is still needed.
-
-[Benchmark script](scripts/benchmark_context_ab.py) · [Recorded responses and token counts](docs/benchmark-context-ab-2026-11-23.json) · [Model](https://build.nvidia.com/nvidia/nemotron-3.5-lightning-30b-a3b/build)
-
-With the project installed and an NVIDIA Developer API key set in the environment, rerun against the NVIDIA-hosted prototype endpoint:
-
-```bash
-python -m scripts.benchmark_context_ab
-```
-
-### Follow-up: retrieve the full function when behavior matters
-
-We reran the same three implementation questions against the same model, using T-Zero's Python symbol packer to provide only the relevant full function. All three answers were correct, matching the full-dependency baseline. The targeted prompts used **455 input tokens** in total versus **1,110** for full dependencies (**59.0% fewer**). The relevant symbols were selected ahead of time. This measures the value of supplying the right function body, while automatic retrieval remains untested.
-
-[Recorded targeted results](docs/benchmark-context-targeted-2026-11-23.json) · Rerun with `python -m scripts.benchmark_context_ab --targeted-only`.
-
-### Gemini 3.8 Flash Low: targeted extraction on a real source file
-
-We ran the same three code-comprehension questions in both conditions with Antigravity CLI. Each condition was repeated three times in a fresh session. The baseline supplied the entire [snapshot engine source file](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/blob/7770f95c4831ee5e2abf59f598abbfdd4ab790fb/tzero/tzero_snapshot.py). The targeted condition used T-Zero to supply two preselected, complete Python methods.
-
-| Measure | Full file | Targeted methods |
-| :--- | ---: | ---: |
-| Correct answers over three runs | 9/9 | 9/9 |
-| Code-only tokens (`o200k_base`) | 4,361 | 127 |
-| Average CLI input tokens (Gemini-reported) | 32,686 | 27,299 |
-
-The targeted input used **97.1% fewer code-only tokens** and **16.5% fewer total CLI input tokens**. The CLI includes its own agent context in the total. This comparison covers one file and three questions, with symbols selected in advance. It does not evaluate automatic symbol selection or end-to-end coding performance.
-
-[Recorded trials](docs/benchmark-gemini-38-flash-low-2026-11-23.json) · [Runner](scripts/benchmark_gemini_flash_cli.py) · Run from the repo root with `python -m scripts.benchmark_gemini_flash_cli` and a signed-in Antigravity CLI. The runner disables paid credit fallback for the session.
-
-### Gemini 3.8 Flash Low: diagnosing noisy pytest output
-
-This is the **human-assisted** track. The runner supplied the log view, and in the follow-up we selected the source methods in advance.
-
-We ran 26 existing T-Zero tests in a temporary copy. The baseline passed, then a deliberately introduced regression made the SQLite path reuse the JSON snapshot filename, causing four tests to fail. We used the same diagnosis prompt in three fresh Antigravity CLI sessions per condition. The focused summary uses failed test names and short stack traces from pytest JUnit XML. In a follow-up, we appended three manually selected T-Zero method definitions to that summary.
-
-| Evidence | Average CLI input tokens | Reduction vs. verbose | Runs finding all four failures | Runs finding the exact root cause |
-| :--- | ---: | ---: | ---: | ---: |
-| Verbose pytest (`-vv --tb=long`) | 34,707 | — | 3/3 | 0/3 |
-| Native short pytest (`-q --tb=short`) | 28,557 | 17.7% | 3/3 | 0/3 |
-| Focused JUnit summary | 27,807 | 19.9% | 3/3 | 0/3 |
-| Focused summary + three source methods | 28,600 | 17.6% | 3/3 | 3/3 |
-
-Every run found the SQLite error. Only runs with the three source methods pinpointed the filename collision and proposed giving SQLite a separate file. The log-only focused summary used **2.6% fewer total CLI input tokens than pytest's short output**. The runner filtered the logs and T-Zero extracted the preselected methods. This experiment measures diagnosis of one seeded regression with supplied evidence. It does not measure automatic source selection or patch success.
-
-[Log-only trials](docs/benchmark-pytest-logs-2026-11-23.json) · [Follow-up trials](docs/benchmark-pytest-logs-with-source-2026-11-23.json) · [Runner](scripts/benchmark_pytest_logs_cli.py). From the repository root with pytest and a signed-in Antigravity CLI, run `python -m scripts.benchmark_pytest_logs_cli <output-dir> --revision 25fed66` for the log-only trials. Append `--focused-with-source-only` for the follow-up. The runner disables paid credit fallback.
-
-### Gemini 3.8 Flash Low: autonomous pytest diagnosis
-
-This is the **autonomous** track. The agent received only the regression description, the workspace, and `pytest.log`, and chose its own evidence using local tools.
-
-In three alternating pairs (six runs total), Antigravity CLI ran in a fresh temporary workspace containing the seeded SQLite filename collision. We compared a baseline with built-in tools (`read_file`) against an enabled condition offering local T-Zero MCP tools (`search_codebase`, `build_project_context`). Sessions stayed within the workspace without internet access, environment inspection, file modification, or paid credits.
-
-| Condition | Runs finding root cause | Average CLI input tokens | Average total tokens | Average duration | Preferred inspection tool |
-| :--- | ---: | ---: | ---: | ---: | :--- |
-| Baseline (built-in tools only) | 3/3 | 49,539 | 51,017 | 26.5s | `read_file` (100%) |
-| T-Zero available (built-in + MCP) | 3/3 | 48,864 | 50,303 | 26.6s | `read_file` (100%) |
-
-Every run located the exact root cause in `SnapshotEngine.get_sqlite_path` and formulated the correct one-line fix. When given an open choice, the agent in all three enabled runs chose built-in `read_file` exclusively to inspect `pytest.log` and the source file, never calling `search_codebase` or `build_project_context`. The minor token difference (1.4%) reflects variance in the line ranges selected with `read_file`, not T-Zero AST pruning. When unguided on a log triage task, the model prefers native file reads over external MCP search tools.
-
-[Recorded trials](docs/benchmark-autonomous-pytest-2026-11-24.json) · [Runner](scripts/benchmark_autonomous_pytest_cli.py). Run from the repository root with `python -m scripts.benchmark_autonomous_pytest_cli <output-dir>`. The runner automatically disables installed plugins during baseline runs to avoid tool leaks and disables paid credit fallback.
-
-### Whole-repository snapshot: 94.5% fewer context tokens
-
-The [November 14 local benchmark report](docs/REAL_PC_BENCHMARK_REPORT.md) records a single scan of 352 files using `cl100k_base`. The full repository counted **1,790,208 tokens** and its Tier-2 AST context counted **98,461 tokens**, a **94.5% reduction** (about 95%). This compares two representations of the entire repository. Actual requests typically use a subset of files, and coding assistants may already select context, so this number does not predict per-request savings, cost savings, or task accuracy.
-
-### Offline token and syntax checks
-
-`tzero task-benchmark` scores three built-in Python fixtures using prewritten implementations by default. A local run with `cl100k_base` counted **1,156 → 897** tokens across the fixtures. The fixture checks inspect syntax and method names. They do not run coding tasks or model inference in the default mode.
-
----
-
-<a id="language-support-breakdown"></a>
-## Language Support Breakdown: AST vs. Heuristic Extraction
-
-We believe in radical engineering transparency:
-
-| Language | Analysis Technique | What is Preserved | What is Pruned |
-| :--- | :---: | :--- | :--- |
-| **Python** | **100% Native AST (`ast` module)** | Classes, methods, parameter types, return hints, decorators, docstrings, imports | Function bodies (`def foo(): ...`) |
-| **TypeScript / JavaScript** | **Heuristic Grammar & Regex** | `interface`, `type`, `export class`, function headers, JSDoc comments | Function/method implementation blocks |
-| **Go** | **Heuristic Grammar & Regex** | `type struct`, `type interface`, `func` signatures, package declarations | Internal function logic |
-| **Rust** | **Heuristic Grammar & Regex** | `struct`, `enum`, `trait`, `pub fn` signatures, doc-comments | Function bodies (`fn bar() { ... }`) |
-| **SQL / Prisma / GraphQL** | **Declarative Schema Reducer** | Table columns, primary/foreign keys, types, mutations, query contracts | Inline seed data, boilerplate migrations |
 
 ---
 
@@ -339,6 +239,108 @@ All 21 canonical tools (and 58 runtime tools) are audited and verified against t
 | `diagnose_and_heal_system` | Doctor | Self-healing operating system doctor fixing environment, zombie processes, and ASTs. |
 | `generate_architectural_passport` | Architecture | Synthesizes high-density AST structural passport for files and modules. |
 | `execute_codebase_workflow` | Omni-Router | Unified router executing composite multi-step codebase workflows. |
+
+---
+
+<a id="language-support-breakdown"></a>
+## Language Support Breakdown: AST vs. Heuristic Extraction
+
+We believe in radical engineering transparency:
+
+| Language | Analysis Technique | What is Preserved | What is Pruned |
+| :--- | :---: | :--- | :--- |
+| **Python** | **100% Native AST (`ast` module)** | Classes, methods, parameter types, return hints, decorators, docstrings, imports | Function bodies (`def foo(): ...`) |
+| **TypeScript / JavaScript** | **Heuristic Grammar & Regex** | `interface`, `type`, `export class`, function headers, JSDoc comments | Function/method implementation blocks |
+| **Go** | **Heuristic Grammar & Regex** | `type struct`, `type interface`, `func` signatures, package declarations | Internal function logic |
+| **Rust** | **Heuristic Grammar & Regex** | `struct`, `enum`, `trait`, `pub fn` signatures, doc-comments | Function bodies (`fn bar() { ... }`) |
+| **SQL / Prisma / GraphQL** | **Declarative Schema Reducer** | Table columns, primary/foreign keys, types, mutations, query contracts | Inline seed data, boilerplate migrations |
+
+---
+
+<a id="task-completion-benchmark"></a>
+## Empirical Benchmarks & Token Reduction Reports
+
+### Whole-repository snapshot: 94.5% fewer context tokens
+
+The [November 14 local benchmark report](docs/REAL_PC_BENCHMARK_REPORT.md) records a single scan of 352 files using `cl100k_base`. The full repository counted **1,790,208 tokens** and its Tier-2 AST context counted **98,461 tokens**, a **94.5% reduction** (about 95%). This compares two representations of the entire repository. Actual requests typically use a subset of files, and coding assistants may already select context, so this number does not predict per-request savings, cost savings, or task accuracy.
+
+### Gemini 3.8 Flash Low: targeted extraction on a real source file
+
+We ran the same three code-comprehension questions in both conditions with Antigravity CLI. Each condition was repeated three times in a fresh session. The baseline supplied the entire [snapshot engine source file](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/blob/7770f95c4831ee5e2abf59f598abbfdd4ab790fb/tzero/tzero_snapshot.py). The targeted condition used T-Zero to supply two preselected, complete Python methods.
+
+| Measure | Full file | Targeted methods |
+| :--- | ---: | ---: |
+| Correct answers over three runs | 9/9 | 9/9 |
+| Code-only tokens (`o200k_base`) | 4,361 | 127 |
+| Average CLI input tokens (Gemini-reported) | 32,686 | 27,299 |
+
+The targeted input used **97.1% fewer code-only tokens** and **16.5% fewer total CLI input tokens**. The CLI includes its own agent context in the total. This comparison covers one file and three questions, with symbols selected in advance. It does not evaluate automatic symbol selection or end-to-end coding performance.
+
+[Recorded trials](docs/benchmark-gemini-38-flash-low-2026-11-23.json) · [Runner](scripts/benchmark_gemini_flash_cli.py) · Run from the repo root with `python -m scripts.benchmark_gemini_flash_cli` and a signed-in Antigravity CLI. The runner disables paid credit fallback for the session.
+
+### Gemini 3.8 Flash Low: diagnosing noisy pytest output
+
+This is the **human-assisted** track. The runner supplied the log view, and in the follow-up we selected the source methods in advance.
+
+We ran 26 existing T-Zero tests in a temporary copy. The baseline passed, then a deliberately introduced regression made the SQLite path reuse the JSON snapshot filename, causing four tests to fail. We used the same diagnosis prompt in three fresh Antigravity CLI sessions per condition. The focused summary uses failed test names and short stack traces from pytest JUnit XML. In a follow-up, we appended three manually selected T-Zero method definitions to that summary.
+
+| Evidence | Average CLI input tokens | Reduction vs. verbose | Runs finding all four failures | Runs finding the exact root cause |
+| :--- | ---: | ---: | ---: | ---: |
+| Verbose pytest (`-vv --tb=long`) | 34,707 | — | 3/3 | 0/3 |
+| Native short pytest (`-q --tb=short`) | 28,557 | 17.7% | 3/3 | 0/3 |
+| Focused JUnit summary | 27,807 | 19.9% | 3/3 | 0/3 |
+| Focused summary + three source methods | 28,600 | 17.6% | 3/3 | 3/3 |
+
+Every run found the SQLite error. Only runs with the three source methods pinpointed the filename collision and proposed giving SQLite a separate file. The log-only focused summary used **2.6% fewer total CLI input tokens than pytest's short output**. The runner filtered the logs and T-Zero extracted the preselected methods. This experiment measures diagnosis of one seeded regression with supplied evidence. It does not measure automatic source selection or patch success.
+
+[Log-only trials](docs/benchmark-pytest-logs-2026-11-23.json) · [Follow-up trials](docs/benchmark-pytest-logs-with-source-2026-11-23.json) · [Runner](scripts/benchmark_pytest_logs_cli.py). From the repository root with pytest and a signed-in Antigravity CLI, run `python -m scripts.benchmark_pytest_logs_cli <output-dir> --revision 25fed66` for the log-only trials. Append `--focused-with-source-only` for the follow-up. The runner disables paid credit fallback.
+
+### Gemini 3.8 Flash Low: autonomous pytest diagnosis
+
+This is the **autonomous** track. The agent received only the regression description, the workspace, and `pytest.log`, and chose its own evidence using local tools.
+
+In three alternating pairs (six runs total), Antigravity CLI ran in a fresh temporary workspace containing the seeded SQLite filename collision. We compared a baseline with built-in tools (`read_file`) against an enabled condition offering local T-Zero MCP tools (`search_codebase`, `build_project_context`). Sessions stayed within the workspace without internet access, environment inspection, file modification, or paid credits.
+
+| Condition | Runs finding root cause | Average CLI input tokens | Average total tokens | Average duration | Preferred inspection tool |
+| :--- | ---: | ---: | ---: | ---: | :--- |
+| Baseline (built-in tools only) | 3/3 | 49,539 | 51,017 | 26.5s | `read_file` (100%) |
+| T-Zero available (built-in + MCP) | 3/3 | 48,864 | 50,303 | 26.6s | `read_file` (100%) |
+
+Every run located the exact root cause in `SnapshotEngine.get_sqlite_path` and formulated the correct one-line fix. When given an open choice, the agent in all three enabled runs chose built-in `read_file` exclusively to inspect `pytest.log` and the source file, never calling `search_codebase` or `build_project_context`. The minor token difference (1.4%) reflects variance in the line ranges selected with `read_file`, not T-Zero AST pruning. When unguided on a log triage task, the model prefers native file reads over external MCP search tools.
+
+[Recorded trials](docs/benchmark-autonomous-pytest-2026-11-24.json) · [Runner](scripts/benchmark_autonomous_pytest_cli.py). Run from the repository root with `python -m scripts.benchmark_autonomous_pytest_cli <output-dir>`. The runner automatically disables installed plugins during baseline runs to avoid tool leaks and disables paid credit fallback.
+
+### Current-model comparison: raw vs. pruned Python context
+
+On 2026-11-23, we ran six paired code-comprehension questions against NVIDIA Nemotron 3.5 Lightning (30B-A3B). Each question used the same model, settings, and wording with either the full Python dependency or its T-Zero AST skeleton. Input counts are the prompt tokens reported by NVIDIA NIM and include both code and question text.
+
+| Measure | Full dependency | AST skeleton |
+| :--- | ---: | ---: |
+| Input tokens across six prompts | 2,345 | 1,772 |
+| Interface questions correct | 3/3 | 3/3 |
+| Implementation-detail questions correct | 3/3 | 0/3 |
+
+**Result:** 24.4% fewer input tokens in this run. The model matched the full-code baseline on this small set of interface questions and answered all three implementation-detail questions incorrectly when the relevant bodies were omitted. Keep full source available when the task depends on behavior inside a function.
+
+These questions use two synthetic Python fixtures and one model. They do not measure end-to-end coding success, latency improvements, or how much context a modern agent would select on its own. A comparison against a current agent's native retrieval is still needed.
+
+[Benchmark script](scripts/benchmark_context_ab.py) · [Recorded responses and token counts](docs/benchmark-context-ab-2026-11-23.json) · [Model](https://build.nvidia.com/nvidia/nemotron-3.5-lightning-30b-a3b/build)
+
+With the project installed and an NVIDIA Developer API key set in the environment, rerun against the NVIDIA-hosted prototype endpoint:
+
+```bash
+python -m scripts.benchmark_context_ab
+```
+
+### Follow-up: retrieve the full function when behavior matters
+
+We reran the same three implementation questions against the same model, using T-Zero's Python symbol packer to provide only the relevant full function. All three answers were correct, matching the full-dependency baseline. The targeted prompts used **455 input tokens** in total versus **1,110** for full dependencies (**59.0% fewer**). The relevant symbols were selected ahead of time. This measures the value of supplying the right function body, while automatic retrieval remains untested.
+
+[Recorded targeted results](docs/benchmark-context-targeted-2026-11-23.json) · Rerun with `python -m scripts.benchmark_context_ab --targeted-only`.
+
+### Offline token and syntax checks
+
+`tzero task-benchmark` scores three built-in Python fixtures using prewritten implementations by default. A local run with `cl100k_base` counted **1,156 → 897** tokens across the fixtures. The fixture checks inspect syntax and method names. They do not run coding tasks or model inference in the default mode.
 
 ---
 
