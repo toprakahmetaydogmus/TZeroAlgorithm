@@ -1,4 +1,5 @@
 """Compare raw and T-Zero-pruned Python dependencies on code questions via NVIDIA NIM."""
+import argparse
 import concurrent.futures
 import json
 import os
@@ -7,6 +8,7 @@ import time
 import urllib.error
 import urllib.request
 
+from tzero.tzero_packer import pack_python_symbols
 from tzero.tzero_task_benchmark import TaskCompletionBenchmark
 
 MODEL = "nvidia/nemotron-3.5-lightning-30b-a3b"
@@ -22,12 +24,23 @@ CASES = [
 ]
 
 
+# Supply the relevant symbol for each follow-up. This isolates retrieval
+# quality from the separate question of whether an agent selects it unaided.
+FOCUS_SYMBOLS = {
+    "quota-default": "RedisSessionStore.get_token_quota",
+    "graph-score": "CallGraphDAG.compute_blast_radius_score",
+    "graph-result": "CallGraphDAG.get_downstream_dependents",
+}
+
+
 def evaluate(case, condition):
     name, fixture_index, category, question, expected = case
     fixture = TaskCompletionBenchmark.TASKS[fixture_index]
     code = fixture["dependency_code"]
     if condition == "pruned":
         code = TaskCompletionBenchmark.prune_to_ast_skeleton(code)
+    elif condition == "targeted":
+        code = pack_python_symbols(code, [FOCUS_SYMBOLS[name]], min_reduction=0).text
 
     prompt = (
         "Answer using only the provided Python code. Return only A, B, C, or D. "
@@ -70,6 +83,13 @@ def evaluate(case, condition):
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--targeted-only", action="store_true")
+    args = parser.parse_args()
+    if args.targeted_only:
+        results = [evaluate(case, "targeted") for case in CASES if case[0] in FOCUS_SYMBOLS]
+        print(json.dumps({"model": MODEL, "temperature": 0, "seed": 0, "results": results}, indent=2))
+        return
     first = evaluate(CASES[0], "raw")
     jobs = [(case, condition) for case in CASES for condition in ("raw", "pruned")]
     with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:

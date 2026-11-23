@@ -1,0 +1,43 @@
+{
+  "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+  "temperature": 0,
+  "seed": 0,
+  "results": [
+    {
+      "case": "quota-default",
+      "category": "implementation",
+      "condition": "targeted",
+      "answer": "A",
+      "response": "A",
+      "expected": "A",
+      "matches_reference": true,
+      "prompt_tokens": 168,
+      "finish_reason": "stop",
+      "elapsed_seconds": 0.56
+    },
+    {
+      "case": "graph-score",
+      "category": "implementation",
+      "condition": "targeted",
+      "answer": "B",
+      "response": "B) 37.0",
+      "expected": "B",
+      "matches_reference": true,
+      "prompt_tokens": 151,
+      "finish_reason": "stop",
+      "elapsed_seconds": 0.394
+    },
+    {
+      "case": "graph-result",
+      "category": "implementation",
+      "condition": "targeted",
+      "answer": "C",
+      "response": "C) APP.WORKERS.INDEXER",
+      "expected": "C",
+      "matches_reference": true,
+      "prompt_tokens": 136,
+      "finish_reason": "stop",
+      "elapsed_seconds": 0.713
+    }
+  ]
+}

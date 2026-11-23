@@ -166,6 +166,12 @@ With the project installed and an NVIDIA Developer API key set in the environmen
 python -m scripts.benchmark_context_ab
 ```
 
+### Follow-up: retrieve the full function when behavior matters
+
+We reran the same three implementation questions against the same model, using T-Zero's Python symbol packer to provide only the relevant full function. All three answers were correct, matching the full-dependency baseline. The targeted prompts used **455 input tokens** in total versus **1,110** for full dependencies (**59.0% fewer**). The relevant symbols were selected ahead of time. This measures the value of supplying the right function body, while automatic retrieval remains untested.
+
+[Recorded targeted results](docs/benchmark-context-targeted-2026-11-23.json) · Rerun with `python -m scripts.benchmark_context_ab --targeted-only`.
+
 ### Whole-repository snapshot: 94.5% fewer context tokens
 
 The [November 14 local benchmark report](docs/REAL_PC_BENCHMARK_REPORT.md) records a single scan of 352 files using `cl100k_base`. The full repository counted **1,790,208 tokens** and its Tier-2 AST context counted **98,461 tokens**, a **94.5% reduction** (about 95%). This compares two representations of the entire repository. Actual requests typically use a subset of files, and coding assistants may already select context, so this number does not predict per-request savings, cost savings, or task accuracy.
