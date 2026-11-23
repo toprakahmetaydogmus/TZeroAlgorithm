@@ -188,6 +188,8 @@ The targeted input used **97.1% fewer code-only tokens** and **16.5% fewer total
 
 ### Gemini 3.8 Flash Low: diagnosing noisy pytest output
 
+This is the **human-assisted** track. The runner supplied the log view, and in the follow-up we selected the source methods in advance.
+
 We ran 26 existing T-Zero tests in a temporary copy. The baseline passed, then a deliberately introduced regression made the SQLite path reuse the JSON snapshot filename, causing four tests to fail. We used the same diagnosis prompt in three fresh Antigravity CLI sessions per condition. The focused summary uses failed test names and short stack traces from pytest JUnit XML. In a follow-up, we appended three manually selected T-Zero method definitions to that summary.
 
 | Evidence | Average CLI input tokens | Reduction vs. verbose | Runs finding all four failures | Runs finding the exact root cause |
@@ -200,6 +202,21 @@ We ran 26 existing T-Zero tests in a temporary copy. The baseline passed, then a
 Every run found the SQLite error. Only runs with the three source methods pinpointed the filename collision and proposed giving SQLite a separate file. The log-only focused summary used **2.6% fewer total CLI input tokens than pytest's short output**. The runner filtered the logs and T-Zero extracted the preselected methods. This experiment measures diagnosis of one seeded regression with supplied evidence. It does not measure automatic source selection or patch success.
 
 [Log-only trials](docs/benchmark-pytest-logs-2026-11-23.json) · [Follow-up trials](docs/benchmark-pytest-logs-with-source-2026-11-23.json) · [Runner](scripts/benchmark_pytest_logs_cli.py). From the repository root with pytest and a signed-in Antigravity CLI, run `python -m scripts.benchmark_pytest_logs_cli <output-dir> --revision 25fed66` for the log-only trials. Append `--focused-with-source-only` for the follow-up. The runner disables paid credit fallback.
+
+### Gemini 3.8 Flash Low: autonomous pytest diagnosis
+
+This is the **autonomous** track. The agent received only the regression description, the workspace, and `pytest.log`, and chose its own evidence using local tools.
+
+In three alternating pairs (six runs total), Antigravity CLI ran in a fresh temporary workspace containing the seeded SQLite filename collision. We compared a baseline with built-in tools (`read_file`) against an enabled condition offering local T-Zero MCP tools (`search_codebase`, `build_project_context`). Sessions stayed within the workspace without internet access, environment inspection, file modification, or paid credits.
+
+| Condition | Runs finding root cause | Average CLI input tokens | Average total tokens | Average duration | Preferred inspection tool |
+| :--- | ---: | ---: | ---: | ---: | :--- |
+| Baseline (built-in tools only) | 3/3 | 49,539 | 51,017 | 26.5s | `read_file` (100%) |
+| T-Zero available (built-in + MCP) | 3/3 | 48,864 | 50,303 | 26.6s | `read_file` (100%) |
+
+Every run located the exact root cause in `SnapshotEngine.get_sqlite_path` and formulated the correct one-line fix. When given an open choice, the agent in all three enabled runs chose built-in `read_file` exclusively to inspect `pytest.log` and the source file, never calling `search_codebase` or `build_project_context`. The minor token difference (1.4%) reflects variance in the line ranges selected with `read_file`, not T-Zero AST pruning. When unguided on a log triage task, the model prefers native file reads over external MCP search tools.
+
+[Recorded trials](docs/benchmark-autonomous-pytest-2026-11-24.json) · [Runner](scripts/benchmark_autonomous_pytest_cli.py). Run from the repository root with `python -m scripts.benchmark_autonomous_pytest_cli <output-dir>`. The runner automatically disables installed plugins during baseline runs to avoid tool leaks and disables paid credit fallback.
 
 ### Whole-repository snapshot: 94.5% fewer context tokens
 
