@@ -1,0 +1,151 @@
+{
+  "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+  "temperature": 0,
+  "seed": 0,
+  "results": [
+    {
+      "case": "quota-api",
+      "category": "interface",
+      "condition": "raw",
+      "answer": "C",
+      "response": "C) DECREMENT_QUOTA",
+      "expected": "C",
+      "matches_reference": true,
+      "prompt_tokens": 467,
+      "finish_reason": "stop",
+      "elapsed_seconds": 0.618
+    },
+    {
+      "case": "quota-api",
+      "category": "interface",
+      "condition": "pruned",
+      "answer": "C",
+      "response": "C) DECREMENT_QUOTA",
+      "expected": "C",
+      "matches_reference": true,
+      "prompt_tokens": 333,
+      "finish_reason": "stop",
+      "elapsed_seconds": 0.428
+    },
+    {
+      "case": "audit-api",
+      "category": "interface",
+      "condition": "raw",
+      "answer": "B",
+      "response": "SEVERITY",
+      "expected": "B",
+      "matches_reference": true,
+      "prompt_tokens": 457,
+      "finish_reason": "stop",
+      "elapsed_seconds": 0.411
+    },
+    {
+      "case": "audit-api",
+      "category": "interface",
+      "condition": "pruned",
+      "answer": "B",
+      "response": "B) SEVERITY",
+      "expected": "B",
+      "matches_reference": true,
+      "prompt_tokens": 323,
+      "finish_reason": "stop",
+      "elapsed_seconds": 0.402
+    },
+    {
+      "case": "quota-default",
+      "category": "implementation",
+      "condition": "raw",
+      "answer": "A",
+      "response": "A) 1000",
+      "expected": "A",
+      "matches_reference": true,
+      "prompt_tokens": 474,
+      "finish_reason": "stop",
+      "elapsed_seconds": 0.419
+    },
+    {
+      "case": "quota-default",
+      "category": "implementation",
+      "condition": "pruned",
+      "answer": "B",
+      "response": "B) 100",
+      "expected": "A",
+      "matches_reference": false,
+      "prompt_tokens": 340,
+      "finish_reason": "stop",
+      "elapsed_seconds": 0.367
+    },
+    {
+      "case": "graph-api",
+      "category": "interface",
+      "condition": "raw",
+      "answer": "D",
+      "response": "D",
+      "expected": "D",
+      "matches_reference": true,
+      "prompt_tokens": 311,
+      "finish_reason": "stop",
+      "elapsed_seconds": 0.354
+    },
+    {
+      "case": "graph-api",
+      "category": "interface",
+      "condition": "pruned",
+      "answer": "D",
+      "response": "D",
+      "expected": "D",
+      "matches_reference": true,
+      "prompt_tokens": 254,
+      "finish_reason": "stop",
+      "elapsed_seconds": 0.37
+    },
+    {
+      "case": "graph-score",
+      "category": "implementation",
+      "condition": "raw",
+      "answer": "B",
+      "response": "B) 37.0",
+      "expected": "B",
+      "matches_reference": true,
+      "prompt_tokens": 320,
+      "finish_reason": "stop",
+      "elapsed_seconds": 0.388
+    },
+    {
+      "case": "graph-score",
+      "category": "implementation",
+      "condition": "pruned",
+      "answer": "C",
+      "response": "C) 40.0",
+      "expected": "B",
+      "matches_reference": false,
+      "prompt_tokens": 263,
+      "finish_reason": "stop",
+      "elapsed_seconds": 0.371
+    },
+    {
+      "case": "graph-result",
+      "category": "implementation",
+      "condition": "raw",
+      "answer": "C",
+      "response": "C) APP.WORKERS.INDEXER",
+      "expected": "C",
+      "matches_reference": true,
+      "prompt_tokens": 316,
+      "finish_reason": "stop",
+      "elapsed_seconds": 0.407
+    },
+    {
+      "case": "graph-result",
+      "category": "implementation",
+      "condition": "pruned",
+      "answer": "B",
+      "response": "APP.WORKER.INDEX",
+      "expected": "C",
+      "matches_reference": false,
+      "prompt_tokens": 259,
+      "finish_reason": "stop",
+      "elapsed_seconds": 0.376
+    }
+  ]
+}

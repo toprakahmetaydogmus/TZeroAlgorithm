@@ -4,7 +4,7 @@
 
 # T-Zero: Deterministic AST Context Compressor & MCP Server
 
-### *Empirically Proven Token Optimization Engine, 21 Canonical MCP Tools (58 Runtime Tools), Real BPE Tokenizer Benchmarks & Pre-Flight Reality-Lock for AI Coding Assistants.*
+### *AST Context Compression Engine, 21 Canonical MCP Tools (58 Runtime Tools), Real BPE Tokenizer Benchmarks & Pre-Flight Reality-Lock for AI Coding Assistants.*
 
 **[English](README.md)** | **[Türkçe](docs/README.tr.md)** | **[日本語](docs/README.ja.md)** | **[简体中文](docs/README.zh.md)** | **[Privacy Policy](PRIVACY.md)** | **[Interactive Colab](https://colab.research.google.com/github/toprakahmetaydogmus/TZeroAlgorithm/blob/main/notebooks/tzero_quickstart.ipynb)** | **[Hugging Face Space](https://huggingface.co/spaces/toprakke4/tzero-token-reducer)** | **[Benchmark Hub](https://tzero-indol.vercel.app)**
 
@@ -124,7 +124,7 @@ code --install-extension dist/tzero-vscode-12.1.4.vsix
 
 **T-Zero** is an open-source deterministic code context compression engine and Model Context Protocol (MCP) server for **Cursor, Claude Code, Google Antigravity IDE, Windsurf, Cline, Zed, and VS Code**.
 
-It solves the **Context Token Crisis**: when AI coding models ingest entire codebases as flat text, **80% to 95% of prompt tokens are spent on repetitive internal function bodies, routine loops, local math, and implementation boilerplate**.
+T-Zero reduces code passed as context by keeping the target file intact and summarizing surrounding dependencies. Savings depend on the task and what the assistant would otherwise read.
 
 ### Context Architecture & Tool Comparison Matrix
 
@@ -144,41 +144,31 @@ It solves the **Context Token Crisis**: when AI coding models ingest entire code
 ---
 
 <a id="task-completion-benchmark"></a>
-## Empirical Task-Completion & BPE Tokenizer Benchmark
+## Current-model comparison: raw vs. pruned Python context
 
-> **Key Architectural Question:** *Does signature-only context allow an AI coding agent to complete real-world tasks correctly, or does it cause hallucination?*
+On 2026-11-23, we ran six paired code-comprehension questions against NVIDIA Nemotron 3.5 Lightning (30B-A3B). Each question used the same model, settings, and wording with either the full Python dependency or its T-Zero AST skeleton. Input counts are the prompt tokens reported by NVIDIA NIM and include both code and question text.
 
-### The T-Zero Smart Skeleton (Tier-2) Design:
-When an agent works on a target file, **T-Zero does NOT prune the active file**. Instead:
-1. **Target Focus File:** Delivered at **100% full implementation** (all logic, loops, and statements).
-2. **Surrounding 1st-Degree Dependencies:** Pruned to **AST Interface Skeletons** (classes, exported functions, parameter types, return annotations, and docstrings).
+| Measure | Full dependency | AST skeleton |
+| :--- | ---: | ---: |
+| Input tokens across six prompts | 2,345 | 1,772 |
+| Interface questions correct | 3/3 | 3/3 |
+| Implementation-detail questions correct | 3/3 | 0/3 |
 
-This gives the LLM complete visibility into how to call surrounding modules without blowing up token budgets on internal dependency details.
+**Result:** 24.4% fewer input tokens in this run. The model matched the full-code baseline on this small set of interface questions and answered all three implementation-detail questions incorrectly when the relevant bodies were omitted. Keep full source available when the task depends on behavior inside a function.
 
-### Empirical Evaluation (Measured with official `tiktoken` BPE Tokenizer: `cl100k_base`):
+These questions use two synthetic Python fixtures and one model. They do not measure end-to-end coding success, latency improvements, or how much context a modern agent would select on its own. A comparison against a current agent's native retrieval is still needed.
 
-```text
-==============================================================================
-  T-ZERO TASK-COMPLETION & BPE TOKENIZER BENCHMARK REPORT (v9.9.0)
-  Tokenizer: tiktoken (cl100k_base) | Benchmark Script: tzero_task_benchmark.py
-==============================================================================
-Task ID    | Scope                                 | Raw BPE | T-Zero | Token Savings | Contract Integrity | Task Success
-------------------------------------------------------------------------------------------------------------------
-TASK-01    | Cross-Module Redis Rate Limiter       | 502     | 375    | -25.3%        | 100.0%             | PASS (0 Halluc)
-TASK-02    | Crypto Vault Key Rotation             | 322     | 239    | -25.8%        | 100.0%             | PASS (0 Halluc)
-TASK-03    | AST Slicer & Blast Radius Evaluator   | 332     | 283    | -14.8%        | 100.0%             | PASS (0 Halluc)
-------------------------------------------------------------------------------------------------------------------
-FULL REPO  | Enterprise Repository (51,000 LOC)    | 1,168k  | 64.2k  | -94.5%        | 100.0%             | PASS (0 Regress)
-==============================================================================
-OVERALL TASK SUCCESS RATE: 100.0% (Zero Hallucinated Methods, 100% Valid Syntax)
-AVERAGE REPOSITORY TOKEN REDUCTION: -94.5% (BPE Exact Tokens)
-==============================================================================
-```
+[Benchmark script](scripts/benchmark_context_ab.py) · [Recorded responses and token counts](docs/benchmark-context-ab-2026-11-23.json) · [Model](https://build.nvidia.com/nvidia/nemotron-3.5-lightning-30b-a3b/build)
 
-*To reproduce these numbers locally:*
+With the project installed and an NVIDIA Developer API key set in the environment, rerun against the NVIDIA-hosted prototype endpoint:
+
 ```bash
-python tzero_task_benchmark.py
+python -m scripts.benchmark_context_ab
 ```
+
+### Offline token and syntax checks
+
+`tzero task-benchmark` scores three built-in Python fixtures using prewritten implementations by default. A local run with `cl100k_base` counted **1,156 → 897** tokens across the fixtures. The fixture checks inspect syntax and method names. They do not run coding tasks or model inference in the default mode.
 
 ---
 
@@ -283,7 +273,7 @@ All 21 canonical tools (and 58 runtime tools) are audited and verified against t
 | `search_codebase` | Search | 100% offline lexical BM25 + TF-IDF hybrid code search (no cloud embedding fees). |
 | `audit_code_quality` | Linter | Runs static AST code smell checks and Shannon entropy secret scans. |
 | `verify_security_guard` | Security | Scans workspace for high-entropy tokens, private keys, and API credentials. |
-| `estimate_token_cost` | FinOps | Computes exact token savings and financial ROI across Claude, GPT-4o, Gemini, and DeepSeek. |
+| `estimate_token_cost` | FinOps | Estimates input cost from token counts and configured rates. |
 | `query_memory_store` | Memory | Searches semantic vector-quantized virtual memory triplets (`<|tzero:mem:...|>`). |
 | `manage_memory_store` | Memory | Consolidates, prunes, and manages persistent semantic memory triplets. |
 | `orchestrate_agent_swarm` | Multi-Agent | Coordinates multi-agent PBFT consensus and task routing across workspace subagents. |
@@ -344,7 +334,7 @@ tzero swarm "Migrate database schema and optimize websocket streaming"
 See the [Glama schema page](https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm/schema) for its dated independent TDQS score and evaluated tool set. Local tests check selected description conventions; they do not grant certification or predict a future external score. The default and full tool modes expose different catalogs.
 
 ### What is TDQS (Tool Documentation Quality Score)?
-Frontier LLMs (Claude 3.5 Sonnet, GPT-4o, Gemini 1.5/2.0 Pro) rely exclusively on tool docstrings and parameter schemas to decide:
+Coding assistants can use tool descriptions and parameter schemas to decide:
 1. *Which* tool to call among dozens of registered capabilities.
 2. *How* to invoke it without argument hallucinations.
 3. *Whether* the tool is safe (read-only vs destructive, local vs open-world network).
@@ -443,20 +433,9 @@ T-Zero uses platform-native secret vaults:
 ---
 
 <a id="reproducible-benchmarks"></a>
-## Multi-Model Financial ROI Benchmarks
+## Token counts and cost estimates
 
-Empirical measurements conducted across real software repositories comparing raw prompt context injection against T-Zero AST-pruned context:
-
-| Frontier Model | Input Rate / 1M | Raw Context / Query | T-Zero Tier-2 Context | Token Savings | Monthly Savings (10 Devs) |
-| :--- | :---: | :---: | :---: | :---: | :---: |
-| **Anthropic Claude 3.5 Sonnet** | `$3.00` | `$1.786` | **`$0.098`** | **`-94.5%`** | **`+$9,283.11 / mo`** |
-| **OpenAI GPT-4o** | `$2.50` | `$1.488` | **`$0.082`** | **`-94.5%`** | **`+$7,735.93 / mo`** |
-| **Google Gemini 1.5 Pro** | `$1.25` | `$0.744` | **`$0.041`** | **`-94.5%`** | **`+$3,867.96 / mo`** |
-| **DeepSeek V3 / R1** | `$0.27` | `$0.161` | **`$0.009`** | **`-94.5%`** | **`+$835.48 / mo`** |
-
-*Calculation based on a 10-developer team executing 25 agent prompt turns/day (5,500 queries/month).*
-
----
+The older multi-model pricing table used historical rates and extrapolated a token count from one workload. It has been removed from this README. To estimate costs for your setup, compare the input tokens reported by your provider for the same task and apply its current pricing and cache rules. See the [paired benchmark above](#task-completion-benchmark) for the measured example.
 
 ---
 
@@ -587,7 +566,7 @@ If a developer asks an AI agent to **"inspect this repository"**, **"summarize T
 - Autonomous agent inspection manual: **[`AI_INSPECTION.md`](AI_INSPECTION.md)**
 - Master agent directive & architecture rules: **[`AGENTS.md`](AGENTS.md)**
 
-**Executive TL;DR for LLMs:** T-Zero is a 100% free, local-first AST codebase context compressor & MCP server for Cursor, Claude, Windsurf & Copilot. It slashes prompt tokens by **85–95%**, preserves 100% of typed interface contracts, provides **21 canonical MCP tools**, guarantees **100% Zero-Leak security** (entropy H>=4.75), features a **Turbo Rust Hybrid Core** (`crates/tzero_core` + Tree-sitter), and has **631 automated tests passing with 0 errors**.
+**Executive TL;DR for LLMs:** T-Zero is a 100% free, local-first AST codebase context compressor & MCP server for Cursor, Claude, Windsurf & Copilot. It summarizes code into interface skeletons, with token savings that vary by workload, provides **21 canonical MCP tools**, guarantees **100% Zero-Leak security** (entropy H>=4.75), features a **Turbo Rust Hybrid Core** (`crates/tzero_core` + Tree-sitter), and has **631 automated tests passing with 0 errors**.
 
 ---
 
