@@ -1,0 +1,108 @@
+{
+  "model": "gemini-3.8-flash-low",
+  "source_commit": "7770f95c4831ee5e2abf59f598abbfdd4ab790fb",
+  "source_path": "tzero/tzero_snapshot.py",
+  "source_sha256": "27324c05e59ba472a59e050b05e31942805b1545fd42e7082606d4cb0e97b369",
+  "symbols": [
+    "SnapshotEngine.get_cache_path",
+    "SnapshotEngine.get_sqlite_path"
+  ],
+  "tokenizer": "o200k_base",
+  "source_tokens": 4361,
+  "targeted_tokens": 127,
+  "source_reduction_pct": 97.08782389360239,
+  "expected": "A C A",
+  "ai_credit_overages": false,
+  "trials": [
+    {
+      "condition": "full",
+      "trial": 1,
+      "answer": "A C A",
+      "correct": true,
+      "usage": {
+        "input_tokens": 32516,
+        "output_tokens": 3,
+        "thinking_tokens": 0,
+        "cache_read_tokens": 0,
+        "total_tokens": 32519
+      },
+      "status": "SUCCESS",
+      "seconds": 7.3398841
+    },
+    {
+      "condition": "targeted",
+      "trial": 1,
+      "answer": "A C A",
+      "correct": true,
+      "usage": {
+        "input_tokens": 27141,
+        "output_tokens": 3,
+        "thinking_tokens": 0,
+        "cache_read_tokens": 0,
+        "total_tokens": 27144
+      },
+      "status": "SUCCESS",
+      "seconds": 7.1272805
+    },
+    {
+      "condition": "targeted",
+      "trial": 2,
+      "answer": "A C A",
+      "correct": true,
+      "usage": {
+        "input_tokens": 27138,
+        "output_tokens": 3,
+        "thinking_tokens": 0,
+        "cache_read_tokens": 0,
+        "total_tokens": 27141
+      },
+      "status": "SUCCESS",
+      "seconds": 6.5066266
+    },
+    {
+      "condition": "full",
+      "trial": 2,
+      "answer": "A C A",
+      "correct": true,
+      "usage": {
+        "input_tokens": 33007,
+        "output_tokens": 3,
+        "thinking_tokens": 0,
+        "cache_read_tokens": 0,
+        "total_tokens": 33010
+      },
+      "status": "SUCCESS",
+      "seconds": 6.7155231
+    },
+    {
+      "condition": "full",
+      "trial": 3,
+      "answer": "A C A",
+      "correct": true,
+      "usage": {
+        "input_tokens": 32535,
+        "output_tokens": 3,
+        "thinking_tokens": 0,
+        "cache_read_tokens": 0,
+        "total_tokens": 32538
+      },
+      "status": "SUCCESS",
+      "seconds": 7.3643199
+    },
+    {
+      "condition": "targeted",
+      "trial": 3,
+      "answer": "A C A",
+      "correct": true,
+      "usage": {
+        "input_tokens": 27618,
+        "output_tokens": 3,
+        "thinking_tokens": 0,
+        "cache_read_tokens": 0,
+        "total_tokens": 27621
+      },
+      "status": "SUCCESS",
+      "seconds": 7.1422964
+    }
+  ]
+}

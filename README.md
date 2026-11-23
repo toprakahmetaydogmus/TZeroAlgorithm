@@ -172,6 +172,20 @@ We reran the same three implementation questions against the same model, using T
 
 [Recorded targeted results](docs/benchmark-context-targeted-2026-11-23.json) · Rerun with `python -m scripts.benchmark_context_ab --targeted-only`.
 
+### Gemini 3.8 Flash Low: targeted extraction on a real source file
+
+We ran the same three code-comprehension questions in both conditions with Antigravity CLI. Each condition was repeated three times in a fresh session. The baseline supplied the entire [snapshot engine source file](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/blob/7770f95c4831ee5e2abf59f598abbfdd4ab790fb/tzero/tzero_snapshot.py). The targeted condition used T-Zero to supply two preselected, complete Python methods.
+
+| Measure | Full file | Targeted methods |
+| :--- | ---: | ---: |
+| Correct answers over three runs | 9/9 | 9/9 |
+| Code-only tokens (`o200k_base`) | 4,361 | 127 |
+| Average CLI input tokens (Gemini-reported) | 32,686 | 27,299 |
+
+The targeted input used **97.1% fewer code-only tokens** and **16.5% fewer total CLI input tokens**. The CLI includes its own agent context in the total. This comparison covers one file and three questions, with symbols selected in advance. It does not evaluate automatic symbol selection or end-to-end coding performance.
+
+[Recorded trials](docs/benchmark-gemini-38-flash-low-2026-11-23.json) · [Runner](scripts/benchmark_gemini_flash_cli.py) · Run from the repo root with `python -m scripts.benchmark_gemini_flash_cli` and a signed-in Antigravity CLI. The runner disables paid credit fallback for the session.
+
 ### Whole-repository snapshot: 94.5% fewer context tokens
 
 The [November 14 local benchmark report](docs/REAL_PC_BENCHMARK_REPORT.md) records a single scan of 352 files using `cl100k_base`. The full repository counted **1,790,208 tokens** and its Tier-2 AST context counted **98,461 tokens**, a **94.5% reduction** (about 95%). This compares two representations of the entire repository. Actual requests typically use a subset of files, and coding assistants may already select context, so this number does not predict per-request savings, cost savings, or task accuracy.
