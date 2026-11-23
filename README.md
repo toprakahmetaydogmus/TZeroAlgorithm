@@ -186,6 +186,20 @@ The targeted input used **97.1% fewer code-only tokens** and **16.5% fewer total
 
 [Recorded trials](docs/benchmark-gemini-38-flash-low-2026-11-23.json) · [Runner](scripts/benchmark_gemini_flash_cli.py) · Run from the repo root with `python -m scripts.benchmark_gemini_flash_cli` and a signed-in Antigravity CLI. The runner disables paid credit fallback for the session.
 
+### Gemini 3.8 Flash Low: diagnosing noisy pytest output
+
+We ran 26 existing T-Zero tests in a temporary copy. The baseline passed, then a deliberately introduced regression made the SQLite path reuse the JSON snapshot filename, causing four tests to fail. We supplied Gemini with the same prompt and three views of the failure, each in three fresh Antigravity CLI sessions. The focused summary was generated from pytest JUnit XML using only failed test names and short stack traces.
+
+| Evidence | Average CLI input tokens | Reduction vs. verbose | Runs finding all four failures | Runs finding the exact root cause |
+| :--- | ---: | ---: | ---: | ---: |
+| Verbose pytest (`-vv --tb=long`) | 34,707 | — | 3/3 | 0/3 |
+| Native short pytest (`-q --tb=short`) | 28,557 | 17.7% | 3/3 | 0/3 |
+| Focused JUnit summary | 27,807 | 19.9% | 3/3 | 0/3 |
+
+Every run found the SQLite error. None identified the specific JSON/SQLite filename collision. One verbose run suggested checking for a conflicting database path, and several responses suggested deleting a cache file without establishing the cause. No suggested fix was applied. The focused summary used **2.6% fewer total input tokens than pytest's own short output**. This is one controlled regression, and the XML filtering is part of the benchmark runner. Test logs were the only evidence supplied, so this does not measure an agent's ability to inspect code and repair the problem.
+
+[Recorded responses and token counts](docs/benchmark-pytest-logs-2026-11-23.json) · [Runner](scripts/benchmark_pytest_logs_cli.py). To reproduce from the repository root with pytest and a signed-in Antigravity CLI, run `python -m scripts.benchmark_pytest_logs_cli <output-dir>`. The runner disables paid credit fallback.
+
 ### Whole-repository snapshot: 94.5% fewer context tokens
 
 The [November 14 local benchmark report](docs/REAL_PC_BENCHMARK_REPORT.md) records a single scan of 352 files using `cl100k_base`. The full repository counted **1,790,208 tokens** and its Tier-2 AST context counted **98,461 tokens**, a **94.5% reduction** (about 95%). This compares two representations of the entire repository. Actual requests typically use a subset of files, and coding assistants may already select context, so this number does not predict per-request savings, cost savings, or task accuracy.

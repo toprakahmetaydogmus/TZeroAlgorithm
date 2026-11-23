@@ -1,0 +1,144 @@
+{
+  "model": "gemini-3.8-flash-low",
+  "source_commit": "25fed66b07ba32b4edab18af1e7446ca81a7e2f5",
+  "suite": [
+    "tests/test_snapshot_incremental.py",
+    "tests/test_packer.py",
+    "tests/test_task_benchmark.py",
+    "tests/test_benchmark.py"
+  ],
+  "fixture": "get_sqlite_path defaults to SNAPSHOT_FILENAME instead of SQLITE_FILENAME",
+  "test_cases": 26,
+  "failing_tests": [
+    "tests.test_snapshot_incremental.TestIncrementalSnapshot.test_incremental_update_reuses_untouched_files_and_deletes_stale",
+    "tests.test_snapshot_incremental.TestIncrementalSnapshot.test_is_valid_detects_change_beyond_first_15_files",
+    "tests.test_snapshot_incremental.TestIncrementalSnapshot.test_multilanguage_snapshot_and_sqlite_store",
+    "tests.test_snapshot_incremental.TestIncrementalSnapshot.test_watch_mode_incremental_snapshot_once"
+  ],
+  "ai_credit_overages": false,
+  "prompt": "Diagnose this pytest run using only the supplied output. Do not inspect any files, use tools, or modify anything. State which test or tests failed, the root cause, and the smallest fix. If the log does not support a conclusion, say what is missing. Keep your answer under 90 words.\n\nPYTEST OUTPUT\n",
+  "log_characters": {
+    "full": 24078,
+    "short": 4303,
+    "focused": 2434
+  },
+  "trials": [
+    {
+      "condition": "full",
+      "trial": 1,
+      "answer": "**Failed Tests:**\n* `test_incremental_update_reuses_untouched_files_and_deletes_stale`\n* `test_is_valid_detects_change_beyond_first_15_files`\n* `test_multilanguage_snapshot_and_sqlite_store`\n* `test_watch_mode_incremental_snapshot_once`\n\n**Root Cause:**\nIn `tzero\\tzero_snapshot.py` at `_save_snapshot()`, `sqlite3.connect(db_path)` opens a non-database or corrupted file at `cls.get_sqlite_path(abs_root)`, raising `sqlite3.DatabaseError: file is not a database` on `conn.execute()`.\n\n**Smallest Fix:**\nEnsure `cls.get_sqlite_path(abs_root)` resolves to a clean `.db` path, or remove/unlink the invalid file before connecting:\n```python\nif os.path.exists(db_path) and os.path.getsize(db_path) == 0:\n    os.remove(db_path)\n```",
+      "usage": {
+        "input_tokens": 34557,
+        "output_tokens": 245,
+        "thinking_tokens": 0,
+        "cache_read_tokens": 0,
+        "total_tokens": 34802
+      },
+      "seconds": 9.4694578
+    },
+    {
+      "condition": "short",
+      "trial": 1,
+      "answer": "**Failed tests:**\n- `test_incremental_update_reuses_untouched_files_and_deletes_stale`\n- `test_is_valid_detects_change_beyond_first_15_files`\n- `test_multilanguage_snapshot_and_sqlite_store`\n- `test_watch_mode_incremental_snapshot_once`\n\n**Root Cause:**\nIn `tzero/tzero_snapshot.py:210` (`_save_snapshot`), SQLite execution fails with `sqlite3.DatabaseError: file is not a database` because `cache_file` already exists as an invalid, corrupt, or non-SQLite file (or an empty/plain-text placeholder).\n\n**Smallest Fix:**\nIn `_save_snapshot`, delete/unlink `cache_file` (or remove corrupted existing file) before initializing the SQLite connection, or wrap connection/execution to re-create the database if invalid.",
+      "usage": {
+        "input_tokens": 29348,
+        "output_tokens": 206,
+        "thinking_tokens": 0,
+        "cache_read_tokens": 0,
+        "total_tokens": 29554
+      },
+      "seconds": 9.3781532
+    },
+    {
+      "condition": "focused",
+      "trial": 1,
+      "answer": "**Failed tests:**\n- `test_incremental_update_reuses_untouched_files_and_deletes_stale`\n- `test_is_valid_detects_change_beyond_first_15_files`\n- `test_multilanguage_snapshot_and_sqlite_store`\n- `test_watch_mode_incremental_snapshot_once`\n\n**Root cause:**\nIn `tzero/tzero_snapshot.py:210` (`_save_snapshot`), SQLite attempts to query or initialize `cache_file`, but the targeted file already exists as an invalid, corrupt, or empty non-database file (`sqlite3.DatabaseError: file is not a database`).\n\n**Smallest fix:**\nIn `_save_snapshot` (or before opening `cache_file`), check if `cache_file` exists and remove/recreate it if corrupt, or ensure the destination path is unlinked prior to initializing a fresh SQLite database connection.",
+      "usage": {
+        "input_tokens": 28118,
+        "output_tokens": 210,
+        "thinking_tokens": 0,
+        "cache_read_tokens": 0,
+        "total_tokens": 28328
+      },
+      "seconds": 9.618954800000001
+    },
+    {
+      "condition": "short",
+      "trial": 2,
+      "answer": "**Failed tests:**\n- `test_incremental_update_reuses_untouched_files_and_deletes_stale`\n- `test_is_valid_detects_change_beyond_first_15_files`\n- `test_multilanguage_snapshot_and_sqlite_store`\n- `test_watch_mode_incremental_snapshot_once`\n\n**Root cause:**\nIn `tzero/tzero_snapshot.py:210` (`_save_snapshot`), SQLite execution fails with `sqlite3.DatabaseError: file is not a database`. The destination `cache_file` already exists as an empty or corrupted non-SQLite file, or an invalid file path was passed when connecting.\n\n**Smallest fix:**\nIn `_save_snapshot`, delete the target `cache_file` before opening the connection if it exists and is invalid/0-byte, or handle `sqlite3.DatabaseError` by unlinking `cache_file` and retrying.",
+      "usage": {
+        "input_tokens": 28165,
+        "output_tokens": 215,
+        "thinking_tokens": 0,
+        "cache_read_tokens": 0,
+        "total_tokens": 28380
+      },
+      "seconds": 8.8549854
+    },
+    {
+      "condition": "focused",
+      "trial": 2,
+      "answer": "**Failed tests:**\n- `test_incremental_update_reuses_untouched_files_and_deletes_stale`\n- `test_is_valid_detects_change_beyond_first_15_files`\n- `test_multilanguage_snapshot_and_sqlite_store`\n- `test_watch_mode_incremental_snapshot_once`\n\n**Root Cause:**\n`_save_snapshot` in `tzero/tzero_snapshot.py` (line 210) attempts to execute SQL on a target `cache_file` that already exists as an invalid/corrupt, empty, or non-SQLite file (`sqlite3.DatabaseError: file is not a database`).\n\n**Smallest Fix:**\nIn `_save_snapshot`, delete/unlink `cache_file` if it is not a valid SQLite database (or catch `DatabaseError`, remove `cache_file`, and re-initialize a fresh database connection).",
+      "usage": {
+        "input_tokens": 27655,
+        "output_tokens": 208,
+        "thinking_tokens": 0,
+        "cache_read_tokens": 0,
+        "total_tokens": 27863
+      },
+      "seconds": 9.1970652
+    },
+    {
+      "condition": "full",
+      "trial": 2,
+      "answer": "**Failed Tests**: \n- `test_incremental_update_reuses_untouched_files_and_deletes_stale`\n- `test_is_valid_detects_change_beyond_first_15_files`\n- `test_multilanguage_snapshot_and_sqlite_store`\n- `test_watch_mode_incremental_snapshot_once`\n\n**Root Cause**: \n`tzero/tzero_snapshot.py:210` fails with `sqlite3.DatabaseError: file is not a database` when connecting to `db_path = cls.get_sqlite_path(abs_root)`. A corrupted/empty non-database file or invalid path pre-exists at `db_path`.\n\n**Smallest Fix**: \nIn `tzero/tzero_snapshot.py`, remove or unlink `db_path` prior to `sqlite3.connect(db_path)` if it exists and is invalid/uninitialized (e.g., `os.remove(db_path)`).",
+      "usage": {
+        "input_tokens": 34547,
+        "output_tokens": 226,
+        "thinking_tokens": 0,
+        "cache_read_tokens": 0,
+        "total_tokens": 34773
+      },
+      "seconds": 8.721907
+    },
+    {
+      "condition": "focused",
+      "trial": 3,
+      "answer": "**Failed tests:**\n- `test_incremental_update_reuses_untouched_files_and_deletes_stale`\n- `test_is_valid_detects_change_beyond_first_15_files`\n- `test_multilanguage_snapshot_and_sqlite_store`\n- `test_watch_mode_incremental_snapshot_once`\n\n**Root Cause:**\nIn `tzero_snapshot.py:210` (`_save_snapshot`), `conn.execute(...)` fails with `sqlite3.DatabaseError: file is not a database` because `cache_file` already exists as an empty or corrupted non-SQLite file.\n\n**Smallest Fix:**\nIn `tzero_snapshot.py` before opening/executing against `cache_file`, ensure an uninitialized, invalid, or zero-byte file is removed, or pass `:memory:` / a freshly created valid database.",
+      "usage": {
+        "input_tokens": 27649,
+        "output_tokens": 201,
+        "thinking_tokens": 0,
+        "cache_read_tokens": 0,
+        "total_tokens": 27850
+      },
+      "seconds": 8.9185478
+    },
+    {
+      "condition": "full",
+      "trial": 3,
+      "answer": "**Failed Tests:**\n- `test_incremental_update_reuses_untouched_files_and_deletes_stale`\n- `test_is_valid_detects_change_beyond_first_15_files`\n- `test_multilanguage_snapshot_and_sqlite_store`\n- `test_watch_mode_incremental_snapshot_once`\n\n**Root Cause:**\nIn `tzero/tzero_snapshot.py` (line 210), `cls.get_sqlite_path(abs_root)` returns a path pointing to a pre-existing invalid/empty non-database file or corrupt target, raising `sqlite3.DatabaseError: file is not a database` during `conn.execute()`.\n\n**Smallest Fix:**\nIn `_save_snapshot`, verify or ensure the SQLite DB is valid before querying, or delete/recreate `db_path` if invalid (or ensure `get_sqlite_path` resolves to a distinct `.db` file path that doesn't conflict with existing non-DB files).",
+      "usage": {
+        "input_tokens": 35016,
+        "output_tokens": 230,
+        "thinking_tokens": 0,
+        "cache_read_tokens": 0,
+        "total_tokens": 35246
+      },
+      "seconds": 9.2306365
+    },
+    {
+      "condition": "short",
+      "trial": 3,
+      "answer": "**Failed tests:** \n- `test_incremental_update_reuses_untouched_files_and_deletes_stale`\n- `test_is_valid_detects_change_beyond_first_15_files`\n- `test_multilanguage_snapshot_and_sqlite_store`\n- `test_watch_mode_incremental_snapshot_once`\n\n**Root cause:** \n`sqlite3.DatabaseError: file is not a database` in `tzero_snapshot.py:210` during `_save_snapshot`. The existing `cache_file` SQLite database file is corrupted, empty, or not a valid SQLite database header before query execution.\n\n**Smallest fix:** \nDelete/recreate the corrupted `cache_file` if invalid, or catch `sqlite3.DatabaseError` on connection in `_save_snapshot` to unlink and reinitialize a fresh SQLite database.",
+      "usage": {
+        "input_tokens": 28158,
+        "output_tokens": 200,
+        "thinking_tokens": 0,
+        "cache_read_tokens": 0,
+        "total_tokens": 28358
+      },
+      "seconds": 8.3786689
+    }
+  ]
+}
