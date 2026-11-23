@@ -166,6 +166,10 @@ With the project installed and an NVIDIA Developer API key set in the environmen
 python -m scripts.benchmark_context_ab
 ```
 
+### Whole-repository snapshot: 94.5% fewer context tokens
+
+The [November 14 local benchmark report](docs/REAL_PC_BENCHMARK_REPORT.md) records a single scan of 352 files using `cl100k_base`. The full repository counted **1,790,208 tokens** and its Tier-2 AST context counted **98,461 tokens**, a **94.5% reduction** (about 95%). This compares two representations of the entire repository. Actual requests typically use a subset of files, and coding assistants may already select context, so this number does not predict per-request savings, cost savings, or task accuracy.
+
 ### Offline token and syntax checks
 
 `tzero task-benchmark` scores three built-in Python fixtures using prewritten implementations by default. A local run with `cl100k_base` counted **1,156 → 897** tokens across the fixtures. The fixture checks inspect syntax and method names. They do not run coding tasks or model inference in the default mode.
@@ -263,7 +267,7 @@ All 21 canonical tools (and 58 runtime tools) are audited and verified against t
 | Tool Name | Scope | Purpose |
 | :--- | :---: | :--- |
 | `search_tools` | Discovery | Dynamic catalog discovery exposing all 58 runtime MCP tools on demand. |
-| `build_project_context` | Context | Builds hierarchical multi-tier context tree (up to ~95% token reduction). |
+| `build_project_context` | Context | Builds a hierarchical context tree. Token reduction varies with the selected files and context tier. |
 | `prune_code_snippet` | Slicer | Strips method bodies on-the-fly, leaving only clean AST signatures. |
 | `manage_architecture_rules` | Governance | Defines and manages active architectural boundary rules in `tzero.rules.json`. |
 | `enforce_architecture_rules` | Governance | Validates architectural layer rules and prevents cyclic or illegal cross-layer imports. |
