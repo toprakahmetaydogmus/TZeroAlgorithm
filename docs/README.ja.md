@@ -153,7 +153,7 @@ T-Zero は、ベンチャーキャピタルや有料サブスクリプション�
 
 | ネットワーク / 資産 | アドレス | 1-Click 送金リンク (Deep Link) | エクスプローラー / 詳細 |
 | :--- | :--- | :--- | :--- |
-| 🔷 **Ethereum / EVM**<br>*(ETH, ERC-20, Polygon, Arbitrum, BSC, Optimism)* | `0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5` | [⚡ **Web3 ウォレットで送金 (EIP-681)**](ethereum:0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5)<br>[🦊 **MetaMask で開く**](https://metamask.app.link/send/0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5) | [🔍 Etherscan](https://etherscan.io/address/0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5) |
+| 🔷 **Ethereum / EVM**<br>*(ETH, ERC-20, Polygon, Arbitrum, BSC, Optimism)* | `0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5` | [⚡ **Web3 ウォレットで送金 (EIP-681)**](ethereum:0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5) | [🔍 Etherscan](https://etherscan.io/address/0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5) |
 | 🟠 **Bitcoin (BTC)**<br>*(Native SegWit bech32)* | `bc1q9k4hvd6c2g8l9w3z7v8f2k3j5l8n9m1p4q7r0s` | [⚡ **Bitcoin ウォレットで送金 (BIP-21)**](bitcoin:bc1q9k4hvd6c2g8l9w3z7v8f2k3j5l8n9m1p4q7r0s?label=T-Zero%20Sponsorship) | [🔍 Mempool Explorer](https://mempool.space/address/bc1q9k4hvd6c2g8l9w3z7v8f2k3j5l8n9m1p4q7r0s) |
 | 🟢 **USDT (TRC-20)**<br>*(Tron Network)* | `TE7uKxZJ414u938gWf6bYh9QvRk2141517` | [⚡ **Tron ウォレットで送金**](tron:TE7uKxZJ414u938gWf6bYh9QvRk2141517) | [🔍 Tronscan](https://tronscan.org/#/address/TE7uKxZJ414u938gWf6bYh9QvRk2141517) |
 | 💖 **GitHub Sponsors** | 開発者支援 | [💖 **GitHub でスポンサーになる**](https://github.com/sponsors/toprakahmetaydogmus) | 単発・定期支援 |
@@ -167,7 +167,7 @@ T-Zero は、ベンチャーキャピタルや有料サブスクリプション�
 
 | 🔷 Ethereum / EVM | 🟠 Bitcoin (BTC) | 🟢 USDT (TRC-20 Tron) |
 | :---: | :---: | :---: |
-| <img src="../assets/qr_ethereum.svg" width="180" height="180" alt="Ethereum QR Code"><br><br>[⚡ **送金 (EIP-681)**](ethereum:0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5)<br>[🦊 **MetaMask**](https://metamask.app.link/send/0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5) | <img src="../assets/qr_bitcoin.svg" width="180" height="180" alt="Bitcoin QR Code"><br><br>[⚡ **送金 (BIP-21)**](bitcoin:bc1q9k4hvd6c2g8l9w3z7v8f2k3j5l8n9m1p4q7r0s?label=T-Zero%20Sponsorship) | <img src="../assets/qr_tron.svg" width="180" height="180" alt="Tron QR Code"><br><br>[⚡ **Tron で送金**](tron:TE7uKxZJ414u938gWf6bYh9QvRk2141517) |
+| <img src="../assets/qr_ethereum.svg" width="180" height="180" alt="Ethereum QR Code"><br><br>[⚡ **送金 (EIP-681)**](ethereum:0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5) | <img src="../assets/qr_bitcoin.svg" width="180" height="180" alt="Bitcoin QR Code"><br><br>[⚡ **送金 (BIP-21)**](bitcoin:bc1q9k4hvd6c2g8l9w3z7v8f2k3j5l8n9m1p4q7r0s?label=T-Zero%20Sponsorship) | <img src="../assets/qr_tron.svg" width="180" height="180" alt="Tron QR Code"><br><br>[⚡ **Tron で送金**](tron:TE7uKxZJ414u938gWf6bYh9QvRk2141517) |
 | `0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5` | `bc1q9k4hvd6c2g8l9w3z7v8f2k3j5l8n9m1p4q7r0s` | `TE7uKxZJ414u938gWf6bYh9QvRk2141517` |
 
 </div>

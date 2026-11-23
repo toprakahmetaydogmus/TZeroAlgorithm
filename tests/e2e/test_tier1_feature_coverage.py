@@ -26,7 +26,7 @@ BTC_ADDRESS = "bc1q9k4hvd6c2g8l9w3z7v8f2k3j5l8n9m1p4q7r0s"
 TRON_ADDRESS = "TE7uKxZJ414u938gWf6bYh9QvRk2141517"
 
 EIP681_URI = f"ethereum:{EVM_ADDRESS}"
-METAMASK_URL = f"https://metamask.app.link/send/{EVM_ADDRESS}"
+ETHERSCAN_URL = f"https://etherscan.io/address/{EVM_ADDRESS}"
 BIP21_URI = f"bitcoin:{BTC_ADDRESS}?label=T-Zero%20Sponsorship"
 TRON_URI = f"tron:{TRON_ADDRESS}"
 
@@ -57,10 +57,10 @@ class TestTier1FeatureCoverage(unittest.TestCase):
         self.assertIn(EIP681_URI, readme, "README.md must contain EIP-681 deep link")
         self.assertIn(EVM_ADDRESS, readme, "README.md must contain EVM address")
 
-    def test_f1_02_readme_metamask_universal_link(self):
-        """F1.2: Verify README.md contains MetaMask universal link."""
+    def test_f1_02_readme_etherscan_link(self):
+        """F1.2: Verify README.md contains Etherscan address link."""
         readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
-        self.assertIn(METAMASK_URL, readme, "README.md must contain MetaMask universal link")
+        self.assertIn(ETHERSCAN_URL, readme, "README.md must contain Etherscan address link")
 
     def test_f1_03_readme_bitcoin_bip21_link(self):
         """F1.3: Verify README.md contains BIP-21 Bitcoin URI with label."""
@@ -77,10 +77,9 @@ class TestTier1FeatureCoverage(unittest.TestCase):
     def test_f1_05_benchmark_site_modal_deep_links(self):
         """F1.5: Verify benchmark-site/index.html modal contains all Web3 deep links."""
         index_html = (REPO_ROOT / "benchmark-site" / "index.html").read_text(encoding="utf-8")
-        self.assertIn(f'href="{EIP681_URI}"', index_html, "Modal must link EIP-681 URI")
         self.assertIn(f'href="{BIP21_URI}"', index_html, "Modal must link BIP-21 URI")
         self.assertIn(f'href="{TRON_URI}"', index_html, "Modal must link Tron URI")
-        self.assertIn(METAMASK_URL, index_html, "Modal must link MetaMask universal URL")
+        self.assertIn(ETHERSCAN_URL, index_html, "Modal must link Etherscan address URL")
 
     # -------------------------------------------------------------------------
     # Feature 2: Offline Standalone QR SVGs & Popovers (F2)
@@ -201,10 +200,10 @@ class TestTier1FeatureCoverage(unittest.TestCase):
         ]
         self.assertGreaterEqual(len(custom_lines), 2, "FUNDING.yml must have at least 2 custom entries")
 
-    def test_f3_04_funding_yml_metamask_link_present(self):
-        """F3.4: Verify MetaMask universal link is in .github/FUNDING.yml."""
+    def test_f3_04_funding_yml_etherscan_link_present(self):
+        """F3.4: Verify Etherscan address link is in .github/FUNDING.yml."""
         content = (REPO_ROOT / ".github" / "FUNDING.yml").read_text(encoding="utf-8")
-        self.assertIn(METAMASK_URL, content, "FUNDING.yml must contain MetaMask universal link")
+        self.assertIn(ETHERSCAN_URL, content, "FUNDING.yml must contain Etherscan address link")
 
     def test_f3_05_funding_yml_block_explorers_or_support(self):
         """F3.5: Verify block explorer or web support hub is present in .github/FUNDING.yml."""

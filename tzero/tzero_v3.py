@@ -9118,7 +9118,6 @@ def print_sponsor_hub(open_browser: bool = False):
     evm_addr = "0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5"
     btc_addr = "bc1q9k4hvd6c2g8l9w3z7v8f2k3j5l8n9m1p4q7r0s"
     usdt_addr = "TE7uKxZJ414u938gWf6bYh9QvRk2141517"
-    metamask_link = f"https://metamask.app.link/send/{evm_addr}"
     etherscan_link = f"https://etherscan.io/address/{evm_addr}"
     tronscan_link = f"https://tronscan.org/#/address/{usdt_addr}"
     mempool_link = f"https://mempool.space/address/{btc_addr}"
@@ -9134,7 +9133,6 @@ def print_sponsor_hub(open_browser: bool = False):
 [🔷 Ethereum / EVM] (ETH, ERC-20, Polygon, Arbitrum, BSC, Optimism):
   Address:       {evm_addr}
   Web3 URI:      ethereum:{evm_addr}
-  MetaMask App:  {metamask_link}
   Explorer:      {etherscan_link}
 
 [🟠 Bitcoin] (Native SegWit bech32):

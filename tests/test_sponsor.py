@@ -170,7 +170,7 @@ class TestWebAndDocumentationIntegrations(unittest.TestCase):
         funding = (REPO_ROOT / ".github" / "FUNDING.yml").read_text(encoding="utf-8")
         self.assertIn("mempool.space/address/" + BTC_ADDR, funding)
         self.assertIn("tronscan.org/#/address/" + TRON_ADDR, funding)
-        self.assertIn("metamask.app.link/send/" + EVM_ADDR, funding)
+        self.assertIn("etherscan.io/address/" + EVM_ADDR, funding)
         self.assertIn("tzero-indol.vercel.app/#support", funding)
 
 

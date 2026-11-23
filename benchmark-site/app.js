@@ -4930,31 +4930,4 @@ function initSupportModal() {
     });
   });
 
-  // Web3 1-Click Send Trigger (MetaMask & Browser Wallets)
-  const web3Triggers = document.querySelectorAll(".web3-send-trigger");
-  web3Triggers.forEach((trigger) => {
-    trigger.addEventListener("click", async (e) => {
-      const addr = trigger.dataset.addr;
-      if (window.ethereum && addr) {
-        e.preventDefault();
-        try {
-          const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
-          if (accounts && accounts.length > 0) {
-            await window.ethereum.request({
-              method: "eth_sendTransaction",
-              params: [{
-                from: accounts[0],
-                to: addr,
-                value: "0x11C37937E08000" // Optional suggested ~0.005 ETH
-              }]
-            });
-            copyTextWithToast(addr, "MetaMask send prompt opened! Thank you for supporting T-Zero 💖");
-          }
-        } catch (err) {
-          console.log("Web3 wallet send redirected to native protocol:", err);
-          window.location.href = `ethereum:${addr}`;
-        }
-      }
-    });
-  });
 }

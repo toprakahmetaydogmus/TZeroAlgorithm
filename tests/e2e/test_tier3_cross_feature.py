@@ -22,7 +22,7 @@ BTC_ADDRESS = "bc1q9k4hvd6c2g8l9w3z7v8f2k3j5l8n9m1p4q7r0s"
 TRON_ADDRESS = "TE7uKxZJ414u938gWf6bYh9QvRk2141517"
 
 EIP681_URI = f"ethereum:{EVM_ADDRESS}"
-METAMASK_URL = f"https://metamask.app.link/send/{EVM_ADDRESS}"
+ETHERSCAN_URL = f"https://etherscan.io/address/{EVM_ADDRESS}"
 BIP21_URI = f"bitcoin:{BTC_ADDRESS}?label=T-Zero%20Sponsorship"
 TRON_URI = f"tron:{TRON_ADDRESS}"
 
@@ -59,7 +59,7 @@ class TestTier3CrossFeature(unittest.TestCase):
         # Verify all addresses and URIs match F1 contracts
         self.assertIn(EVM_ADDRESS, stdout)
         self.assertIn(EIP681_URI, stdout)
-        self.assertIn(METAMASK_URL, stdout)
+        self.assertIn(ETHERSCAN_URL, stdout)
         self.assertIn(BTC_ADDRESS, stdout)
         self.assertIn(BIP21_URI, stdout)
         self.assertIn(TRON_ADDRESS, stdout)
@@ -69,7 +69,7 @@ class TestTier3CrossFeature(unittest.TestCase):
         """Pairwise F1 ↔ F3: .github/FUNDING.yml targets align with Web3 EVM address and GitHub owner."""
         funding_content = (REPO_ROOT / ".github" / "FUNDING.yml").read_text(encoding="utf-8")
         self.assertIn(GITHUB_OWNER, funding_content)
-        self.assertIn(METAMASK_URL, funding_content)
+        self.assertIn(ETHERSCAN_URL, funding_content)
         self.assertIn(EVM_ADDRESS, funding_content)
 
         # Confirm all custom URLs use HTTPS per GitHub requirements

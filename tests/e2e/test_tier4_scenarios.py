@@ -22,7 +22,7 @@ BTC_ADDRESS = "bc1q9k4hvd6c2g8l9w3z7v8f2k3j5l8n9m1p4q7r0s"
 TRON_ADDRESS = "TE7uKxZJ414u938gWf6bYh9QvRk2141517"
 
 EIP681_URI = f"ethereum:{EVM_ADDRESS}"
-METAMASK_URL = f"https://metamask.app.link/send/{EVM_ADDRESS}"
+ETHERSCAN_URL = f"https://etherscan.io/address/{EVM_ADDRESS}"
 BIP21_URI = f"bitcoin:{BTC_ADDRESS}?label=T-Zero%20Sponsorship"
 TRON_URI = f"tron:{TRON_ADDRESS}"
 
@@ -63,21 +63,20 @@ class TestTier4Scenarios(unittest.TestCase):
         # 2. GitHub FUNDING.yml Touchpoint
         funding_content = (REPO_ROOT / ".github" / "FUNDING.yml").read_text(encoding="utf-8")
         self.assertIn(EVM_ADDRESS, funding_content)
-        self.assertIn(METAMASK_URL, funding_content)
+        self.assertIn(ETHERSCAN_URL, funding_content)
 
         # 3. Documentation Touchpoint
         readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
         self.assertIn(EIP681_URI, readme)
         self.assertIn(BIP21_URI, readme)
         self.assertIn(TRON_URI, readme)
-        self.assertIn(METAMASK_URL, readme)
+        self.assertIn(ETHERSCAN_URL, readme)
 
         # 4. Benchmark Site Web Touchpoint
         index_html = (REPO_ROOT / "benchmark-site" / "index.html").read_text(encoding="utf-8")
-        self.assertIn(f'href="{EIP681_URI}"', index_html)
         self.assertIn(f'href="{BIP21_URI}"', index_html)
         self.assertIn(f'href="{TRON_URI}"', index_html)
-        self.assertIn(METAMASK_URL, index_html)
+        self.assertIn(ETHERSCAN_URL, index_html)
 
         # 5. Programmatic bit-for-bit consistency assertion
         self.assertEqual(EVM_ADDRESS, "0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5")

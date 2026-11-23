@@ -175,14 +175,13 @@ DOWNLOADS_V12_GRID = '''    <!-- Live Dynamic Release Banner -->
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
                 Copy
               </button>
-              <a href="ethereum:0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5" class="btn btn-send-crypto web3-send-trigger" data-addr="0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5" title="1-Click Send via Web3 Wallet">⚡ Send</a>
-              <a href="https://metamask.app.link/send/0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5" target="_blank" rel="noopener noreferrer" class="btn btn-wallet-link" title="Open in MetaMask">🦊 MetaMask</a>
+              <a href="https://etherscan.io/address/0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5" target="_blank" rel="noopener noreferrer" class="btn btn-wallet-link" title="View Ethereum address on Etherscan">Etherscan</a>
               <button class="btn btn-qr-toggle" data-target-qr="qr-eth-grid" title="Show QR Code">📱 QR</button>
             </div>
           </div>
           <div class="crypto-qr-container" id="qr-eth-grid" style="display: none;">
             <img src="assets/qr_ethereum.svg" alt="Ethereum QR Code" width="160" height="160">
-            <span class="qr-label">Scan with MetaMask / Web3 Wallet</span>
+            <span class="qr-label">Scan with a compatible wallet</span>
           </div>
         </div>
 

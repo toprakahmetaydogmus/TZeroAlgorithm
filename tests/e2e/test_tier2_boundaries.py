@@ -28,7 +28,7 @@ BTC_ADDRESS = "bc1q9k4hvd6c2g8l9w3z7v8f2k3j5l8n9m1p4q7r0s"
 TRON_ADDRESS = "TE7uKxZJ414u938gWf6bYh9QvRk2141517"
 
 EIP681_URI = f"ethereum:{EVM_ADDRESS}"
-METAMASK_URL = f"https://metamask.app.link/send/{EVM_ADDRESS}"
+ETHERSCAN_URL = f"https://etherscan.io/address/{EVM_ADDRESS}"
 BIP21_URI = f"bitcoin:{BTC_ADDRESS}?label=T-Zero%20Sponsorship"
 TRON_URI = f"tron:{TRON_ADDRESS}"
 
@@ -70,12 +70,12 @@ class TestTier2Boundaries(unittest.TestCase):
         self.assertRegex(TRON_URI, tron_pattern, "Tron URI must match base58 format starting with T")
         self.assertEqual(len(TRON_URI), 39, "Total Tron URI length must be exactly 39 characters")
 
-    def test_f1_09_metamask_url_security_and_scheme(self):
-        """F1.9: Validate MetaMask universal link scheme, trusted host, and target path."""
-        parsed = urllib.parse.urlparse(METAMASK_URL)
-        self.assertEqual(parsed.scheme, "https", "MetaMask link must be strictly HTTPS")
-        self.assertEqual(parsed.netloc, "metamask.app.link", "MetaMask host must be metamask.app.link")
-        self.assertEqual(parsed.path, f"/send/{EVM_ADDRESS}", "MetaMask path must target EVM address")
+    def test_f1_09_etherscan_url_security_and_scheme(self):
+        """F1.9: Validate Etherscan address link scheme, trusted host, and target path."""
+        parsed = urllib.parse.urlparse(ETHERSCAN_URL)
+        self.assertEqual(parsed.scheme, "https", "Etherscan link must be strictly HTTPS")
+        self.assertEqual(parsed.netloc, "etherscan.io", "Etherscan host must be etherscan.io")
+        self.assertEqual(parsed.path, f"/address/{EVM_ADDRESS}", "Etherscan path must target EVM address")
 
     def test_f1_10_negative_private_key_entropy_scan(self):
         """F1.10: Security audit ensuring no private keys or seed phrases near donation tables."""

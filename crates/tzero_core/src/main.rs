@@ -245,7 +245,6 @@ fn main() {
 [🔷 Ethereum / EVM] (ETH, ERC-20, Polygon, Arbitrum, BSC, Optimism):
   Address:       0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5
   Web3 URI:      ethereum:0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5
-  MetaMask App:  https://metamask.app.link/send/0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5
   Explorer:      https://etherscan.io/address/0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5
 
 [🟠 Bitcoin] (Native SegWit bech32):
