@@ -166,10 +166,10 @@ class TestWebAndDocumentationIntegrations(unittest.TestCase):
         self.assertIn("btn-qr-toggle", html)
 
     def test_funding_yml_contains_explorer_links(self):
-        """Verify .github/FUNDING.yml retains the other funding links without Mempool."""
+        """Verify .github/FUNDING.yml retains Etherscan and T-Zero portal without Mempool or Tronscan."""
         funding = (REPO_ROOT / ".github" / "FUNDING.yml").read_text(encoding="utf-8")
         self.assertNotIn("mempool.space", funding)
-        self.assertIn("tronscan.org/#/address/" + TRON_ADDR, funding)
+        self.assertNotIn("tronscan.org", funding)
         self.assertIn("etherscan.io/address/" + EVM_ADDR, funding)
         self.assertIn("tzero-indol.vercel.app/#support", funding)
 

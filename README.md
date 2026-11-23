@@ -642,6 +642,7 @@ T-Zero has no venture capital backing, no paywalls, and no telemetry tracking. I
 | 🔷 **Ethereum / EVM**<br>*(ETH, ERC-20, Polygon, Arbitrum, BSC, Optimism)* | `0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5` | [⚡ **Send via Web3 Wallet (EIP-681)**](ethereum:0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5) | [🔍 Etherscan](https://etherscan.io/address/0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5) &bull; [DeBank](https://debank.com/profile/0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5) |
 | 🟠 **Bitcoin (BTC)**<br>*(Native SegWit bech32)* | `bc1q9k4hvd6c2g8l9w3z7v8f2k3j5l8n9m1p4q7r0s` | [⚡ **Send via Bitcoin Wallet (BIP-21)**](bitcoin:bc1q9k4hvd6c2g8l9w3z7v8f2k3j5l8n9m1p4q7r0s?label=T-Zero%20Sponsorship) | [🔍 Mempool Explorer](https://mempool.space/address/bc1q9k4hvd6c2g8l9w3z7v8f2k3j5l8n9m1p4q7r0s) |
 | 🟢 **USDT (TRC-20)**<br>*(Tron Network)* | `TE7uKxZJ414u938gWf6bYh9QvRk2141517` | [⚡ **Send via Tron Wallet**](tron:TE7uKxZJ414u938gWf6bYh9QvRk2141517) | [🔍 Tronscan](https://tronscan.org/#/address/TE7uKxZJ414u938gWf6bYh9QvRk2141517) |
+| 🌐 **Web3 Support Hub** | T-Zero Interactive Portal | [🌐 **tzero-indol.vercel.app/#support**](https://tzero-indol.vercel.app/#support) | Direct interactive crypto & QR hub |
 | 💖 **GitHub Sponsors** | Direct GitHub Sponsorship | [💖 **Sponsor on GitHub**](https://github.com/sponsors/toprakahmetaydogmus) | Recurring or one-time |
 | 🌐 **Creator Hub** | Toprak Ahmet Aydoğmuş (Siber Akademi) | [🌐 **hopp.bio/siberegitim**](https://hopp.bio/siberegitim) | Direct developer hub & profiles |
 
