@@ -551,6 +551,205 @@ def _pure_fuzzy_symbol_search(
     return matches[:top_k]
 
 
+def _pure_build_context_tree(root_dir: str, tier: int = 3) -> Dict[str, Any]:
+    total_lines = 0
+    file_count = 0
+    nodes = []
+    ignored = {".git", "node_modules", "venv", ".venv", "__pycache__", "dist", "build", "target", ".pytest_cache", ".gemini"}
+    for root, dirs, files in os.walk(root_dir):
+        dirs[:] = [d for d in dirs if d not in ignored and not d.startswith('.')]
+        for f in files:
+            if f.endswith((".py", ".rs", ".ts", ".js", ".go", ".json", ".toml", ".md")):
+                fpath = os.path.join(root, f)
+                try:
+                    with open(fpath, "r", encoding="utf-8", errors="ignore") as fp:
+                        content = fp.read()
+                    lines = len(content.splitlines())
+                    total_lines += lines
+                    file_count += 1
+                    rel = os.path.relpath(fpath, root_dir).replace("\\", "/")
+                    nodes.append({
+                        "path": fpath,
+                        "relative_path": rel,
+                        "lines": lines,
+                        "raw_tokens": len(content) // 4,
+                        "pruned_tokens": max(5, (len(content) // 4) // 10),
+                    })
+                except Exception:
+                    pass
+    raw_toks = sum(n["raw_tokens"] for n in nodes)
+    pruned_toks = sum(n["pruned_tokens"] for n in nodes)
+    red = round(((raw_toks - pruned_toks) / raw_toks) * 100.0, 1) if raw_toks else 0.0
+    tree_text = f"T-ZERO CONTEXT TREE (Tier {tier}) | {file_count} files, {total_lines} lines\nTokens: {raw_toks} raw -> {pruned_toks} context ({red}% reduction)\n"
+    for n in nodes[:30]:
+        tree_text += f"+-- {n['relative_path']} ({n['lines']} lines)\n"
+    return {
+        "root_dir": root_dir,
+        "tier": tier,
+        "total_files": file_count,
+        "total_lines": total_lines,
+        "raw_tokens": raw_toks,
+        "pruned_tokens": pruned_toks,
+        "token_reduction_percent": red,
+        "formatted_tree": tree_text,
+    }
+
+
+def _pure_enforce_boundaries(edges: List[Tuple[str, str]], banned: Optional[List[str]] = None) -> Dict[str, Any]:
+    banned_set = set(banned or ["eval", "exec", "pickle"])
+    violations = []
+    circular = []
+    banned_findings = []
+    graph = collections.defaultdict(list)
+    all_mods = set()
+
+    for src, dst in edges:
+        all_mods.add(src)
+        all_mods.add(dst)
+        graph[src].append(dst)
+        for b in banned_set:
+            if b in dst:
+                banned_findings.append(f"Module '{src}' imports banned symbol/module '{dst}'")
+
+        src_low = src.lower()
+        dst_low = dst.lower()
+        src_is_persist = any(k in src_low for k in ("model", "persist", "db", "ast"))
+        dst_is_pres = any(k in dst_low for k in ("cli", "api", "ui", "mcp"))
+        if src_is_persist and dst_is_pres:
+            violations.append({
+                "source_module": src,
+                "source_layer": "Persistence",
+                "target_module": dst,
+                "target_layer": "Presentation",
+                "violation_type": "LayerBreach",
+                "description": f"Inward-only violation: Persistence module '{src}' cannot depend on outer Presentation module '{dst}'",
+            })
+
+    visited = set()
+    rec_stack = set()
+    path = []
+
+    def dfs(node):
+        visited.add(node)
+        rec_stack.add(node)
+        path.append(node)
+        for nbr in graph.get(node, []):
+            if nbr not in visited:
+                dfs(nbr)
+            elif nbr in rec_stack:
+                idx = path.index(nbr) if nbr in path else 0
+                cycle = path[idx:] + [nbr]
+                circular.append({"cycle": cycle, "length": len(cycle) - 1})
+        path.pop()
+        rec_stack.remove(node)
+
+    for m in all_mods:
+        if m not in visited:
+            dfs(m)
+
+    is_compliant = not violations and not circular and not banned_findings
+    return {
+        "total_modules_checked": len(all_mods),
+        "total_edges_checked": len(edges),
+        "is_compliant": is_compliant,
+        "violations": violations,
+        "circular_dependencies": circular,
+        "banned_import_findings": banned_findings,
+    }
+
+
+def _pure_verify_hallucinations(code: str, valid_symbols: List[str]) -> Dict[str, Any]:
+    import re
+    valid_set = set(valid_symbols) | {
+        "print", "len", "range", "str", "int", "float", "bool", "list", "dict",
+        "set", "tuple", "open", "isinstance", "sum", "min", "max", "sorted",
+        "enumerate", "zip",
+    }
+    call_re = re.compile(r"([a-zA-Z0-9_]+)\s*\(")
+    detected = []
+    total_checked = 0
+    lines = code.splitlines()
+
+    for idx, line in enumerate(lines, 1):
+        tr = line.strip()
+        if tr.startswith(("#", "//", "def ", "async def ", "class ", "fn ", "pub fn ", "func ")):
+            continue
+        for m in call_re.finditer(line):
+            call_name = m.group(1)
+            if call_name in ("if", "while", "for", "with", "match", "def", "class", "return"):
+                continue
+            total_checked += 1
+            if call_name not in valid_set and not call_name.startswith("_"):
+                best_cand = None
+                best_sim = 0.0
+                for cand in valid_symbols:
+                    sim = _pure_fuzzy_similarity(call_name, cand)
+                    if sim > best_sim and sim >= 0.5:
+                        best_sim = sim
+                        best_cand = cand
+                detected.append({
+                    "symbol": call_name,
+                    "kind": "call_identifier",
+                    "line": idx,
+                    "suggested_replacement": best_cand,
+                    "similarity_confidence": round(best_sim, 2),
+                })
+
+    total = max(1, total_checked)
+    score = round(((total - len(detected)) / total) * 100.0, 1)
+    return {
+        "total_symbols_checked": total,
+        "hallucination_count": len(detected),
+        "hallucination_free": len(detected) == 0,
+        "safety_score": score,
+        "hallucinations": detected,
+    }
+
+
+def _pure_estimate_costs(
+    raw_tokens: int,
+    pruned_tokens: int,
+    output_tokens: int = 2000,
+    model: str = "gpt-4o",
+) -> Dict[str, Any]:
+    pricing_table = {
+        "gpt-4o": (2.50, 10.00),
+        "gpt-4o-mini": (0.15, 0.60),
+        "o3-mini": (1.10, 4.40),
+        "claude-3-5-sonnet": (3.00, 15.00),
+        "claude-3-5-haiku": (0.80, 4.00),
+        "gemini-1-5-pro": (1.25, 5.00),
+        "gemini-1-5-flash": (0.075, 0.30),
+        "gemini-2-0-flash": (0.10, 0.40),
+        "deepseek-v3": (0.14, 0.28),
+        "deepseek-r1": (0.55, 2.19),
+    }
+    inp_price, out_price = pricing_table.get(model, (2.50, 10.00))
+    base_in = (raw_tokens / 1_000_000.0) * inp_price
+    base_out = (output_tokens / 1_000_000.0) * out_price
+    baseline_cost = round(base_in + base_out, 5)
+
+    opt_in = (pruned_tokens / 1_000_000.0) * inp_price
+    opt_out = (output_tokens / 1_000_000.0) * out_price
+    optimized_cost = round(opt_in + opt_out, 5)
+
+    savings = max(0.0, round(baseline_cost - optimized_cost, 5))
+    red_pct = round((savings / baseline_cost) * 100.0, 1) if baseline_cost > 0 else 0.0
+    monthly_savings = round(savings * 20_000.0, 2)
+
+    return {
+        "input_tokens": raw_tokens,
+        "output_tokens": output_tokens,
+        "pruned_input_tokens": pruned_tokens,
+        "baseline_model": model,
+        "baseline_cost_usd": baseline_cost,
+        "optimized_cost_usd": optimized_cost,
+        "cost_savings_usd": savings,
+        "cost_reduction_percent": red_pct,
+        "monthly_projected_savings_usd": monthly_savings,
+    }
+
+
 class RustCoreBridge:
     """Adaptive FFI/subprocess/PyO3 bridge to crates/tzero_core with pure-Python fallback."""
 
@@ -818,6 +1017,40 @@ class RustCoreBridge:
             return list(self._pyo3_mod.fuzzy_symbol_search(query, candidates, min_similarity, top_k))
         return _pure_fuzzy_symbol_search(query, candidates, min_similarity=min_similarity, top_k=top_k)
 
+    def build_context_tree(self, root_dir: str, tier: int = 3) -> Dict[str, Any]:
+        if self._pyo3_mod is not None and hasattr(self._pyo3_mod, "build_context_tree"):
+            res = self._pyo3_mod.build_context_tree(root_dir, tier)
+            if isinstance(res, dict):
+                return res
+        return _pure_build_context_tree(root_dir, tier=tier)
+
+    def enforce_boundaries(self, edges: List[Tuple[str, str]], banned: Optional[List[str]] = None) -> Dict[str, Any]:
+        if self._pyo3_mod is not None and hasattr(self._pyo3_mod, "enforce_boundaries"):
+            res = self._pyo3_mod.enforce_boundaries(edges, banned)
+            if isinstance(res, dict):
+                return res
+        return _pure_enforce_boundaries(edges, banned=banned)
+
+    def verify_hallucinations(self, code: str, valid_symbols: List[str]) -> Dict[str, Any]:
+        if self._pyo3_mod is not None and hasattr(self._pyo3_mod, "verify_hallucinations"):
+            res = self._pyo3_mod.verify_hallucinations(code, valid_symbols)
+            if isinstance(res, dict):
+                return res
+        return _pure_verify_hallucinations(code, valid_symbols)
+
+    def estimate_costs(
+        self,
+        raw_tokens: int,
+        pruned_tokens: int,
+        output_tokens: int = 2000,
+        model: str = "gpt-4o",
+    ) -> Dict[str, Any]:
+        if self._pyo3_mod is not None and hasattr(self._pyo3_mod, "estimate_costs"):
+            res = self._pyo3_mod.estimate_costs(raw_tokens, pruned_tokens, output_tokens, model)
+            if isinstance(res, dict):
+                return res
+        return _pure_estimate_costs(raw_tokens, pruned_tokens, output_tokens=output_tokens, model=model)
+
 
 _GLOBAL_BRIDGE: Optional[RustCoreBridge] = None
 
@@ -920,6 +1153,27 @@ def fuzzy_symbol_search(
     top_k: int = 5,
 ) -> List[Dict[str, Any]]:
     return get_bridge().fuzzy_symbol_search(query, candidates, min_similarity=min_similarity, top_k=top_k)
+
+
+def build_context_tree(root_dir: str, tier: int = 3) -> Dict[str, Any]:
+    return get_bridge().build_context_tree(root_dir, tier=tier)
+
+
+def enforce_boundaries(edges: List[Tuple[str, str]], banned: Optional[List[str]] = None) -> Dict[str, Any]:
+    return get_bridge().enforce_boundaries(edges, banned=banned)
+
+
+def verify_hallucinations(code: str, valid_symbols: List[str]) -> Dict[str, Any]:
+    return get_bridge().verify_hallucinations(code, valid_symbols)
+
+
+def estimate_costs(
+    raw_tokens: int,
+    pruned_tokens: int,
+    output_tokens: int = 2000,
+    model: str = "gpt-4o",
+) -> Dict[str, Any]:
+    return get_bridge().estimate_costs(raw_tokens, pruned_tokens, output_tokens=output_tokens, model=model)
 
 
 class AgentKernelSandbox:

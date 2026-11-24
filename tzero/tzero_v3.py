@@ -493,7 +493,7 @@ def calculate_token_cost(token_count: int, provider_name: str) -> float:
 # i18n Translations
 TRANSLATIONS: Dict[str, Dict[str, str]] = {
     "en": {
-        "title": "T-Zero Developer Console & Context Architect v12.1.4",
+        "title": "T-Zero Developer Console & Context Architect v12.2.0",
         "subtitle": f"Developer: {DEV_NAME} | {DEV_URL_MAIN} | {DEV_URL_BIO}",
         "overview_tab": "🏠 Overview Dashboard",
         "setup_tab": "⚡ Setup & AI Models",
@@ -530,7 +530,7 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "audit_btn": "🛡️ SECURITY AUDIT"
     },
     "tr": {
-        "title": "T-Zero Geliştirici Konsolu & Bağlam Mimarı v12.1.4",
+        "title": "T-Zero Geliştirici Konsolu & Bağlam Mimarı v12.2.0",
         "subtitle": f"Geliştirici: {DEV_NAME} | {DEV_URL_MAIN} | {DEV_URL_BIO}",
         "overview_tab": "🏠 Genel Bakış",
         "setup_tab": "⚡ Kurulum & Model",
@@ -9272,6 +9272,68 @@ def main():
         run_system_disk_doctor(clean=True, workspace_dir=target_dir)
         sys.exit(0)
 
+    # Fast path for Anti-REA armor / protection
+    if len(sys.argv) > 1 and sys.argv[1].lower() in ("armor", "anti-rea", "--armor", "--anti-rea"):
+        from tzero.tzero_armor import protect_path_with_armor
+        target_path = sys.argv[2] if len(sys.argv) > 2 and not sys.argv[2].startswith("-") else "."
+        res = protect_path_with_armor(target_path)
+        if res.get("success"):
+            print(f"[OK] Applied Anti-REA Armor to: {target_path}")
+            if "score_after" in res:
+                print(f"     AI Resistance Score: {res.get('score_before')}/100 -> {res.get('score_after')}/100 [{res.get('rating')}]")
+            elif "files_protected" in res:
+                print(f"     Protected {res['files_protected']} files in directory.")
+        else:
+            print(f"[FAIL] Armor protection failed: {res.get('error', 'Unknown error')}", file=sys.stderr)
+        sys.exit(0 if res.get("success") else 1)
+
+    # Fast path for Anti-REA audit
+    if len(sys.argv) > 1 and sys.argv[1].lower() in ("audit-rea", "--audit-rea"):
+        from tzero.tzero_armor import audit_path_rea_resistance
+        target_path = sys.argv[2] if len(sys.argv) > 2 and not sys.argv[2].startswith("-") else "."
+        audit = audit_path_rea_resistance(target_path)
+        print("================================================================================")
+        print("  SHIELD AUDIT REPORT: AI REVERSE-ENGINEERING RESISTANCE (TDQS-REA)")
+        print("================================================================================")
+        print(f"Target:       {target_path}")
+        print(f"AI Score:     {audit.get('score', 0)} / 100 [{audit.get('rating', 'UNKNOWN')}]")
+        print(f"Status:       {audit.get('status', 'N/A')}")
+        if audit.get("defenses_active"):
+            print("\nActive Defenses:")
+            for k, v in audit["defenses_active"].items():
+                print(f"  [{'✔' if v else ' '}] {k}")
+        recs = audit.get("sample_findings") or audit.get("findings", [])
+        if recs:
+            print("\nRecommendations:")
+            for f in recs:
+                print(f"  • {f}")
+        print("================================================================================")
+        sys.exit(0)
+
+    # Fast path for Anti-REA shield-exe
+    if len(sys.argv) > 1 and sys.argv[1].lower() in ("shield-exe", "--shield-exe"):
+        from tzero.tzero_armor import shield_executable
+        target_path = sys.argv[2] if len(sys.argv) > 2 and not sys.argv[2].startswith("-") else ""
+        if not target_path:
+            print("Usage: tzero shield-exe <path_to_binary.exe>", file=sys.stderr)
+            sys.exit(1)
+        res = shield_executable(target_path)
+        if res.get("shielded"):
+            print(f"[OK] Shielded executable against pyinstxtractor: {res.get('output_path', target_path)}")
+            print(f"     Decoy archive traps injected: {res.get('decoy_traps_injected', 0)}")
+        else:
+            print(f"[INFO] {res.get('reason', 'Already shielded or not a PyInstaller binary.')}")
+        sys.exit(0 if res.get("shielded") else 1)
+
+    # Fast path for Anti-REA radar / gui
+    if len(sys.argv) > 1 and sys.argv[1].lower() in ("radar", "--radar", "anti-rea-gui"):
+        try:
+            from tzero.anti_rea.gui import main as gui_main
+            gui_main()
+        except Exception as e:
+            print(f"Error launching Anti-REA GUI: {e}", file=sys.stderr)
+        sys.exit(0)
+
     parser = argparse.ArgumentParser(
         description="Siber Akademi T-Zero Context Architect - Enterprise Codebase Context Builder & Token Reducer",
         epilog="""
@@ -9345,6 +9407,8 @@ def main():
     parser.add_argument("--patch", "--apply-patch", dest="apply_patch", metavar="DIFF_FILE_OR_STR", help="Apply patch with AST-tolerant fuzzy matching (whitespace & line drift agnostic)")
     parser.add_argument("--target", default=None, metavar="TARGET_FILE", help="Target file for --patch (optional if patch specifies file header)")
     parser.add_argument("--fuzzy", action="store_true", default=True, help="Enable fuzzy AST and whitespace matching for patch application (default: True)")
+    parser.add_argument("--armor", "--anti-rea", nargs="?", const=".", default=None, metavar="PATH", dest="armor", help="Apply military-grade Anti-REA armor against AI reverse engineering (morluto/rea)")
+    parser.add_argument("--audit-rea", nargs="?", const=".", default=None, metavar="PATH", dest="audit_rea", help="Audit code or binary for resistance against AI reverse engineering (0-100)")
     parser.add_argument("--no-fuzzy", dest="fuzzy", action="store_false", help="Disable fuzzy matching and enforce exact line matches only")
     parser.add_argument("--dry-run-patch", action="store_true", help="Validate patch applicability without modifying files on disk")
     parser.add_argument("--reverse-patch", action="store_true", help="Un-apply / revert patch changes")
@@ -9364,7 +9428,7 @@ def main():
                         default="o200k_base", help="BPE encoding for --symbol-context")
     parser.add_argument("--cache-aligned", action="store_true", help="Order context for KV-cache prefix stability (immutable static prefix before dynamic query suffix)")
     parser.add_argument("--commit-msg", action="store_true", help="Generate Conventional Commit message from local AST git diff ($0 local engine)")
-    parser.add_argument("--changelog", nargs="?", const="v12.1.4", default=None, metavar="VERSION", help="Generate release CHANGELOG markdown from git history")
+    parser.add_argument("--changelog", nargs="?", const="v12.2.0", default=None, metavar="VERSION", help="Generate release CHANGELOG markdown from git history")
     parser.add_argument("--ci", choices=["github", "gitlab", "pre-commit", "local", "all"], default=None, help="Install CI/CD workflow or run local verification suite")
     parser.add_argument("--local-ci", action="store_true", help="Run comprehensive Local CI & Pre-Push verification battery ($0 quota burn)")
     parser.add_argument("--quick-ci", action="store_true", help="Run fast Local CI smoke checks in seconds")
@@ -9428,7 +9492,7 @@ def main():
     parser.add_argument("--card", "--badge", nargs="?", const="assets/tzero_badge_card.svg", default=None, metavar="FILE", help="Generate viral dark-mode SVG banner card and GitHub README badges")
     parser.add_argument("--showcase", nargs="?", const="tzero_showcase.html", default=None, metavar="FILE", help="Generate interactive split-screen HTML5 comparison showcase slider")
     parser.add_argument("--marketing", "--growth", action="store_true", help="Launch $0-budget viral growth engine and export campaign materials for Reddit, HN, X, and Product Hunt")
-    parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect v12.1.4 Master Edition (engine v4.1.0)")
+    parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect v12.2.0 Master Edition (engine v4.1.0)")
 
 
     def print_master_tutorial():
@@ -9537,7 +9601,7 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
     def print_quickstart_guide():
         print("""
 ================================================================================
-⚡ SİBER AKADEMİ — T-ZERO CONTEXT ARCHITECT & MCP v12.1.4 MASTER (engine v4.1.0)
+⚡ SİBER AKADEMİ — T-ZERO CONTEXT ARCHITECT & MCP v12.2.0 MASTER (engine v4.1.0)
 ================================================================================
 🎯 %95'e Varan Token Tasarrufu & Otonom Yapay Zeka Mimari Bağlam Motoru
 
@@ -9745,6 +9809,24 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
     elif getattr(args, "clean", False):
         from tzero.tzero_traffic import run_system_disk_doctor
         run_system_disk_doctor(clean=True, workspace_dir=args.dir)
+        return
+    elif getattr(args, "armor", None):
+        from tzero.tzero_armor import protect_path_with_armor
+        res = protect_path_with_armor(args.armor)
+        if res.get("success"):
+            print(f"[OK] Applied Anti-REA Armor to: {args.armor}")
+            if "score_after" in res:
+                print(f"     AI Resistance Score: {res.get('score_before')}/100 -> {res.get('score_after')}/100 [{res.get('rating')}]")
+            elif "files_protected" in res:
+                print(f"     Protected {res['files_protected']} files in directory.")
+        else:
+            print(f"[FAIL] Armor protection failed: {res.get('error', 'Unknown error')}", file=sys.stderr)
+            sys.exit(1)
+        return
+    elif getattr(args, "audit_rea", None):
+        from tzero.tzero_armor import audit_path_rea_resistance
+        audit = audit_path_rea_resistance(args.audit_rea)
+        print(json.dumps(audit, indent=2))
         return
     elif getattr(args, "info", False):
         print_quickstart_guide()
@@ -10484,7 +10566,7 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
         if not os.path.exists(app_path):
             app_path = os.path.join(os.getcwd(), "huggingface-space", "app.py")
         print("\033[36m" + "=" * 80)
-        print("🤗 SİBER AKADEMİ — T-ZERO HUGGING FACE SPACE & GRADIO COCKPIT (v12.1.4)")
+        print("🤗 SİBER AKADEMİ — T-ZERO HUGGING FACE SPACE & GRADIO COCKPIT (v12.2.0)")
         print("=" * 80 + "\033[0m")
         print("🌐 Official Live Space : https://huggingface.co/spaces/toprakke4/tzero-token-reducer")
         print(f"📁 Local Application   : {app_path}")

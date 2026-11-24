@@ -1,6 +1,6 @@
 [package]
 name = "tzero-core"
-version = "12.1.4"
+version = "12.2.0"
 edition = "2021"
 authors = ["Toprak Ahmet Aydoğmuş (Siber Akademi) <siberakademi@org.tr>"]
 description = "T-Zero Turbo Rust Hybrid Core — Ultra-High Performance Multi-Language AST Pruning, Shannon Entropy Zero-Leak Guard & BPE Tokenizer"

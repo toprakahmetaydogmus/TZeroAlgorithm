@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tzero-mcp"
-version = "12.1.4"
-description = "Enterprise Codebase Context Builder, AST Signatures Analyzer, & Token Reducer for LLMs"
+version = "12.2.0"
+description = "Enterprise Codebase Context Builder, AST Signatures Analyzer, Token Reducer & 24-Tier Anti-REA Armor Suite for LLMs"
 readme = "README.md"
 requires-python = ">=3.11"
 license = "AGPL-3.0-only"
@@ -101,9 +101,11 @@ tzero-explain = "tzero.tzero_v3:main"
 tzero-ci = "tzero.tzero_ci:main"
 tzero-local-ci = "tzero.tzero_ci:main"
 tzero-promo = "tzero.tzero_promo:main"
+tzero-armor = "tzero.tzero_v3:main"
+tzero-radar = "tzero.tzero_v3:main"
 
 [tool.setuptools]
-packages = ["tzero", "tzero.tzero_jarvis", "tzero.tzero_fixer"]
+packages = ["tzero", "tzero.tzero_jarvis", "tzero.tzero_fixer", "tzero.anti_rea"]
 py-modules = ["main", "addmcp", "app", "pc_fixer_mcp", "tzero", "tzero_mcp"]
 
 [tool.setuptools.package-data]

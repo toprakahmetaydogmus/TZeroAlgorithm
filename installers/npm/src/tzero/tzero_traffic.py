@@ -26,6 +26,7 @@ NPM_URL = "https://www.npmjs.com/package/tzero-mcp"
 BIO_URL = "https://hopp.bio/siberegitim"
 
 # Official Crypto Donation Addresses (100% Free & Open-Source Sustenance)
+CRYPTO_ETH = "0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5"
 CRYPTO_USDT_TRC20 = "TE7uKxZJ414u938gWf6bYh9QvRk2141517"
 CRYPTO_BTC = "bc1q9k4hvd6c2g8l9w3z7v8f2k3j5l8n9m1p4q7r0s"
 
@@ -124,6 +125,9 @@ def print_crypto_support_card() -> Dict[str, str]:
 │   %100 BEDAVA sunulabilmesi için geliştirici Toprak Ahmet Aydoğmuş'a         │
 │   kripto ile destek olabilirsiniz."                                          │
 │                                                                              │
+│  🔷 Ethereum / EVM (ERC-20, Arbitrum, Polygon, Optimism, BSC):               │
+│     \033[1;32m{CRYPTO_ETH}\033[1;33m                    │
+│                                                                              │
 │  🪙 USDT (TRC-20 Network):                                                   │
 │     \033[1;32m{CRYPTO_USDT_TRC20}\033[1;33m                          │
 │                                                                              │
@@ -139,6 +143,8 @@ def print_crypto_support_card() -> Dict[str, str]:
 """
     print(card)
     return {
+        "eth": CRYPTO_ETH,
+        "ethereum": CRYPTO_ETH,
         "usdt_trc20": CRYPTO_USDT_TRC20,
         "btc": CRYPTO_BTC,
         "repo": REPO_URL,

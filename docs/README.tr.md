@@ -92,7 +92,7 @@ tzero init
 tzero share
 
 # VS Code / Cursor Eklentisini (.vsix) Yükle:
-code --install-extension dist/tzero-vscode-12.1.4.vsix
+code --install-extension dist/tzero-vscode-12.2.0.vsix
 
 # Yerel CI ve Pre-Push Korumasını Çalıştır ($0 Kota):
 tzero local-ci --quick

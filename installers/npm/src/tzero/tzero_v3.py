@@ -9102,6 +9102,69 @@ def print_viral_share_hub(open_browser: bool = False):
             pass
 
 
+def print_sponsor_hub(open_browser: bool = False):
+    """Prints 1-click Web3 and crypto donation deep links, addresses, and opens sponsor page."""
+    try:
+        from tzero.tzero_terminal import init_terminal, sanitize_terminal_text
+        init_terminal()
+    except ImportError:
+        try:
+            from tzero_terminal import init_terminal, sanitize_terminal_text
+            init_terminal()
+        except Exception:
+            def sanitize_terminal_text(t):
+                return t
+
+    evm_addr = "0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5"
+    btc_addr = "bc1q9k4hvd6c2g8l9w3z7v8f2k3j5l8n9m1p4q7r0s"
+    usdt_addr = "TE7uKxZJ414u938gWf6bYh9QvRk2141517"
+    etherscan_link = f"https://etherscan.io/address/{evm_addr}"
+    tronscan_link = f"https://tronscan.org/#/address/{usdt_addr}"
+    mempool_link = f"https://mempool.space/address/{btc_addr}"
+    github_sponsors = "https://github.com/sponsors/toprakahmetaydogmus"
+    support_web = "https://tzero-indol.vercel.app/#support"
+
+    raw_hub = f"""
+┌────────────────────────────────────────────────────────────────────────┐
+│  💖 T-ZERO 1-CLICK WEB3 & CRYPTO DONATION HUB                          │
+│  Keeping T-Zero 100% Free, Offline & Zero-Leak Worldwide                │
+└────────────────────────────────────────────────────────────────────────┘
+
+[🔷 Ethereum / EVM] (ETH, ERC-20, Polygon, Arbitrum, BSC, Optimism):
+  Address:       {evm_addr}
+  Web3 URI:      ethereum:{evm_addr}
+  Explorer:      {etherscan_link}
+
+[🟠 Bitcoin] (Native SegWit bech32):
+  Address:       {btc_addr}
+  Bitcoin URI:   bitcoin:{btc_addr}?label=T-Zero%20Sponsorship
+  Explorer:      {mempool_link}
+
+[🟢 USDT] (TRC-20 Tron Network):
+  Address:       {usdt_addr}
+  Tron URI:      tron:{usdt_addr}
+  Explorer:      {tronscan_link}
+
+[💖 GitHub Sponsors]:
+  {github_sponsors}
+
+[🌐 Interactive Web3 & QR Code Hub]:
+  {support_web}
+
+════════════════════════════════════════════════════════════════════════
+✔ 100% of contributions directly sustain local-first open-source tooling!
+════════════════════════════════════════════════════════════════════════
+"""
+    print(sanitize_terminal_text(raw_hub))
+    if open_browser:
+        try:
+            import webbrowser
+            print(sanitize_terminal_text("\n\033[36m► Opening Web3 sponsor hub in default browser...\033[0m"))
+            webbrowser.open(support_web)
+        except Exception:
+            pass
+
+
 def main():
     import argparse
     import json
@@ -9146,6 +9209,12 @@ def main():
     if len(sys.argv) > 1 and sys.argv[1].lower() in ("share", "--share", "-share", "tweet", "social"):
         open_b = any(arg in ("--open", "-o", "open") for arg in sys.argv[2:])
         print_viral_share_hub(open_browser=open_b)
+        sys.exit(0)
+
+    # Fast path for sponsor / donate subcommands
+    if len(sys.argv) > 1 and sys.argv[1].lower() in ("sponsor", "donate", "funding", "--sponsor", "-sponsor"):
+        open_b = any(arg in ("--open", "-o", "open") for arg in sys.argv[2:])
+        print_sponsor_hub(open_browser=open_b)
         sys.exit(0)
 
     # Fast path for promo / launch subcommands
@@ -9203,6 +9272,68 @@ def main():
         run_system_disk_doctor(clean=True, workspace_dir=target_dir)
         sys.exit(0)
 
+    # Fast path for Anti-REA armor / protection
+    if len(sys.argv) > 1 and sys.argv[1].lower() in ("armor", "anti-rea", "--armor", "--anti-rea"):
+        from tzero.tzero_armor import protect_path_with_armor
+        target_path = sys.argv[2] if len(sys.argv) > 2 and not sys.argv[2].startswith("-") else "."
+        res = protect_path_with_armor(target_path)
+        if res.get("success"):
+            print(f"[OK] Applied Anti-REA Armor to: {target_path}")
+            if "score_after" in res:
+                print(f"     AI Resistance Score: {res.get('score_before')}/100 -> {res.get('score_after')}/100 [{res.get('rating')}]")
+            elif "files_protected" in res:
+                print(f"     Protected {res['files_protected']} files in directory.")
+        else:
+            print(f"[FAIL] Armor protection failed: {res.get('error', 'Unknown error')}", file=sys.stderr)
+        sys.exit(0 if res.get("success") else 1)
+
+    # Fast path for Anti-REA audit
+    if len(sys.argv) > 1 and sys.argv[1].lower() in ("audit-rea", "--audit-rea"):
+        from tzero.tzero_armor import audit_path_rea_resistance
+        target_path = sys.argv[2] if len(sys.argv) > 2 and not sys.argv[2].startswith("-") else "."
+        audit = audit_path_rea_resistance(target_path)
+        print("================================================================================")
+        print("  SHIELD AUDIT REPORT: AI REVERSE-ENGINEERING RESISTANCE (TDQS-REA)")
+        print("================================================================================")
+        print(f"Target:       {target_path}")
+        print(f"AI Score:     {audit.get('score', 0)} / 100 [{audit.get('rating', 'UNKNOWN')}]")
+        print(f"Status:       {audit.get('status', 'N/A')}")
+        if audit.get("defenses_active"):
+            print("\nActive Defenses:")
+            for k, v in audit["defenses_active"].items():
+                print(f"  [{'✔' if v else ' '}] {k}")
+        recs = audit.get("sample_findings") or audit.get("findings", [])
+        if recs:
+            print("\nRecommendations:")
+            for f in recs:
+                print(f"  • {f}")
+        print("================================================================================")
+        sys.exit(0)
+
+    # Fast path for Anti-REA shield-exe
+    if len(sys.argv) > 1 and sys.argv[1].lower() in ("shield-exe", "--shield-exe"):
+        from tzero.tzero_armor import shield_executable
+        target_path = sys.argv[2] if len(sys.argv) > 2 and not sys.argv[2].startswith("-") else ""
+        if not target_path:
+            print("Usage: tzero shield-exe <path_to_binary.exe>", file=sys.stderr)
+            sys.exit(1)
+        res = shield_executable(target_path)
+        if res.get("shielded"):
+            print(f"[OK] Shielded executable against pyinstxtractor: {res.get('output_path', target_path)}")
+            print(f"     Decoy archive traps injected: {res.get('decoy_traps_injected', 0)}")
+        else:
+            print(f"[INFO] {res.get('reason', 'Already shielded or not a PyInstaller binary.')}")
+        sys.exit(0 if res.get("shielded") else 1)
+
+    # Fast path for Anti-REA radar / gui
+    if len(sys.argv) > 1 and sys.argv[1].lower() in ("radar", "--radar", "anti-rea-gui"):
+        try:
+            from tzero.anti_rea.gui import main as gui_main
+            gui_main()
+        except Exception as e:
+            print(f"Error launching Anti-REA GUI: {e}", file=sys.stderr)
+        sys.exit(0)
+
     parser = argparse.ArgumentParser(
         description="Siber Akademi T-Zero Context Architect - Enterprise Codebase Context Builder & Token Reducer",
         epilog="""
@@ -9211,6 +9342,12 @@ def main():
     T-Zero'yu sıfırdan yapay zeka araçlarındaki token israfını çözmek için geliştirdim.
     Beni Google'da 'Toprak Ahmet Aydoğmuş' olarak aratabilirsiniz!
     GitHub: https://github.com/toprakahmetaydogmus/TZeroAlgorithm
+
+💖 WEB3 & KRİPTO BAĞIŞ:
+    tzero sponsor  /  python tzero_v3.py sponsor
+    Ethereum: 0xF36Cd453f9F2bE91647C006C46ff66fB41d9F0c5
+    Bitcoin:  bc1q9k4hvd6c2g8l9w3z7v8f2k3j5l8n9m1p4q7r0s
+    USDT:     TE7uKxZJ414u938gWf6bYh9QvRk2141517
 """,
         formatter_class=argparse.RawTextHelpFormatter
     )
@@ -9262,12 +9399,16 @@ def main():
     parser.add_argument("--share", action="store_true", help="Generate 1-click social sharing links for Twitter/X, Reddit, Hacker News, and LinkedIn")
     parser.add_argument("--star", action="store_true", help="1-Click open GitHub repo in browser to give a star towards the 100 stars goal")
     parser.add_argument("--update", action="store_true", help="Check PyPI and GitHub for latest version and update commands")
+    parser.add_argument("--sponsor", action="store_true", help="Display 1-click Web3 and crypto donation hub (Ethereum, Bitcoin, Tron)")
+    parser.add_argument("--open", action="store_true", help="Open Web3 sponsor hub or link in default browser")
     parser.add_argument("--donate", "--support", action="store_true", dest="support", help="Display developer crypto donation & community support card")
     parser.add_argument("--roi", "--stats", action="store_true", dest="roi", help="Display live token reduction & financial dollars saved mini dashboard")
     parser.add_argument("--clean", "--disk-clean", action="store_true", dest="clean", help="Safely clean workspace temporary caches and build artifacts")
     parser.add_argument("--patch", "--apply-patch", dest="apply_patch", metavar="DIFF_FILE_OR_STR", help="Apply patch with AST-tolerant fuzzy matching (whitespace & line drift agnostic)")
     parser.add_argument("--target", default=None, metavar="TARGET_FILE", help="Target file for --patch (optional if patch specifies file header)")
     parser.add_argument("--fuzzy", action="store_true", default=True, help="Enable fuzzy AST and whitespace matching for patch application (default: True)")
+    parser.add_argument("--armor", "--anti-rea", nargs="?", const=".", default=None, metavar="PATH", dest="armor", help="Apply military-grade Anti-REA armor against AI reverse engineering (morluto/rea)")
+    parser.add_argument("--audit-rea", nargs="?", const=".", default=None, metavar="PATH", dest="audit_rea", help="Audit code or binary for resistance against AI reverse engineering (0-100)")
     parser.add_argument("--no-fuzzy", dest="fuzzy", action="store_false", help="Disable fuzzy matching and enforce exact line matches only")
     parser.add_argument("--dry-run-patch", action="store_true", help="Validate patch applicability without modifying files on disk")
     parser.add_argument("--reverse-patch", action="store_true", help="Un-apply / revert patch changes")
@@ -9654,6 +9795,9 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
         from tzero.tzero_traffic import check_version_and_updates
         check_version_and_updates()
         return
+    elif getattr(args, "sponsor", False):
+        print_sponsor_hub(open_browser=getattr(args, "open", False))
+        return
     elif getattr(args, "support", False):
         from tzero.tzero_traffic import print_crypto_support_card
         print_crypto_support_card()
@@ -9665,6 +9809,24 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
     elif getattr(args, "clean", False):
         from tzero.tzero_traffic import run_system_disk_doctor
         run_system_disk_doctor(clean=True, workspace_dir=args.dir)
+        return
+    elif getattr(args, "armor", None):
+        from tzero.tzero_armor import protect_path_with_armor
+        res = protect_path_with_armor(args.armor)
+        if res.get("success"):
+            print(f"[OK] Applied Anti-REA Armor to: {args.armor}")
+            if "score_after" in res:
+                print(f"     AI Resistance Score: {res.get('score_before')}/100 -> {res.get('score_after')}/100 [{res.get('rating')}]")
+            elif "files_protected" in res:
+                print(f"     Protected {res['files_protected']} files in directory.")
+        else:
+            print(f"[FAIL] Armor protection failed: {res.get('error', 'Unknown error')}", file=sys.stderr)
+            sys.exit(1)
+        return
+    elif getattr(args, "audit_rea", None):
+        from tzero.tzero_armor import audit_path_rea_resistance
+        audit = audit_path_rea_resistance(args.audit_rea)
+        print(json.dumps(audit, indent=2))
         return
     elif getattr(args, "info", False):
         print_quickstart_guide()

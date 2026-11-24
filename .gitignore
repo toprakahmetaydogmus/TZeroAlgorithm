@@ -45,6 +45,7 @@ Desktop.ini
 .DS_Store
 
 # Node & Video Outputs
+packages/
 node_modules/
 tzero-showcase/node_modules/
 tzero-showcase/package-lock.json

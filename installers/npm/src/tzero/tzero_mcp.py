@@ -4782,9 +4782,63 @@ def create_mcp_server():
             + "\n".join([f"- [{'PASS' if s.passed else 'FAIL'}] **{s.name}** ({s.duration:.2f}s): {s.output or s.error}" for s in report.steps])
         )
 
+    def armor_against_ai_reverse_engineering(target: str = ".", output_path: str = "") -> str:
+        """Applies military-grade Anti-REA code and binary protection against AI reverse-engineering agents."""
+        from tzero.tzero_armor import protect_path_with_armor
+        res = protect_path_with_armor(target, output_path=output_path or None)
+        if not res.get("success"):
+            return f"❌ Anti-REA protection failed: {res.get('error', 'Unknown error')}"
+
+        if "score_after" in res:
+            return (
+                f"### 🛡️ T-Zero Anti-REA Military Armor Report\n"
+                f"- **Target File:** `{res['output_file']}`\n"
+                f"- **AI Resistance Score:** `{res['score_before']}/100` ➔ `{res['score_after']}/100`\n"
+                f"- **Rating:** `{res['rating']}`\n"
+                f"- **Status:** `ACTIVE` (Protected against morluto/rea, Ghidra MCP, pyinstxtractor)\n"
+            )
+        elif "files_protected" in res:
+            return (
+                f"### 🛡️ T-Zero Anti-REA Codebase Armor Report\n"
+                f"- **Directory:** `{res['directory']}`\n"
+                f"- **Files Protected:** `{res['files_protected']}`\n"
+                f"- **Status:** `ACTIVE` (All Python modules hardened with Anti-REA defense matrix)\n"
+            )
+        return json.dumps(res, indent=2)
+
+    def audit_ai_decompilation_resistance(target: str = ".") -> str:
+        """Audits target code or binary for resistance against AI reverse engineering (0-100 score)."""
+        from tzero.tzero_armor import audit_path_rea_resistance
+        audit = audit_path_rea_resistance(target)
+        if not audit.get("success", True):
+            return f"❌ Audit failed: {audit.get('error', 'Unknown error')}"
+
+        report = [
+            f"### 🛡️ AI Reverse-Engineering Resistance Audit (TDQS-REA)",
+            f"- **Target:** `{target}`",
+            f"- **Resistance Score:** `{audit.get('score', 0)} / 100` (`{audit.get('rating', 'UNKNOWN')}`)",
+            f"- **Status:** `{audit.get('status', 'N/A')}`\n",
+            f"#### Active Defenses:",
+        ]
+        for k, v in audit.get("defenses_active", {}).items():
+            report.append(f"- [{'✔' if v else ' '}] **{k}**")
+
+        recs = audit.get("sample_findings") or audit.get("findings", [])
+        if recs:
+            report.append("\n#### Hardening Recommendations:")
+            for r in recs:
+                report.append(f"- ⚠️ {r}")
+
+        return "\n".join(report)
+
     # Register canonical mappings
     _CANONICAL_DISPATCH['execute_codebase_workflow'] = execute_codebase_workflow
     _CANONICAL_DISPATCH['run_codebase_autopilot'] = execute_codebase_workflow
+    _CANONICAL_DISPATCH['armor_against_ai_reverse_engineering'] = armor_against_ai_reverse_engineering
+    _CANONICAL_DISPATCH['armor'] = armor_against_ai_reverse_engineering
+    _CANONICAL_DISPATCH['anti_rea'] = armor_against_ai_reverse_engineering
+    _CANONICAL_DISPATCH['audit_ai_decompilation_resistance'] = audit_ai_decompilation_resistance
+    _CANONICAL_DISPATCH['audit_rea'] = audit_ai_decompilation_resistance
     _CANONICAL_DISPATCH['build_project_context'] = build_project_context
     _CANONICAL_DISPATCH['prune_code_snippet'] = prune_code_snippet
     _CANONICAL_DISPATCH['manage_architecture_rules'] = manage_architecture_rules

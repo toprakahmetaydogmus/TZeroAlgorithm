@@ -284,6 +284,18 @@ def build_binary():
 
         for path in expected_outputs:
             logger.info("Binary successfully built at: %s", os.path.abspath(path))
+
+        # Apply military-grade Anti-REA binary shielding against pyinstxtractor
+        try:
+            from tzero.tzero_armor import shield_executable
+            for path in expected_outputs:
+                if os.path.exists(path) and path.endswith((".exe", ".bin")):
+                    shield_res = shield_executable(path)
+                    if shield_res.get("shielded"):
+                        logger.info("Anti-REA Armor successfully shielded executable: %s", path)
+        except Exception as e:
+            logger.warning("Could not apply Anti-REA binary shielding: %s", e)
+
         return True
             
     except subprocess.CalledProcessError as cpe:

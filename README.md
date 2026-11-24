@@ -10,10 +10,10 @@
 
 <!-- Badges Tier 1: Distribution, Release & Scale -->
 [![GitHub Release](https://img.shields.io/github/v/release/toprakahmetaydogmus/TZeroAlgorithm?style=flat-square&logo=github&color=38bdf8)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases)
-[![PyPI](https://img.shields.io/badge/pypi-v12.1.4-3b82f6?style=flat-square&logo=pypi&logoColor=white)](https://pypi.org/project/tzero-mcp/)
-[![npm](https://img.shields.io/badge/npm-v12.1.4-cb3837?style=flat-square&logo=npm)](https://www.npmjs.com/package/tzero-mcp)
-[![VS Code](https://img.shields.io/badge/vscode-v12.1.4-007acc?style=flat-square&logo=visualstudiocode&logoColor=white)](https://marketplace.visualstudio.com/items?itemName=siber-akademi.tzero-vscode)
-[![Open VSX](https://img.shields.io/badge/open--vsx-v12.1.4-8b5cf6?style=flat-square&logo=openvsx&logoColor=white)](https://open-vsx.org/extension/siber-akademi/tzero-vscode)
+[![PyPI](https://img.shields.io/badge/pypi-v12.2.0-3b82f6?style=flat-square&logo=pypi&logoColor=white)](https://pypi.org/project/tzero-mcp/)
+[![npm](https://img.shields.io/badge/npm-v12.2.0-cb3837?style=flat-square&logo=npm)](https://www.npmjs.com/package/tzero-mcp)
+[![VS Code](https://img.shields.io/badge/vscode-v12.2.0-007acc?style=flat-square&logo=visualstudiocode&logoColor=white)](https://marketplace.visualstudio.com/items?itemName=siber-akademi.tzero-vscode)
+[![Open VSX](https://img.shields.io/badge/open--vsx-v12.2.0-8b5cf6?style=flat-square&logo=openvsx&logoColor=white)](https://open-vsx.org/extension/siber-akademi/tzero-vscode)
 [![Downloads](https://img.shields.io/badge/downloads-20%2C880%2B-10b981?style=flat-square&logo=git)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases)
 [![Stars](https://img.shields.io/github/stars/toprakahmetaydogmus/TZeroAlgorithm?style=flat-square&logo=github&color=f59e0b)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/stargazers)
 
@@ -83,10 +83,10 @@ tzero share
 
 # Option D: Standalone Windows 64-Bit Executable Suite (Zero Dependencies):
 # Download all-in-one suite (.ZIP) with GUI, CLI, MCP Server & 1-Click Configurator:
-# https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/download/v12.1.4/TZero-v12.1.4-Windows-x64.zip
+# https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/download/v12.2.0/TZero-v12.2.0-Windows-x64.zip
 
 # Install VS Code / Cursor Extension (.vsix):
-code --install-extension dist/tzero-vscode-12.1.4.vsix
+code --install-extension dist/tzero-vscode-12.2.0.vsix
 ```
 
 ### Navigation & Interactive Jump Stations
@@ -162,7 +162,7 @@ tzero init --vscode        # VS Code (Continue / Copilot)
 tzero init --zed           # Zed Editor
 
 # Install official VS Code / Cursor Extension (.vsix):
-code --install-extension dist/tzero-vscode-12.1.4.vsix
+code --install-extension dist/tzero-vscode-12.2.0.vsix
 ```
 
 ### Manual Configuration Snippets (Any MCP Client)
@@ -607,6 +607,18 @@ curl -fsSL https://raw.githubusercontent.com/toprakahmetaydogmus/tzero-pc-fixer/
 - **🛡️ CWE-78 & CWE-327 Static AST Remediator:** Rewrites dangerous `subprocess.Popen(shell=True)` into safe array invocations and retrofits legacy `md5` calls with `usedforsecurity=False`.
 - **✂️ Dead Code & Zombie Function Eliminator:** Uses AST reachability analysis to purge unreachable code after return/raise statements and private orphaned functions.
 - **⚡ Async/IO Event Loop Modernizer:** Detects blocking `time.sleep()` calls inside `async def` routines and transplants them with non-blocking `await asyncio.sleep()`.
+
+---
+
+<a id="whats-new-in-v1220-24-tier-anti-rea-armor-suite"></a>
+## What's New in v12.2.0: 24-Tier Anti-REA Armor Suite & AI Reverse Engineering Shield
+T-Zero v12.2.0 introduces the world's first **24-Tier Anti-REA (Reverse Engineering Agent) Armor Suite**, providing defense against automated AI code extractors, decompilers (`pyinstxtractor`, `uncompyle6`, `pycdc`), debugger hooks (`x64dbg`, `IDA Pro`), and cognitive jailbreaks:
+- **PyInstaller ExtractorShield:** Corrupts pyinstxtractor archive parsing with deceptive headers while maintaining 100% native runtime execution.
+- **PolyVM Stack Bytecode Obfuscator & CFG Traps:** Flattens control-flow graphs into synthetic dispatcher loops, crashing static AST reconstructors.
+- **Hardware & Ring-3 Anti-Debug Matrix:** Detects `x64dbg`, `IDA`, Win32 `IsDebuggerPresent`, `NtGlobalFlag` (0x70), and PEB `BeingDebugged` with instant hard exits (`0xC0000409`).
+- **In-Flight Memory & String Vault:** Encrypts string literals with rolling-key XOR and scrubs process memory (`memset(0)`).
+- **Stealth Canary Beacon:** Dispatches real-time intrusion alarms via Webhook/DNS without plaintext network footprints.
+- **Built-in CLI & GUI:** Run `tzero armor`, `tzero audit-rea`, `tzero shield-exe`, or launch `tzero-gui`.
 
 ---
 
