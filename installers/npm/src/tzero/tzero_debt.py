@@ -212,9 +212,10 @@ class CodeHealthAnalyzer:
     def analyze_file(cls, file_path: str, code: Optional[str] = None) -> FileHealthReport:
         if code is None:
             import tempfile
-            real_fp = os.path.realpath(os.path.abspath(file_path))
-            allowed_roots = (os.path.realpath("."), os.path.realpath(tempfile.gettempdir()))
-            if not any(real_fp == r or real_fp.startswith(r + os.sep) for r in allowed_roots):
+            ws_root = os.path.realpath(".")
+            tmp_root = os.path.realpath(tempfile.gettempdir())
+            real_fp = os.path.normpath(os.path.realpath(os.path.abspath(file_path)))
+            if not real_fp.startswith(ws_root + os.sep) and not real_fp.startswith(tmp_root + os.sep):
                 raise ValueError(f"Path outside allowed workspace/temp root: {file_path}")
             try:
                 with open(real_fp, "r", encoding="utf-8", errors="replace") as f:

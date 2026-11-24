@@ -340,14 +340,15 @@ class ScipIndexImporter:
     def load(cls, path: str) -> ScipIndexGraph:
         if not path or "\x00" in path:
             raise ValueError("Invalid SCIP/LSIF index path.")
-        real_path = os.path.realpath(os.path.abspath(path))
-        allowed_roots = (os.path.realpath("."), os.path.realpath(os.path.expanduser("~")))
         import tempfile
-        temp_root = os.path.realpath(tempfile.gettempdir())
-        if not (
-            real_path == temp_root
-            or real_path.startswith(temp_root + os.sep)
-            or any(real_path == r or real_path.startswith(r + os.sep) for r in allowed_roots)
+        ws_root = os.path.realpath(".")
+        tmp_root = os.path.realpath(tempfile.gettempdir())
+        home_root = os.path.realpath(os.path.expanduser("~"))
+        real_path = os.path.normpath(os.path.realpath(os.path.abspath(path)))
+        if (
+            not real_path.startswith(ws_root + os.sep)
+            and not real_path.startswith(tmp_root + os.sep)
+            and not real_path.startswith(home_root + os.sep)
         ):
             raise ValueError(f"SCIP/LSIF path outside allowed scope: {path}")
         if not os.path.isfile(real_path):

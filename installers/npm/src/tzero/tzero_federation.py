@@ -235,12 +235,17 @@ class FederationSyncEngine:
 
         # 3. Optional SCIP trace
         scip_trace: Optional[Dict[str, Any]] = None
-        if scip_path and os.path.isfile(scip_path):
-            try:
-                from tzero.tzero_scip import ScipIndexImporter
-                scip_trace = ScipIndexImporter.load(scip_path).trace_symbol(sym)
-            except Exception as e:
-                scip_trace = {"error": str(e)}
+        if scip_path:
+            import tempfile
+            ws_root = os.path.realpath(".")
+            tmp_root = os.path.realpath(tempfile.gettempdir())
+            safe_scip = os.path.normpath(os.path.realpath(os.path.abspath(scip_path)))
+            if (safe_scip.startswith(ws_root + os.sep) or safe_scip.startswith(tmp_root + os.sep)) and os.path.isfile(safe_scip):
+                try:
+                    from tzero.tzero_scip import ScipIndexImporter
+                    scip_trace = ScipIndexImporter.load(safe_scip).trace_symbol(sym)
+                except Exception as e:
+                    scip_trace = {"error": str(e)}
 
         return {
             "symbol": sym,

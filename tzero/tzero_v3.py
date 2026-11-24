@@ -10049,8 +10049,8 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
                 print(f"   [LAYER VIOLATION] {v['file']}:{v['line']} (layer: {v['layer']}) imports forbidden '{v['imported']}' - {v['reason']}")
             for c in report["circular_cycles"]:
                 print(f"   [CIRCULAR IMPORT] Cycle detected: {c}")
-            for s in report["secret_leaks"]:
-                print(f"   [SECRET LEAK] {s.get('file', '<unknown>')} (credential pattern detected)")
+            for idx, _ in enumerate(report["secret_leaks"], 1):
+                print(f"   [SECRET LEAK #{idx}] Hardcoded credential detected by audit rule.")
             print()
             sys.exit(1)
     elif getattr(args, "mutate", None) is not None:
@@ -10637,17 +10637,9 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
             if args.migrate:
                 with open(target, "w", encoding="utf-8") as f:
                     f.write(migrated_code)
-                print(f"[AUTO-VAULT] Successfully migrated {count} secret(s) from {target} into .env and updated code.")
+                print(f"[AUTO-VAULT] Successfully migrated {count} secret(s) into .env and updated code.")
             else:
-                print(report)
-                redacted_env_lines = [
-                    f"{line.split('=', 1)[0]}=***REDACTED***" if "=" in line and not line.lstrip().startswith("#") else line
-                    for line in env_file.splitlines()
-                ]
-                print("\n--- .env preview (redacted) ---")
-                print("\n".join(redacted_env_lines))
-                print("\n--- Refactored Code Preview ---")
-                print(migrated_code[:1000])
+                print(f"[AUTO-VAULT DRY-RUN] Detected {count} hardcoded credential(s) ready for .env migration. Re-run with --migrate to apply.")
         else:
             findings = ZeroLeakEngine.scan_workspace(target)
             violations = findings.get("violations", [])
@@ -10656,8 +10648,8 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
                 print("[AUTO-VAULT] 100% Zero-Leak Verified. No hardcoded credentials found.")
             else:
                 print(f"[AUTO-VAULT] Found {len(violations)} secret(s) across {findings.get('files_with_violations', 0)} file(s).")
-                for v in violations:
-                    print(f"  - [{v['provider']}] {v['file']}:{v['line']} -> ***REDACTED***")
+                for idx, _ in enumerate(violations, 1):
+                    print(f"  - [FINDING #{idx}] Credential pattern detected (redacted).")
                 if args.migrate:
                     total_migrated = 0
                     violating_files = sorted({v.get("file", "") for v in violations if v.get("file")})

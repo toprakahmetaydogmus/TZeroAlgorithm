@@ -1570,9 +1570,12 @@ class DashboardRequestHandler(http.server.BaseHTTPRequestHandler):
         candidate = (raw_path or ".").strip() or "."
         if "\x00" in candidate:
             raise ValueError("Invalid null byte in path.")
-        real_target = os.path.realpath(os.path.abspath(candidate))
-        allowed_roots = (os.path.realpath("."), os.path.realpath(tempfile.gettempdir()))
-        if not any(real_target == r or real_target.startswith(r + os.sep) for r in allowed_roots):
+        ws_root = os.path.realpath(".")
+        tmp_root = os.path.realpath(tempfile.gettempdir())
+        real_target = os.path.normpath(os.path.realpath(os.path.abspath(candidate)))
+        in_ws = (real_target == ws_root) or real_target.startswith(ws_root + os.sep)
+        in_tmp = (real_target == tmp_root) or real_target.startswith(tmp_root + os.sep)
+        if not in_ws and not in_tmp:
             raise ValueError(f"Access denied: path outside allowed workspace or temp scope ({candidate})")
         return real_target
     """Handles static UI and JSON-RPC API endpoints for T-Zero Dashboard."""

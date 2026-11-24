@@ -16,7 +16,7 @@ Developer: Toprak Ahmet Aydoğmuş (Siber Akademi)
 
 import os
 import struct
-from typing import Dict, Any, Tuple, Optional
+from typing import Dict, Any, List, Tuple, Optional
 
 
 PYINSTALLER_COOKIE = b"MEI\014\013\012\013\016"
@@ -27,7 +27,7 @@ class ExtractorShield:
     """Hardens executables against automated PyInstaller extraction scripts."""
 
     @classmethod
-    def scan_cookie(cls, binary_data: bytes) -> List_Int:
+    def scan_cookie(cls, binary_data: bytes) -> List[int]:
         """Locates all occurrences of PyInstaller cookie in binary data."""
         offsets = []
         pos = 0

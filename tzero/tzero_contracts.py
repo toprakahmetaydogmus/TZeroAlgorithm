@@ -458,14 +458,22 @@ class ASTContractExtractor:
     @classmethod
     def _extract_ts_contracts(cls, clean_code: str, functions: Dict[str, FunctionContract], classes: Dict[str, ClassContract]) -> None:
         class_pattern = re.compile(
-            r'(?:export\s+)?(?:default\s+)?(?:abstract\s+)?class\s+([A-Za-z0-9_$]+)(?:\s+extends\s+([^\s{\r\n](?:[^{\r\n]*[^\s{\r\n])?))?[ \t]*\{'
+            r'(?:export\s+)?(?:default\s+)?(?:abstract\s+)?class\s+([A-Za-z0-9_$]+)'
         )
         top_level_code = list(clean_code)
 
         for m in class_pattern.finditer(clean_code):
             cls_name = m.group(1)
-            bases = [b.strip() for b in m.group(2).split(",")] if m.group(2) else []
-            brace_idx = m.end() - 1
+            brace_idx = clean_code.find("{", m.end())
+            if brace_idx == -1:
+                continue
+            header_tail = clean_code[m.end():brace_idx]
+            if "\n" in header_tail and "extends" not in header_tail:
+                continue
+            bases: List[str] = []
+            ext_m = re.search(r'\bextends\s+(.+)$', header_tail, re.DOTALL)
+            if ext_m:
+                bases = [b.strip() for b in ext_m.group(1).split(",") if b.strip()]
             end_brace = cls._find_matching_brace(clean_code, brace_idx)
             if end_brace == -1:
                 end_brace = len(clean_code) - 1
@@ -537,7 +545,7 @@ class ASTContractExtractor:
 
         top_str = "".join(top_level_code)
         fn_pattern = re.compile(
-            r'(?:export\s+(?:default\s+)?)?(?:async\s+)?function\s+([A-Za-z0-9_$]+)(?:[ \t]*<[^>\n]+>[ \t]*|[ \t]*)\('
+            r'(?:export\s+(?:default\s+)?)?(?:async\s+)?function\s+([A-Za-z0-9_$]+)'
         )
         for m in fn_pattern.finditer(top_str):
             fn_name = m.group(1)
@@ -546,7 +554,18 @@ class ASTContractExtractor:
             if fn_name.startswith("_") and not is_exported:
                 continue
 
-            paren_start = m.end() - 1
+            scan_pos = m.end()
+            while scan_pos < len(top_str) and top_str[scan_pos] in " \t\r\n":
+                scan_pos += 1
+            if scan_pos < len(top_str) and top_str[scan_pos] == "<":
+                gt_pos = top_str.find(">", scan_pos + 1)
+                if gt_pos != -1 and "\n" not in top_str[scan_pos:gt_pos]:
+                    scan_pos = gt_pos + 1
+                    while scan_pos < len(top_str) and top_str[scan_pos] in " \t\r\n":
+                        scan_pos += 1
+            if scan_pos >= len(top_str) or top_str[scan_pos] != "(":
+                continue
+            paren_start = scan_pos
             paren_end = cls._find_matching_paren(top_str, paren_start)
             if paren_end != -1:
                 raw_params = top_str[paren_start + 1:paren_end]

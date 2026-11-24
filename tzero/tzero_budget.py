@@ -66,9 +66,10 @@ class ASTTokenBudgetOptimizer:
     def estimate_raw_tokens(cls, workspace_root: str, max_files: int = 300) -> Tuple[int, int, str]:
         """Calculates raw token count and aggregated content hash for the workspace."""
         import tempfile
-        abs_root = os.path.realpath(os.path.abspath(workspace_root))
-        allowed_roots = (os.path.realpath("."), os.path.realpath(tempfile.gettempdir()))
-        if not any(abs_root == r or abs_root.startswith(r + os.sep) for r in allowed_roots):
+        ws_root = os.path.realpath(".")
+        tmp_root = os.path.realpath(tempfile.gettempdir())
+        abs_root = os.path.normpath(os.path.realpath(os.path.abspath(workspace_root)))
+        if abs_root != ws_root and not abs_root.startswith(ws_root + os.sep) and not abs_root.startswith(tmp_root + os.sep):
             raise ValueError(f"Workspace path outside allowed scope: {workspace_root}")
         total_chars = 0
         file_count = 0

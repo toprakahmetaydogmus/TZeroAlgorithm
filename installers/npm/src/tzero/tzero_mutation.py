@@ -216,9 +216,10 @@ class ASTMutationEngine:
     def _sanitize_target_path(target_path: str) -> str:
         if not target_path or "\x00" in target_path:
             raise ValueError("Invalid target path.")
-        real_target = os.path.realpath(os.path.abspath(target_path))
-        allowed_roots = (os.path.realpath("."), os.path.realpath(tempfile.gettempdir()))
-        if not any(real_target == r or real_target.startswith(r + os.sep) for r in allowed_roots):
+        ws_root = os.path.realpath(".")
+        tmp_root = os.path.realpath(tempfile.gettempdir())
+        real_target = os.path.normpath(os.path.realpath(os.path.abspath(target_path)))
+        if not real_target.startswith(ws_root + os.sep) and not real_target.startswith(tmp_root + os.sep):
             raise ValueError(f"Path outside allowed workspace or temp scope: {target_path}")
         return real_target
 
@@ -267,13 +268,20 @@ class ASTMutationEngine:
         else:
             if any(tok in test_command for tok in (";", "&&", "||", "|", "`", "$(", ">", "<", "\n", "\r")):
                 raise ValueError("Unsafe shell metacharacters detected in test_command.")
-            test_cmd_args = [
+            parsed_args = [
                 tok.strip('"').strip("'")
                 for tok in shlex.split(test_command, posix=(os.name != "nt"))
                 if tok.strip()
             ]
-            if not test_cmd_args:
+            if not parsed_args:
                 raise ValueError("Empty test_command.")
+            bin_name = os.path.basename(parsed_args[0]).lower()
+            if bin_name.startswith("python"):
+                test_cmd_args = [sys.executable] + parsed_args[1:]
+            elif bin_name in ("pytest", "pytest.exe"):
+                test_cmd_args = [sys.executable, "-m", "pytest"] + parsed_args[1:]
+            else:
+                raise ValueError(f"Unsupported test runner executable: {parsed_args[0]}")
 
         killed = 0
         survived = 0
