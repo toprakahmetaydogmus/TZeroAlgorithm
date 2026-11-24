@@ -432,13 +432,30 @@ class PolyglotTypeBridge:
         flavor = model_flavor.lower().strip()
         models = []
 
+        def _extract_brace_blocks(src: str, header_re: re.Pattern) -> List[Tuple[str, str]]:
+            blocks: List[Tuple[str, str]] = []
+            for m in header_re.finditer(src):
+                open_idx = m.end() - 1
+                depth = 0
+                close_idx = -1
+                for pos in range(open_idx, len(src)):
+                    ch = src[pos]
+                    if ch == "{":
+                        depth += 1
+                    elif ch == "}":
+                        depth -= 1
+                        if depth == 0:
+                            close_idx = pos
+                            break
+                if close_idx > open_idx:
+                    blocks.append((m.group(1), src[open_idx + 1:close_idx]))
+            return blocks
+
         if lang in ("ts", "typescript"):
-            pattern = re.compile(r'(?:export\s+)?(?:interface|type)\s+([A-Za-z0-9_]+)(?:\s*=\s*)?\s*\{([^}]+)\}', re.MULTILINE)
-            for m in pattern.finditer(code):
-                name = m.group(1)
-                body = m.group(2)
+            pattern = re.compile(r'(?:export\s+)?(?:interface|type)\s+([A-Za-z0-9_]+)(?:[ \t]*=[ \t]*|[ \t]*)\{', re.MULTILINE)
+            for name, body in _extract_brace_blocks(code, pattern):
                 fields = []
-                for line in re.split(r'[\n;]+', body):
+                for line in body.replace(";", "\n").splitlines():
                     line = line.strip().rstrip(";,")
                     if not line or line.startswith("//"):
                         continue
@@ -453,12 +470,10 @@ class PolyglotTypeBridge:
                 models.append((name, fields))
 
         elif lang in ("rust", "rs"):
-            pattern = re.compile(r'(?:pub\s+)?struct\s+([A-Za-z0-9_]+)\s*\{([^}]+)\}', re.MULTILINE)
-            for m in pattern.finditer(code):
-                name = m.group(1)
-                body = m.group(2)
+            pattern = re.compile(r'(?:pub\s+)?struct\s+([A-Za-z0-9_]+)[ \t]*\{', re.MULTILINE)
+            for name, body in _extract_brace_blocks(code, pattern):
                 fields = []
-                for line in re.split(r'[\n,;]+', body):
+                for line in body.replace(",", "\n").replace(";", "\n").splitlines():
                     line = line.strip().rstrip(",")
                     if not line or line.startswith("//"):
                         continue
@@ -476,12 +491,10 @@ class PolyglotTypeBridge:
                 models.append((name, fields))
 
         elif lang in ("go", "golang"):
-            pattern = re.compile(r'type\s+([A-Za-z0-9_]+)\s+struct\s*\{([^}]+)\}', re.MULTILINE)
-            for m in pattern.finditer(code):
-                name = m.group(1)
-                body = m.group(2)
+            pattern = re.compile(r'type\s+([A-Za-z0-9_]+)\s+struct[ \t]*\{', re.MULTILINE)
+            for name, body in _extract_brace_blocks(code, pattern):
                 fields = []
-                for line in re.split(r'[\n;]+', body):
+                for line in body.replace(";", "\n").splitlines():
                     line = re.sub(r'`[^`]*`', '', line).strip()
                     if not line or line.startswith("//"):
                         continue

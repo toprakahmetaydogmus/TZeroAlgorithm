@@ -90,13 +90,22 @@ function initCortexMatrix() {
     });
 
     if (filtered.length === 0) {
-      container.innerHTML = `
-        <div style="grid-column: 1/-1; text-align: center; padding: 4rem 1rem; color: var(--text-muted);">
-          <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🔍</div>
-          <div style="font-size: 1.1rem; color: #fff; font-weight: 600;">No capabilities match "${searchQuery}"</div>
-          <div style="font-size: 0.88rem; margin-top: 0.25rem;">Try selecting "All (105)" or search by tags like "ast", "security", "tokens", or "dag".</div>
-        </div>
-      `;
+      container.replaceChildren();
+      const emptyBox = document.createElement("div");
+      emptyBox.style.cssText = "grid-column: 1/-1; text-align: center; padding: 4rem 1rem; color: var(--text-muted);";
+      const iconDiv = document.createElement("div");
+      iconDiv.style.cssText = "font-size: 2.5rem; margin-bottom: 0.5rem;";
+      iconDiv.textContent = "🔍";
+      const titleDiv = document.createElement("div");
+      titleDiv.style.cssText = "font-size: 1.1rem; color: #fff; font-weight: 600;";
+      titleDiv.textContent = `No capabilities match "${searchQuery}"`;
+      const hintDiv = document.createElement("div");
+      hintDiv.style.cssText = "font-size: 0.88rem; margin-top: 0.25rem;";
+      hintDiv.textContent = 'Try selecting "All (105)" or search by tags like "ast", "security", "tokens", or "dag".';
+      emptyBox.appendChild(iconDiv);
+      emptyBox.appendChild(titleDiv);
+      emptyBox.appendChild(hintDiv);
+      container.appendChild(emptyBox);
       return;
     }
 

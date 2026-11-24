@@ -236,9 +236,83 @@ def sync_release_metadata(target_version: str, check_only: bool = False) -> Dict
 
     tr_readme_p = ROOT_DIR / "docs" / "README.tr.md"
     if tr_readme_p.is_file():
-        c_tr1 = _regex_replace(tr_readme_p, r'VS%20Code-v[0-9]+\.[0-9]+\.[0-9]+', f"VS%20Code-v{target_version}", check_only)
-        c_tr2 = _regex_replace(tr_readme_p, r'dist/tzero-vscode-[0-9]+\.[0-9]+\.[0-9]+\.vsix', f"dist/tzero-vscode-{target_version}.vsix", check_only)
-        results["docs/README.tr.md"] = c_tr1 or c_tr2
+        c_tr = any((
+            _regex_replace(tr_readme_p, r'(badge/(?:pypi|npm|vscode|open--vsx|VS%20Code)-v)[0-9]+\.[0-9]+\.[0-9]+', rf'\g<1>{target_version}', check_only),
+            _regex_replace(tr_readme_p, r'dist/tzero-vscode-[0-9]+\.[0-9]+\.[0-9]+\.vsix', f"dist/tzero-vscode-{target_version}.vsix", check_only),
+        ))
+        results["docs/README.tr.md"] = c_tr
+
+    for loc_readme in ("docs/README.ja.md", "docs/README.zh.md"):
+        loc_p = ROOT_DIR / loc_readme
+        if loc_p.is_file():
+            results[loc_readme] = _regex_replace(
+                loc_p,
+                r'(badge/(?:pypi|npm|vscode|open--vsx)-v)[0-9]+\.[0-9]+\.[0-9]+',
+                rf'\g<1>{target_version}',
+                check_only,
+            )
+
+    ci_p = ROOT_DIR / "tzero" / "tzero_ci.py"
+    if ci_p.is_file():
+        results["tzero/tzero_ci.py"] = _regex_replace(
+            ci_p,
+            r'(version="%\(prog\)s )[0-9]+\.[0-9]+\.[0-9]+(")',
+            rf'\g<1>{target_version}\2',
+            check_only,
+        )
+
+    rust_lib = ROOT_DIR / "crates" / "tzero_core" / "src" / "lib.rs"
+    if rust_lib.is_file():
+        results["crates/tzero_core/src/lib.rs"] = _regex_replace(
+            rust_lib,
+            r'(Rust Hybrid Core Engine \(v)[0-9]+\.[0-9]+\.[0-9]+(\))',
+            rf'\g<1>{target_version}\2',
+            check_only,
+        )
+
+    for wf_rel in (".github/workflows/rust-core.yml", ".github/workflows/release.yml"):
+        wf_p = ROOT_DIR / wf_rel
+        if wf_p.is_file():
+            c_wf1 = _regex_replace(wf_p, r"(default:\s*'|tag_name:\s*.*?\|\|\s*')v[0-9]+\.[0-9]+\.[0-9]+(')", rf"\1v{target_version}\2", check_only)
+            c_wf2 = _regex_replace(wf_p, r"(e\.g\. |version tag like )v[0-9]+\.[0-9]+\.[0-9]+", rf"\1v{target_version}", check_only)
+            results[wf_rel] = c_wf1 or c_wf2
+
+    for doc_rel in ("llms.txt", "benchmark-site/llms.txt"):
+        dp = ROOT_DIR / doc_rel
+        if dp.is_file():
+            results[doc_rel] = _regex_replace(dp, r'(?m)^(>\s*Version:\s*)[0-9]+\.[0-9]+\.[0-9]+', rf'\g<1>{target_version}', check_only)
+
+    ai_insp = ROOT_DIR / "AI_INSPECTION.md"
+    if ai_insp.is_file():
+        results["AI_INSPECTION.md"] = _regex_replace(ai_insp, r'(>\s*Version:\s*`)[0-9]+\.[0-9]+\.[0-9]+(`)', rf'\g<1>{target_version}\2', check_only)
+
+    for app_rel in ("huggingface-space/app.py", "app.py"):
+        ap = ROOT_DIR / app_rel
+        if ap.is_file():
+            c_a1 = _regex_replace(ap, r'(?m)^(APP_VERSION\s*=\s*)"[^"]+"', rf'\1"{target_version}"', check_only)
+            c_a2 = _regex_replace(ap, r'(T-ZERO ALGORITHM v)[0-9]+\.[0-9]+\.[0-9]+', rf'\g<1>{target_version}', check_only)
+            results[app_rel] = c_a1 or c_a2
+
+    gw_p = ROOT_DIR / "tzero_gateway.py"
+    if gw_p.is_file():
+        results["tzero_gateway.py"] = _regex_replace(gw_p, r'(?m)^(VERSION\s*=\s*)"[^"]+"', rf'\1"{target_version}"', check_only)
+
+    e2e_init = ROOT_DIR / "tests" / "e2e" / "__init__.py"
+    if e2e_init.is_file():
+        results["tests/e2e/__init__.py"] = _regex_replace(e2e_init, r'(?m)^(__version__\s*=\s*)"[^"]+"', rf'\1"{target_version}"', check_only)
+
+    try:
+        import update_benchmark_site
+        results["benchmark-site"] = update_benchmark_site.sync_site(ROOT_DIR / "benchmark-site", target_version, check_only=check_only)
+    except ImportError:
+        site_script = ROOT_DIR / "scripts" / "update_benchmark_site.py"
+        if site_script.is_file():
+            import importlib.util
+            spec = importlib.util.spec_from_file_location("update_benchmark_site", site_script)
+            if spec and spec.loader:
+                mod = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(mod)
+                results["benchmark-site"] = mod.sync_site(ROOT_DIR / "benchmark-site", target_version, check_only=check_only)
 
     return results
 

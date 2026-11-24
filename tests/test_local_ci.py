@@ -7,6 +7,7 @@ Repository: https://github.com/toprakahmetaydogmus/TZeroAlgorithm
 
 import os
 import json
+import re
 import tempfile
 import pathlib
 import unittest
@@ -99,7 +100,10 @@ class TestLocalCI(unittest.TestCase):
         cmd_ver = [sys.executable, "-m", "tzero.tzero_ci", "--version"]
         proc_ver = subprocess.run(cmd_ver, cwd=str(ROOT_DIR), capture_output=True, text=True)
         self.assertEqual(proc_ver.returncode, 0, f"--version failed:\n{proc_ver.stderr}\n{proc_ver.stdout}")
-        self.assertIn("12.1.4", proc_ver.stdout + proc_ver.stderr)
+        pyproject_text = (ROOT_DIR / "pyproject.toml").read_text(encoding="utf-8")
+        ver_match = re.search(r'^version\s*=\s*"([^"]+)"', pyproject_text, re.MULTILINE)
+        canonical_ver = ver_match.group(1) if ver_match else "12.2.0"
+        self.assertIn(canonical_ver, proc_ver.stdout + proc_ver.stderr)
 
         # Run CLI with --quick and --json
         cmd = [sys.executable, "-m", "tzero.tzero_ci", "--quick", "--json"]

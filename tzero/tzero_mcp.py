@@ -4745,7 +4745,7 @@ def create_mcp_server():
                 sig = inspect.signature(handler)
                 kwargs = {}
                 for p_name in sig.parameters:
-                    if p_name in ("project_root", "target_dir", "code_snippet", "diff_content"):
+                    if p_name in ("project_root", "target_dir", "target", "target_path", "code_snippet", "diff_content"):
                         kwargs[p_name] = target
                     elif p_name in ("query", "symbol_name", "goal", "prompt"):
                         kwargs[p_name] = query or target
@@ -4759,7 +4759,8 @@ def create_mcp_server():
             f"❌ Unknown action '{act}'.\n"
             f"Supported actions: 'auto', 'context', 'audit', 'security', 'blueprint', 'dependencies', "
             f"'impact', 'search', 'prune', 'rules', 'enforce', 'cost', 'memory', 'swarm', 'heal', 'design', "
-            f"'patch', 'pagerank', 'dead_code', 'duplicity', 'call_chain', 'sync', 'roi', 'drift', 'ci', 'local_ci'."
+            f"'patch', 'pagerank', 'dead_code', 'duplicity', 'call_chain', 'sync', 'roi', 'drift', 'ci', 'local_ci', "
+            f"'armor', 'anti_rea', 'audit_rea'."
         )
 
     def run_local_ci(quick: bool = False, auto_fix: bool = False, install_hook: bool = False, uninstall_hook: bool = False, project_root: str = ".") -> str:
@@ -4908,7 +4909,7 @@ def create_mcp_server():
 
         def _classify(t_name: str, summary: str) -> str:
             blob = f"{t_name} {summary}".lower()
-            if any(k in blob for k in ("secret", "leak", "hallucinat", "guard", "security", "audit", "contract", "arch")):
+            if any(k in blob for k in ("secret", "leak", "hallucinat", "guard", "security", "audit", "contract", "arch", "armor", "anti-rea", "anti_rea", "shield", "decompil")):
                 return "security"
             if any(k in blob for k in ("jarvis", "memory", "graph", "minhash", "latent", "causal")):
                 return "memory"

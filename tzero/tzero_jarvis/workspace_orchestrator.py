@@ -221,6 +221,9 @@ class WorkspaceProfiler:
         container_configs: List[str] = []
         ci_cd_configs: List[str] = []
 
+        test_cmds: List[str] = []
+        lint_cmds: List[str] = []
+        build_cmds: List[str] = []
         test_cmd = "pytest -v" if primary_language == "Python" else "npm test"
         lint_cmd = "ruff check ." if primary_language == "Python" else "eslint ."
         build_cmd = "python -m build" if primary_language == "Python" else "npm run build"
@@ -231,6 +234,7 @@ class WorkspaceProfiler:
         setup_p = os.path.join(self.workspace_root, "setup.py")
 
         if os.path.isfile(pyproject_p) or os.path.isfile(req_p) or os.path.isfile(setup_p) or "Python" in languages_count:
+            py_lint = "flake8 ."
             if os.path.isfile(pyproject_p):
                 package_managers.append("poetry/uv/flit")
                 build_systems.append("pyproject.toml")
@@ -241,7 +245,7 @@ class WorkspaceProfiler:
                         if "django" in txt: frameworks.append("Django")
                         if "flask" in txt: frameworks.append("Flask")
                         if "pytest" in txt: test_frameworks.append("pytest")
-                        if "ruff" in txt: lint_cmd = "ruff check ."
+                        if "ruff" in txt: py_lint = "ruff check ."
                 except Exception:
                     pass
             if os.path.isfile(req_p):
@@ -259,9 +263,9 @@ class WorkspaceProfiler:
                     pass
             if not test_frameworks:
                 test_frameworks.append("unittest/pytest")
-            test_cmd = "python -m unittest discover -s tests -p \"test_*.py\"" if os.path.isdir(os.path.join(self.workspace_root, "tests")) else "pytest"
-            lint_cmd = "ruff check ." if os.path.isfile(os.path.join(self.workspace_root, "ruff.toml")) else "flake8 ."
-            build_cmd = "python setup.py build" if os.path.isfile(setup_p) else "python -m build"
+            test_cmds.append("python -m unittest discover -s tests -p \"test_*.py\"" if os.path.isdir(os.path.join(self.workspace_root, "tests")) else "pytest")
+            lint_cmds.append("ruff check ." if os.path.isfile(os.path.join(self.workspace_root, "ruff.toml")) else py_lint)
+            build_cmds.append("python setup.py build" if os.path.isfile(setup_p) else "python -m build")
 
         # Node / TypeScript / JavaScript İncelemesi
         pkg_json_p = os.path.join(self.workspace_root, "package.json")
@@ -295,11 +299,11 @@ class WorkspaceProfiler:
                     if "mocha" in deps: test_frameworks.append("mocha")
 
                     if "test" in scripts:
-                        test_cmd = "npm test"
+                        test_cmds.append("npm test")
                     if "lint" in scripts:
-                        lint_cmd = "npm run lint"
+                        lint_cmds.append("npm run lint")
                     if "build" in scripts:
-                        build_cmd = "npm run build"
+                        build_cmds.append("npm run build")
                     
                     workspaces = pkg_data.get("workspaces", [])
                     if workspaces:
@@ -313,9 +317,9 @@ class WorkspaceProfiler:
             package_managers.append("cargo")
             build_systems.append("cargo")
             test_frameworks.append("cargo test")
-            test_cmd = "cargo test"
-            lint_cmd = "cargo clippy"
-            build_cmd = "cargo build --release"
+            test_cmds.append("cargo test")
+            lint_cmds.append("cargo clippy")
+            build_cmds.append("cargo build --release")
             try:
                 with open(cargo_p, "r", encoding="utf-8", errors="ignore") as fp:
                     c_txt = fp.read().lower()
@@ -332,9 +336,9 @@ class WorkspaceProfiler:
             package_managers.append("go modules")
             build_systems.append("go build")
             test_frameworks.append("go test")
-            test_cmd = "go test ./..."
-            lint_cmd = "golangci-lint run"
-            build_cmd = "go build ./..."
+            test_cmds.append("go test ./...")
+            lint_cmds.append("golangci-lint run")
+            build_cmds.append("go build ./...")
             try:
                 with open(go_mod_p, "r", encoding="utf-8", errors="ignore") as fp:
                     g_txt = fp.read().lower()
@@ -343,6 +347,13 @@ class WorkspaceProfiler:
                     if "echo" in g_txt: frameworks.append("Echo")
             except Exception:
                 pass
+
+        if test_cmds:
+            test_cmd = " && ".join(test_cmds)
+        if lint_cmds:
+            lint_cmd = " && ".join(lint_cmds)
+        if build_cmds:
+            build_cmd = " && ".join(build_cmds)
 
         # Container & CI/CD
         if os.path.isfile(os.path.join(self.workspace_root, "Dockerfile")):

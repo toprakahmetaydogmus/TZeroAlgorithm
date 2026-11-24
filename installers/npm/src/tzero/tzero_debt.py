@@ -13,7 +13,7 @@ Capabilities:
 - 100% Offline, $0 cost, zero cloud dependencies (Python standard library only).
 
 Author: Toprak Ahmet Aydoğmuş (Siber Akademi)
-Part of T-Zero Context Architect v12.1.4 Master Edition.
+Part of T-Zero Context Architect v12.2.0 Master Edition.
 """
 
 import ast
@@ -211,8 +211,13 @@ class CodeHealthAnalyzer:
     @classmethod
     def analyze_file(cls, file_path: str, code: Optional[str] = None) -> FileHealthReport:
         if code is None:
+            import tempfile
+            real_fp = os.path.realpath(os.path.abspath(file_path))
+            allowed_roots = (os.path.realpath("."), os.path.realpath(tempfile.gettempdir()))
+            if not any(real_fp == r or real_fp.startswith(r + os.sep) for r in allowed_roots):
+                raise ValueError(f"Path outside allowed workspace/temp root: {file_path}")
             try:
-                with open(file_path, "r", encoding="utf-8", errors="replace") as f:
+                with open(real_fp, "r", encoding="utf-8", errors="replace") as f:
                     code = f.read()
             except Exception as e:
                 return FileHealthReport(
@@ -335,7 +340,7 @@ class CodeHealthAnalyzer:
 
     @classmethod
     def analyze_workspace(cls, workspace_root: str = ".", max_files: int = 250) -> WorkspaceHealthReport:
-        abs_root = os.path.abspath(workspace_root)
+        abs_root = os.path.realpath(os.path.abspath(workspace_root))
         reports: List[FileHealthReport] = []
 
         ignore_dirs = {".git", ".venv", "venv", "__pycache__", "node_modules", "dist", "build", ".pytest_cache"}
@@ -344,8 +349,11 @@ class CodeHealthAnalyzer:
             dirs[:] = [d for d in dirs if d not in ignore_dirs and not d.startswith(".")]
             for f in files:
                 if f.endswith(".py"):
-                    rel_p = os.path.relpath(os.path.join(root, f), abs_root)
-                    rep = cls.analyze_file(os.path.join(root, f))
+                    full_p = os.path.realpath(os.path.join(root, f))
+                    if not (full_p == abs_root or full_p.startswith(abs_root + os.sep)):
+                        continue
+                    rel_p = os.path.relpath(full_p, abs_root)
+                    rep = cls.analyze_file(full_p)
                     rep.file_path = rel_p.replace("\\", "/")
                     reports.append(rep)
                     if len(reports) >= max_files:

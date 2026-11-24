@@ -101,17 +101,17 @@ runs:
         t = sys.argv[1]
         s, f, b = 0.0, 0, 0
         try:
-            from tzero_cost import TokenCostCalculator
+            from tzero.tzero_cost import TokenCostCalculator
             s = round(float(TokenCostCalculator.calculate_cost(t).reduction_pct), 1)
         except Exception:
             pass
         try:
-            from tzero_security import ZeroLeakEngine
+            from tzero.tzero_security import ZeroLeakEngine
             f = int(ZeroLeakEngine.scan_workspace(t).get("violation_count", 0))
         except Exception:
             pass
         try:
-            from tzero_features import ChangeImpactAnalyzer
+            from tzero.tzero_features import ChangeImpactAnalyzer
             top = sorted(ChangeImpactAnalyzer(t).inbound_graph.items(), key=lambda kv: len(kv[1]), reverse=True)
             b = min(100, len(top[0][1]) * 10) if top else 0
         except Exception:

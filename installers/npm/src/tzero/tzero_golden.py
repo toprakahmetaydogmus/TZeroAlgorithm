@@ -11,7 +11,7 @@ Capabilities:
 - 100% Offline, $0 cost, zero cloud dependencies (Python standard library only).
 
 Author: Toprak Ahmet Aydoğmuş (Siber Akademi)
-Part of T-Zero Context Architect v12.1.4 Master Edition.
+Part of T-Zero Context Architect v12.2.0 Master Edition.
 """
 
 import ast
@@ -160,7 +160,7 @@ class ASTGoldenRegressionEngine:
     @classmethod
     def generate_baseline(cls, workspace_root: str = ".", max_files: int = 300) -> GoldenBaseline:
         """Scans workspace and generates the golden contract baseline."""
-        abs_root = os.path.abspath(workspace_root)
+        abs_root = os.path.realpath(os.path.abspath(workspace_root))
         all_sigs: Dict[str, Dict[str, Any]] = {}
         hasher = hashlib.sha256()
 
@@ -171,7 +171,9 @@ class ASTGoldenRegressionEngine:
             dirs[:] = [d for d in dirs if d not in ignore_dirs and not d.startswith(".")]
             for f in files:
                 if f.endswith(".py"):
-                    full_p = os.path.join(root, f)
+                    full_p = os.path.realpath(os.path.join(root, f))
+                    if not (full_p == abs_root or full_p.startswith(abs_root + os.sep)):
+                        continue
                     rel_p = os.path.relpath(full_p, abs_root).replace("\\", "/")
                     try:
                         with open(full_p, "r", encoding="utf-8", errors="replace") as fp:
@@ -192,7 +194,7 @@ class ASTGoldenRegressionEngine:
 
         return GoldenBaseline(
             workspace_root=abs_root,
-            version="12.1.4",
+            version="12.2.0",
             created_at=time.time(),
             symbols=all_sigs,
             total_symbols=len(all_sigs),
@@ -210,8 +212,11 @@ class ASTGoldenRegressionEngine:
     @classmethod
     def verify_against_golden(cls, workspace_root: str = ".", golden_path: Optional[str] = None) -> Dict[str, Any]:
         """Compares current working tree AST signatures against the golden baseline."""
-        abs_root = os.path.abspath(workspace_root)
-        g_path = golden_path or os.path.join(abs_root, ".tzero", "goldens.json")
+        abs_root = os.path.realpath(os.path.abspath(workspace_root))
+        raw_g_path = golden_path or os.path.join(abs_root, ".tzero", "goldens.json")
+        g_path = os.path.realpath(os.path.abspath(raw_g_path))
+        if not (g_path == abs_root or g_path.startswith(abs_root + os.sep)):
+            return {"success": False, "error": "Golden path outside workspace root."}
 
         if not os.path.isfile(g_path):
             return {

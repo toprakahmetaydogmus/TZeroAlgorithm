@@ -103,7 +103,7 @@ class TestTZeroTerminalCockpit(unittest.TestCase):
 
     def test_menu_wrap_around_and_navigation(self):
         menu_len = len(TZeroTerminalCockpit.MENU_OPTIONS)
-        self.assertEqual(menu_len, 12)
+        self.assertEqual(menu_len, 14)
         # Wrap up from top to bottom
         top_idx = 0
         wrap_up = (top_idx - 1) % menu_len
@@ -133,7 +133,7 @@ class TestTZeroTerminalCockpit(unittest.TestCase):
         self.assertIn("Pack Context Window", screen_top)
 
         # Bottom item (Exit TUI) highlighted
-        screen_bottom = TZeroTerminalCockpit.render_cockpit(dummy_metrics, selected_index=11)
+        screen_bottom = TZeroTerminalCockpit.render_cockpit(dummy_metrics, selected_index=len(TZeroTerminalCockpit.MENU_OPTIONS) - 1)
         self.assertIn("▶", screen_bottom)
         self.assertIn("Exit TUI", screen_bottom)
 

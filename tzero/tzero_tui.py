@@ -135,6 +135,8 @@ class TZeroTerminalCockpit:
         ("9", "Run AST Mutation Test Suite", "🧬 Run AST Mutation Test Suite (`tzero --mutate <file>`)"),
         ("10", "Code Health & Technical Debt Index", "🏥 Code Health & Technical Debt Index (`tzero --debt`)"),
         ("11", "Context Budget Optimizer & Certificate", "📜 Context Budget Optimizer & Certificate (`tzero --budget`)"),
+        ("12", "Anti-REA 26-Tier Armor & Audit", "🛡️  Anti-REA 26-Tier Armor & Audit (`tzero --audit-rea`)"),
+        ("13", "Offline Telemetry & ROI Tracker", "📊 Offline Telemetry & ROI Tracker (`tzero --telemetry`)"),
         ("0", "Exit TUI", "🚪 Exit TUI"),
     ]
 
@@ -397,6 +399,20 @@ class TZeroTerminalCockpit:
             saved_p = ASTTokenBudgetOptimizer.save_certificate(cert)
             print(f"\n{cls.BRIGHT_CYAN}{ASTTokenBudgetOptimizer.format_markdown_certificate(cert)}{cls.RESET}\n")
             print(f"{cls.GREEN}[SUCCESS] Certificate saved to: {saved_p}{cls.RESET}")
+            input("Press Enter to return to cockpit...")
+        elif choice == "12":
+            from tzero.tzero_armor import audit_path_rea_resistance, protect_path_with_armor
+            print(f"\n{cls.YELLOW}[Auditing 26-Tier Anti-REA Resistance for {workspace_dir}]...{cls.RESET}")
+            audit = audit_path_rea_resistance(workspace_dir)
+            print(f"{cls.BRIGHT_CYAN}AI Resistance Score: {audit.get('score', 0)}/100 ({audit.get('rating', 'UNKNOWN')}){cls.RESET}")
+            apply_ans = input("Apply Anti-REA armor to target file/dir now? [y/N]: ").strip().lower()
+            if apply_ans == "y":
+                res = protect_path_with_armor(workspace_dir)
+                print(f"{cls.GREEN}[OK] Protected: {res}{cls.RESET}")
+            input("Press Enter to return to cockpit...")
+        elif choice == "13":
+            from tzero.tzero_telemetry import render_report
+            print(f"\n{cls.BRIGHT_CYAN}{render_report(workspace_dir)}{cls.RESET}\n")
             input("Press Enter to return to cockpit...")
         else:
             print(f"{cls.RED}Invalid selection: {choice}{cls.RESET}")

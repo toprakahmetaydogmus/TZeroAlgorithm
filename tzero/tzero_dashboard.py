@@ -1563,6 +1563,18 @@ def compute_live_dashboard_stats(workspace_dir: str = ".") -> Dict[str, Any]:
 
 
 class DashboardRequestHandler(http.server.BaseHTTPRequestHandler):
+    @staticmethod
+    def _resolve_safe_api_path(raw_path: str) -> str:
+        """Restricts dashboard API file/workspace paths to CWD or temp directory."""
+        import tempfile
+        candidate = (raw_path or ".").strip() or "."
+        if "\x00" in candidate:
+            raise ValueError("Invalid null byte in path.")
+        real_target = os.path.realpath(os.path.abspath(candidate))
+        allowed_roots = (os.path.realpath("."), os.path.realpath(tempfile.gettempdir()))
+        if not any(real_target == r or real_target.startswith(r + os.sep) for r in allowed_roots):
+            raise ValueError(f"Access denied: path outside allowed workspace or temp scope ({candidate})")
+        return real_target
     """Handles static UI and JSON-RPC API endpoints for T-Zero Dashboard."""
 
     def log_message(self, format, *args):
@@ -1768,7 +1780,7 @@ class DashboardRequestHandler(http.server.BaseHTTPRequestHandler):
             body = self.rfile.read(content_length).decode("utf-8")
             try:
                 payload = json.loads(body)
-                tgt_file = payload.get("file", "tzero_arch_test.py")
+                tgt_file = self._resolve_safe_api_path(payload.get("file", "tzero_arch_test.py"))
                 max_m = int(payload.get("max_mutants", 5))
                 from tzero.tzero_mutation import ASTMutationEngine
                 rep = ASTMutationEngine.run_mutation_analysis(target_file=tgt_file, max_mutants=max_m)
@@ -1818,7 +1830,7 @@ class DashboardRequestHandler(http.server.BaseHTTPRequestHandler):
             body = self.rfile.read(content_length).decode("utf-8")
             try:
                 payload = json.loads(body) if body.strip() else {}
-                target_p = payload.get("path", ".")
+                target_p = self._resolve_safe_api_path(payload.get("path", "."))
                 from tzero.tzero_debt import CodeHealthAnalyzer
                 if os.path.isfile(target_p):
                     rep = CodeHealthAnalyzer.analyze_file(target_p)
@@ -1855,7 +1867,7 @@ class DashboardRequestHandler(http.server.BaseHTTPRequestHandler):
             body = self.rfile.read(content_length).decode("utf-8")
             try:
                 payload = json.loads(body) if body.strip() else {}
-                target_p = payload.get("path", ".")
+                target_p = self._resolve_safe_api_path(payload.get("path", "."))
                 target_tokens = payload.get("target_tokens")
                 model_name = payload.get("model", "claude-3-7")
                 from tzero.tzero_budget import ASTTokenBudgetOptimizer
@@ -1884,7 +1896,7 @@ class DashboardRequestHandler(http.server.BaseHTTPRequestHandler):
             body = self.rfile.read(content_length).decode("utf-8")
             try:
                 payload = json.loads(body) if body.strip() else {}
-                target_p = payload.get("path", ".")
+                target_p = self._resolve_safe_api_path(payload.get("path", "."))
                 from tzero.tzero_golden import ASTGoldenRegressionEngine
                 rep = ASTGoldenRegressionEngine.verify_against_golden(target_p)
                 resp = {
@@ -1903,7 +1915,8 @@ class DashboardRequestHandler(http.server.BaseHTTPRequestHandler):
             try:
                 payload = self._read_json_body()
                 symbol = str(payload.get("symbol") or "").strip()
-                scip_path = str(payload.get("scip_path") or "").strip() or None
+                raw_scip = str(payload.get("scip_path") or "").strip()
+                scip_path = self._resolve_safe_api_path(raw_scip) if raw_scip else None
                 if not symbol:
                     resp = {"success": False, "error": "symbol required"}
                 else:
@@ -1916,13 +1929,17 @@ class DashboardRequestHandler(http.server.BaseHTTPRequestHandler):
         elif parsed.path == "/api/scip/summary":
             try:
                 payload = self._read_json_body()
-                scip_path = str(payload.get("path") or "").strip()
-                if not scip_path or not os.path.isfile(scip_path):
-                    resp = {"success": False, "error": f"SCIP/LSIF index file not found: {scip_path or '(empty)'}"}
+                raw_scip = str(payload.get("path") or "").strip()
+                if not raw_scip:
+                    resp = {"success": False, "error": "SCIP/LSIF index file not found: (empty)"}
                 else:
-                    from tzero.tzero_scip import ScipIndexImporter
-                    graph = ScipIndexImporter.load(scip_path)
-                    resp = {"success": True, **graph.export_tzero_graph()}
+                    scip_path = self._resolve_safe_api_path(raw_scip)
+                    if not os.path.isfile(scip_path):
+                        resp = {"success": False, "error": f"SCIP/LSIF index file not found: {raw_scip}"}
+                    else:
+                        from tzero.tzero_scip import ScipIndexImporter
+                        graph = ScipIndexImporter.load(scip_path)
+                        resp = {"success": True, **graph.export_tzero_graph()}
             except Exception as e:
                 resp = {"success": False, "error": str(e)}
             self._send_json(resp)

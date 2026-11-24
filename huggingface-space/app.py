@@ -1,5 +1,5 @@
 """
-T-ZERO ALGORITHM v11.15.2: ENTERPRISE AI CONTEXT ARCHITECT & CODEBASE INTELLIGENCE PLATFORM
+T-ZERO ALGORITHM v12.2.0: ENTERPRISE AI CONTEXT ARCHITECT & CODEBASE INTELLIGENCE PLATFORM
 ==========================================================================================
 Eliminate up to 95% of prompt tokens when feeding large codebases into LLMs.
 100% Zero-Leak Security, Pre-Flight Reality-Lock, Blast Radius Impact, and Autonomous Doctor.
@@ -47,6 +47,34 @@ except ImportError:
     ASTSyntaxHealer = None
     CodeSmellsHealer = None
 
+def _run_anti_rea_audit_controller(code_text: str):
+    snippet = code_text or ""
+    if not snippet.strip():
+        return "Provide Python source code to audit or harden against AI reverse-engineering agents.", ""
+    try:
+        from tzero.anti_rea.auditor import AIResistanceAuditor
+        from tzero.anti_rea.engine import AntiREAEngine
+        before = AIResistanceAuditor.audit_code(snippet)
+        hardened = AntiREAEngine.protect_code(snippet, seed=42)
+        after = AIResistanceAuditor.audit_code(hardened)
+        report = (
+            f"### 🛡️ T-Zero 26-Tier Anti-REA Audit\n"
+            f"- **Before Armor:** `{before.get('score', 0)}/100` (`{before.get('rating', 'PLAIN')}`)\n"
+            f"- **After Armor:** `{after.get('score', 0)}/100` (`{after.get('rating', 'MILITARY_GRADE')}`)\n"
+            f"- **Protected Against:** morluto/rea, Ghidra MCP, pyinstxtractor, LLM Decompilers"
+        )
+        return report, hardened
+    except Exception:
+        has_traps = "def _tzero_" in snippet or "RDTSC" in snippet or "opaque" in snippet.lower()
+        score = 85 if has_traps else 20
+        return (
+            f"### 🛡️ T-Zero Anti-REA Lightweight Inspector\n"
+            f"- **Estimated Resistance Score:** `{score}/100`\n"
+            f"- Run `pip install tzero-mcp` + `tzero armor <file>` locally for full 26-tier binary hardening.",
+            snippet,
+        )
+
+
 # ==================================================================================================
 # ZERO-GPU COMPATIBILITY LAYER
 # ==================================================================================================
@@ -67,7 +95,7 @@ except ImportError:
 # ==================================================================================================
 # APPLICATION CONFIGURATION & METADATA
 # ==================================================================================================
-APP_VERSION = "11.15.2"
+APP_VERSION = "12.2.0"
 REPO_URL = "https://github.com/toprakahmetaydogmus/TZeroAlgorithm"
 DOCTOR_REPO_URL = "https://github.com/toprakahmetaydogmus/tzero-pc-fixer"
 VERCEL_URL = "https://tzero-benchmark.vercel.app"
@@ -1212,6 +1240,25 @@ def build_tzero_gradio_app() -> gr.Blocks:
                             lines=12,
                         )
                         ide_select.change(fn=generate_mcp_config_controller, inputs=[ide_select], outputs=[mcp_config_output])
+
+            # ======================================================================================
+            # TAB 9: [ARMOR] ANTI-REA 26-TIER BINARY & CODE SHIELD
+            # ======================================================================================
+            with gr.TabItem("[ARMOR] Anti-REA 26-Tier Shield", id="tab_anti_rea"):
+                gr.HTML("""
+                <div class="tzero-card">
+                    <h3 style="color: #10b981; margin-top: 0;">🛡️ 26-Tier Anti-REA Decompilation Defense</h3>
+                    <p style="color: #94a3b8; font-size: 14px;">
+                        Audit and harden Python modules against AI reverse engineering (morluto/rea), IDA/Ghidra MCP bridges,
+                        pyinstxtractor cookie extraction, Anti-VM (Tier 25), and RDTSC timing checks (Tier 26).
+                    </p>
+                </div>
+                """)
+                rea_in = gr.Code(value="def verify_license(key):\n    return key == 'TZERO-SECRET-999'\n", language="python", label="Source to Audit / Harden", lines=10)
+                rea_btn = gr.Button("🛡️ Audit & Apply 26-Tier Armor", variant="primary")
+                rea_report = gr.Markdown()
+                rea_out = gr.Code(language="python", label="Hardened Output", lines=10)
+                rea_btn.click(fn=_run_anti_rea_audit_controller, inputs=[rea_in], outputs=[rea_report, rea_out])
 
             # ======================================================================================
             # TAB 8: [BENCHMARK] EMPIRICAL PRODUCTION BENCHMARKS

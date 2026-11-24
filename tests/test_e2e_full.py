@@ -6,6 +6,7 @@ Tests all 37 MCP tools, the polyglot engine across all languages, and the web da
 import asyncio
 import json
 import os
+import tempfile
 from unittest.mock import patch
 import threading
 import time
@@ -151,9 +152,10 @@ class TestAllMCPToolsExhaustive(unittest.TestCase):
         res = self.call("search_codebase_semantic", {"query": "token reduction", "project_root": "."})
         self.assertTrue(len(res) > 10)
 
-        # 12. export_agent_rules
-        res = self.call("export_agent_rules", {"project_root": "."})
-        self.assertTrue(len(res) > 10)
+        # 12. export_agent_rules (isolated temp directory to keep repo clean)
+        with tempfile.TemporaryDirectory() as tmp_rules_dir:
+            res = self.call("export_agent_rules", {"project_root": tmp_rules_dir})
+            self.assertTrue(len(res) > 10)
 
         # 13. get_token_savings_metrics
         res = self.call("get_token_savings_metrics", {"project_root": "."})

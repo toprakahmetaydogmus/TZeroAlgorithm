@@ -411,6 +411,20 @@ function activate(context) {
         await executeOutputCommand(`Packed Context (${budget} tokens)`, args, wsRoot, 'markdown');
     });
 
+    const armorCmd = vscode.commands.registerCommand('tzero.armor', async () => {
+        const wsRoot = getWorkspaceRoot() || '.';
+        const editor = vscode.window.activeTextEditor;
+        const targetPath = (editor && editor.document && editor.document.fileName) ? editor.document.fileName : wsRoot;
+        await executeOutputCommand('Anti-REA 26-Tier Armor', ['--armor', targetPath], wsRoot, 'markdown');
+    });
+
+    const auditReaCmd = vscode.commands.registerCommand('tzero.auditRea', async () => {
+        const wsRoot = getWorkspaceRoot() || '.';
+        const editor = vscode.window.activeTextEditor;
+        const targetPath = (editor && editor.document && editor.document.fileName) ? editor.document.fileName : wsRoot;
+        await executeOutputCommand('Anti-REA Resistance Audit', ['--audit-rea', targetPath], wsRoot, 'json');
+    });
+
     const copyContractCmd = vscode.commands.registerCommand('tzero.copySymbolContract', async (filePath, lineNum) => {
         const doc = vscode.workspace.textDocuments.find((d) => d.fileName === filePath)
             || (vscode.window.activeTextEditor && vscode.window.activeTextEditor.document);
@@ -507,6 +521,8 @@ function activate(context) {
         federationImpactCmd,
         groundingCmd,
         packCmd,
+        armorCmd,
+        auditReaCmd,
         copyContractCmd
     );
 
@@ -549,7 +565,7 @@ function activate(context) {
             const starTimer = setTimeout(async () => {
                 try {
                     const choice = await vscode.window.showInformationMessage(
-                        '⭐ T-Zero v12.0.0 is active! 20,880+ downloads & 1,120,000+ tokens saved. Help us reach our 100 stars milestone (Current: 45/100)!',
+                        '⭐ T-Zero v12.2.0 is active! 26-Tier Anti-REA Armor + AST Context Architect. Help us reach our 100 stars milestone!',
                         '⭐ Star on GitHub (1-Click)',
                         'Later'
                     );

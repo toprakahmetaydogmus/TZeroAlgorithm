@@ -795,9 +795,13 @@ diff --git a/core.py b/core.py
         res_bp = self.run_async(self.server.call_tool("execute_codebase_workflow", {"action": "blueprint", "target": "."}))
         self.assertIn("Architecture", tool_result_text(res_bp))
 
-        # Test 4: Action = 'sync'
-        res_sync = self.run_async(self.server.call_tool("execute_codebase_workflow", {"action": "sync", "target": "."}))
-        self.assertIn("T-Zero Autonomous Rules Synchronization", tool_result_text(res_sync))
+        # Test 4: Action = 'sync' (isolated temp workspace to avoid dirtying repo rule files)
+        import tempfile
+        with tempfile.TemporaryDirectory() as sync_tmp_dir:
+            with open(os.path.join(sync_tmp_dir, "sample.py"), "w", encoding="utf-8") as sf:
+                sf.write("class DemoSync:\n    def ping(self) -> str:\n        return 'ok'\n")
+            res_sync = self.run_async(self.server.call_tool("execute_codebase_workflow", {"action": "sync", "target": sync_tmp_dir}))
+            self.assertIn("T-Zero Autonomous Rules Synchronization", tool_result_text(res_sync))
 
         # Test 5: Action = 'roi'
         res_roi = self.run_async(self.server.call_tool("execute_codebase_workflow", {"action": "roi", "target": "."}))
@@ -902,11 +906,15 @@ diff --git a/core.py b/core.py
 
     def test_tool_sync_cost_drift(self):
         """Verifies individual execution of sync_workspace_rules, calculate_token_cost_roi, and analyze_instruction_drift."""
-        # Test sync_workspace_rules
-        res_sync = self.run_async(self.server.call_tool("sync_workspace_rules", {"workspace_dir": "."}))
-        sync_txt = tool_result_text(res_sync)
-        self.assertIn("Autonomous Rules Synchronization", sync_txt)
-        self.assertIn("AST Symbols Indexed", sync_txt)
+        # Test sync_workspace_rules (isolated temp workspace)
+        import tempfile
+        with tempfile.TemporaryDirectory() as sync_tmp_dir:
+            with open(os.path.join(sync_tmp_dir, "sample.py"), "w", encoding="utf-8") as sf:
+                sf.write("class DemoRule:\n    pass\n")
+            res_sync = self.run_async(self.server.call_tool("sync_workspace_rules", {"workspace_dir": sync_tmp_dir}))
+            sync_txt = tool_result_text(res_sync)
+            self.assertIn("Autonomous Rules Synchronization", sync_txt)
+            self.assertIn("AST Symbols Indexed", sync_txt)
 
         # Test calculate_token_cost_roi
         res_cost = self.run_async(self.server.call_tool("calculate_token_cost_roi", {"workspace_dir": "."}))

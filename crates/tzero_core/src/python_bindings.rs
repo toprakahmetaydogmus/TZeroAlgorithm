@@ -139,7 +139,7 @@ pub fn py_bm25_search<'py>(
 ) -> PyResult<Bound<'py, PyList>> {
     let mut docs = Vec::with_capacity(documents.len());
     for item in documents.iter() {
-        if let Ok(dict) = item.downcast::<PyDict>() {
+        if let Ok(dict) = item.cast::<PyDict>() {
             let id = dict.get_item("id")?.map(|v| v.extract::<String>()).transpose()?.unwrap_or_default();
             let path = dict.get_item("path")?.map(|v| v.extract::<String>()).transpose()?.unwrap_or_default();
             let content = dict.get_item("content")?.map(|v| v.extract::<String>()).transpose()?.unwrap_or_default();
@@ -250,7 +250,7 @@ pub fn py_compute_pagerank<'py>(
 ) -> PyResult<Bound<'py, PyList>> {
     let mut rust_edges = Vec::with_capacity(edges.len());
     for item in edges.iter() {
-        if let Ok(d) = item.downcast::<PyDict>() {
+        if let Ok(d) = item.cast::<PyDict>() {
             let source = d.get_item("source")?.map(|v| v.extract::<String>()).transpose()?.unwrap_or_default();
             let target = d.get_item("target")?.map(|v| v.extract::<String>()).transpose()?.unwrap_or_default();
             let kind = d.get_item("kind")?.map(|v| v.extract::<String>()).transpose()?.unwrap_or_else(|| "import".to_string());
@@ -283,7 +283,7 @@ pub fn py_analyze_reachability<'py>(
 ) -> PyResult<Bound<'py, PyDict>> {
     let mut rust_symbols = Vec::with_capacity(symbols.len());
     for item in symbols.iter() {
-        if let Ok(d) = item.downcast::<PyDict>() {
+        if let Ok(d) = item.cast::<PyDict>() {
             let name = d.get_item("name")?.map(|v| v.extract::<String>()).transpose()?.unwrap_or_default();
             let kind = d.get_item("kind")?.map(|v| v.extract::<String>()).transpose()?.unwrap_or_default();
             let line = d.get_item("line")?.map(|v| v.extract::<usize>()).transpose()?.unwrap_or(1);
@@ -584,7 +584,7 @@ pub fn py_is_native() -> PyResult<bool> {
 #[pyfunction]
 #[pyo3(name = "core_version")]
 pub fn py_core_version() -> PyResult<&'static str> {
-    Ok("12.1.4")
+    Ok(env!("CARGO_PKG_VERSION"))
 }
 
 /// Registers all Python functions onto the target PyModule bound handle.
@@ -615,7 +615,7 @@ pub fn register_python_bindings(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(py_estimate_costs, m)?)?;
     m.add_function(wrap_pyfunction!(py_is_native, m)?)?;
     m.add_function(wrap_pyfunction!(py_core_version, m)?)?;
-    m.add("__version__", "12.1.4")?;
+    m.add("__version__", env!("CARGO_PKG_VERSION"))?;
     m.add("__doc__", "T-Zero Turbo Rust Hybrid Core Native Extension Module")?;
     Ok(())
 }

@@ -17,7 +17,10 @@ License: MIT
 """
 
 import os
+import re
+import shutil
 import sys
+import sysconfig
 import subprocess
 from pathlib import Path
 from typing import Dict, Any, Optional
@@ -93,3 +96,74 @@ PyMODINIT_FUNC PyInit_native_armor_core(void) {{
             "native_shield_ratio": round(ratio, 2),
             "status": "HYBRID_HARDENED" if native_files else "BYTECODE_ONLY"
         }
+
+    @classmethod
+    def compile_native_extension(
+        cls,
+        func_name: str,
+        logic_c: str,
+        output_dir: str,
+    ) -> Dict[str, Any]:
+        """Generates C extension source and compiles a stripped shared library when a compiler is available."""
+        safe_fn = re.sub(r"[^A-Za-z0-9_]", "_", func_name or "kernel")
+        out_path = Path(output_dir)
+        out_path.mkdir(parents=True, exist_ok=True)
+        c_src_path = out_path / f"{safe_fn}_native.c"
+        c_code = cls.generate_c_wrapper_template(safe_fn, logic_c)
+        c_src_path.write_text(c_code, encoding="utf-8")
+
+        ext_suffix = sysconfig.get_config_var("EXT_SUFFIX") or (".pyd" if os.name == "nt" else ".so")
+        binary_path = out_path / f"native_armor_core{ext_suffix}"
+        include_dir = sysconfig.get_path("include")
+        compiler = shutil.which("gcc") or shutil.which("clang")
+
+        if not compiler or not include_dir:
+            return {
+                "compiled": False,
+                "compiler": None,
+                "source_file": str(c_src_path),
+                "binary_file": None,
+                "fallback": "C_SOURCE_EMITTED",
+                "reason": "Native C compiler (gcc/clang) or Python headers unavailable.",
+            }
+
+        cmd = [
+            compiler,
+            "-O3",
+            "-shared",
+            "-s",
+            f"-I{include_dir}",
+            str(c_src_path),
+            "-o",
+            str(binary_path),
+        ]
+        if os.name != "nt":
+            cmd.insert(2, "-fPIC")
+
+        try:
+            proc = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+            if proc.returncode == 0 and binary_path.is_file():
+                return {
+                    "compiled": True,
+                    "compiler": compiler,
+                    "source_file": str(c_src_path),
+                    "binary_file": str(binary_path),
+                    "fallback": None,
+                }
+            return {
+                "compiled": False,
+                "compiler": compiler,
+                "source_file": str(c_src_path),
+                "binary_file": None,
+                "fallback": "C_SOURCE_EMITTED",
+                "reason": (proc.stderr or proc.stdout or "Compiler exited non-zero")[:300],
+            }
+        except Exception as exc:
+            return {
+                "compiled": False,
+                "compiler": compiler,
+                "source_file": str(c_src_path),
+                "binary_file": None,
+                "fallback": "C_SOURCE_EMITTED",
+                "reason": str(exc),
+            }

@@ -493,7 +493,7 @@ def calculate_token_cost(token_count: int, provider_name: str) -> float:
 # i18n Translations
 TRANSLATIONS: Dict[str, Dict[str, str]] = {
     "en": {
-        "title": "T-Zero Developer Console & Context Architect v12.1.4",
+        "title": "T-Zero Developer Console & Context Architect v12.2.0",
         "subtitle": f"Developer: {DEV_NAME} | {DEV_URL_MAIN} | {DEV_URL_BIO}",
         "overview_tab": "🏠 Overview Dashboard",
         "setup_tab": "⚡ Setup & AI Models",
@@ -530,7 +530,7 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "audit_btn": "🛡️ SECURITY AUDIT"
     },
     "tr": {
-        "title": "T-Zero Geliştirici Konsolu & Bağlam Mimarı v12.1.4",
+        "title": "T-Zero Geliştirici Konsolu & Bağlam Mimarı v12.2.0",
         "subtitle": f"Geliştirici: {DEV_NAME} | {DEV_URL_MAIN} | {DEV_URL_BIO}",
         "overview_tab": "🏠 Genel Bakış",
         "setup_tab": "⚡ Kurulum & Model",
@@ -714,7 +714,9 @@ class ConfigManager:
                     ],
                     "ignored_folders": [
                         ".git", "node_modules", "__pycache__", "venv", ".venv", "dist", "build",
-                        ".next", ".nuxt", "out", "coverage", ".idea", ".vscode", "temp", "tmp"
+                        ".next", ".nuxt", "out", "coverage", ".idea", ".vscode", "temp", "tmp",
+                        "installers", "packages", ".superpowers", "brag-output", "target", ".tzero",
+                        "tzero_mcp.egg-info"
                     ],
                     "thread_pool_size": 4,
                     "max_tokens_budget": 60000
@@ -3558,13 +3560,18 @@ HorizontalProgressBarGroup = MonthlyStackedBarCard
 
 
 class SecurityHubCard(LuxuryCard):
-    """Siber Akademi security badge & quick audit launcher card."""
-    def __init__(self, parent, action_cmd=None, **kwargs):
+    """Siber Akademi security badge & quick audit / Anti-REA launcher card."""
+    def __init__(self, parent, action_cmd=None, armor_cmd=None, **kwargs):
         super().__init__(parent, radius=18, padding=12, **kwargs)
         tk.Label(self.inner, text="🛡 SİBER AKADEMİ GÜVENLİK", font=("Segoe UI", 9, "bold"), fg=PALETTE.get("accent_cyan", "#3843a0"), bg=self.card_bg).pack(anchor=tk.W)
-        tk.Label(self.inner, text="100% Zero-Leak Sıfır Bellek İfşası Koruması", font=("Segoe UI", 7), fg=PALETTE.get("accent_green", "#10b981"), bg=self.card_bg).pack(anchor=tk.W, pady=(1, 6))
-        self.btn = CanvasPillButton(self.inner, text="RAPORU İNCELE", command=action_cmd, height=28, radius=14, font=("Segoe UI", 7, "bold"), bg_color=PALETTE.get("card_hover", "#e0e7ff"), text_color=PALETTE.get("accent_cyan", "#3843a0"))
-        self.btn.pack(fill=tk.X)
+        tk.Label(self.inner, text="100% Zero-Leak + 26-Tier Anti-REA Armor", font=("Segoe UI", 7), fg=PALETTE.get("accent_green", "#10b981"), bg=self.card_bg).pack(anchor=tk.W, pady=(1, 6))
+        btn_row = tk.Frame(self.inner, bg=self.card_bg)
+        btn_row.pack(fill=tk.X)
+        self.btn = CanvasPillButton(btn_row, text="RAPORU İNCELE", command=action_cmd, height=28, radius=14, font=("Segoe UI", 7, "bold"), bg_color=PALETTE.get("card_hover", "#e0e7ff"), text_color=PALETTE.get("accent_cyan", "#3843a0"))
+        self.btn.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 3))
+        if armor_cmd is not None:
+            self.armor_btn = CanvasPillButton(btn_row, text="🛡️ ANTI-REA", command=armor_cmd, height=28, radius=14, font=("Segoe UI", 7, "bold"), bg_color="#064e3b", text_color="#34d399")
+            self.armor_btn.pack(side=tk.RIGHT, fill=tk.X, expand=True, padx=(3, 0))
 
 class GlowingStatusDot(tk.Canvas):
     def __init__(self, parent, size: int = 16, **kwargs):
@@ -4939,6 +4946,23 @@ class AutoReadmeGUI:
     def run_quick_security_audit(self):
         self.open_security_audit_dialog()
 
+    def run_quick_anti_rea_armor(self):
+        """Executes 26-Tier Anti-REA Resistance audit & protection from GUI Security Hub."""
+        target = (self.dir_entry.get().strip() if hasattr(self, "dir_entry") else "") or os.getcwd()
+        try:
+            from tzero.tzero_armor import audit_path_rea_resistance
+            audit = audit_path_rea_resistance(target)
+            score = audit.get("score", 0)
+            rating = audit.get("rating", "UNKNOWN")
+            self.log(f"[ANTI-REA AUDIT] Target: {target} | Score: {score}/100 ({rating})")
+            messagebox.showinfo(
+                "T-Zero 26-Tier Anti-REA Armor",
+                f"Target: {target}\nAI Resistance Score: {score}/100 ({rating})\n"
+                f"Active Tiers: Anti-VM (25), RDTSC Guard (26), Ring-3 Anti-Debug, Opaque CFF, PolyVM.",
+            )
+        except Exception as exc:
+            self.log(f"[ANTI-REA ERROR] {exc}")
+
     def open_security_audit_dialog(self, target_dir: Optional[str] = None):
         """Runs a complete T-Zero 4-Tier Security & AST Architecture Audit (T-001 to T-004)
         and displays an interactive luxury report dialog with filtering and export capabilities."""
@@ -5523,7 +5547,7 @@ class AutoReadmeGUI:
         self.daily_card.grid(row=2, column=1, sticky="nsew", padx=4, pady=4)
 
         # Card 9: Siber Akademi Security Hub Card
-        self.security_card = SecurityHubCard(f, action_cmd=self.run_quick_security_audit)
+        self.security_card = SecurityHubCard(f, action_cmd=self.run_quick_security_audit, armor_cmd=self.run_quick_anti_rea_armor)
         self.security_card.grid(row=2, column=2, columnspan=2, sticky="nsew", padx=4, pady=4)
 
     # --- TAB 7: SETTINGS & SECRETS MANAGEMENT ---
@@ -9409,6 +9433,7 @@ def main():
     parser.add_argument("--fuzzy", action="store_true", default=True, help="Enable fuzzy AST and whitespace matching for patch application (default: True)")
     parser.add_argument("--armor", "--anti-rea", nargs="?", const=".", default=None, metavar="PATH", dest="armor", help="Apply military-grade Anti-REA armor against AI reverse engineering (morluto/rea)")
     parser.add_argument("--audit-rea", nargs="?", const=".", default=None, metavar="PATH", dest="audit_rea", help="Audit code or binary for resistance against AI reverse engineering (0-100)")
+    parser.add_argument("--telemetry", action="store_true", help="Show offline SQLite token savings & ROI telemetry report")
     parser.add_argument("--no-fuzzy", dest="fuzzy", action="store_false", help="Disable fuzzy matching and enforce exact line matches only")
     parser.add_argument("--dry-run-patch", action="store_true", help="Validate patch applicability without modifying files on disk")
     parser.add_argument("--reverse-patch", action="store_true", help="Un-apply / revert patch changes")
@@ -9428,7 +9453,7 @@ def main():
                         default="o200k_base", help="BPE encoding for --symbol-context")
     parser.add_argument("--cache-aligned", action="store_true", help="Order context for KV-cache prefix stability (immutable static prefix before dynamic query suffix)")
     parser.add_argument("--commit-msg", action="store_true", help="Generate Conventional Commit message from local AST git diff ($0 local engine)")
-    parser.add_argument("--changelog", nargs="?", const="v12.1.4", default=None, metavar="VERSION", help="Generate release CHANGELOG markdown from git history")
+    parser.add_argument("--changelog", nargs="?", const="v12.2.0", default=None, metavar="VERSION", help="Generate release CHANGELOG markdown from git history")
     parser.add_argument("--ci", choices=["github", "gitlab", "pre-commit", "local", "all"], default=None, help="Install CI/CD workflow or run local verification suite")
     parser.add_argument("--local-ci", action="store_true", help="Run comprehensive Local CI & Pre-Push verification battery ($0 quota burn)")
     parser.add_argument("--quick-ci", action="store_true", help="Run fast Local CI smoke checks in seconds")
@@ -9492,7 +9517,7 @@ def main():
     parser.add_argument("--card", "--badge", nargs="?", const="assets/tzero_badge_card.svg", default=None, metavar="FILE", help="Generate viral dark-mode SVG banner card and GitHub README badges")
     parser.add_argument("--showcase", nargs="?", const="tzero_showcase.html", default=None, metavar="FILE", help="Generate interactive split-screen HTML5 comparison showcase slider")
     parser.add_argument("--marketing", "--growth", action="store_true", help="Launch $0-budget viral growth engine and export campaign materials for Reddit, HN, X, and Product Hunt")
-    parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect v12.1.4 Master Edition (engine v4.1.0)")
+    parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect v12.2.0 Master Edition (engine v4.1.0)")
 
 
     def print_master_tutorial():
@@ -9601,7 +9626,7 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
     def print_quickstart_guide():
         print("""
 ================================================================================
-⚡ SİBER AKADEMİ — T-ZERO CONTEXT ARCHITECT & MCP v12.1.4 MASTER (engine v4.1.0)
+⚡ SİBER AKADEMİ — T-ZERO CONTEXT ARCHITECT & MCP v12.2.0 MASTER (engine v4.1.0)
 ================================================================================
 🎯 %95'e Varan Token Tasarrufu & Otonom Yapay Zeka Mimari Bağlam Motoru
 
@@ -9765,6 +9790,7 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
             "badge": "--card",
             "showcase": "--showcase",
             "star": "--star",
+            "telemetry": "--telemetry",
         }
         if sub in sub_map:
             sys.argv[1] = sub_map[sub]
@@ -9827,6 +9853,14 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
         from tzero.tzero_armor import audit_path_rea_resistance
         audit = audit_path_rea_resistance(args.audit_rea)
         print(json.dumps(audit, indent=2))
+        return
+    elif getattr(args, "telemetry", False):
+        from tzero.tzero_telemetry import get_summary, render_report
+        ws_dir = getattr(args, "dir", ".") or "."
+        if getattr(args, "format", "text") == "json":
+            print(json.dumps(get_summary(workspace_dir=ws_dir), indent=2))
+        else:
+            print(render_report(workspace_dir=ws_dir))
         return
     elif getattr(args, "info", False):
         print_quickstart_guide()
@@ -10016,7 +10050,7 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
             for c in report["circular_cycles"]:
                 print(f"   [CIRCULAR IMPORT] Cycle detected: {c}")
             for s in report["secret_leaks"]:
-                print(f"   [SECRET LEAK] {s['file']}: {s['pattern']}")
+                print(f"   [SECRET LEAK] {s.get('file', '<unknown>')} (credential pattern detected)")
             print()
             sys.exit(1)
     elif getattr(args, "mutate", None) is not None:
@@ -10566,7 +10600,7 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
         if not os.path.exists(app_path):
             app_path = os.path.join(os.getcwd(), "huggingface-space", "app.py")
         print("\033[36m" + "=" * 80)
-        print("🤗 SİBER AKADEMİ — T-ZERO HUGGING FACE SPACE & GRADIO COCKPIT (v12.1.4)")
+        print("🤗 SİBER AKADEMİ — T-ZERO HUGGING FACE SPACE & GRADIO COCKPIT (v12.2.0)")
         print("=" * 80 + "\033[0m")
         print("🌐 Official Live Space : https://huggingface.co/spaces/toprakke4/tzero-token-reducer")
         print(f"📁 Local Application   : {app_path}")
@@ -10606,8 +10640,12 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
                 print(f"[AUTO-VAULT] Successfully migrated {count} secret(s) from {target} into .env and updated code.")
             else:
                 print(report)
-                print("\n--- .env preview ---")
-                print(env_file)
+                redacted_env_lines = [
+                    f"{line.split('=', 1)[0]}=***REDACTED***" if "=" in line and not line.lstrip().startswith("#") else line
+                    for line in env_file.splitlines()
+                ]
+                print("\n--- .env preview (redacted) ---")
+                print("\n".join(redacted_env_lines))
                 print("\n--- Refactored Code Preview ---")
                 print(migrated_code[:1000])
         else:
@@ -10619,7 +10657,7 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
             else:
                 print(f"[AUTO-VAULT] Found {len(violations)} secret(s) across {findings.get('files_with_violations', 0)} file(s).")
                 for v in violations:
-                    print(f"  - [{v['provider']}] {v['file']}:{v['line']} -> {v['preview']}")
+                    print(f"  - [{v['provider']}] {v['file']}:{v['line']} -> ***REDACTED***")
                 if args.migrate:
                     total_migrated = 0
                     violating_files = sorted({v.get("file", "") for v in violations if v.get("file")})

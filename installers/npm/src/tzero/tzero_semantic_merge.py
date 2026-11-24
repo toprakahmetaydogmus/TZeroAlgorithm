@@ -32,15 +32,42 @@ class MergeResult:
 class ASTSemanticMerger:
     """Semantic AST-aware 3-way merger and git conflict block healer."""
 
-    CONFLICT_PATTERN = re.compile(
-        r'<<<<<<<[^\n]*\n(.*?)=======\n(.*?)>>>>>>>[^\n]*\n',
-        re.DOTALL
-    )
+    CONFLICT_PATTERN = re.compile(r'^<<<<<<<[^\n]*$', re.MULTILINE)
+
+    @classmethod
+    def _find_conflict_blocks(cls, text: str) -> List[Tuple[str, str, str]]:
+        """Scans text linearly O(N) for git conflict blocks without regex backtracking."""
+        blocks: List[Tuple[str, str, str]] = []
+        lines = text.splitlines(keepends=True)
+        i = 0
+        n = len(lines)
+        while i < n:
+            if lines[i].startswith("<<<<<<<"):
+                start = i
+                sep = -1
+                end = -1
+                j = i + 1
+                while j < n:
+                    if sep == -1 and lines[j].startswith("======="):
+                        sep = j
+                    elif sep != -1 and lines[j].startswith(">>>>>>>"):
+                        end = j
+                        break
+                    j += 1
+                if sep != -1 and end != -1:
+                    full_match = "".join(lines[start:end + 1])
+                    ours_block = "".join(lines[start + 1:sep])
+                    theirs_block = "".join(lines[sep + 1:end])
+                    blocks.append((full_match, ours_block, theirs_block))
+                    i = end + 1
+                    continue
+            i += 1
+        return blocks
 
     @classmethod
     def has_conflict_markers(cls, text: str) -> bool:
         """Returns True if file contains standard git conflict markers."""
-        return bool(cls.CONFLICT_PATTERN.search(text))
+        return len(cls._find_conflict_blocks(text)) > 0
 
     @classmethod
     def extract_ast_symbols(cls, code: str) -> Dict[str, str]:
@@ -73,7 +100,7 @@ class ASTSemanticMerger:
         Scans content for git conflict blocks (<<<<<<< ... ======= ... >>>>>>>)
         and attempts semantic AST healing.
         """
-        matches = list(cls.CONFLICT_PATTERN.finditer(content))
+        matches = cls._find_conflict_blocks(content)
         if not matches:
             return MergeResult(
                 success=True,
@@ -91,10 +118,7 @@ class ASTSemanticMerger:
         added_theirs = []
 
         # Process each conflict block
-        for idx, m in enumerate(matches, 1):
-            full_match = m.group(0)
-            ours_block = m.group(1)
-            theirs_block = m.group(2)
+        for idx, (full_match, ours_block, theirs_block) in enumerate(matches, 1):
 
             ours_syms = cls.extract_ast_symbols(ours_block)
             theirs_syms = cls.extract_ast_symbols(theirs_block)

@@ -22,14 +22,14 @@ from tzero.tzero_armor import (
     audit_path_rea_resistance,
     shield_executable,
 )
-from anti_rea.extractor_shield import PYINSTALLER_COOKIE, ExtractorShield
-from anti_rea.flattener import ControlFlowFlattener
-from anti_rea.traps import AdversarialTrapGenerator
-from anti_rea.honeypot import HoneypotGenerator
-from anti_rea.vm_obfuscator import DynamicVMObfuscator
-from anti_rea.bytecode_trap import BytecodeTrap
-from anti_rea.jailbreak_decoy import CognitiveJailbreakDecoy
-from anti_rea.anti_agent_guard import AntiAgentGuard
+from tzero.anti_rea.extractor_shield import PYINSTALLER_COOKIE, ExtractorShield
+from tzero.anti_rea.flattener import ControlFlowFlattener
+from tzero.anti_rea.traps import AdversarialTrapGenerator
+from tzero.anti_rea.honeypot import HoneypotGenerator
+from tzero.anti_rea.vm_obfuscator import DynamicVMObfuscator
+from tzero.anti_rea.bytecode_trap import BytecodeTrap
+from tzero.anti_rea.jailbreak_decoy import CognitiveJailbreakDecoy
+from tzero.anti_rea.anti_agent_guard import AntiAgentGuard
 
 
 class TestAntiREAArmor(unittest.TestCase):
@@ -170,6 +170,96 @@ class TestAntiREAArmor(unittest.TestCase):
         finally:
             if os.path.exists(temp_path):
                 os.remove(temp_path)
+
+    def test_08_mcp_workflow_armor_and_search_tools(self):
+        """Verify execute_codebase_workflow forwards target to armor/audit_rea and search_tools classifies armor under security."""
+        import asyncio
+        from tzero.tzero_mcp import create_mcp_server
+
+        server = create_mcp_server()
+        with tempfile.NamedTemporaryFile("w", suffix=".py", delete=False, encoding="utf-8") as f:
+            f.write("def secret_calc(a, b):\n    return a * b + 1\n")
+            temp_path = f.name
+        try:
+            res = asyncio.run(
+                server.call_tool(
+                    "execute_codebase_workflow",
+                    {"action": "audit_rea", "target": temp_path},
+                )
+            )
+            txt = getattr(getattr(res, "content", [res])[0], "text", str(res))
+            self.assertIn("TDQS-REA", txt)
+
+            sec_search = asyncio.run(
+                server.call_tool("search_tools", {"query": "armor", "category": "security"})
+            )
+            sec_txt = getattr(getattr(sec_search, "content", [sec_search])[0], "text", str(sec_search))
+            self.assertIn("security", sec_txt.lower())
+        finally:
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
+
+    def test_09_offline_sqlite_telemetry_and_cli(self):
+        """Verify tzero_telemetry SQLite recording, aggregation, and CLI --telemetry --format json."""
+        import json
+        from tzero.tzero_telemetry import record_event, get_summary, render_report
+
+        with tempfile.TemporaryDirectory() as tmp:
+            db_file = os.path.join(tmp, "telemetry_test.db")
+            env = os.environ.copy()
+            env["TZERO_TELEMETRY_DB"] = db_file
+            old_env = os.environ.get("TZERO_TELEMETRY_DB")
+            os.environ["TZERO_TELEMETRY_DB"] = db_file
+            try:
+                rec = record_event("pack", 10000, 1200, workspace_dir=tmp)
+                self.assertEqual(rec["saved_tokens"], 8800)
+                summary = get_summary(workspace_dir=tmp, days=7)
+                self.assertEqual(summary["runs"], 1)
+                self.assertEqual(summary["saved_tokens"], 8800)
+                self.assertAlmostEqual(summary["reduction_pct"], 88.0, places=1)
+                self.assertIn("Offline SQLite Telemetry", render_report(workspace_dir=tmp))
+
+                proc = subprocess.run(
+                    [sys.executable, "-m", "tzero.tzero_v3", "telemetry", "--format", "json"],
+                    capture_output=True,
+                    text=True,
+                    encoding="utf-8",
+                    errors="replace",
+                    cwd=str(REPO_ROOT),
+                    env=env,
+                    timeout=10,
+                )
+                self.assertEqual(proc.returncode, 0, proc.stderr)
+                parsed = json.loads(proc.stdout)
+                self.assertEqual(parsed["saved_tokens"], 8800)
+            finally:
+                if old_env is None:
+                    os.environ.pop("TZERO_TELEMETRY_DB", None)
+                else:
+                    os.environ["TZERO_TELEMETRY_DB"] = old_env
+
+    def test_10_native_bridge_compile_or_emit_fallback(self):
+        """Verify Tier 20 NativeBridge emits valid C source and handles compiler or clean fallback."""
+        from tzero.anti_rea.native_bridge import NativeBridge
+
+        with tempfile.TemporaryDirectory() as tmp:
+            res = NativeBridge.compile_native_extension(
+                "shield_op",
+                "result = (x ^ 0x5A5A) + y;",
+                tmp,
+            )
+            self.assertTrue(os.path.isfile(res["source_file"]))
+            self.assertIn("PyInit_native_armor_core", Path(res["source_file"]).read_text(encoding="utf-8"))
+            self.assertIn("compiled", res)
+
+    def test_11_hybrid_workspace_orchestrator_preserves_python_and_rust(self):
+        """Verify WorkspaceProfiler preserves both unittest and cargo test in hybrid Python+Rust repos."""
+        from tzero.tzero_jarvis.workspace_orchestrator import WorkspaceProfiler
+
+        meta = WorkspaceProfiler(str(REPO_ROOT)).profile()
+        self.assertIn("unittest", meta.default_test_command)
+        self.assertIn("cargo test", meta.default_test_command)
+        self.assertIn("cargo clippy", meta.default_lint_command)
 
 
 if __name__ == "__main__":

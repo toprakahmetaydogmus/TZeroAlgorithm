@@ -17,6 +17,7 @@ Part of T-Zero Context Architect v10.8.0 Master Edition.
 import ast
 import copy
 import os
+import shlex
 import subprocess
 import sys
 import tempfile
@@ -211,6 +212,16 @@ class ASTMutationEngine:
 
         return mutants
 
+    @staticmethod
+    def _sanitize_target_path(target_path: str) -> str:
+        if not target_path or "\x00" in target_path:
+            raise ValueError("Invalid target path.")
+        real_target = os.path.realpath(os.path.abspath(target_path))
+        allowed_roots = (os.path.realpath("."), os.path.realpath(tempfile.gettempdir()))
+        if not any(real_target == r or real_target.startswith(r + os.sep) for r in allowed_roots):
+            raise ValueError(f"Path outside allowed workspace or temp scope: {target_path}")
+        return real_target
+
     @classmethod
     def run_mutation_analysis(
         cls,
@@ -221,7 +232,7 @@ class ASTMutationEngine:
     ) -> MutationReport:
         """Executes full mutation testing on target_file against test_command."""
         start_time = time.time()
-        abs_target = os.path.abspath(target_file)
+        abs_target = cls._sanitize_target_path(target_file)
         if not os.path.isfile(abs_target):
             raise FileNotFoundError(f"Target file not found: {target_file}")
 
@@ -242,31 +253,40 @@ class ASTMutationEngine:
                 mutants=[]
             )
 
-        # Infer test command if not provided
+        # Build argv safely without shell=True
         if not test_command:
-            base_name = os.path.splitext(os.path.basename(target_file))[0]
-            # Check for candidate test file
-            candidate_test = os.path.join(os.path.dirname(abs_target), "tests", f"test_{base_name}.py")
-            if not os.path.isfile(candidate_test):
-                candidate_test = os.path.join(".", "tests", f"test_{base_name}.py")
-
-            if os.path.isfile(candidate_test):
-                test_command = f"{sys.executable} -m unittest {candidate_test}"
+            base_name = os.path.splitext(os.path.basename(abs_target))[0]
+            candidate_a = os.path.join(os.path.dirname(abs_target), "tests", f"test_{base_name}.py")
+            candidate_b = os.path.realpath(os.path.join(".", "tests", f"test_{base_name}.py"))
+            if os.path.isfile(candidate_a):
+                test_cmd_args = [sys.executable, "-m", "unittest", candidate_a]
+            elif os.path.isfile(candidate_b):
+                test_cmd_args = [sys.executable, "-m", "unittest", candidate_b]
             else:
-                test_command = f"{sys.executable} -m unittest discover -s tests -p 'test_*.py'"
+                test_cmd_args = [sys.executable, "-m", "unittest", "discover", "-s", "tests", "-p", "test_*.py"]
+        else:
+            if any(tok in test_command for tok in (";", "&&", "||", "|", "`", "$(", ">", "<", "\n", "\r")):
+                raise ValueError("Unsafe shell metacharacters detected in test_command.")
+            test_cmd_args = [
+                tok.strip('"').strip("'")
+                for tok in shlex.split(test_command, posix=(os.name != "nt"))
+                if tok.strip()
+            ]
+            if not test_cmd_args:
+                raise ValueError("Empty test_command.")
 
         killed = 0
         survived = 0
         timeouts = 0
         errors = 0
 
-        # Backup original content
-        backup_path = abs_target + ".tzero_mut_bak"
+        target_dir = os.path.dirname(abs_target)
+        safe_bak_name = os.path.basename(abs_target) + ".tzero_mut_bak"
+        backup_path = os.path.join(target_dir, safe_bak_name)
         with open(backup_path, "w", encoding="utf-8") as f:
             f.write(original_code)
 
         env = os.environ.copy()
-        target_dir = os.path.dirname(abs_target)
         existing_pythonpath = env.get("PYTHONPATH", "")
         env["PYTHONPATH"] = f"{target_dir}{os.pathsep}{existing_pythonpath}" if existing_pythonpath else target_dir
 
@@ -278,8 +298,8 @@ class ASTMutationEngine:
 
                 try:
                     proc = subprocess.run(
-                        test_command,
-                        shell=True,
+                        test_cmd_args,
+                        shell=False,
                         capture_output=True,
                         text=True,
                         timeout=timeout_seconds,

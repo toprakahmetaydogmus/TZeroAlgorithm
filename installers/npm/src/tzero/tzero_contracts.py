@@ -13,7 +13,7 @@ Capabilities:
 - 100% Offline, $0 cost, zero external dependencies (pure Python standard library).
 
 Author: Toprak Ahmet Aydoğmuş (Siber Akademi)
-Part of T-Zero Context Architect v12.1.4 Master Edition.
+Part of T-Zero Context Architect v12.2.0 Master Edition.
 """
 
 import ast
@@ -458,7 +458,7 @@ class ASTContractExtractor:
     @classmethod
     def _extract_ts_contracts(cls, clean_code: str, functions: Dict[str, FunctionContract], classes: Dict[str, ClassContract]) -> None:
         class_pattern = re.compile(
-            r'(?:export\s+)?(?:default\s+)?(?:abstract\s+)?class\s+([A-Za-z0-9_$]+)(?:\s+extends\s+([^{]+))?\s*\{'
+            r'(?:export\s+)?(?:default\s+)?(?:abstract\s+)?class\s+([A-Za-z0-9_$]+)(?:\s+extends\s+([^\s{\r\n](?:[^{\r\n]*[^\s{\r\n])?))?[ \t]*\{'
         )
         top_level_code = list(clean_code)
 
@@ -494,7 +494,7 @@ class ASTContractExtractor:
 
                 if method_depth == 0:
                     m_hdr = re.match(
-                        r'^(?:(?:public|static|async|get|set|override|readonly)\s+)*([A-Za-z0-9_$]+)\s*(?:<[^>]+>)?\s*\(',
+                        r'^(?:(?:public|static|async|get|set|override|readonly)\s+)*([A-Za-z0-9_$]+)(?:[ \t]*<[^>\n]+>[ \t]*|[ \t]*)\(',
                         class_body[idx:]
                     )
                     if m_hdr:
@@ -537,7 +537,7 @@ class ASTContractExtractor:
 
         top_str = "".join(top_level_code)
         fn_pattern = re.compile(
-            r'(?:export\s+(?:default\s+)?)?(?:async\s+)?function\s+([A-Za-z0-9_$]+)\s*(?:<[^>]+>)?\s*\('
+            r'(?:export\s+(?:default\s+)?)?(?:async\s+)?function\s+([A-Za-z0-9_$]+)(?:[ \t]*<[^>\n]+>[ \t]*|[ \t]*)\('
         )
         for m in fn_pattern.finditer(top_str):
             fn_name = m.group(1)
@@ -646,7 +646,7 @@ class ASTContractExtractor:
                 classes[impl_name] = ClassContract(name=impl_name, bases=[])
 
             impl_body = clean_code[brace_idx + 1:end_brace]
-            for fn_m in re.finditer(r'\bpub\s+(?:async\s+)?(?:unsafe\s+)?fn\s+([A-Za-z0-9_]+)\s*(?:<[^>]+>)?\s*\(', impl_body):
+            for fn_m in re.finditer(r'\bpub\s+(?:async\s+)?(?:unsafe\s+)?fn\s+([A-Za-z0-9_]+)(?:[ \t]*<[^>\n]+>[ \t]*|[ \t]*)\(', impl_body):
                 fn_name = fn_m.group(1)
                 p_start = fn_m.end() - 1
                 p_end = cls._find_matching_paren(impl_body, p_start)
@@ -663,7 +663,7 @@ class ASTContractExtractor:
                     )
 
         top_str = "".join(top_level_code)
-        for fn_m in re.finditer(r'\bpub\s+(?:async\s+)?(?:unsafe\s+)?fn\s+([A-Za-z0-9_]+)\s*(?:<[^>]+>)?\s*\(', top_str):
+        for fn_m in re.finditer(r'\bpub\s+(?:async\s+)?(?:unsafe\s+)?fn\s+([A-Za-z0-9_]+)(?:[ \t]*<[^>\n]+>[ \t]*|[ \t]*)\(', top_str):
             fn_name = fn_m.group(1)
             p_start = fn_m.end() - 1
             p_end = cls._find_matching_paren(top_str, p_start)
@@ -682,7 +682,7 @@ class ASTContractExtractor:
     @classmethod
     def _extract_java_cs_contracts(cls, clean_code: str, functions: Dict[str, FunctionContract], classes: Dict[str, ClassContract]) -> None:
         class_pattern = re.compile(
-            r'\bpublic\s+(?:abstract\s+|static\s+|sealed\s+)?(?:class|interface)\s+([A-Za-z0-9_]+)(?:\s+extends\s+([^{]+))?\s*\{'
+            r'\bpublic\s+(?:abstract\s+|static\s+|sealed\s+)?(?:class|interface)\s+([A-Za-z0-9_]+)(?:\s+extends\s+([^\s{\r\n](?:[^{\r\n]*[^\s{\r\n])?))?[ \t]*\{'
         )
         for m in class_pattern.finditer(clean_code):
             cls_name = m.group(1)
@@ -1035,7 +1035,7 @@ class ASTContractComparator:
                     "tool": {
                         "driver": {
                             "name": "T-Zero Contract Guardian",
-                            "version": "12.1.4",
+                            "version": "12.2.0",
                             "rules": rules_list
                         }
                     },

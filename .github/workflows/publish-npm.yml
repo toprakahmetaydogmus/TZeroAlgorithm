@@ -44,14 +44,7 @@ jobs:
 
           if [ -n "$NODE_AUTH_TOKEN" ]; then
             echo "Publishing to npm registry using NPM_TOKEN..."
-            npm publish --access public || {
-              echo "::warning::npm publish with NPM_TOKEN encountered an issue."
-              exit 0
-            }
+            npm publish --access public
           else
-            echo "NPM_TOKEN not set. Attempting OIDC provenance publish..."
-            npm publish --access public --provenance || {
-              echo "::warning::npm publish skipped: NPM_TOKEN not provided and OIDC provenance publish not configured."
-              exit 0
-            }
+            echo "::notice::NPM_TOKEN secret is not configured; skipping npm publish cleanly."
           fi

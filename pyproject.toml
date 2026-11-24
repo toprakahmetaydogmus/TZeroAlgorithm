@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "tzero-mcp"
 version = "12.2.0"
-description = "Enterprise Codebase Context Builder, AST Signatures Analyzer, Token Reducer & 24-Tier Anti-REA Armor Suite for LLMs"
+description = "Enterprise Codebase Context Builder, AST Signatures Analyzer, Token Reducer & 26-Tier Anti-REA Armor Suite for LLMs"
 readme = "README.md"
 requires-python = ">=3.11"
 license = "AGPL-3.0-only"
@@ -63,8 +63,8 @@ dependencies = [
     "keyring>=23.13.1",
     "darkdetect>=0.8.0",
     "pygments>=2.14.0",
-    "Pillow>=10.4.0",
-    "certifi>=2024.7.4",
+    "Pillow>=13.0.0",
+    "certifi>=2026.10.18",
     "mcp>=1.0.0",
     "typing-extensions>=4.0"
 ]

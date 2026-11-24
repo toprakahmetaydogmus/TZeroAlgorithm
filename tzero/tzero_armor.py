@@ -46,6 +46,8 @@ try:
     from tzero.anti_rea.canary_beacon import CanaryBeacon
     from tzero.anti_rea.string_vault import StringVault
     from tzero.anti_rea.asar_shield import AsarShield
+    from tzero.anti_rea.anti_vm import AntiVMGuard
+    from tzero.anti_rea.rdtsc_guard import RDTSCTimingGuard
 except ImportError:
     try:
         from anti_rea.engine import AntiREAEngine
@@ -71,11 +73,15 @@ except ImportError:
         from anti_rea.canary_beacon import CanaryBeacon
         from anti_rea.string_vault import StringVault
         from anti_rea.asar_shield import AsarShield
+        from anti_rea.anti_vm import AntiVMGuard
+        from anti_rea.rdtsc_guard import RDTSCTimingGuard
     except ImportError:
         sys.path.append(str(Path(__file__).resolve().parent))
         from anti_rea.engine import AntiREAEngine
         from anti_rea.auditor import AIResistanceAuditor
         from anti_rea.extractor_shield import ExtractorShield
+        from anti_rea.anti_vm import AntiVMGuard
+        from anti_rea.rdtsc_guard import RDTSCTimingGuard
 
 
 def protect_path_with_armor(

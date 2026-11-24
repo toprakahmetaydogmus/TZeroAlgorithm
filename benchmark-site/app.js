@@ -512,7 +512,13 @@ function showToast(message, icon = "⚡") {
 
   const toast = document.createElement("div");
   toast.className = "toast";
-  toast.innerHTML = `<span style="font-size:16px">${icon}</span><span>${message}</span>`;
+  const iconSpan = document.createElement("span");
+  iconSpan.style.fontSize = "16px";
+  iconSpan.textContent = String(icon ?? "⚡");
+  const msgSpan = document.createElement("span");
+  msgSpan.textContent = String(message ?? "");
+  toast.appendChild(iconSpan);
+  toast.appendChild(msgSpan);
   container.appendChild(toast);
 
   setTimeout(() => {
@@ -1842,12 +1848,21 @@ function initMCPTools() {
     });
 
     if (filtered.length === 0) {
-      container.innerHTML = `
-        <div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--text-muted);">
-          <div style="font-size: 2rem; margin-bottom: 0.5rem;">🔍</div>
-          No tools match "<strong>${searchQuery}</strong>" in the selected category.
-        </div>
-      `;
+      container.replaceChildren();
+      const emptyBox = document.createElement("div");
+      emptyBox.style.cssText = "grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--text-muted);";
+      const iconDiv = document.createElement("div");
+      iconDiv.style.cssText = "font-size: 2rem; margin-bottom: 0.5rem;";
+      iconDiv.textContent = "🔍";
+      const msgNode = document.createElement("span");
+      msgNode.appendChild(document.createTextNode('No tools match "'));
+      const strong = document.createElement("strong");
+      strong.textContent = searchQuery;
+      msgNode.appendChild(strong);
+      msgNode.appendChild(document.createTextNode('" in the selected category.'));
+      emptyBox.appendChild(iconDiv);
+      emptyBox.appendChild(msgNode);
+      container.appendChild(emptyBox);
       return;
     }
 
@@ -3923,13 +3938,22 @@ function initCortexMatrix() {
     });
 
     if (filtered.length === 0) {
-      container.innerHTML = `
-        <div style="grid-column: 1/-1; text-align: center; padding: 4rem 1rem; color: var(--text-muted);">
-          <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🔍</div>
-          <div style="font-size: 1.1rem; color: #fff; font-weight: 600;">No capabilities match "${searchQuery}"</div>
-          <div style="font-size: 0.88rem; margin-top: 0.25rem;">Try selecting "All (105)" or search by tags like "ast", "security", "tokens", or "dag".</div>
-        </div>
-      `;
+      container.replaceChildren();
+      const emptyBox = document.createElement("div");
+      emptyBox.style.cssText = "grid-column: 1/-1; text-align: center; padding: 4rem 1rem; color: var(--text-muted);";
+      const iconDiv = document.createElement("div");
+      iconDiv.style.cssText = "font-size: 2.5rem; margin-bottom: 0.5rem;";
+      iconDiv.textContent = "🔍";
+      const titleDiv = document.createElement("div");
+      titleDiv.style.cssText = "font-size: 1.1rem; color: #fff; font-weight: 600;";
+      titleDiv.textContent = `No capabilities match "${searchQuery}"`;
+      const hintDiv = document.createElement("div");
+      hintDiv.style.cssText = "font-size: 0.88rem; margin-top: 0.25rem;";
+      hintDiv.textContent = 'Try selecting "All (105)" or search by tags like "ast", "security", "tokens", or "dag".';
+      emptyBox.appendChild(iconDiv);
+      emptyBox.appendChild(titleDiv);
+      emptyBox.appendChild(hintDiv);
+      container.appendChild(emptyBox);
       return;
     }
 
@@ -4659,7 +4683,7 @@ function initGitHubStars() {
 
 function initViralShare() {
   const repoUrl = "https://github.com/toprakahmetaydogmus/TZeroAlgorithm";
-  const shareText = "T-Zero v12.1.4: Cut AI coding context tokens by up to 95% using deterministic AST pruning! Open-source local MCP server for Cursor & Claude. Check it out: " + repoUrl;
+  const shareText = "T-Zero v12.2.0: Cut AI coding context tokens by up to 95% using deterministic AST pruning! Open-source local MCP server for Cursor & Claude. Check it out: " + repoUrl;
 
   const btnX = document.getElementById("share-x");
   const btnReddit = document.getElementById("share-reddit");
@@ -4676,7 +4700,7 @@ function initViralShare() {
 
   if (btnReddit) {
     btnReddit.addEventListener("click", () => {
-      const title = "T-Zero v12.1.4: Open-source local AST context pruning for Cursor & Claude (-88% to -95% tokens, $0, 100% offline)";
+      const title = "T-Zero v12.2.0: Open-source local AST context pruning for Cursor & Claude (-88% to -95% tokens, $0, 100% offline)";
       const url = "https://reddit.com/submit?url=" + encodeURIComponent(repoUrl) + "&title=" + encodeURIComponent(title);
       window.open(url, "_blank", "width=800,height=600");
     });
@@ -4691,7 +4715,7 @@ function initViralShare() {
 
   if (btnHN) {
     btnHN.addEventListener("click", () => {
-      const t = "Show HN: T-Zero v12.1.4 – Local AST context pruning for LLMs with 88-95% token reduction";
+      const t = "Show HN: T-Zero v12.2.0 – Local AST context pruning for LLMs with 88-95% token reduction";
       const url = "https://news.ycombinator.com/submitlink?u=" + encodeURIComponent(repoUrl) + "&t=" + encodeURIComponent(t);
       window.open(url, "_blank", "width=700,height=500");
     });
@@ -4724,7 +4748,7 @@ function initLatestRelease() {
 
   function renderRelease(data) {
     if (!data) return;
-    const tagName = data.tag_name || "v12.1.4";
+    const tagName = data.tag_name || "v12.2.0";
     if (releaseTagEl) releaseTagEl.textContent = tagName;
     
     if (releaseDateEl && data.published_at) {
@@ -4786,7 +4810,7 @@ function initLatestRelease() {
   } else {
     // Default fallback baseline
     renderRelease({
-      tag_name: "v12.1.4",
+      tag_name: "v12.2.0",
       published_at: "2026-11-21T00:00:00Z",
       assets: new Array(6),
       body: "Production Sovereign Release: AST pruning, Zero-Leak OS security, multi-agent context optimization, and verified standalone executables.",
@@ -4841,7 +4865,7 @@ function openSupportModal(downloadName = null) {
     if (titleEl) titleEl.textContent = "Thank You for Downloading T-Zero!";
     if (descEl) descEl.innerHTML = `Your download of <strong>${safeName}</strong> has started. T-Zero is 100% free, offline, and zero-leak. Help us keep it alive and free for everyone!`;
   } else {
-    if (itemEl) itemEl.textContent = "T-Zero v12.1.4";
+    if (itemEl) itemEl.textContent = "T-Zero v12.2.0";
     if (titleEl) titleEl.textContent = "Support Open Source & Keep T-Zero Free";
     if (descEl) descEl.innerHTML = "T-Zero is completely free, local-first, and zero-leak. You can support continuous development and cloud benchmark infrastructure with crypto donations or a GitHub star!";
   }

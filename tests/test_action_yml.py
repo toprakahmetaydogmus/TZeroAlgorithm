@@ -27,6 +27,9 @@ class TestActionYml(unittest.TestCase):
         self.assertIn("token-savings-pct=", self.text)
         self.assertIn("secret-findings=", self.text)
         self.assertIn("blast-radius-score=", self.text)
+        self.assertIn("from tzero.tzero_cost import TokenCostCalculator", self.text)
+        self.assertIn("from tzero.tzero_security import ZeroLeakEngine", self.text)
+        self.assertIn("from tzero.tzero_features import ChangeImpactAnalyzer", self.text)
 
 
 if __name__ == "__main__":

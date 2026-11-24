@@ -26,7 +26,13 @@ ETHERSCAN_URL = f"https://etherscan.io/address/{EVM_ADDRESS}"
 BIP21_URI = f"bitcoin:{BTC_ADDRESS}?label=T-Zero%20Sponsorship"
 TRON_URI = f"tron:{TRON_ADDRESS}"
 
-CANONICAL_VERSION = "12.1.4"
+def _load_canonical_version() -> str:
+    text = (REPO_ROOT / "pyproject.toml").read_text(encoding="utf-8")
+    match = re.search(r'^version\s*=\s*"([^"]+)"', text, re.MULTILINE)
+    return match.group(1) if match else "12.2.0"
+
+
+CANONICAL_VERSION = _load_canonical_version()
 GITHUB_OWNER = "toprakahmetaydogmus"
 
 _fifteen = "fif" + "teen"

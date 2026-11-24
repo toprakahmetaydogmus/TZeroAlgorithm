@@ -162,6 +162,14 @@
       {
         "command": "tzero.pack",
         "title": "T-Zero: Pack Repository Context to Token Budget (--pack)"
+      },
+      {
+        "command": "tzero.armor",
+        "title": "T-Zero: Apply Anti-REA 26-Tier Armor (--armor)"
+      },
+      {
+        "command": "tzero.auditRea",
+        "title": "T-Zero: Audit AI Decompilation Resistance (--audit-rea)"
       }
     ],
     "menus": {

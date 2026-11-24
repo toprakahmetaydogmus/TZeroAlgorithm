@@ -25,8 +25,9 @@ use tzero_core::mcp_server::run_mcp_stdio_server;
 use tzero_core::token_cost::compare_all_models;
 
 fn print_usage() {
-    println!(r#"
-T-Zero Turbo Rust Hybrid Core CLI (v12.1.4)
+    println!(
+        r#"
+T-Zero Turbo Rust Hybrid Core CLI (v{})
 Developer: Toprak Ahmet Aydoğmuş (Siber Akademi)
 License: AGPL-3.0-only
 
@@ -48,7 +49,9 @@ SUBCOMMANDS:
     sponsor                          Prints 1-click Web3 and crypto donation deep links
     mcp                              Runs embedded native stdio JSON-RPC 2.0 MCP server
     version                          Prints engine version and build metadata
-"#);
+"#,
+        env!("CARGO_PKG_VERSION")
+    );
 }
 
 fn main() {
@@ -60,7 +63,7 @@ fn main() {
 
     match args[1].as_str() {
         "version" | "--version" | "-v" => {
-            println!("tzero-core v12.1.4 (x86_64 native AGPL-3.0)");
+            println!("tzero-core v{} (x86_64 native AGPL-3.0)", env!("CARGO_PKG_VERSION"));
             println!("Features: AST-Pruning, Shannon-Entropy, BM25, PageRank, Complexity, Contracts, Duplicity, Context-Tree, Boundary-Guard, MCP");
         }
         "prune" => {

@@ -53,7 +53,7 @@ pub fn run_mcp_stdio_server() -> io::Result<()> {
                         "protocolVersion": "2024-11-05",
                         "serverInfo": {
                             "name": "tzero-core-mcp",
-                            "version": "12.1.4"
+                            "version": env!("CARGO_PKG_VERSION")
                         },
                         "capabilities": {
                             "tools": {}

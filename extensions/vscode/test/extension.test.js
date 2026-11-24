@@ -46,7 +46,9 @@ test('package.json defines 11.0.0 metadata, sidebar viewContainer, and commands 
         'tzero.hookInstall',
         'tzero.federationImpact',
         'tzero.grounding',
-        'tzero.pack'
+        'tzero.pack',
+        'tzero.armor',
+        'tzero.auditRea'
     ]) {
         assert.ok(commandIds.has(required), `Missing command: ${required}`);
     }

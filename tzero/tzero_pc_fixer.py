@@ -6109,10 +6109,28 @@ class SecurityZeroLeakDoctor:
                                 with open(p, "w", encoding="utf-8", newline="\n") as f:
                                     f.writelines(lines)
 
-                                # Append to .env safely
-                                env_entry = f"{env_var}={raw_sec}\n"
+                                # Store secret in OS keyring when available and write non-sensitive .env stub
+                                stored_in_keyring = False
+                                try:
+                                    import keyring  # type: ignore
+                                    keyring.set_password("tzero-vault", env_var, raw_sec)
+                                    stored_in_keyring = True
+                                except Exception:
+                                    pass
+
+                                stub_note = (
+                                    f"# {env_var} stored in OS Keyring service 'tzero-vault'\n"
+                                    if stored_in_keyring
+                                    else f"# {env_var} migrated from source — populate securely\n"
+                                )
+                                env_stub = f"{stub_note}{env_var}=\n"
                                 with open(env_file, "a", encoding="utf-8") as ef:
-                                    ef.write(env_entry)
+                                    ef.write(env_stub)
+                                if os.name != "nt":
+                                    try:
+                                        os.chmod(env_file, 0o600)
+                                    except OSError:
+                                        pass
 
                             actions.append(HealAction(
                                 category=DiagnosticCategory.SECURITY.value,
