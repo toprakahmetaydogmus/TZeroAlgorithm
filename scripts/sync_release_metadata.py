@@ -107,8 +107,8 @@ def sync_release_metadata(target_version: str, check_only: bool = False) -> Dict
     for rel in ("Formula/tzero.rb", "installers/brew/tzero.rb"):
         p = ROOT_DIR / rel
         c1 = _regex_replace(
-            p, r'(refs/tags/(?:v|release-))[0-9]+\.[0-9]+\.[0-9]+\.tar\.gz',
-            rf'\g<1>{target_version}.tar.gz', check_only,
+            p, r'refs/tags/(?:v|release-)[0-9]+\.[0-9]+\.[0-9]+\.tar\.gz',
+            f'refs/tags/v{target_version}.tar.gz', check_only,
         )
         c2 = _regex_replace(p, r'(?m)^(\s*version\s+)"[^"]+"', rf'\1"{target_version}"', check_only)
         results[rel] = c1 or c2
@@ -292,6 +292,15 @@ def sync_release_metadata(target_version: str, check_only: bool = False) -> Dict
             c_a1 = _regex_replace(ap, r'(?m)^(APP_VERSION\s*=\s*)"[^"]+"', rf'\1"{target_version}"', check_only)
             c_a2 = _regex_replace(ap, r'(T-ZERO ALGORITHM v)[0-9]+\.[0-9]+\.[0-9]+', rf'\g<1>{target_version}', check_only)
             results[app_rel] = c_a1 or c_a2
+
+    hf_readme = ROOT_DIR / "huggingface-space" / "README.md"
+    if hf_readme.is_file():
+        results["huggingface-space/README.md"] = _regex_replace(
+            hf_readme,
+            r'(\*\*T-Zero \(v)[0-9]+\.[0-9]+\.[0-9]+',
+            rf'\g<1>{target_version}',
+            check_only,
+        )
 
     gw_p = ROOT_DIR / "tzero_gateway.py"
     if gw_p.is_file():

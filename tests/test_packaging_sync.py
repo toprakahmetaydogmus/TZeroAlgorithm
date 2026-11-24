@@ -63,7 +63,7 @@ class TestPackagingAndVersionSync(unittest.TestCase):
             m = re.search(r'version\s+"([^"]+)"', rb_text)
             self.assertIsNotNone(m, f"Version missing in {rb_path}")
             self.assertEqual(m.group(1), canonical, f"Version mismatch in {rb_path}")
-            self.assertIn(f"release-{canonical}.tar.gz", rb_text)
+            self.assertIn(f"v{canonical}.tar.gz", rb_text)
 
         scoop_pkg = json.loads((ROOT_DIR / "installers" / "scoop" / "tzero.json").read_text(encoding="utf-8"))
         self.assertEqual(scoop_pkg["version"], canonical)
