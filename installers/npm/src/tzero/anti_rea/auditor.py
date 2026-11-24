@@ -105,6 +105,8 @@ class AIResistanceAuditor:
         has_jailbreak_decoy = "CANARY_SIG_0x8F91A2B3" in source_code or "_proprietary_zero_leak_kernel" in source_code
         has_anti_agent = "_verify_execution_integrity" in source_code
         has_anti_debugger = "_verify_bare_metal_execution_environment" in source_code or "IsDebuggerPresent" in source_code
+        has_anti_vm = "_verify_bare_metal_hardware" in source_code or "VBoxMouse.sys" in source_code
+        has_rdtsc = "_rdtsc_checkpoint" in source_code or "perf_counter_ns" in source_code
 
         rating = (
             "MILITARY_GRADE_IMPREGNABLE" if score >= 90 else
@@ -130,6 +132,8 @@ class AIResistanceAuditor:
                 "anti_agent_sandbox_guard": has_anti_agent,
                 "algebraic_mba_mutation": has_mba,
                 "native_anti_debugger_gate": has_anti_debugger,
+                "anti_vm_hypervisor_guard": has_anti_vm,
+                "rdtsc_hardware_timing_guard": has_rdtsc,
                 "memory_integrity_guard": has_debugger_or_integrity,
             },
             "jailbreak_ai_immune": score >= 85 and has_jailbreak_decoy and has_vm,

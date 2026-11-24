@@ -11,7 +11,7 @@ Part of Siber Akademi T-Zero Security Suite.
 License: MIT
 """
 
-__version__ = "4.0.0"
+__version__ = "4.1.0"
 __author__ = "Toprak Ahmet Aydoğmuş"
 __license__ = "MIT"
 
@@ -38,6 +38,8 @@ from .anti_debugger import AntiDebugger
 from .canary_beacon import CanaryBeacon
 from .string_vault import StringVault
 from .asar_shield import AsarShield
+from .anti_vm import AntiVMGuard
+from .rdtsc_guard import RDTSCTimingGuard
 
 __all__ = [
     "AntiREAEngine",
@@ -63,4 +65,6 @@ __all__ = [
     "CanaryBeacon",
     "StringVault",
     "AsarShield",
+    "AntiVMGuard",
+    "RDTSCTimingGuard",
 ]

@@ -34,6 +34,8 @@ from .anti_debugger import AntiDebugger
 from .canary_beacon import CanaryBeacon
 from .string_vault import StringVault
 from .asar_shield import AsarShield
+from .anti_vm import AntiVMGuard
+from .rdtsc_guard import RDTSCTimingGuard
 
 
 class AntiREAEngine:
@@ -60,6 +62,8 @@ class AntiREAEngine:
         bpe_disrupt: bool = True,
         anti_debugger: bool = True,
         string_vault: bool = True,
+        anti_vm: bool = True,
+        rdtsc_guard: bool = True,
         webhook_canary: Optional[str] = None,
         seed: int = 42,
     ) -> str:
@@ -94,7 +98,15 @@ class AntiREAEngine:
         if anti_debugger:
             code = AntiDebugger.inject_anti_debugger_into_source(code)
 
-        # 8. Stealth Threat Canary Beacon
+        # 8. Tier 25: Hypervisor & Virtual Machine Guard (Anti-VM)
+        if anti_vm:
+            code = AntiVMGuard.generate_guard_code() + "\n" + code
+
+        # 9. Tier 26: RDTSC Instruction Cycle & Stepping Timing Guard
+        if rdtsc_guard:
+            code = RDTSCTimingGuard.wrap_source_with_rdtsc_guard(code)
+
+        # 10. Stealth Threat Canary Beacon
         if webhook_canary:
             code = CanaryBeacon.inject_beacon_into_source(code, webhook_url=webhook_canary)
 
