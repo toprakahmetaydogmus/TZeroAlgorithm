@@ -13,6 +13,11 @@ concurrency:
       - main
     paths:
       - 'huggingface-space/**'
+      - 'tzero/__init__.py'
+      - 'tzero/tzero_features.py'
+      - 'tzero/tzero_security.py'
+      - 'tzero/tzero_pc_fixer.py'
+      - 'tzero/anti_rea/**'
       - '.github/workflows/publish-huggingface.yml'
   release:
     types: [published]
@@ -34,12 +39,12 @@ jobs:
       - name: Install Hugging Face Hub client
         run: python -m pip install --upgrade pip huggingface_hub
 
-      - name: Upload huggingface-space to Space repository
+      - name: Stage and upload huggingface-space to Space repository
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
           python -c "
-          import os, sys, tomllib
+          import os, pathlib, shutil, sys, tomllib
           from huggingface_hub import HfApi
 
           token = os.environ.get('HF_TOKEN', '').strip()
@@ -50,13 +55,30 @@ jobs:
           with open('pyproject.toml', 'rb') as f:
               version = tomllib.load(f)['project']['version']
 
+          stage = pathlib.Path('.hf_staging')
+          if stage.exists():
+              shutil.rmtree(stage)
+          shutil.copytree('huggingface-space', stage, ignore=shutil.ignore_patterns('__pycache__', '*.pyc', '.DS_Store'))
+
+          tzero_dst = stage / 'tzero'
+          tzero_dst.mkdir(parents=True, exist_ok=True)
+          for fname in ('__init__.py', 'tzero_features.py', 'tzero_security.py', 'tzero_pc_fixer.py'):
+              shutil.copy2(pathlib.Path('tzero') / fname, tzero_dst / fname)
+          shutil.copytree(
+              pathlib.Path('tzero') / 'anti_rea',
+              tzero_dst / 'anti_rea',
+              ignore=shutil.ignore_patterns('__pycache__', '*.pyc', '.DS_Store'),
+          )
+
           api = HfApi(token=token)
           api.upload_folder(
-              folder_path='huggingface-space',
+              folder_path=str(stage),
               repo_id='toprakke4/tzero-token-reducer',
               repo_type='space',
-              commit_message=f'Sync T-Zero v{version} Hugging Face Space',
+              commit_message=f'Sync T-Zero v{version} Hugging Face Space (bundled pure-Python core)',
+              delete_patterns=['tzero/**'],
               ignore_patterns=['__pycache__/**', '*.pyc', '.DS_Store'],
           )
+          shutil.rmtree(stage)
           print(f'Successfully synced toprakke4/tzero-token-reducer to v{version}')
           "
