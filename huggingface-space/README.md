@@ -2,13 +2,13 @@
 title: T-Zero Context Architect & Token Reducer
 emoji: 🧠
 colorFrom: blue
-colorTo: cyan
+colorTo: indigo
 sdk: gradio
 sdk_version: 5.9.1
 app_file: app.py
 pinned: false
 license: agpl-3.0
-short_description: Enterprise AST Context Architect, Token Reducer & AgentOS for LLMs
+short_description: AST Context Architect, Token Reducer & Anti-REA MCP
 ---
 
 # T-Zero: Enterprise AST Context Architect & Token Reducer
