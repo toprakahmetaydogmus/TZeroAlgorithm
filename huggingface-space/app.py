@@ -98,7 +98,7 @@ except ImportError:
 APP_VERSION = "12.2.0"
 REPO_URL = "https://github.com/toprakahmetaydogmus/TZeroAlgorithm"
 DOCTOR_REPO_URL = "https://github.com/toprakahmetaydogmus/tzero-pc-fixer"
-VERCEL_URL = "https://tzero-benchmark.vercel.app"
+VERCEL_URL = "https://tzero-indol.vercel.app"
 SPACE_URL = "https://huggingface.co/spaces/toprakke4/tzero-token-reducer"
 
 MODEL_PRICING = {

@@ -1,0 +1,62 @@
+name: Publish to Hugging Face Space
+
+permissions:
+  contents: read
+
+concurrency:
+  group: hf-space-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+'on':
+  push:
+    branches:
+      - main
+    paths:
+      - 'huggingface-space/**'
+      - '.github/workflows/publish-huggingface.yml'
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  hf-space-publish:
+    name: Sync T-Zero Space to Hugging Face
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install Hugging Face Hub client
+        run: python -m pip install --upgrade pip huggingface_hub
+
+      - name: Upload huggingface-space to Space repository
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          python -c "
+          import os, sys, tomllib
+          from huggingface_hub import HfApi
+
+          token = os.environ.get('HF_TOKEN', '').strip()
+          if not token:
+              print('::notice::HF_TOKEN secret is not configured; skipping Hugging Face Space sync.')
+              sys.exit(0)
+
+          with open('pyproject.toml', 'rb') as f:
+              version = tomllib.load(f)['project']['version']
+
+          api = HfApi(token=token)
+          api.upload_folder(
+              folder_path='huggingface-space',
+              repo_id='toprakke4/tzero-token-reducer',
+              repo_type='space',
+              commit_message=f'Sync T-Zero v{version} Hugging Face Space',
+              ignore_patterns=['__pycache__/**', '*.pyc', '.DS_Store'],
+          )
+          print(f'Successfully synced toprakke4/tzero-token-reducer to v{version}')
+          "
