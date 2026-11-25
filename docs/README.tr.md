@@ -25,10 +25,10 @@
 
 <br>
 
-### 100 Yıldız Yolculuğu: T-Zero'yu %100 Ücretsiz ve Açık Kaynak Tutmamıza Destek Olun!
+### 500 Yıldız Yolculuğu: T-Zero'yu %100 Ücretsiz ve Açık Kaynak Tutmamıza Destek Olun!
 *Cursor, Claude Code, Windsurf ve Antigravity IDE için ampirik olarak kanıtlanmış deterministik AST token sıkıştırma motoru.*
 
-[![GitHub'da Yıldızla](https://img.shields.io/badge/%E2%AD%90%20GitHub'da%20Y%C4%B1ld%C4%B1zla-Hedef%3A%20100-f59e0b?style=for-the-badge&logo=github&logoColor=white)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)
+[![GitHub'da Yıldızla](https://img.shields.io/badge/%E2%AD%90%20GitHub'da%20Y%C4%B1ld%C4%B1zla-Hedef%3A%20500-f59e0b?style=for-the-badge&logo=github&logoColor=white)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)
 [![Google Colab Canlı Lab](https://img.shields.io/badge/%F0%9F%9A%80%20%C4%B0nteraktif-Google%20Colab-f9ab00?style=for-the-badge&logo=googlecolab&logoColor=white)](https://colab.research.google.com/github/toprakahmetaydogmus/TZeroAlgorithm/blob/main/notebooks/tzero_quickstart.ipynb)
 [![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Zero--GPU%20Demo-Hugging%20Face-ffd21e?style=for-the-badge&logo=huggingface&logoColor=black)](https://huggingface.co/spaces/toprakke4/tzero-token-reducer)
 [![Canlı Ağ Geçidi](https://img.shields.io/badge/%E2%9A%A1%20Canl%C4%B1%20Ge%C3%A7it-Vercel-000000?style=for-the-badge&logo=vercel)](https://tzero-indol.vercel.app)
@@ -82,8 +82,11 @@ pip install --upgrade tzero-mcp
 # Seçenek D: Git Clone ile Doğrudan Kaynak Koddan Çalışma:
 git clone https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git
 cd TZeroAlgorithm
-python scripts/welcome.py    # Hoş geldin & otomatik git hook yıldız hatırlatıcı
-pip install -e .             # Geliştirici modu (.githooks otomatik aktifleşir)
+python scripts/welcome.py    # Karşılama ekranı (Git hook ayarlarını değiştirmez)
+pip install -e .             # Geliştirici modu (Git hook ayarlarını değiştirmez)
+
+# İsteğe bağlı yıldız hatırlatıcı (mevcut hook varsa kurmaz):
+python scripts/welcome.py --install-star-hooks
 
 # Tek Tıkla IDE'leri (Cursor, Claude, Windsurf, VS Code) Bağla:
 tzero init
@@ -153,7 +156,7 @@ T-Zero'nun hiçbir risk sermayesi fonu, ücretli aboneliği veya telemetri takib
 <div align="center">
 
 ### Tek Tıkla Topluluk Paylaşımı
-**100 Yıldız Hedefimize** ulaşmamıza destek olun! T-Zero'yu tek tıkla paylaşın:
+**500 Yıldız Hedefimize** ulaşmamıza destek olun! T-Zero'yu tek tıkla paylaşın:
 
 [![X'te Paylaş](https://img.shields.io/badge/Payla%C5%9F-X%20%2F%20Twitter-000000?style=for-the-badge&logo=x&logoColor=white)](https://twitter.com/intent/tweet?text=T-Zero%3A%20Yapay%20zeka%20kodlama%20ara%C3%A7lar%C4%B1nda%20token%20israf%C4%B1n%C4%B1%20%2595%20azaltan%20yerel%20AST%20ba%C4%9Flam%20motoru.%20Geli%C5%9Ftirici%3A%20Toprak%20Ahmet%20Aydo%C4%9Fmu%C5%9F%20(Siber%20Akademi).&url=https%3A%2F%2Fgithub.com%2Ftoprakahmetaydogmus%2FTZeroAlgorithm&hashtags=CursorAI,ClaudeAI,MCP,OpenSource)
 [![Reddit'te Paylaş](https://img.shields.io/badge/Payla%C5%9F-Reddit-FF4500?style=for-the-badge&logo=reddit&logoColor=white)](https://www.reddit.com/submit?url=https%3A%2F%2Fgithub.com%2Ftoprakahmetaydogmus%2FTZeroAlgorithm&title=T-Zero%20%E2%80%94%20Deterministik%20AST%20Ba%C4%9Flam%20S%C4%B1k%C4%B1%C5%9Ft%C4%B1r%C4%B1c%C4%B1s%C4%B1%20ve%20MCP%20Sunucusu)

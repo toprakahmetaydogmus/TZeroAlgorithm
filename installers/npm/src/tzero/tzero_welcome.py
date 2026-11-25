@@ -6,9 +6,11 @@ License: AGPL-3.0-only
 Repository: https://github.com/toprakahmetaydogmus/TZeroAlgorithm
 """
 
+import argparse
 import os
-import sys
 import subprocess
+import sys
+import warnings
 from pathlib import Path
 from typing import Optional
 
@@ -44,7 +46,7 @@ def find_git_root(start_dir: Optional[Path] = None) -> Optional[Path]:
     """Recursively locates .git root directory starting from start_dir or cwd."""
     curr = (start_dir or Path.cwd()).resolve()
     for p in [curr] + list(curr.parents):
-        if (p / ".git").is_dir():
+        if (p / ".git").exists():
             return p
     return None
 
@@ -109,8 +111,6 @@ def print_star_banner(force: bool = False) -> None:
         _BANNER_PRINTED = True
         # On first interactive terminal run, open GitHub repository to encourage star
         check_first_launch_repo_open()
-        # Silently ensure git hooks are installed if running inside repository
-        install_git_star_hooks()
     except Exception:
         pass
 
@@ -143,13 +143,37 @@ def check_first_launch_repo_open(force_open: bool = False, state_path: Optional[
 
 
 def install_git_star_hooks(repo_dir: Optional[Path] = None) -> bool:
-    """Configures repository git hooks so developers get a friendly star reminder on checkout/pull."""
+    """Install reminders only when explicitly called; never change Git configuration.
+
+    Refuse configured hook managers and existing active hooks. The default Git
+    hooks directory also works for linked worktrees; no core.hooksPath is needed.
+    """
+    created = []
     try:
         target_dir = find_git_root(repo_dir)
         if not target_dir:
-            return False
+            raise ValueError("not inside a Git repository")
 
-        githooks_dir = target_dir / ".githooks"
+        configured = subprocess.run(
+            ["git", "config", "--get", "core.hooksPath"], cwd=target_dir,
+            capture_output=True, text=True, check=False,
+        )
+        if configured.returncode == 0:
+            raise ValueError("core.hooksPath is already configured; existing hooks preserved")
+        if configured.returncode != 1:
+            raise ValueError("could not read Git hook configuration")
+
+        result = subprocess.run(
+            ["git", "rev-parse", "--path-format=absolute", "--git-path", "hooks"],
+            cwd=target_dir, capture_output=True, text=True, check=True,
+        )
+        githooks_dir = Path(result.stdout.strip())
+        if not githooks_dir.is_absolute():
+            raise ValueError("Git did not return an absolute hooks directory")
+        if githooks_dir.exists() and any(
+            not entry.name.endswith(".sample") for entry in githooks_dir.iterdir()
+        ):
+            raise ValueError("existing Git hooks found; no hooks were changed")
         githooks_dir.mkdir(parents=True, exist_ok=True)
 
         hook_content = f"""#!/bin/sh
@@ -162,34 +186,37 @@ exit 0
 """
         for hook_name in ("post-checkout", "post-merge"):
             hook_file = githooks_dir / hook_name
-            hook_file.write_text(hook_content, encoding="utf-8")
-            try:
-                hook_file.chmod(0o755)
-            except Exception:
-                pass
-
-        # Set core.hooksPath in git config
-        subprocess.run(
-            ["git", "config", "core.hooksPath", ".githooks"],
-            cwd=target_dir,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-            check=False
-        )
+            # Exclusive creation also protects hooks created after the checks above.
+            with hook_file.open("x", encoding="utf-8", newline="\n") as stream:
+                created.append(hook_file)
+                stream.write(hook_content)
+            hook_file.chmod(0o755)
         return True
-    except Exception:
+    except (OSError, ValueError, subprocess.SubprocessError) as exc:
+        for hook_file in created:
+            hook_file.unlink(missing_ok=True)
+        warnings.warn(f"Star reminder hooks were not installed: {exc}", stacklevel=2)
         return False
 
 
-def main():
+def main(argv=None) -> int:
     """CLI entrypoint for scripts/welcome.py."""
+    parser = argparse.ArgumentParser(description="T-Zero community welcome")
+    parser.add_argument(
+        "--install-star-hooks", action="store_true",
+        help="Explicitly install star reminders in an unused default Git hooks directory",
+    )
+    args = parser.parse_args(argv)
     init_terminal()
     print_star_banner(force=True)
-    if install_git_star_hooks():
-        print(sanitize_terminal_text("\033[32m✔ Git community hooks configured (.githooks)\033[0m"))
+    if args.install_star_hooks:
+        if not install_git_star_hooks():
+            return 1
+        print(sanitize_terminal_text("\033[32m✔ Git community hooks installed\033[0m"))
     info_text = f"\033[36mFor questions or support, visit:\033[0m {REPO_URL}/discussions\n"
     print(sanitize_terminal_text(info_text))
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
