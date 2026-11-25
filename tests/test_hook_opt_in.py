@@ -8,7 +8,8 @@ import subprocess
 import tempfile
 import unittest
 from pathlib import Path
-from unittest.mock import patch
+from types import ModuleType
+from unittest.mock import Mock, patch
 
 from tzero import tzero_welcome as welcome
 
@@ -19,7 +20,7 @@ class TestHookOptIn(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
-        self.root = Path(self.tmp.name)
+        self.root = Path(self.tmp.name).resolve()
         self.repo = self.root / "repo"
         self.repo.mkdir()
         self.environment = patch.dict(os.environ, {
@@ -42,9 +43,13 @@ class TestHookOptIn(unittest.TestCase):
 
     def test_setup_has_no_install_or_develop_side_effects(self):
         before = self.snapshot()
-        with patch("setuptools.setup") as setup, patch.object(welcome, "install_git_star_hooks") as install:
+        # setuptools is a build dependency, absent from clean Python 3.12+ runtimes.
+        setuptools = ModuleType("setuptools")
+        setuptools.setup = Mock()
+        with patch.dict("sys.modules", {"setuptools": setuptools}), \
+             patch.object(welcome, "install_git_star_hooks") as install:
             runpy.run_path(str(ROOT / "setup.py"), run_name="__main__")
-        self.assertNotIn("cmdclass", setup.call_args.kwargs)
+        self.assertNotIn("cmdclass", setuptools.setup.call_args.kwargs)
         install.assert_not_called()
         self.assertEqual(before, self.snapshot())
 
