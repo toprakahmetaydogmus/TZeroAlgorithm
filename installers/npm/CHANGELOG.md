@@ -1,5 +1,19 @@
 # Changelog
 
+## [12.2.1] - 2026-11-25
+
+### Fixed
+- Package installation and the welcome banner no longer install Git hooks or change `core.hooksPath` (#43, #44).
+- Star-reminder hooks now require explicit opt-in via `python -m tzero.tzero_welcome --install-star-hooks` and preserve existing hook managers and files.
+- Hook installation reports failures, rolls back partial writes, and supports linked worktrees.
+- Synchronized the npm-bundled Python runtime with the canonical package.
+
+### Changed
+- Successful trusted main CI now creates the missing version release and starts all existing publication workflows against its immutable tag.
+- Registry publication errors now fail their workflow instead of being silently reported as success.
+- Updated the English and Turkish README community goal to 500 GitHub stars.
+- Synchronized Python, npm, VS Code/Open VSX, MCP, and release metadata to 12.2.1.
+
 ## [11.0.0] - 2026-11-11
 
 - Bundle the reorganized `tzero/` package and desktop icon.

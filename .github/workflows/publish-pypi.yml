@@ -55,7 +55,6 @@ jobs:
       - name: Publish distribution to PyPI (Token)
         if: steps.pypi_auth.outputs.auth_mode == 'token'
         uses: pypa/gh-action-pypi-publish@release/v1
-        continue-on-error: true
         with:
           password: ${{ secrets.PYPI_API_TOKEN || secrets.PYPI_TOKEN }}
           packages-dir: dist/
@@ -64,7 +63,6 @@ jobs:
       - name: Publish distribution to PyPI (Trusted Publishing / OIDC)
         if: steps.pypi_auth.outputs.auth_mode == 'oidc'
         uses: pypa/gh-action-pypi-publish@release/v1
-        continue-on-error: true
         with:
           packages-dir: dist/
           skip-existing: true

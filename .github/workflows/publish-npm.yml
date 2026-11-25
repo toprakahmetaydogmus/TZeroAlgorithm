@@ -29,7 +29,6 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
 
       - name: Publish package to npm
-        continue-on-error: true
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
@@ -46,5 +45,6 @@ jobs:
             echo "Publishing to npm registry using NPM_TOKEN..."
             npm publish --access public
           else
-            echo "::notice::NPM_TOKEN secret is not configured; skipping npm publish cleanly."
+            echo "::error::NPM_TOKEN secret is not configured; npm publication did not happen."
+            exit 1
           fi

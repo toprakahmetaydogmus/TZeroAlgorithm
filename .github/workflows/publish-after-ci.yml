@@ -1,0 +1,47 @@
+name: Publish Version After Main CI
+
+'on':
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-version-${{ github.repository }}
+  cancel-in-progress: false
+
+jobs:
+  dispatch:
+    # Only trusted pushes to this repository's main branch can create releases.
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'main' &&
+      github.event.workflow_run.head_repository.full_name == github.repository
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      actions: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          persist-credentials: false
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Verify synchronized package metadata
+        run: python scripts/sync_release_metadata.py --check
+
+      - name: Create version release and start all publication workflows
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_COMMIT: ${{ github.event.workflow_run.head_sha }}
+        run: python scripts/dispatch_release.py --repository "$GH_REPO" --commit "$RELEASE_COMMIT"

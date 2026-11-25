@@ -1,0 +1,26 @@
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.installer.1.6.0.schema.json
+
+PackageIdentifier: SiberAkademi.TZero
+PackageVersion: 12.2.1
+InstallerType: zip
+NestedInstallerType: portable
+NestedInstallerFiles:
+  - RelativeFilePath: TZeroCLI.exe
+    PortableCommandAlias: tzero
+  - RelativeFilePath: TZeroCI.exe
+    PortableCommandAlias: tzero-ci
+  - RelativeFilePath: TZeroMCP.exe
+    PortableCommandAlias: tzero-mcp
+Commands:
+  - tzero
+  - tzero-ci
+  - tzero-mcp
+InstallerSwitches:
+  Silent: /S
+  SilentWithProgress: /S
+Installers:
+  - Architecture: x64
+    InstallerUrl: https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/download/v12.2.1/TZero-v12.2.1-Windows-x64.zip
+    InstallerSha256: 07DDDD8A6E1CE14C6A0A420372F4C12AA16F48FBFBB5CF5C0ACEF5883F4B65F3
+ManifestType: installer
+ManifestVersion: 1.6.0

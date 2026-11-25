@@ -4,6 +4,7 @@ import contextlib
 import io
 import os
 import runpy
+import shutil
 import subprocess
 import tempfile
 import unittest
@@ -115,7 +116,9 @@ class TestHookOptIn(unittest.TestCase):
             self.assertIn(welcome.REPO_URL, hook.read_text(encoding="utf-8"))
             if os.name != "nt":
                 self.assertTrue(os.access(hook, os.X_OK))
-            self.assertEqual(subprocess.run(["sh", str(hook)], capture_output=True).returncode, 0)
+            sh_bin = shutil.which("sh")
+            if sh_bin:
+                self.assertEqual(subprocess.run([sh_bin, str(hook)], capture_output=True).returncode, 0)
 
     def test_linked_worktree_uses_default_shared_hooks_directory(self):
         self.git("-c", "user.name=Test", "-c", "user.email=test@example.invalid",

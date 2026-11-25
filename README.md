@@ -86,10 +86,10 @@ tzero share
 
 # Option D: Standalone Windows 64-Bit Executable Suite (Zero Dependencies):
 # Download all-in-one suite (.ZIP) with GUI, CLI, MCP Server & 1-Click Configurator:
-# https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/download/v12.2.0/TZero-v12.2.0-Windows-x64.zip
+# https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/download/v12.2.1/TZero-v12.2.1-Windows-x64.zip
 
 # Install VS Code / Cursor Extension (.vsix):
-code --install-extension dist/tzero-vscode-12.2.0.vsix
+code --install-extension dist/tzero-vscode-12.2.1.vsix
 ```
 
 Git reminder hooks are opt-in. Installation and normal startup do not change
@@ -177,7 +177,7 @@ tzero init --vscode        # VS Code (Continue / Copilot)
 tzero init --zed           # Zed Editor
 
 # Install official VS Code / Cursor Extension (.vsix):
-code --install-extension dist/tzero-vscode-12.2.0.vsix
+code --install-extension dist/tzero-vscode-12.2.1.vsix
 ```
 
 ### Manual Configuration Snippets (Any MCP Client)

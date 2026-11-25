@@ -75,7 +75,9 @@ class TestCIWorkflow(unittest.TestCase):
 
         self.assertIn("VSCE_PAT", ext_text)
         self.assertIn("OVSX_PAT", ext_text)
-        self.assertIn("continue-on-error", ext_text)
+        self.assertIn("!cancelled()", ext_text)
+        self.assertIn("--trusted-publishing", ext_text)
+        self.assertIn("--oidc", ext_text)
         self.assertIn("inputs.publish_openvsx", ext_text)
         self.assertIn("inputs.publish_vscode", ext_text)
 
@@ -104,7 +106,8 @@ class TestCIWorkflow(unittest.TestCase):
 
         self.assertIn("NPM_TOKEN", npm_text)
         self.assertIn("registry.npmjs.org", npm_text)
-        self.assertIn("continue-on-error", npm_text)
+        self.assertIn("npm publish --access public", npm_text)
+        self.assertIn("exit 1", npm_text)
 
     def test_publish_pypi_workflow_handles_pypi_token(self):
         pypi_path = ROOT_DIR / ".github" / "workflows" / "publish-pypi.yml"
@@ -113,7 +116,8 @@ class TestCIWorkflow(unittest.TestCase):
 
         self.assertIn("pypa/gh-action-pypi-publish", pypi_text)
         self.assertIn("PYPI_TOKEN", pypi_text)
-        self.assertIn("continue-on-error", pypi_text)
+        self.assertIn("steps.pypi_auth.outputs.auth_mode", pypi_text)
+        self.assertIn("skip-existing", pypi_text)
 
     def test_release_workflow_triggers_on_version_tags(self):
         rel_path = ROOT_DIR / ".github" / "workflows" / "release.yml"
