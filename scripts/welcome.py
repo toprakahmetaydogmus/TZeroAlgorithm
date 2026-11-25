@@ -4,6 +4,9 @@
 
 Run automatically or manually after cloning:
     python scripts/welcome.py
+
+Git reminders require explicit opt-in:
+    python scripts/welcome.py --install-star-hooks
 """
 
 import sys
@@ -17,4 +20,4 @@ if str(ROOT) not in sys.path:
 from tzero.tzero_welcome import main
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

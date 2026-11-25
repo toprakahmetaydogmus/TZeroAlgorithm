@@ -24,11 +24,10 @@ class TestWelcomeAndInstallIde(unittest.TestCase):
         from tzero.tzero_welcome import install_git_star_hooks
         with tempfile.TemporaryDirectory() as tmp:
             tmp_path = Path(tmp)
-            # Initialize a bare mock .git dir
-            (tmp_path / ".git").mkdir()
+            subprocess.run(["git", "init", str(tmp_path)], check=True, capture_output=True)
             success = install_git_star_hooks(tmp_path)
             self.assertTrue(success)
-            githooks = tmp_path / ".githooks"
+            githooks = tmp_path / ".git" / "hooks"
             self.assertTrue(githooks.is_dir())
             self.assertTrue((githooks / "post-checkout").is_file())
             self.assertTrue((githooks / "post-merge").is_file())

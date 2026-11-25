@@ -29,10 +29,10 @@
 
 <br>
 
-### Road to 100 GitHub Stars: Help Keep T-Zero 100% Free & Open-Source
+### Road to 500 GitHub Stars: Help Keep T-Zero 100% Free & Open-Source
 *Empirically proven token optimization engine for Cursor, Claude Code, Windsurf & Antigravity IDE.*
 
-[![Star on GitHub](https://img.shields.io/badge/%E2%AD%90%20Star%20on%20GitHub-Goal%3A%20100-f59e0b?style=for-the-badge&logo=github&logoColor=white)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)
+[![Star on GitHub](https://img.shields.io/badge/%E2%AD%90%20Star%20on%20GitHub-Goal%3A%20500-f59e0b?style=for-the-badge&logo=github&logoColor=white)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)
 [![Interactive Colab](https://img.shields.io/badge/%F0%9F%9A%80%20Interactive-Google%20Colab-f9ab00?style=for-the-badge&logo=googlecolab&logoColor=white)](https://colab.research.google.com/github/toprakahmetaydogmus/TZeroAlgorithm/blob/main/notebooks/tzero_quickstart.ipynb)
 [![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Zero--GPU%20Demo-Hugging%20Face-ffd21e?style=for-the-badge&logo=huggingface&logoColor=black)](https://huggingface.co/spaces/toprakke4/tzero-token-reducer)
 [![Live Vercel Hub](https://img.shields.io/badge/%E2%9A%A1%20Live%20Gateway-Vercel-000000?style=for-the-badge&logo=vercel)](https://tzero-indol.vercel.app)
@@ -72,8 +72,11 @@ irm https://raw.githubusercontent.com/toprakahmetaydogmus/TZeroAlgorithm/main/in
 # Option E: Git Clone & Source Checkout:
 git clone https://github.com/toprakahmetaydogmus/TZeroAlgorithm.git
 cd TZeroAlgorithm
-python scripts/welcome.py    # Turnkey community welcome & git star reminder
-pip install -e .             # Editable dev install (auto-configures .githooks)
+python scripts/welcome.py    # Community welcome (does not modify Git hooks)
+pip install -e .             # Editable dev install (does not modify Git hooks)
+
+# Optional: explicitly install star reminders (skips existing hooks/managers):
+python scripts/welcome.py --install-star-hooks
 
 # 1-Click Configure MCP in Cursor, Claude, Antigravity, Windsurf:
 tzero init
@@ -88,6 +91,18 @@ tzero share
 # Install VS Code / Cursor Extension (.vsix):
 code --install-extension dist/tzero-vscode-12.2.0.vsix
 ```
+
+Git reminder hooks are opt-in. Installation and normal startup do not change
+`core.hooksPath`. The optional command uses Git's default hooks directory and
+refuses an existing hook manager or active hooks.
+
+If an older T-Zero install set your local `core.hooksPath` to `.githooks`, inspect
+`git config --show-origin --get-all core.hooksPath` and `.githooks/` first. If that
+local setting was added by T-Zero, `git config --local --unset core.hooksPath`
+restores inherited/default hook lookup. If it replaced a previous local setting,
+restore that original value or rerun your hook manager's installer. T-Zero cannot
+recover an overwritten configuration value automatically.
+
 
 ### Navigation & Interactive Jump Stations
 
@@ -680,7 +695,7 @@ T-Zero has no venture capital backing, no paywalls, and no telemetry tracking. I
 <div align="center">
 
 ### 1-Click Community Share Hub
-Help us reach our **100 Stars Milestone**! Share T-Zero with your network in one click:
+Help us reach our **500 Stars Milestone**! Share T-Zero with your network in one click:
 
 [![Share on X](https://img.shields.io/badge/Share%20on-X%20%2F%20Twitter-000000?style=for-the-badge&logo=x&logoColor=white)](https://twitter.com/intent/tweet?text=T-Zero%3A%20Deterministic%20AST%20Context%20Compressor%20%26%20MCP%20Server%20cutting%20AI%20prompt%20tokens%20by%20up%20to%2095%25.%20Built%20by%20Toprak%20Ahmet%20Aydo%C4%9Fmu%C5%9F%20(Siber%20Akademi).&url=https%3A%2F%2Fgithub.com%2Ftoprakahmetaydogmus%2FTZeroAlgorithm&hashtags=CursorAI,ClaudeAI,MCP,OpenSource)
 [![Post to Reddit](https://img.shields.io/badge/Post%20to-Reddit-FF4500?style=for-the-badge&logo=reddit&logoColor=white)](https://www.reddit.com/submit?url=https%3A%2F%2Fgithub.com%2Ftoprakahmetaydogmus%2FTZeroAlgorithm&title=T-Zero%20%E2%80%94%20Deterministic%20AST%20Context%20Compressor%20%26%20Canonical%20MCP%20Server%20(cuts%20tokens%20by%2095%25))
