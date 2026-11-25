@@ -40,8 +40,41 @@ class ExtractorShield:
         return offsets
 
     @classmethod
+    def _find_pe_slack_offset(cls, data_array: bytearray, max_offset: int) -> int:
+        """Locates an unused all-zero PE section alignment cave before the CArchive overlay."""
+        if len(data_array) < 0x100 or data_array[:2] != b"MZ":
+            return -1
+        try:
+            e_lfanew = struct.unpack_from("<I", data_array, 0x3C)[0]
+            if e_lfanew + 24 > len(data_array) or data_array[e_lfanew:e_lfanew + 4] != b"PE\x00\x00":
+                return -1
+            num_sec = struct.unpack_from("<H", data_array, e_lfanew + 6)[0]
+            opt_size = struct.unpack_from("<H", data_array, e_lfanew + 20)[0]
+            sec_off = e_lfanew + 24 + opt_size
+            if sec_off + num_sec * 40 > len(data_array):
+                return -1
+            preferred = (".rdata", ".rsrc", ".pdata", ".fptable")
+            candidates = []
+            for i in range(num_sec):
+                s = sec_off + i * 40
+                name = data_array[s:s + 8].rstrip(b"\x00").decode("ascii", errors="ignore")
+                vsize, _vaddr, rsize, rptr = struct.unpack_from("<IIII", data_array, s + 8)
+                if name in preferred and rsize > vsize + 32:
+                    slack_start = rptr + ((vsize + 15) & ~15)
+                    slack_end = min(rptr + rsize, max_offset)
+                    if slack_end - slack_start >= 32:
+                        candidates.append((slack_start, slack_end))
+            for slack_start, slack_end in candidates:
+                zero_idx = data_array[slack_start:slack_end].find(b"\x00" * 32)
+                if zero_idx != -1:
+                    return slack_start + zero_idx
+        except Exception:
+            return -1
+        return -1
+
+    @classmethod
     def shield_binary_bytes(cls, binary_data: bytes) -> Tuple[bytes, Dict[str, Any]]:
-        """Applies header mutation and decoy cookie injection to raw binary bytes."""
+        """Applies non-destructive decoy cookie injection strictly into null-byte caves."""
         offsets = cls.scan_cookie(binary_data)
         if not offsets:
             return binary_data, {
@@ -52,19 +85,29 @@ class ExtractorShield:
         data_array = bytearray(binary_data)
         mutations_applied = 0
 
-        # For each cookie found, inject a decoy cookie with corrupted TOC length earlier in padding
         for cookie_offset in offsets:
-            # Check if there is space in preceding padding (at least 64 bytes)
             padding_start = max(0, cookie_offset - 128)
             padding_chunk = data_array[padding_start:cookie_offset]
-            
-            # If there's an all-zero null padding region, insert decoy corrupted cookie
+
+            # 1. Inject only if a genuine 32-byte null region exists before the cookie (e.g. mock/aligned cave)
             zero_idx = padding_chunk.find(b"\x00" * 32)
-            decoy_offset = padding_start + zero_idx if zero_idx != -1 else (padding_start if len(padding_chunk) >= 32 else -1)
-            if decoy_offset != -1:
-                # Write decoy cookie
+            decoy_offset = padding_start + zero_idx if zero_idx != -1 else -1
+
+            # 2. For real PyInstaller PE executables, use unmapped .rdata/.rsrc section alignment slack
+            if decoy_offset == -1 and len(data_array) >= 0x100 and data_array[:2] == b"MZ":
+                pkg_start = cookie_offset
+                if cookie_offset + 12 <= len(data_array):
+                    try:
+                        pkg_len = struct.unpack_from(">I", data_array, cookie_offset + 8)[0]
+                        trailer_end = min(len(data_array), cookie_offset + 88)
+                        if 0 < pkg_len <= trailer_end:
+                            pkg_start = trailer_end - pkg_len
+                    except Exception:
+                        pass
+                decoy_offset = cls._find_pe_slack_offset(data_array, min(cookie_offset, pkg_start))
+
+            if decoy_offset != -1 and decoy_offset + PYINSTALLER_COOKIE_LEN + 8 <= cookie_offset:
                 data_array[decoy_offset:decoy_offset + PYINSTALLER_COOKIE_LEN] = PYINSTALLER_COOKIE
-                # Write a corrupted TOC length (0xFFFFFFFF) and negative package count immediately following
                 corrupted_header = struct.pack(">II", 0xFFFFFFFF, 0x00000000)
                 data_array[decoy_offset + PYINSTALLER_COOKIE_LEN:decoy_offset + PYINSTALLER_COOKIE_LEN + 8] = corrupted_header
                 mutations_applied += 1

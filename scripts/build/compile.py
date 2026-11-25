@@ -308,7 +308,7 @@ def create_release_bundle():
     import zipfile
     import tomllib
     
-    version = "11.11.0"
+    version = "12.2.1"
     try:
         with open(PROJECT_ROOT / "pyproject.toml", "rb") as f:
             version = tomllib.load(f)["project"]["version"]

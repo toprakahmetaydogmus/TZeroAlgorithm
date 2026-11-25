@@ -68,16 +68,20 @@ jobs:
       - name: Smoke-test executables
         shell: pwsh
         run: |
-          if (-not (Test-Path dist\TZeroAlgorithm.exe)) { throw "dist\TZeroAlgorithm.exe was not built" }
-          if (-not (Test-Path dist\TZeroMCP.exe)) { throw "dist\TZeroMCP.exe was not built" }
-          if (-not (Test-Path dist\AddMCP.exe)) { throw "dist\AddMCP.exe was not built" }
-          if (-not (Test-Path dist\TZeroCLI.exe)) { throw "dist\TZeroCLI.exe was not built" }
-          if (-not (Test-Path dist\TZeroCI.exe)) { throw "dist\TZeroCI.exe was not built" }
-          foreach ($name in @("TZeroAlgorithm.exe", "TZeroMCP.exe", "AddMCP.exe", "TZeroCLI.exe", "TZeroCI.exe")) {
-            $p = Start-Process -FilePath "dist\$name" -ArgumentList "--version" -Wait -PassThru
-            if ($p.ExitCode -ne 0) { throw "$name --version exited with code $($p.ExitCode)" }
-            Write-Host "$name OK, size: $((Get-Item "dist\$name").Length) bytes"
-          }
+          python -c '
+          import os, subprocess, sys
+          exes = ["TZeroAlgorithm.exe", "TZeroMCP.exe", "AddMCP.exe", "TZeroCLI.exe", "TZeroCI.exe"]
+          for name in exes:
+              path = os.path.join("dist", name)
+              if not os.path.isfile(path):
+                  raise SystemExit(f"{path} was not built")
+              res = subprocess.run([path, "--version"], capture_output=True, text=True, timeout=30)
+              if res.returncode != 0:
+                  print(res.stdout)
+                  print(res.stderr, file=sys.stderr)
+                  raise SystemExit(f"{name} --version exited with code {res.returncode}")
+              print(f"{name} OK, size: {os.path.getsize(path)} bytes | {(res.stdout or res.stderr).strip()}")
+          '
 
       - name: Set up Node.js for Packages
         uses: actions/setup-node@v4

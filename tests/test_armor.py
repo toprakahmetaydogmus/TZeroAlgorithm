@@ -305,6 +305,16 @@ class TestAntiREAArmor(unittest.TestCase):
             if os.path.exists(temp_path):
                 os.remove(temp_path)
 
+    def test_14_extractor_shield_preserves_nonzero_archive_bytes(self):
+        """Verify ExtractorShield never overwrites non-zero CArchive/TOC bytes when no null cave exists."""
+        from tzero.anti_rea.extractor_shield import ExtractorShield
+
+        payload = b"\x7a\x6c\x69\x62\x31\x2e\x64\x6c\x6c" * 32
+        archive_blob = payload + PYINSTALLER_COOKIE + b"\x00\x00\x00\x20"
+        shielded, meta = ExtractorShield.shield_binary_bytes(archive_blob)
+        self.assertFalse(meta.get("shielded"))
+        self.assertEqual(shielded, archive_blob)
+
 
 if __name__ == "__main__":
     unittest.main()

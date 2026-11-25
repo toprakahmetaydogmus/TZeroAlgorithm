@@ -218,19 +218,27 @@ class ASTMutationEngine:
     }
 
     @classmethod
-    def _resolve_existing_test_entry(cls, token: str, roots: List[str]) -> Optional[str]:
-        """Resolves a relative test path against actual filesystem entries under allowed roots."""
-        cand = os.path.realpath(os.path.abspath(token))
+    def _build_allowed_test_entries(cls, roots: List[str]) -> Dict[str, str]:
+        """Builds an allowlist mapping real filesystem paths to safe relative test paths."""
+        allowed: Dict[str, str] = {}
+        primary_root = roots[0]
         for root in roots:
-            rel = os.path.relpath(cand, root)
-            if rel == ".." or rel.startswith(".." + os.sep) or os.path.isabs(rel):
+            if not os.path.isdir(root):
                 continue
-            for walk_root, _, files in os.walk(root):
+            for walk_root, dirnames, files in os.walk(root):
+                dirnames[:] = [d for d in dirnames if not d.startswith(".") and d != "__pycache__"]
+                real_dir = os.path.realpath(walk_root)
+                rel_dir = os.path.relpath(real_dir, primary_root)
+                if rel_dir != ".." and not rel_dir.startswith(".." + os.sep) and not os.path.isabs(rel_dir):
+                    allowed[real_dir] = rel_dir
                 for fname in files:
+                    if not fname.endswith(".py"):
+                        continue
                     real_entry = os.path.realpath(os.path.join(walk_root, fname))
-                    if real_entry == cand:
-                        return os.path.relpath(real_entry, roots[0])
-        return None
+                    rel_entry = os.path.relpath(real_entry, primary_root)
+                    if rel_entry != ".." and not rel_entry.startswith(".." + os.sep) and not os.path.isabs(rel_entry):
+                        allowed[real_entry] = rel_entry
+        return allowed
 
     @staticmethod
     def _sanitize_target_path(target_path: str) -> str:
@@ -320,16 +328,15 @@ class ASTMutationEngine:
             else:
                 raise ValueError(f"Unsupported test runner executable: {parsed_args[0]}")
 
+            allowed_entries = cls._build_allowed_test_entries([target_dir, ws_root])
             safe_tail: List[str] = []
             for tok in parsed_args[1:]:
                 if tok in cls._ALLOWED_TEST_ARGS:
                     safe_tail.append(cls._ALLOWED_TEST_ARGS[tok])
                 else:
-                    matched_rel = cls._resolve_existing_test_entry(tok, [target_dir, ws_root])
-                    if not matched_rel:
-                        # Also support test filenames passed relative to target_dir
-                        alt_cand = os.path.join(target_dir, tok)
-                        matched_rel = cls._resolve_existing_test_entry(alt_cand, [target_dir, ws_root])
+                    cand_primary = os.path.realpath(os.path.abspath(tok))
+                    cand_rel = os.path.realpath(os.path.join(target_dir, tok))
+                    matched_rel = allowed_entries.get(cand_primary) or allowed_entries.get(cand_rel)
                     if not matched_rel:
                         raise ValueError(f"Unsupported or missing test argument: {tok}")
                     safe_tail.append(matched_rel)
