@@ -150,7 +150,7 @@ jobs:
             dist/*.tgz.sha256
 
       - name: Publish GitHub Release
-        if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'release' || github.event_name == 'workflow_dispatch'
+        if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'release'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || inputs.tag_name || 'v12.2.1' }}
@@ -177,3 +177,35 @@ jobs:
             dist/*.tgz
             dist/*.tgz.sha256
           generate_release_notes: false
+
+      - name: Upload GitHub Release Assets (Manual Dispatch)
+        if: github.event_name == 'workflow_dispatch'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = if ("${{ inputs.tag_name }}") { "${{ inputs.tag_name }}" } else { "v12.2.1" }
+          $patterns = @(
+            "dist/TZeroAlgorithm.exe", "dist/TZeroAlgorithm.exe.sha256",
+            "dist/TZeroCLI.exe", "dist/TZeroCLI.exe.sha256",
+            "dist/TZeroMCP.exe", "dist/TZeroMCP.exe.sha256",
+            "dist/TZeroCI.exe", "dist/TZeroCI.exe.sha256",
+            "dist/AddMCP.exe", "dist/AddMCP.exe.sha256",
+            "dist/TZero-*.zip", "dist/TZero-*.zip.sha256",
+            "dist/*.vsix", "dist/*.vsix.sha256",
+            "dist/*.whl", "dist/*.whl.sha256",
+            "dist/*.tar.gz", "dist/*.tar.gz.sha256",
+            "dist/*.tgz", "dist/*.tgz.sha256"
+          )
+          $files = @()
+          foreach ($pat in $patterns) {
+            $files += Get-Item -Path $pat -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName
+          }
+          $files = $files | Sort-Object -Unique
+          if ($files.Count -eq 0) { throw "No release assets found in dist/" }
+          gh release view $tag *> $null
+          if ($LASTEXITCODE -eq 0) {
+            gh release upload $tag @files --clobber
+          } else {
+            gh release create $tag @files --title "T-Zero $tag" --generate-notes
+          }
