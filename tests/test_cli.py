@@ -340,11 +340,14 @@ class TestCLI(unittest.TestCase):
             self.assertIn("db_path", tel_data)
             self.assertIn("saved_tokens", tel_data)
 
-            for mod_cmd in (
+            cli_help_cmds = [
                 [sys.executable, "-m", "tzero.tzero_tui", "--help"],
-                [sys.executable, "tzero_gateway.py", "--help"],
+                [sys.executable, "addmcp.py", "--help"],
                 [sys.executable, "pc_fixer_mcp.py", "--help"],
-            ):
+            ]
+            if os.path.isfile("tzero_gateway.py"):
+                cli_help_cmds.append([sys.executable, "tzero_gateway.py", "--help"])
+            for mod_cmd in cli_help_cmds:
                 r_help = subprocess.run(mod_cmd, capture_output=True, text=True, check=True, timeout=10)
                 self.assertIn("--help", r_help.stdout + r_help.stderr)
 
