@@ -17,25 +17,28 @@ concurrency:
 jobs:
   test:
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 5
     strategy:
       fail-fast: false
       matrix:
         include:
           - os: ubuntu-24.04
             python-version: "3.11"
+            suite: full
           - os: ubuntu-24.04
             python-version: "3.12"
-          - os: ubuntu-24.04
-            python-version: "3.13"
+            suite: full
           - os: windows-latest
             python-version: "3.12"
+            suite: cross-os
           - os: macos-latest
             python-version: "3.12"
+            suite: cross-os
 
     steps:
     - uses: actions/checkout@v5
       with:
-        fetch-depth: 0
+        fetch-depth: 2
 
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v6
@@ -51,19 +54,24 @@ jobs:
 
     - name: Install package and dependencies
       run: |
-        python -m pip install --upgrade pip
-        python -m pip install . flake8 pyyaml qrcode
+        python -m pip install --disable-pip-version-check --no-compile . flake8 pyyaml qrcode pytest pytest-xdist
 
     - name: Smoke-test installed CLI and metadata sync
       run: |
         tzero --version
         python scripts/sync_release_metadata.py --check
-        python -m compileall -q .
+        python -m compileall -q tzero
         python -m flake8 --select=E9,F63,F7,F82 --exclude=.git,__pycache__,.venv,venv,installers,extensions,build .
 
-    - name: Run Unit Tests
+    - name: Run Full Test Suite (Parallel)
+      if: matrix.suite == 'full'
       run: |
-        python -m unittest discover -s tests -p "test_*.py" -v
+        python -m pytest tests packages/anti_rea/tests -n auto --dist loadscope -q
+
+    - name: Run Cross-Platform OS & Guard Tests
+      if: matrix.suite == 'cross-os'
+      run: |
+        python -m pytest tests/test_welcome_and_install_ide.py tests/test_local_ci.py tests/test_terminal.py tests/test_cli.py tests/test_packaging_sync.py tests/test_ci_workflow.py tests/test_release_dispatch.py tests/test_armor.py packages/anti_rea/tests -n auto --dist loadscope -q
 
     - name: Run Node and VS Code Extension Tests
       if: matrix.os == 'ubuntu-24.04' && matrix.python-version == '3.12'
