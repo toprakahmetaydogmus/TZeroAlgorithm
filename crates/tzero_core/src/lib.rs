@@ -7,7 +7,7 @@
 #![allow(warnings)]
 
 // -*- coding: utf-8 -*-
-//! T-Zero Turbo Rust Hybrid Core Engine (v12.2.0)
+//! T-Zero Turbo Rust Hybrid Core Engine (v12.2.1)
 //! Ultra-High Performance Multi-Language AST Pruning, Shannon Entropy Zero-Leak Guard & BPE Tokenizer.
 //! Developer: Toprak Ahmet Aydoğmuş (Siber Akademi)
 //! License: AGPL-3.0-only

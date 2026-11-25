@@ -493,7 +493,7 @@ def calculate_token_cost(token_count: int, provider_name: str) -> float:
 # i18n Translations
 TRANSLATIONS: Dict[str, Dict[str, str]] = {
     "en": {
-        "title": "T-Zero Developer Console & Context Architect v12.2.0",
+        "title": "T-Zero Developer Console & Context Architect v12.2.1",
         "subtitle": f"Developer: {DEV_NAME} | {DEV_URL_MAIN} | {DEV_URL_BIO}",
         "overview_tab": "🏠 Overview Dashboard",
         "setup_tab": "⚡ Setup & AI Models",
@@ -530,7 +530,7 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "audit_btn": "🛡️ SECURITY AUDIT"
     },
     "tr": {
-        "title": "T-Zero Geliştirici Konsolu & Bağlam Mimarı v12.2.0",
+        "title": "T-Zero Geliştirici Konsolu & Bağlam Mimarı v12.2.1",
         "subtitle": f"Geliştirici: {DEV_NAME} | {DEV_URL_MAIN} | {DEV_URL_BIO}",
         "overview_tab": "🏠 Genel Bakış",
         "setup_tab": "⚡ Kurulum & Model",
@@ -9453,7 +9453,7 @@ def main():
                         default="o200k_base", help="BPE encoding for --symbol-context")
     parser.add_argument("--cache-aligned", action="store_true", help="Order context for KV-cache prefix stability (immutable static prefix before dynamic query suffix)")
     parser.add_argument("--commit-msg", action="store_true", help="Generate Conventional Commit message from local AST git diff ($0 local engine)")
-    parser.add_argument("--changelog", nargs="?", const="v12.2.0", default=None, metavar="VERSION", help="Generate release CHANGELOG markdown from git history")
+    parser.add_argument("--changelog", nargs="?", const="v12.2.1", default=None, metavar="VERSION", help="Generate release CHANGELOG markdown from git history")
     parser.add_argument("--ci", choices=["github", "gitlab", "pre-commit", "local", "all"], default=None, help="Install CI/CD workflow or run local verification suite")
     parser.add_argument("--local-ci", action="store_true", help="Run comprehensive Local CI & Pre-Push verification battery ($0 quota burn)")
     parser.add_argument("--quick-ci", action="store_true", help="Run fast Local CI smoke checks in seconds")
@@ -9517,7 +9517,7 @@ def main():
     parser.add_argument("--card", "--badge", nargs="?", const="assets/tzero_badge_card.svg", default=None, metavar="FILE", help="Generate viral dark-mode SVG banner card and GitHub README badges")
     parser.add_argument("--showcase", nargs="?", const="tzero_showcase.html", default=None, metavar="FILE", help="Generate interactive split-screen HTML5 comparison showcase slider")
     parser.add_argument("--marketing", "--growth", action="store_true", help="Launch $0-budget viral growth engine and export campaign materials for Reddit, HN, X, and Product Hunt")
-    parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect v12.2.0 Master Edition (engine v4.1.0)")
+    parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect v12.2.1 Master Edition (engine v4.1.0)")
 
 
     def print_master_tutorial():
@@ -9626,7 +9626,7 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
     def print_quickstart_guide():
         print("""
 ================================================================================
-⚡ SİBER AKADEMİ — T-ZERO CONTEXT ARCHITECT & MCP v12.2.0 MASTER (engine v4.1.0)
+⚡ SİBER AKADEMİ — T-ZERO CONTEXT ARCHITECT & MCP v12.2.1 MASTER (engine v4.1.0)
 ================================================================================
 🎯 %95'e Varan Token Tasarrufu & Otonom Yapay Zeka Mimari Bağlam Motoru
 
@@ -10600,7 +10600,7 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
         if not os.path.exists(app_path):
             app_path = os.path.join(os.getcwd(), "huggingface-space", "app.py")
         print("\033[36m" + "=" * 80)
-        print("🤗 SİBER AKADEMİ — T-ZERO HUGGING FACE SPACE & GRADIO COCKPIT (v12.2.0)")
+        print("🤗 SİBER AKADEMİ — T-ZERO HUGGING FACE SPACE & GRADIO COCKPIT (v12.2.1)")
         print("=" * 80 + "\033[0m")
         print("🌐 Official Live Space : https://huggingface.co/spaces/toprakke4/tzero-token-reducer")
         print(f"📁 Local Application   : {app_path}")

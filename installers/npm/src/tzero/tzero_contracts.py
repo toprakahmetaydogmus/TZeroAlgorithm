@@ -13,7 +13,7 @@ Capabilities:
 - 100% Offline, $0 cost, zero external dependencies (pure Python standard library).
 
 Author: Toprak Ahmet Aydoğmuş (Siber Akademi)
-Part of T-Zero Context Architect v12.2.0 Master Edition.
+Part of T-Zero Context Architect v12.2.1 Master Edition.
 """
 
 import ast
@@ -1054,7 +1054,7 @@ class ASTContractComparator:
                     "tool": {
                         "driver": {
                             "name": "T-Zero Contract Guardian",
-                            "version": "12.2.0",
+                            "version": "12.2.1",
                             "rules": rules_list
                         }
                     },

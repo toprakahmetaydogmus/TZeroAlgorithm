@@ -10,10 +10,10 @@
 
 <!-- Badges Tier 1: Distribution, Release & Scale -->
 [![GitHub Release](https://img.shields.io/github/v/release/toprakahmetaydogmus/TZeroAlgorithm?style=flat-square&logo=github&color=38bdf8)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases)
-[![PyPI](https://img.shields.io/badge/pypi-v12.2.0-3b82f6?style=flat-square&logo=pypi&logoColor=white)](https://pypi.org/project/tzero-mcp/)
-[![npm](https://img.shields.io/badge/npm-v12.2.0-cb3837?style=flat-square&logo=npm)](https://www.npmjs.com/package/tzero-mcp)
-[![VS Code](https://img.shields.io/badge/vscode-v12.2.0-007acc?style=flat-square&logo=visualstudiocode&logoColor=white)](https://marketplace.visualstudio.com/items?itemName=siber-akademi.tzero-vscode)
-[![Open VSX](https://img.shields.io/badge/open--vsx-v12.2.0-8b5cf6?style=flat-square&logo=openvsx&logoColor=white)](https://open-vsx.org/extension/siber-akademi/tzero-vscode)
+[![PyPI](https://img.shields.io/badge/pypi-v12.2.1-3b82f6?style=flat-square&logo=pypi&logoColor=white)](https://pypi.org/project/tzero-mcp/)
+[![npm](https://img.shields.io/badge/npm-v12.2.1-cb3837?style=flat-square&logo=npm)](https://www.npmjs.com/package/tzero-mcp)
+[![VS Code](https://img.shields.io/badge/vscode-v12.2.1-007acc?style=flat-square&logo=visualstudiocode&logoColor=white)](https://marketplace.visualstudio.com/items?itemName=siber-akademi.tzero-vscode)
+[![Open VSX](https://img.shields.io/badge/open--vsx-v12.2.1-8b5cf6?style=flat-square&logo=openvsx&logoColor=white)](https://open-vsx.org/extension/siber-akademi/tzero-vscode)
 [![Downloads](https://img.shields.io/badge/downloads-20%2C880%2B-10b981?style=flat-square&logo=git)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases)
 [![Stars](https://img.shields.io/github/stars/toprakahmetaydogmus/TZeroAlgorithm?style=flat-square&logo=github&color=f59e0b)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/stargazers)
 

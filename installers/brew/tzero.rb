@@ -3,9 +3,9 @@ class Tzero < Formula
 
   desc "AST Codebase Context Architect, Token Reducer & Autonomous MCP Engine"
   homepage "https://tzero-indol.vercel.app"
-  url "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/archive/refs/tags/v12.2.0.tar.gz"
-  version "12.2.0"
-  license "MIT"
+  url "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/archive/refs/tags/v12.2.1.tar.gz"
+  version "12.2.1"
+  license "AGPL-3.0-only"
 
   depends_on "python@3.12"
 
