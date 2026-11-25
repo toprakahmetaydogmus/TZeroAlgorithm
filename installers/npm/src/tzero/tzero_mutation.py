@@ -219,25 +219,25 @@ class ASTMutationEngine:
 
     @classmethod
     def _build_allowed_test_entries(cls, roots: List[str]) -> Dict[str, str]:
-        """Builds an allowlist mapping real filesystem paths to safe relative test paths."""
+        """Builds an allowlist mapping real filesystem paths to verified on-disk paths."""
         allowed: Dict[str, str] = {}
-        primary_root = roots[0]
         for root in roots:
             if not os.path.isdir(root):
                 continue
-            for walk_root, dirnames, files in os.walk(root):
+            real_root = os.path.realpath(root)
+            for walk_root, dirnames, files in os.walk(real_root):
                 dirnames[:] = [d for d in dirnames if not d.startswith(".") and d != "__pycache__"]
                 real_dir = os.path.realpath(walk_root)
-                rel_dir = os.path.relpath(real_dir, primary_root)
+                rel_dir = os.path.relpath(real_dir, real_root)
                 if rel_dir != ".." and not rel_dir.startswith(".." + os.sep) and not os.path.isabs(rel_dir):
-                    allowed[real_dir] = rel_dir
+                    allowed[real_dir] = real_dir
                 for fname in files:
                     if not fname.endswith(".py"):
                         continue
                     real_entry = os.path.realpath(os.path.join(walk_root, fname))
-                    rel_entry = os.path.relpath(real_entry, primary_root)
+                    rel_entry = os.path.relpath(real_entry, real_root)
                     if rel_entry != ".." and not rel_entry.startswith(".." + os.sep) and not os.path.isabs(rel_entry):
-                        allowed[real_entry] = rel_entry
+                        allowed[real_entry] = real_entry
         return allowed
 
     @staticmethod
@@ -299,13 +299,24 @@ class ASTMutationEngine:
         target_dir = os.path.dirname(abs_target)
         expected_test_name = f"test_{os.path.splitext(os.path.basename(abs_target))[0]}.py"
 
-        # Build argv strictly from fixed flags and verified on-disk entries without shell=True
+        # Discover untainted test files strictly from workspace root (and tzero_* temp dirs)
+        discover_roots = [ws_root]
+        try:
+            for d_entry in os.scandir(tmp_root):
+                if d_entry.is_dir() and d_entry.name.startswith("tzero_"):
+                    discover_roots.append(os.path.realpath(d_entry.path))
+        except OSError:
+            pass
+
+        # Build argv strictly from fixed flags and untainted on-disk entries without shell=True
         if not test_command:
-            matched_test = None
-            for tests_dir in (os.path.join(target_dir, "tests"), os.path.join(ws_root, "tests")):
-                if os.path.isdir(tests_dir) and expected_test_name in os.listdir(tests_dir):
-                    matched_test = os.path.join(tests_dir, expected_test_name)
-                    break
+            ws_tests_map: Dict[str, str] = {}
+            ws_tests_root = os.path.join(ws_root, "tests")
+            if os.path.isdir(ws_tests_root):
+                for fn in os.listdir(ws_tests_root):
+                    if fn.startswith("test_") and fn.endswith(".py"):
+                        ws_tests_map[fn] = os.path.join(ws_tests_root, fn)
+            matched_test = ws_tests_map.get(expected_test_name)
             if matched_test:
                 test_cmd_args = [sys.executable, "-m", "unittest", matched_test]
             else:
@@ -328,7 +339,7 @@ class ASTMutationEngine:
             else:
                 raise ValueError(f"Unsupported test runner executable: {parsed_args[0]}")
 
-            allowed_entries = cls._build_allowed_test_entries([target_dir, ws_root])
+            allowed_entries = cls._build_allowed_test_entries(discover_roots)
             safe_tail: List[str] = []
             for tok in parsed_args[1:]:
                 if tok in cls._ALLOWED_TEST_ARGS:

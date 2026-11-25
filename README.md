@@ -10,10 +10,10 @@
 
 <!-- Badges Tier 1: Distribution, Release & Scale -->
 [![GitHub Release](https://img.shields.io/github/v/release/toprakahmetaydogmus/TZeroAlgorithm?style=flat-square&logo=github&color=38bdf8)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases)
-[![PyPI](https://img.shields.io/badge/pypi-v12.2.0-3b82f6?style=flat-square&logo=pypi&logoColor=white)](https://pypi.org/project/tzero-mcp/)
-[![npm](https://img.shields.io/badge/npm-v12.2.0-cb3837?style=flat-square&logo=npm)](https://www.npmjs.com/package/tzero-mcp)
-[![VS Code](https://img.shields.io/badge/vscode-v12.2.0-007acc?style=flat-square&logo=visualstudiocode&logoColor=white)](https://marketplace.visualstudio.com/items?itemName=siber-akademi.tzero-vscode)
-[![Open VSX](https://img.shields.io/badge/open--vsx-v12.2.0-8b5cf6?style=flat-square&logo=openvsx&logoColor=white)](https://open-vsx.org/extension/siber-akademi/tzero-vscode)
+[![PyPI](https://img.shields.io/badge/pypi-v12.2.1-3b82f6?style=flat-square&logo=pypi&logoColor=white)](https://pypi.org/project/tzero-mcp/)
+[![npm](https://img.shields.io/badge/npm-v12.2.1-cb3837?style=flat-square&logo=npm)](https://www.npmjs.com/package/tzero-mcp)
+[![VS Code](https://img.shields.io/badge/vscode-v12.2.1-007acc?style=flat-square&logo=visualstudiocode&logoColor=white)](https://marketplace.visualstudio.com/items?itemName=siber-akademi.tzero-vscode)
+[![Open VSX](https://img.shields.io/badge/open--vsx-v12.2.1-8b5cf6?style=flat-square&logo=openvsx&logoColor=white)](https://open-vsx.org/extension/siber-akademi/tzero-vscode)
 [![Downloads](https://img.shields.io/badge/downloads-20%2C880%2B-10b981?style=flat-square&logo=git)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases)
 [![Stars](https://img.shields.io/github/stars/toprakahmetaydogmus/TZeroAlgorithm?style=flat-square&logo=github&color=f59e0b)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/stargazers)
 
@@ -36,6 +36,10 @@
 [![Interactive Colab](https://img.shields.io/badge/%F0%9F%9A%80%20Interactive-Google%20Colab-f9ab00?style=for-the-badge&logo=googlecolab&logoColor=white)](https://colab.research.google.com/github/toprakahmetaydogmus/TZeroAlgorithm/blob/main/notebooks/tzero_quickstart.ipynb)
 [![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Zero--GPU%20Demo-Hugging%20Face-ffd21e?style=for-the-badge&logo=huggingface&logoColor=black)](https://huggingface.co/spaces/toprakke4/tzero-token-reducer)
 [![Live Vercel Hub](https://img.shields.io/badge/%E2%9A%A1%20Live%20Gateway-Vercel-000000?style=for-the-badge&logo=vercel)](https://tzero-indol.vercel.app)
+
+<p align="center">
+  <a href="https://vibeshelf.co/tool/t-zero/"><img src="https://vibeshelf.co/badge.svg" width="200" height="44" alt="Listed on VibeShelf"/></a>
+</p>
 
 > **If T-Zero cuts your LLM prompt tokens or saves you API bills in Cursor / Claude, please give us a star! ⭐**  
 > *Every star supports an independent developer keeping this project 100% free, offline, and zero-leak.*

@@ -33,6 +33,10 @@
 [![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Zero--GPU%20Demo-Hugging%20Face-ffd21e?style=for-the-badge&logo=huggingface&logoColor=black)](https://huggingface.co/spaces/toprakke4/tzero-token-reducer)
 [![Canlı Ağ Geçidi](https://img.shields.io/badge/%E2%9A%A1%20Canl%C4%B1%20Ge%C3%A7it-Vercel-000000?style=for-the-badge&logo=vercel)](https://tzero-indol.vercel.app)
 
+<p align="center">
+  <a href="https://vibeshelf.co/tool/t-zero/"><img src="https://vibeshelf.co/badge.svg" width="200" height="44" alt="Listed on VibeShelf"/></a>
+</p>
+
 > **T-Zero LLM bağlam boyutunuzu küçülttüyse veya token faturalarınızı düşürdüyse lütfen GitHub'da bize bir yıldız verin! ⭐**  
 > *Her bir yıldız, bağımsız geliştiricinin bu projeyi %100 ücretsiz, çevrimdışı ve sıfır sızıntılı olarak sürdürmesini destekler.*
 
