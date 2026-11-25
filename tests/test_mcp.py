@@ -1180,6 +1180,26 @@ diff --git a/core.py b/core.py
         finally:
             sys.argv = old_argv
 
+    def test_workflow_telemetry_action(self):
+        """Verifies execute_codebase_workflow(action='telemetry') returns text and JSON summaries."""
+        import json
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            res_text = self.run_async(self.server.call_tool(
+                "execute_codebase_workflow",
+                {"action": "telemetry", "target": temp_dir}
+            ))
+            out_text = tool_result_text(res_text)
+            self.assertIn("T-ZERO", out_text.upper())
+
+            res_json = self.run_async(self.server.call_tool(
+                "execute_codebase_workflow",
+                {"action": "telemetry", "target": temp_dir, "query": "json"}
+            ))
+            data = json.loads(tool_result_text(res_json))
+            self.assertIn("saved_tokens", data)
+            self.assertIn("usd_saved", data)
+
 
 if __name__ == "__main__":
     unittest.main()

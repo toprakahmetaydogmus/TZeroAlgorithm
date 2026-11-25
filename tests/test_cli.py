@@ -294,6 +294,60 @@ class TestCLI(unittest.TestCase):
             self.assertIsInstance(data["files"], list)
             self.assertEqual(len(data["files"]), 2)
 
+    def test_tree_context_out_and_headless_radar(self):
+        import json
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as tmp:
+            sample = os.path.join(tmp, "mod.py")
+            with open(sample, "w", encoding="utf-8") as fh:
+                fh.write("def greet(name: str) -> str:\n    return 'hi ' + name\n")
+
+            out_tree = os.path.join(tmp, "tree.md")
+            r_tree = subprocess.run(
+                [sys.executable, "tzero/tzero_v3.py", "--tree", tmp, "--out", out_tree],
+                capture_output=True, text=True, check=True, timeout=15,
+            )
+            self.assertEqual(r_tree.returncode, 0)
+            self.assertTrue(os.path.isfile(out_tree))
+
+            out_ctx = os.path.join(tmp, "ctx.md")
+            r_ctx = subprocess.run(
+                [sys.executable, "tzero/tzero_v3.py", "--context", tmp, "--output", out_ctx],
+                capture_output=True, text=True, check=True, timeout=15,
+            )
+            self.assertEqual(r_ctx.returncode, 0)
+            self.assertTrue(os.path.isfile(out_ctx))
+
+            r_radar_help = subprocess.run(
+                [sys.executable, "tzero/tzero_v3.py", "radar", "--help"],
+                capture_output=True, text=True, check=True, timeout=10,
+            )
+            self.assertIn("Usage: tzero radar", r_radar_help.stdout)
+
+            r_radar_audit = subprocess.run(
+                [sys.executable, "tzero/tzero_v3.py", "radar", sample],
+                capture_output=True, text=True, check=True, timeout=10,
+            )
+            audit_data = json.loads(r_radar_audit.stdout)
+            self.assertIn("score", audit_data)
+
+            r_telemetry = subprocess.run(
+                [sys.executable, "tzero/tzero_v3.py", "--telemetry", tmp, "--format", "json"],
+                capture_output=True, text=True, check=True, timeout=15,
+            )
+            tel_data = json.loads(r_telemetry.stdout)
+            self.assertIn("db_path", tel_data)
+            self.assertIn("saved_tokens", tel_data)
+
+            for mod_cmd in (
+                [sys.executable, "-m", "tzero.tzero_tui", "--help"],
+                [sys.executable, "tzero_gateway.py", "--help"],
+                [sys.executable, "pc_fixer_mcp.py", "--help"],
+            ):
+                r_help = subprocess.run(mod_cmd, capture_output=True, text=True, check=True, timeout=10)
+                self.assertIn("--help", r_help.stdout + r_help.stderr)
+
 
 if __name__ == "__main__":
     unittest.main()

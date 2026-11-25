@@ -109,6 +109,7 @@ class ChangeImpactAnalyzer:
         self.symbol_locations: Dict[str, List[str]] = collections.defaultdict(list) # symbol -> [defining_files]
         self.import_graph: Dict[str, Set[str]] = collections.defaultdict(set) # file -> imported_modules
         self.inbound_graph: Dict[str, Set[str]] = collections.defaultdict(set) # module -> dependent_files
+        self._file_ref_cache: Dict[str, Tuple[Dict[str, Set[int]], Dict[str, Set[int]], Dict[str, Set[int]]]] = {}
         self._build_index()
 
     def _add_symbol_def(self, symbol: str, rel_path: str):
@@ -139,8 +140,7 @@ class ChangeImpactAnalyzer:
         try:
             tree = ast.parse(code)
             self.ast_trees[rel_path] = tree
-            stem = os.path.splitext(os.path.basename(rel_path))[0]
-            
+
             for node in tree.body:
                 if isinstance(node, ast.ClassDef):
                     self._add_symbol_def(node.name, rel_path)
@@ -163,6 +163,34 @@ class ChangeImpactAnalyzer:
         except Exception:
             pass
 
+    def _get_file_refs(self, rel_path: str, content: str) -> Tuple[Dict[str, Set[int]], Dict[str, Set[int]], Dict[str, Set[int]]]:
+        """Builds and caches a per-file AST reference index in a single traversal."""
+        cached = self._file_ref_cache.get(rel_path)
+        if cached is not None:
+            return cached
+        tree = self.ast_trees.get(rel_path)
+        if tree is None:
+            tree = ast.parse(content)
+            self.ast_trees[rel_path] = tree
+        name_lines: Dict[str, Set[int]] = collections.defaultdict(set)
+        call_attr_lines: Dict[str, Set[int]] = collections.defaultdict(set)
+        dotted_lines: Dict[str, Set[int]] = collections.defaultdict(set)
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Call):
+                if isinstance(node.func, ast.Attribute):
+                    lineno = getattr(node, 'lineno', 1)
+                    call_attr_lines[node.func.attr].add(lineno)
+                    if isinstance(node.func.value, ast.Name):
+                        dotted_lines[f"{node.func.value.id}.{node.func.attr}"].add(lineno)
+            elif isinstance(node, ast.Attribute):
+                if isinstance(node.value, ast.Name):
+                    dotted_lines[f"{node.value.id}.{node.attr}"].add(getattr(node, 'lineno', 1))
+            elif isinstance(node, ast.Name):
+                name_lines[node.id].add(getattr(node, 'lineno', 1))
+        entry = (name_lines, call_attr_lines, dotted_lines)
+        self._file_ref_cache[rel_path] = entry
+        return entry
+
     def analyze_symbol(self, symbol_name: str) -> Dict[str, Any]:
         """Calculates the blast radius for modifying a specific symbol (class/function).
         
@@ -176,44 +204,30 @@ class ChangeImpactAnalyzer:
 
         target_attr = symbol_name.split('.')[-1]
         target_class = symbol_name.split('.')[0] if '.' in symbol_name else ""
+        dotted_key = f"{target_class}.{target_attr}" if target_class else ""
 
         for f, content in self.snippets.items():
             if f in defining_locations or target_attr not in content:
                 continue
 
-            matches_lines: List[int] = []
+            matches_set: Set[int] = set()
             try:
-                tree = self.ast_trees.get(f)
-                if tree is None:
-                    tree = ast.parse(content)
-                    self.ast_trees[f] = tree
-                for node in ast.walk(tree):
-                    if isinstance(node, ast.Call):
-                        matched = False
-                        if isinstance(node.func, ast.Name) and node.func.id == target_attr:
-                            matched = True
-                        elif isinstance(node.func, ast.Attribute) and node.func.attr == target_attr:
-                            if target_class:
-                                if isinstance(node.func.value, ast.Name) and node.func.value.id == target_class:
-                                    matched = True
-                            else:
-                                matched = True
-                        if matched:
-                            matches_lines.append(getattr(node, 'lineno', 1))
-                    elif isinstance(node, ast.Attribute) and node.attr == target_attr:
-                        if target_class and isinstance(node.value, ast.Name) and node.value.id == target_class:
-                            matches_lines.append(getattr(node, 'lineno', 1))
-                    elif isinstance(node, ast.Name) and node.id == target_attr:
-                        # Direct symbol reference as argument, type annotation, or value
-                        matches_lines.append(getattr(node, 'lineno', 1))
+                name_lines, call_attr_lines, dotted_lines = self._get_file_refs(f, content)
+                if target_attr in name_lines:
+                    matches_set.update(name_lines[target_attr])
+                if target_class:
+                    if dotted_key in dotted_lines:
+                        matches_set.update(dotted_lines[dotted_key])
+                else:
+                    if target_attr in call_attr_lines:
+                        matches_set.update(call_attr_lines[target_attr])
             except Exception:
                 # Fallback for non-python files or invalid syntax
                 pattern = rf"\b{re.escape(target_attr)}\b"
                 for m in re.finditer(pattern, content):
-                    line_no = content[:m.start()].count('\n') + 1
-                    matches_lines.append(line_no)
+                    matches_set.add(content[:m.start()].count('\n') + 1)
 
-            unique_lines = sorted(list(set(matches_lines)))
+            unique_lines = sorted(matches_set)
             if unique_lines:
                 direct_callers.append({
                     "file": f,

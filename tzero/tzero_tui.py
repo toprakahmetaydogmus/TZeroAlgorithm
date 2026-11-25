@@ -443,7 +443,7 @@ class TZeroTerminalCockpit:
             # Fallback for non-interactive / piped environments
             if not sys.stdin.isatty():
                 try:
-                    choice = input(f"\n{cls.BOLD}Select an action [0-11] (or press Enter to refresh): {cls.RESET}").strip()
+                    choice = input(f"\n{cls.BOLD}Select an action [0-13] (or press Enter to refresh): {cls.RESET}").strip()
                 except (KeyboardInterrupt, EOFError):
                     print(f"\n{cls.CYAN}Goodbye! T-Zero Context Engine active.{cls.RESET}")
                     break
@@ -457,7 +457,7 @@ class TZeroTerminalCockpit:
             chosen = False
             choice = ""
             while not chosen:
-                print(f"\r{cls.BOLD}  Navigate [↑/↓/←/→, w/s, k/j] │ Select [Enter] │ Quick Jump [0-11] │ Exit [q/esc]: {cls.RESET}", end="", flush=True)
+                print(f"\r{cls.BOLD}  Navigate [↑/↓/←/→, w/s, k/j] │ Select [Enter] │ Quick Jump [0-13] │ Exit [q/esc]: {cls.RESET}", end="", flush=True)
                 key = cls._read_key()
                 if not key:
                     time.sleep(0.04)
@@ -510,12 +510,21 @@ class TZeroTerminalCockpit:
 
 def main():
     """CLI entrypoint for standalone cockpit execution."""
-    target_dir = sys.argv[1] if len(sys.argv) > 1 and not sys.argv[1].startswith("-") else "."
-    if "--snapshot" in sys.argv:
-        metrics = TZeroTerminalCockpit.gather_workspace_metrics(target_dir)
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        prog="tzero-tui",
+        description="T-Zero Interactive Terminal Cockpit (Zero-Leak, Context Engine & Telemetry)",
+    )
+    parser.add_argument("target_dir", nargs="?", default=".", help="Workspace directory to inspect (default: .)")
+    parser.add_argument("--snapshot", action="store_true", help="Print a non-interactive snapshot and exit")
+    args = parser.parse_args()
+
+    if args.snapshot:
+        metrics = TZeroTerminalCockpit.gather_workspace_metrics(args.target_dir)
         print(TZeroTerminalCockpit.render_cockpit(metrics))
     else:
-        TZeroTerminalCockpit.run_interactive(target_dir)
+        TZeroTerminalCockpit.run_interactive(args.target_dir)
 
 
 if __name__ == "__main__":

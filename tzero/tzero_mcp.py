@@ -4738,6 +4738,13 @@ def create_mcp_server():
                     md.append(f"- **Video Prompt:** `{sc.video_prompt}`\n")
                 return "\n".join(md)
 
+        elif act in ("telemetry", "savings_telemetry", "sqlite_telemetry"):
+            from tzero.tzero_telemetry import render_report, get_summary
+            target_dir = target if os.path.isdir(target) else "."
+            if opts.get("format") == "json" or query.strip().lower() == "json":
+                return json.dumps(get_summary(workspace_dir=target_dir), indent=2)
+            return render_report(workspace_dir=target_dir)
+
         # Fallback to general dispatch
         handler = _CANONICAL_DISPATCH.get(act) or _LEGACY_DISPATCH.get(act)
         if handler:
@@ -4759,7 +4766,7 @@ def create_mcp_server():
             f"❌ Unknown action '{act}'.\n"
             f"Supported actions: 'auto', 'context', 'audit', 'security', 'blueprint', 'dependencies', "
             f"'impact', 'search', 'prune', 'rules', 'enforce', 'cost', 'memory', 'swarm', 'heal', 'design', "
-            f"'patch', 'pagerank', 'dead_code', 'duplicity', 'call_chain', 'sync', 'roi', 'drift', 'ci', 'local_ci', "
+            f"'patch', 'pagerank', 'dead_code', 'duplicity', 'call_chain', 'sync', 'roi', 'drift', 'telemetry', 'ci', 'local_ci', "
             f"'armor', 'anti_rea', 'audit_rea'."
         )
 

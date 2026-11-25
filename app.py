@@ -11,15 +11,12 @@
 from __future__ import annotations
 
 import ast
-import html
 import json
 import math
-import os
 import re
-import sys
 import time
-from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Tuple
+from dataclasses import dataclass
+from typing import Any, Dict, List, Tuple
 
 # ==================================================================================================
 # ZERO-GPU COMPATIBILITY LAYER
@@ -945,7 +942,6 @@ class SecurityQualityAuditor:
     @classmethod
     def run_full_audit(cls, code_str: str) -> Tuple[int, List[AuditFinding], Dict[str, Any]]:
         findings: List[AuditFinding] = []
-        lines = code_str.splitlines()
 
         # 1. T-001 Zero-Leak Checks
         from tzero.tzero_security import ZeroLeakEngine
@@ -1345,8 +1341,6 @@ def calculate_roi_controller(
     annual_savings_str = f"${res['annual_dollar_savings']:,.2f}"
     tokens_saved_str = f"{res['monthly_tokens_saved'] / 1_000_000:,.1f} M Tokens / mo"
     carbon_str = f"{res['co2_kg_saved_annual']:,} kg CO2 / yr"
-
-    pricing = MODEL_PRICING.get(model_choice, MODEL_PRICING["OpenAI GPT-4o"])
 
     roi_card_html = f"""
     <div class="tzero-card" style="margin-top: 10px;">

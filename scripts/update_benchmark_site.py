@@ -24,7 +24,7 @@ DIST_DIR = ROOT_DIR / "dist"
 def get_canonical_version() -> str:
     text = (ROOT_DIR / "pyproject.toml").read_text(encoding="utf-8")
     match = re.search(r'^version\s*=\s*"([^"]+)"', text, re.MULTILINE)
-    return match.group(1) if match else "12.2.0"
+    return match.group(1) if match else "12.2.1"
 
 
 def _human_size(num_bytes: int) -> str:

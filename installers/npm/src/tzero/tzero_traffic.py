@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Siber Akademi T-Zero — Traffic, Update & Crypto Support Engine (v12.0.0).
+"""Siber Akademi T-Zero — Traffic, Update & Crypto Support Engine (v12.2.1).
 
 Developer: Toprak Ahmet Aydoğmuş (Siber Akademi)
 License: AGPL-3.0-only

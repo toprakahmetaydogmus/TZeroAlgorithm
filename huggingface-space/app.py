@@ -10,14 +10,9 @@ Official Repositories:
 - Doctor: https://github.com/toprakahmetaydogmus/tzero-pc-fixer
 """
 
-import os
-import sys
-import time
 import ast
-import re
-import math
-from typing import Dict, List, Any, Tuple, Optional
-from dataclasses import dataclass, field, asdict
+import time
+from typing import Dict, List, Any, Tuple
 
 import gradio as gr
 
@@ -383,7 +378,6 @@ class ASTContextArchitect:
             except Exception:
                 pass
         # Fallback estimation
-        words = len(text.split())
         chars = len(text)
         return max(1, int(chars / 3.7))
 

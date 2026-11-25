@@ -481,6 +481,16 @@ class PCFixerMcpServer:
 
 def main():
     """Main CLI entrypoint for PC-Fixer MCP Server."""
+    import argparse
+    from tzero import __version__ as tzero_version
+
+    parser = argparse.ArgumentParser(
+        prog="pc-fixer-mcp",
+        description="T-Zero PC-Fixer & Codebase Doctor Standalone JSON-RPC 2.0 MCP Server (stdio)",
+    )
+    parser.add_argument("--version", action="version", version=f"pc-fixer-mcp {tzero_version}")
+    parser.parse_args()
+
     server = PCFixerMcpServer()
     server.run()
 

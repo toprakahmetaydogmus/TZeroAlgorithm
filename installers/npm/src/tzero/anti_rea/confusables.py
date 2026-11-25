@@ -1,23 +1,21 @@
 # -*- coding: utf-8 -*-
 """Tier 9: Homoglyphs & BPE Tokenizer Desynchronization.
 
-Substitutes ASCII characters in internal, non-exported identifier names
+Substitutes ASCII characters in internal, locally-scoped identifier names
 with visually identical Cyrillic or Unicode homoglyphs (e.g. Cyrillic 'а' U+0430
-for Latin 'a' U+0061).
-While Python 3 natively permits arbitrary UTF-8 identifiers, LLM Byte-Pair
-Encoding (BPE) and SentencePiece tokenizers tokenize these homoglyphs as
-separate, high-entropy token fragments, destroying semantic vector alignments
-in the attention heads of AI coding agents.
+for Latin 'a' U+0061) while strictly preserving Python builtins, decorators,
+keywords, and imported symbols so runtime execution remains 100% intact.
 
 Developer: Toprak Ahmet Aydoğmuş (Siber Akademi)
 """
 
 import ast
+import builtins
+import keyword
 import random
-from typing import Dict, Set, Optional
+from typing import Dict, Optional, Set
 
 
-# Mapping from Latin ASCII letters to visually indistinguishable Cyrillic / Greek homoglyphs
 HOMOGLYPH_MAP: Dict[str, str] = {
     "a": "а",  # Cyrillic small letter a (U+0430)
     "e": "е",  # Cyrillic small letter ie (U+0435)
@@ -30,28 +28,72 @@ HOMOGLYPH_MAP: Dict[str, str] = {
     "j": "ј",  # Cyrillic small letter je (U+0458)
 }
 
+_BUILTIN_PROTECTED: Set[str] = (
+    set(dir(builtins))
+    | set(keyword.kwlist)
+    | {
+        "self", "cls", "classmethod", "staticmethod", "property", "super",
+        "__init__", "__name__", "__main__", "__file__", "__doc__", "__package__",
+        "True", "False", "None",
+    }
+)
+
+
+def _collect_safe_targets(tree: ast.AST, protected: Set[str]) -> Set[str]:
+    """Collect private/internal locally defined names safe to rename without breaking callers or imports."""
+    imported: Set[str] = set()
+    public_defs: Set[str] = set()
+    local_candidates: Set[str] = set()
+
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                imported.add(alias.asname or alias.name.split(".")[0])
+        elif isinstance(node, ast.ImportFrom):
+            for alias in node.names:
+                imported.add(alias.asname or alias.name)
+        elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            if node.name.startswith("_") and not node.name.startswith("__"):
+                local_candidates.add(node.name)
+            else:
+                public_defs.add(node.name)
+            # Only rename internal-looking local assignments (not kwargs/public params)
+            for arg in node.args.args + node.args.kwonlyargs:
+                protected.add(arg.arg)
+        elif isinstance(node, ast.ClassDef):
+            public_defs.add(node.name)
+        elif isinstance(node, ast.Global) or isinstance(node, ast.Nonlocal):
+            protected.update(node.names)
+        elif isinstance(node, ast.Name) and isinstance(node.ctx, ast.Store):
+            if node.id.startswith("_") and not node.id.startswith("__"):
+                local_candidates.add(node.id)
+
+    blocked = protected | imported | public_defs
+    return {name for name in local_candidates if name not in blocked and len(name) >= 4}
+
 
 class HomoglyphDesynchronizer(ast.NodeTransformer):
     """AST transformer that substitutes internal identifier characters with homoglyphs."""
 
-    def __init__(self, protected_names: Optional[Set[str]] = None, seed: int = 42):
+    def __init__(self, protected_names: Optional[Set[str]] = None, seed: int = 42, target_names: Optional[Set[str]] = None):
         super().__init__()
-        self.protected_names = protected_names or {
-            "self", "cls", "__init__", "__name__", "__main__", "__file__",
-            "True", "False", "None", "print", "range", "len", "open"
-        }
+        self.protected_names = set(_BUILTIN_PROTECTED)
+        if protected_names:
+            self.protected_names |= set(protected_names)
+        self.target_names = target_names
         self.rng = random.Random(seed)
         self.renamed_map: Dict[str, str] = {}
 
     def _convert_name(self, name: str) -> str:
-        """Converts an internal name using homoglyph substitution."""
+        """Converts an eligible internal name using homoglyph substitution."""
         if name in self.protected_names or name.startswith("__") or len(name) < 4:
+            return name
+        if self.target_names is not None and name not in self.target_names:
             return name
         if name in self.renamed_map:
             return self.renamed_map[name]
 
         chars = list(name)
-        # Substitute at least one character if possible
         for i, ch in enumerate(chars):
             if ch in HOMOGLYPH_MAP:
                 chars[i] = HOMOGLYPH_MAP[ch]
@@ -62,7 +104,7 @@ class HomoglyphDesynchronizer(ast.NodeTransformer):
         return new_name
 
     def visit_Name(self, node: ast.Name) -> ast.Name:
-        """Renames local variable references."""
+        """Renames eligible internal variable references."""
         node.id = self._convert_name(node.id)
         return node
 
@@ -75,10 +117,12 @@ class HomoglyphDesynchronizer(ast.NodeTransformer):
 
     @classmethod
     def desynchronize_source(cls, source_code: str, seed: int = 42) -> str:
-        """Applies homoglyph desynchronization to internal identifiers."""
+        """Applies homoglyph desynchronization to internal identifiers safely."""
         try:
             tree = ast.parse(source_code)
-            transformer = cls(seed=seed)
+            protected = set(_BUILTIN_PROTECTED)
+            targets = _collect_safe_targets(tree, protected)
+            transformer = cls(protected_names=protected, seed=seed, target_names=targets)
             transformed = transformer.visit(tree)
             ast.fix_missing_locations(transformed)
             return ast.unparse(transformed)

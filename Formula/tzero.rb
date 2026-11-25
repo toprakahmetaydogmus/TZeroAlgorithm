@@ -4,6 +4,7 @@ class Tzero < Formula
   desc "Deterministic AST Context Compressor, 95% Token Reducer & 20-Tool MCP Server"
   homepage "https://github.com/toprakahmetaydogmus/TZeroAlgorithm"
   url "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/archive/refs/tags/v12.2.1.tar.gz"
+  sha256 "518b3f09391cea7084bfc7093218effa2f1dcc78ff5b672603d2ca0b322131fa"
   version "12.2.1"
   license "AGPL-3.0-only"
 

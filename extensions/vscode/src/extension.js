@@ -565,7 +565,7 @@ function activate(context) {
             const starTimer = setTimeout(async () => {
                 try {
                     const choice = await vscode.window.showInformationMessage(
-                        '⭐ T-Zero v12.2.0 is active! 26-Tier Anti-REA Armor + AST Context Architect. Help us reach our 100 stars milestone!',
+                        '⭐ T-Zero v12.2.1 is active! 26-Tier Anti-REA Armor + AST Context Architect. Help us reach our 100 stars milestone!',
                         '⭐ Star on GitHub (1-Click)',
                         'Later'
                     );

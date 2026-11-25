@@ -13,9 +13,8 @@ Part of Siber Akademi T-Zero Security Suite.
 License: MIT
 """
 
+import ast
 import time
-import os
-import sys
 from typing import Dict, Any, Callable
 
 
@@ -56,9 +55,23 @@ def _rdtsc_checkpoint(_t_prev, _threshold_ns={max_allowed_ns}):
     def wrap_source_with_rdtsc_guard(cls, source_code: str) -> str:
         """Wraps functions in source code with RDTSC single-stepping checkpoints."""
         guard_header = cls.generate_stepping_check_code()
-        trap_insertion = (
-            "\n    _t_gate = time.perf_counter_ns()\n"
-            "    # Critical execution path\n"
-            "    _t_gate = _rdtsc_checkpoint(_t_gate)\n"
-        )
-        return f"import time\n{guard_header}\n{source_code}"
+        transformed = source_code
+        try:
+            tree = ast.parse(source_code)
+            checkpoint_stmts = ast.parse(
+                "_t_gate = time.perf_counter_ns()\n"
+                "_t_gate = _rdtsc_checkpoint(_t_gate)\n"
+            ).body
+            for node in ast.walk(tree):
+                if isinstance(node, ast.FunctionDef) and node.body:
+                    insert_at = 1 if (
+                        isinstance(node.body[0], ast.Expr)
+                        and isinstance(getattr(node.body[0], "value", None), ast.Constant)
+                        and isinstance(node.body[0].value.value, str)
+                    ) else 0
+                    node.body[insert_at:insert_at] = [ast.fix_missing_locations(s) for s in checkpoint_stmts]
+            ast.fix_missing_locations(tree)
+            transformed = ast.unparse(tree)
+        except Exception:
+            pass
+        return f"import time\n{guard_header}\n{transformed}"

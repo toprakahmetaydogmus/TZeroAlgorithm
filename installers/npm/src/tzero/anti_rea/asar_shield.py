@@ -22,7 +22,6 @@ License: MIT
 
 import os
 import struct
-import json
 from typing import Dict, Any, Optional, Tuple
 
 
@@ -66,6 +65,9 @@ class AsarShield:
 
         return shielded_data, {
             "shielded": True,
+            "original_u32_4": orig_u32_4,
+            "original_total_size": orig_total_size,
+            "original_header_size": orig_header_size,
             "original_json_len": orig_json_len,
             "poisoned_json_len": poisoned_json_len,
             "status": "ASAR_EXTRACTOR_POISONED"

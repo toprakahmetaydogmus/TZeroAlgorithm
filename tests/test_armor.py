@@ -261,6 +261,50 @@ class TestAntiREAArmor(unittest.TestCase):
         self.assertIn("cargo test", meta.default_test_command)
         self.assertIn("cargo clippy", meta.default_lint_command)
 
+    def test_12_canary_beacon_dns_and_rdtsc_ast_injection(self):
+        """Verify CanaryBeacon retains DNS domain without webhook and RDTSCTimingGuard injects checkpoints."""
+        from tzero.anti_rea.canary_beacon import CanaryBeacon
+        from tzero.anti_rea.rdtsc_guard import RDTSCTimingGuard
+
+        beacon_src = CanaryBeacon.get_injected_beacon_code(canary_domain="canary.example.invalid")
+        self.assertIn("canary.example.invalid", beacon_src)
+        self.assertIn("socket.getaddrinfo", beacon_src)
+
+        wrapped = RDTSCTimingGuard.wrap_source_with_rdtsc_guard("def secret_fn(x):\n    return x + 1\n")
+        self.assertIn("_rdtsc_checkpoint(_t_gate)", wrapped)
+        compile(wrapped, "<rdtsc_test>", "exec")
+
+    def test_13_confusables_preserves_classmethod_and_armor_audit_flag(self):
+        """Verify HomoglyphDesynchronizer preserves @classmethod/builtins and `armor <file> --audit` is non-mutating."""
+        from tzero.anti_rea.confusables import HomoglyphDesynchronizer
+
+        src = (
+            "class Box:\n"
+            "    @classmethod\n"
+            "    def make(cls, val):\n"
+            "        _tmp_val = val + 1\n"
+            "        return _tmp_val\n"
+        )
+        out = HomoglyphDesynchronizer.desynchronize_source(src)
+        self.assertIn("@classmethod", out)
+        ns = {}
+        exec(out, ns)
+        self.assertEqual(ns["Box"].make(4), 5)
+
+        with tempfile.NamedTemporaryFile("w", suffix=".py", delete=False, encoding="utf-8") as f:
+            f.write(src)
+            temp_path = f.name
+        try:
+            proc = subprocess.run(
+                [sys.executable, "-m", "tzero.tzero_v3", "armor", temp_path, "--audit"],
+                capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=10,
+            )
+            self.assertEqual(proc.returncode, 0, proc.stderr)
+            self.assertEqual(Path(temp_path).read_text(encoding="utf-8"), src)
+        finally:
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
+
 
 if __name__ == "__main__":
     unittest.main()

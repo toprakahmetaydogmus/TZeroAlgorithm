@@ -8,15 +8,13 @@
 3. Anti-Reinvention: Always reuse existing helper functions before writing new utilities.
 4. AST Compression: When ingesting code, prioritize interface signatures and contracts over raw method bodies.
 
-# Key Workspace Classes (936 total)
+# Key Workspace Classes (1008 total)
 - ClientTarget (addmcp.py)
 - AddMCPApp (addmcp.py)
 - ASTContextArchitect (app.py)
 - AuditFinding (app.py)
 - SecurityQualityAuditor (app.py)
 - ROIEstimator (app.py)
-- PostDevelopCommand (setup.py)
-- PostInstallCommand (setup.py)
 - ZeroCostSemanticCache (tzero_gateway.py)
 - ZeroLeakShield (tzero_gateway.py)
 - CustomHandler (benchmark-site/serve.py)
@@ -29,8 +27,10 @@
 - SecurityQualityAuditor (installers/npm/src/app.py)
 - ROIEstimator (installers/npm/src/app.py)
 - TierMetric (installers/npm/src/tzero/tzero_benchmark.py)
+- ModelBenchmarkItem (installers/npm/src/tzero/tzero_benchmark.py)
+- BenchmarkReport (installers/npm/src/tzero/tzero_benchmark.py)
 
-# Key Exported Helpers (431 total)
+# Key Exported Helpers (462 total)
 - build_client_targets() (addmcp.py)
 - server_entry() (addmcp.py)
 - merge_server_config() (addmcp.py)

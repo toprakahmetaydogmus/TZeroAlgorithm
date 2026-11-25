@@ -35,9 +35,11 @@ class BillingManager:
         shutil.rmtree(self.test_dir, ignore_errors=True)
 
     def test_run_benchmark(self):
+        from tzero import __version__ as tz_ver
+
         rep = TZeroBenchmarkEngine.run_benchmark(self.test_dir)
         self.assertIsInstance(rep, BenchmarkReport)
-        self.assertEqual(rep.version, "11.15.2")
+        self.assertEqual(rep.version, tz_ver)
         self.assertGreater(rep.raw_tokens, 0)
         self.assertGreater(rep.tzero_tokens, 0)
         self.assertGreater(rep.reduction_pct, 50.0)
@@ -66,10 +68,12 @@ class BillingManager:
         self.assertIn("recommendation", tuning)
 
     def test_jarvis_orchestrator_benchmark_call(self):
+        from tzero import __version__ as tz_ver
+
         orch = JarvisOrchestrator(workspace_root=self.test_dir)
         res = orch.run_autonomous_benchmark(target_budget=32000)
         self.assertTrue(res.get("success"))
-        self.assertEqual(res.get("version"), "11.15.2")
+        self.assertEqual(res.get("version"), tz_ver)
         self.assertIn("tuning", res)
 
 

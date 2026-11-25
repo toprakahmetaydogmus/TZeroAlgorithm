@@ -196,13 +196,26 @@ def sync_release_metadata(target_version: str, check_only: bool = False) -> Dict
     lsp_p = ROOT_DIR / "tzero" / "tzero_lsp.py"
     results["tzero_lsp.py"] = _regex_replace(lsp_p, r'("serverInfo":\s*\{"name":\s*"tzero-lsp",\s*"version":\s*)"[0-9]+\.[0-9]+\.[0-9]+"', rf'\1"{target_version}"', check_only)
 
-    for doc_mod in ("tzero_budget.py", "tzero_debt.py"):
+    for doc_mod in ("tzero_budget.py", "tzero_debt.py", "tzero_armor.py"):
         p = ROOT_DIR / "tzero" / doc_mod
         results[doc_mod] = _regex_replace(p, r'Context Architect v[0-9]+\.[0-9]+\.[0-9]+ Master Edition', f"Context Architect v{target_version} Master Edition", check_only)
 
+    for ver_mod in ("tzero_benchmark.py", "tzero_explain.py", "tzero_growth.py"):
+        p = ROOT_DIR / "tzero" / ver_mod
+        if p.is_file():
+            results[ver_mod] = _regex_replace(p, r'Version:\s*[0-9]+\.[0-9]+\.[0-9]+', f"Version: {target_version}", check_only)
+
     vs_js = ROOT_DIR / "extensions" / "vscode" / "src" / "extension.js"
     if vs_js.is_file():
-        results["extensions/vscode/src/extension.js"] = _regex_replace(vs_js, r'Command Center \(v[0-9]+\.[0-9]+\.[0-9]+\)', f"Command Center (v{target_version})", check_only)
+        c_vs1 = _regex_replace(vs_js, r'Command Center \(v[0-9]+\.[0-9]+\.[0-9]+\)', f"Command Center (v{target_version})", check_only)
+        c_vs2 = _regex_replace(vs_js, r'(T-Zero v)[0-9]+\.[0-9]+\.[0-9]+( is active!)', rf'\g<1>{target_version}\2', check_only)
+        results["extensions/vscode/src/extension.js"] = c_vs1 or c_vs2
+
+    vs_readme = ROOT_DIR / "extensions" / "vscode" / "README.md"
+    if vs_readme.is_file():
+        c_vr1 = _regex_replace(vs_readme, r'Version-[0-9]+\.[0-9]+\.[0-9]+-', f"Version-{target_version}-", check_only)
+        c_vr2 = _regex_replace(vs_readme, r'alt="Version [0-9]+\.[0-9]+\.[0-9]+"', f'alt="Version {target_version}"', check_only)
+        results["extensions/vscode/README.md"] = c_vr1 or c_vr2
 
     vs_test = ROOT_DIR / "extensions" / "vscode" / "test" / "extension.test.js"
     if vs_test.is_file():

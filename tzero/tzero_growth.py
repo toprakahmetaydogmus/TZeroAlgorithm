@@ -3,7 +3,7 @@
 T-ZERO $0.00 BUDGET VIRAL MARKETING & COMMUNITY GROWTH ENGINE
 -------------------------------------------------------------
 Developer: Toprak Ahmet Aydoğmuş (Siber Akademi)
-License: MIT | Version: 11.11.0
+License: MIT | Version: 12.2.1
 
 Strictly $0.00 budget: Zero paid ads, zero paid APIs, zero cloud tokens.
 Pure organic developer-to-developer growth engine engineered to drive 100+ GitHub stars.
@@ -22,7 +22,11 @@ REPO_URL = "https://github.com/toprakahmetaydogmus/TZeroAlgorithm"
 WEB_URL = "https://tzero-indol.vercel.app"
 AUTHOR = "Toprak Ahmet Aydoğmuş"
 ORGANIZATION = "Siber Akademi"
-VERSION = "v11.15.5"
+try:
+    from tzero import __version__ as _TZ_VER
+except Exception:
+    _TZ_VER = "12.2.1"
+VERSION = f"v{_TZ_VER}"
 PYPI_PKG = "tzero-mcp"
 NPM_PKG = "tzero-mcp"
 

@@ -3495,7 +3495,6 @@ class MonthlyStackedBarCard(LuxuryCard):
 
     def _draw(self, event=None):
         w = max(20, self.c.winfo_width())
-        h = max(20, self.c.winfo_height())
         self.c.delete("all")
         months = ["EKI", "KAS", "ARA", "OCA"]
         ratios = [0.75, 0.55, 0.85, 0.65]
@@ -4017,7 +4016,6 @@ class NodeGraphCanvas(tk.Canvas):
         h = max(380, self.winfo_height())
 
         card_bg = PALETTE.get("card_bg", "#0f172a")
-        card_border = PALETTE.get("card_border", "#1e293b")
         text_main = PALETTE.get("text_main", "#f8fafc")
         text_muted = PALETTE.get("text_muted", "#64748b")
         accent_cyan = PALETTE.get("accent_cyan", "#38bdf8")
@@ -4641,7 +4639,6 @@ class AutoReadmeGUI:
         self.bg_canvas.pack(fill=tk.BOTH, expand=True)
 
         sidebar_bg = PALETTE.get("sidebar_bg", "#3843a0")
-        sidebar_fg = PALETTE.get("sidebar_fg", "#ffffff")
         sidebar_muted = PALETTE.get("sidebar_muted", "#a5b4fc")
         sidebar_hover = PALETTE.get("sidebar_hover", "#4a55ab")
         sidebar_active = PALETTE.get("sidebar_active", "#2b3478")
@@ -6138,7 +6135,6 @@ class AutoReadmeGUI:
         self.sync_git_commits()
 
     def load_saved_credentials(self):
-        pname = self.provider_var.get()
         self.on_provider_select()
         executable_dir = os.path.dirname(sys.executable) if getattr(sys, "frozen", False) else None
         if not self.dir_entry.get().strip():
@@ -6184,7 +6180,7 @@ class AutoReadmeGUI:
             CRYPTO_BTC = "bc1q9k4hvd6c2g8l9w3z7v8f2k3j5l8n9m1p4q7r0s"
             REPO_URL = "https://github.com/toprakahmetaydogmus/TZeroAlgorithm"
             BIO_URL = "https://hopp.bio/siberegitim"
-            CURRENT_VERSION = "12.0.0"
+            from tzero import __version__ as CURRENT_VERSION
 
         dialog = tk.Toplevel(self.root)
         dialog.title(f"T-Zero v{CURRENT_VERSION} — Destek & Sürüm Merkezi")
@@ -6277,7 +6273,7 @@ class AutoReadmeGUI:
             from tzero.tzero_traffic import REPO_URL, CURRENT_VERSION
         except Exception:
             REPO_URL = "https://github.com/toprakahmetaydogmus/TZeroAlgorithm"
-            CURRENT_VERSION = "12.1.4"
+            from tzero import __version__ as CURRENT_VERSION
 
         # On first launch, automatically open the GitHub repo in browser and ask to star!
         first_launch = not profile.get("first_launch_repo_opened_v12", False)
@@ -8273,7 +8269,7 @@ Custom Requirements:
                     else:
                         args = ", ".join(item["args"])
                         self.ast_tree.insert(file_node, "end", text=f"⚙ def {item['name']}({args})")
-            except Exception as e:
+            except Exception:
                 # Fallback to simple label
                 file_node = self.ast_tree.insert("", "end", text=f"📄 {os.path.basename(filepath)} (AST Fail)")
 
@@ -8377,7 +8373,7 @@ def launch_gui():
     except Exception:
         pass
 
-    app = AutoReadmeGUI(root)
+    AutoReadmeGUI(root)
     root.mainloop()
 
 
@@ -8549,8 +8545,12 @@ def run_pr_report_cli(target_dir: str, base_ref: str = "HEAD~1"):
     analyzer = ChangeImpactAnalyzer(target_dir)
     impact_items = []
     for f in modified_files:
+        if len(impact_items) >= 10:
+            break
         symbols = analyzer.extract_symbols_from_file(f)
         for s in symbols[:3]:
+            if len(impact_items) >= 10:
+                break
             imp = analyzer.analyze_symbol(s)
             impact_items.append((s, imp["score"], imp["dependents_count"], imp["risk_level"]))
 
@@ -8650,7 +8650,6 @@ def run_review_cli(target_dir: str = ".", ref: str = "auto") -> bool:
                     added_code_lines.append(content)
 
     full_added_text = "\n".join(added_lines)
-    full_added_code = "\n".join(added_code_lines)
 
     sec_findings = ZeroLeakEngine.scan_text(full_added_text)
 
@@ -9298,8 +9297,19 @@ def main():
 
     # Fast path for Anti-REA armor / protection
     if len(sys.argv) > 1 and sys.argv[1].lower() in ("armor", "anti-rea", "--armor", "--anti-rea"):
+        extra_args = sys.argv[2:]
+        if any(flag in ("-h", "--help") for flag in extra_args):
+            print("Usage: tzero armor [TARGET_PATH] [--audit]")
+            print("  Protect source files against AI reverse engineering (26-Tier TDQS-REA Armor).")
+            print("  --audit, -a   Audit AI decompilation resistance without modifying files.")
+            sys.exit(0)
+        target_path = next((a for a in extra_args if not a.startswith("-")), ".")
+        if any(flag in ("--audit", "-a") for flag in extra_args):
+            from tzero.tzero_armor import audit_path_rea_resistance
+            audit = audit_path_rea_resistance(target_path)
+            print(json.dumps(audit, indent=2))
+            sys.exit(0 if "error" not in audit else 1)
         from tzero.tzero_armor import protect_path_with_armor
-        target_path = sys.argv[2] if len(sys.argv) > 2 and not sys.argv[2].startswith("-") else "."
         res = protect_path_with_armor(target_path)
         if res.get("success"):
             print(f"[OK] Applied Anti-REA Armor to: {target_path}")
@@ -9351,6 +9361,18 @@ def main():
 
     # Fast path for Anti-REA radar / gui
     if len(sys.argv) > 1 and sys.argv[1].lower() in ("radar", "--radar", "anti-rea-gui"):
+        radar_args = sys.argv[2:]
+        if any(a in ("-h", "--help") for a in radar_args):
+            print("Usage: tzero radar [PATH | --audit PATH | --armor PATH]\n"
+                  "Launch Anti-REA Radar GUI or run headless Anti-REA audit/armor on a target path.")
+            sys.exit(0)
+        if radar_args:
+            from tzero.tzero_armor import audit_path_rea_resistance, protect_path_with_armor
+            mode_armor = "--armor" in radar_args
+            target = next((a for a in radar_args if not a.startswith("-")), ".")
+            res = protect_path_with_armor(target) if mode_armor else audit_path_rea_resistance(target)
+            print(json.dumps(res, indent=2))
+            sys.exit(0 if res.get("success", True) else 1)
         try:
             from tzero.anti_rea.gui import main as gui_main
             gui_main()
@@ -9378,6 +9400,7 @@ def main():
     parser.add_argument("--cli", "-c", action="store_true", help="Run interactive guided terminal wizard")
     parser.add_argument("--install-ide", "--install-mcp", nargs="?", const="all", default=None, metavar="CLIENT", dest="install_ide", help="1-Click MCP installer for Cursor, Claude, Windsurf, Antigravity, VS Code, etc. (e.g. --install-ide cursor, --install-ide all)")
     parser.add_argument("--scan", "-s", nargs="?", const=".", default=None, metavar="DIR", help="Scan codebase directory and print summary metrics")
+    parser.add_argument("--tree", "--context", nargs="?", const=".", default=None, metavar="DIR", dest="tree", help="Generate complete AST skeleton context tree offline")
     parser.add_argument("--watch", "-w", nargs="?", const=".", default=None, metavar="DIR", help="Continuous background AST context watcher (auto-reindexes on file save for Cursor/Claude)")
     parser.add_argument("--audit", "-a", nargs="?", const=".", default=None, metavar="DIR", help="Run AST static code analysis & audit for code smells")
     parser.add_argument("--dry-run", "-d", action="store_true", help="Generate complete context tree offline without API call (100%% free)")
@@ -9386,7 +9409,7 @@ def main():
     parser.add_argument("--export-repomap", nargs="?", const="REPO_MAP.txt", default=None, metavar="FILE", help="Generate compact token repository map (REPO_MAP.txt)")
     parser.add_argument("--export-html", nargs="?", const="README.html", default=None, metavar="FILE", help="Generate styled dark-mode HTML architecture preview")
     parser.add_argument("--dir", default=".", help="Target project workspace directory (default: current dir)")
-    parser.add_argument("--output", "-o", default="README.md", help="Output filepath for generated markdown (default: README.md)")
+    parser.add_argument("--output", "--out", "-o", default="README.md", dest="output", help="Output filepath for generated markdown (default: README.md)")
     parser.add_argument("--force", action="store_true", help="Allow the guided context wizard to overwrite an existing output file")
     parser.add_argument("--provider", "-p", choices=list(PROVIDERS.keys()), help="AI Provider to use (default: active profile)")
     parser.add_argument("--impact", metavar="SYMBOL", help="Analyze blast radius and change impact for a symbol")
@@ -9433,7 +9456,7 @@ def main():
     parser.add_argument("--fuzzy", action="store_true", default=True, help="Enable fuzzy AST and whitespace matching for patch application (default: True)")
     parser.add_argument("--armor", "--anti-rea", nargs="?", const=".", default=None, metavar="PATH", dest="armor", help="Apply military-grade Anti-REA armor against AI reverse engineering (morluto/rea)")
     parser.add_argument("--audit-rea", nargs="?", const=".", default=None, metavar="PATH", dest="audit_rea", help="Audit code or binary for resistance against AI reverse engineering (0-100)")
-    parser.add_argument("--telemetry", action="store_true", help="Show offline SQLite token savings & ROI telemetry report")
+    parser.add_argument("--telemetry", nargs="?", const=".", default=None, metavar="DIR", help="Show offline SQLite token savings & ROI telemetry report")
     parser.add_argument("--no-fuzzy", dest="fuzzy", action="store_false", help="Disable fuzzy matching and enforce exact line matches only")
     parser.add_argument("--dry-run-patch", action="store_true", help="Validate patch applicability without modifying files on disk")
     parser.add_argument("--reverse-patch", action="store_true", help="Un-apply / revert patch changes")
@@ -9837,6 +9860,11 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
         run_system_disk_doctor(clean=True, workspace_dir=args.dir)
         return
     elif getattr(args, "armor", None):
+        if getattr(args, "audit", None) is not None:
+            from tzero.tzero_armor import audit_path_rea_resistance
+            audit = audit_path_rea_resistance(args.armor)
+            print(json.dumps(audit, indent=2))
+            return
         from tzero.tzero_armor import protect_path_with_armor
         res = protect_path_with_armor(args.armor)
         if res.get("success"):
@@ -9854,9 +9882,9 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
         audit = audit_path_rea_resistance(args.audit_rea)
         print(json.dumps(audit, indent=2))
         return
-    elif getattr(args, "telemetry", False):
+    elif getattr(args, "telemetry", None) is not None:
         from tzero.tzero_telemetry import get_summary, render_report
-        ws_dir = getattr(args, "dir", ".") or "."
+        ws_dir = args.telemetry if args.telemetry != "." else (getattr(args, "dir", ".") or ".")
         if getattr(args, "format", "text") == "json":
             print(json.dumps(get_summary(workspace_dir=ws_dir), indent=2))
         else:
@@ -10746,6 +10774,8 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
         run_export_cli(args.dir, "repomap", args.export_repomap)
     elif args.export_html is not None:
         run_export_cli(args.dir, "html", args.export_html)
+    elif getattr(args, "tree", None) is not None:
+        run_dry_run_cli(args.tree or args.dir, args.output, args.force)
     elif args.dry_run:
         run_dry_run_cli(args.dir, args.output, args.force)
     elif args.cli:

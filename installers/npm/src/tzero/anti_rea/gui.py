@@ -11,7 +11,6 @@ License: MIT
 """
 
 import os
-import sys
 import threading
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
@@ -19,8 +18,6 @@ from typing import Optional
 
 from .engine import AntiREAEngine
 from .auditor import AIResistanceAuditor
-from .extractor_shield import ExtractorShield
-from .anti_debugger import AntiDebugger
 
 
 class AntiREAGUI(tk.Tk):
@@ -225,7 +222,7 @@ class AntiREAGUI(tk.Tk):
     def _on_simulate_attack(self):
         target = self.file_entry.get().strip()
         self._log("==================================================================")
-        self._log("LAUNCHING SIMULATED REA & ADVERSARIAL ATTACK WAVE...")
+        self._log(f"LAUNCHING SIMULATED REA & ADVERSARIAL ATTACK WAVE ({os.path.basename(target) if target else 'default'})...")
         self._log("==================================================================")
 
         def _attack_worker():

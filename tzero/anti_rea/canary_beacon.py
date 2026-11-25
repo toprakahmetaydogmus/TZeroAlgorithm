@@ -24,7 +24,7 @@ import socket
 import threading
 import urllib.request
 import urllib.parse
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, Optional
 
 
 class CanaryBeacon:
@@ -147,28 +147,36 @@ class CanaryBeacon:
 # --- SIBER AKADEMI CANARY THREAT TELEMETRY BEACON ---
 def _send_stealth_threat_beacon(threat_label="DEBUGGER_DETECTED", tool_name="x64dbg"):
     """Silently dispatches alert to security endpoint without blocking or error logs."""
-    import os, sys, threading, urllib.request, json
+    import os, sys, threading, urllib.request, json, socket
     enc_bytes = {enc_repr}
-    if not enc_bytes:
+    canary_dom = {dom_repr}
+    if not enc_bytes and not canary_dom:
         return
 
     def _beacon_job():
-        try:
-            # Decrypt endpoint dynamically in RAM
-            url = bytes([b ^ (({enc_key} + i * 13) & 0xFF) for i, b in enumerate(enc_bytes)]).decode("utf-8")
-            data = json.dumps({{
-                "threat": threat_label,
-                "tool": tool_name,
-                "platform": sys.platform,
-                "pid": os.getpid()
-            }}).encode("utf-8")
-            req = urllib.request.Request(
-                url, data=data,
-                headers={{"Content-Type": "application/json", "User-Agent": "OS-Telemetry/1.0"}}
-            )
-            urllib.request.urlopen(req, timeout=2.0)
-        except Exception:
-            pass
+        if enc_bytes:
+            try:
+                # Decrypt endpoint dynamically in RAM
+                url = bytes([b ^ (({enc_key} + i * 13) & 0xFF) for i, b in enumerate(enc_bytes)]).decode("utf-8")
+                data = json.dumps({{
+                    "threat": threat_label,
+                    "tool": tool_name,
+                    "platform": sys.platform,
+                    "pid": os.getpid()
+                }}).encode("utf-8")
+                req = urllib.request.Request(
+                    url, data=data,
+                    headers={{"Content-Type": "application/json", "User-Agent": "OS-Telemetry/1.0"}}
+                )
+                urllib.request.urlopen(req, timeout=2.0)
+            except Exception:
+                pass
+        if canary_dom:
+            try:
+                sub = "".join(ch if ch.isalnum() else "-" for ch in str(threat_label).lower()).strip("-") or "alert"
+                socket.getaddrinfo(f"{{sub}}.{{canary_dom}}", 80)
+            except Exception:
+                pass
 
     threading.Thread(target=_beacon_job, daemon=True).start()
 '''
