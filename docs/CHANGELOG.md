@@ -9,6 +9,8 @@
 - Synchronized the npm-bundled Python runtime with the canonical package.
 
 ### Changed
+- Successful trusted main CI now creates the missing version release and starts all existing publication workflows against its immutable tag.
+- Registry publication errors now fail their workflow instead of being silently reported as success.
 - Updated the English and Turkish README community goal to 500 GitHub stars.
 - Synchronized Python, npm, VS Code/Open VSX, MCP, and release metadata to 12.2.1.
 
