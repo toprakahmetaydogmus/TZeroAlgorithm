@@ -239,8 +239,15 @@ class FederationSyncEngine:
             import tempfile
             ws_root = os.path.realpath(".")
             tmp_root = os.path.realpath(tempfile.gettempdir())
-            safe_scip = os.path.normpath(os.path.realpath(os.path.abspath(scip_path)))
-            if (safe_scip.startswith(ws_root + os.sep) or safe_scip.startswith(tmp_root + os.sep)) and os.path.isfile(safe_scip):
+            cand_scip = os.path.realpath(os.path.abspath(scip_path))
+            base_root = tmp_root if (cand_scip == tmp_root or cand_scip.startswith(tmp_root + os.sep)) else ws_root
+            rel_scip = os.path.relpath(cand_scip, base_root)
+            safe_scip = os.path.normpath(os.path.join(base_root, rel_scip))
+            if rel_scip == ".." or rel_scip.startswith(".." + os.sep) or os.path.isabs(rel_scip):
+                safe_scip = ""
+            elif not safe_scip.startswith(base_root):
+                safe_scip = ""
+            if safe_scip and os.path.isfile(safe_scip):
                 try:
                     from tzero.tzero_scip import ScipIndexImporter
                     scip_trace = ScipIndexImporter.load(safe_scip).trace_symbol(sym)

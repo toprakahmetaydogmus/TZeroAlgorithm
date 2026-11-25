@@ -344,12 +344,18 @@ class ScipIndexImporter:
         ws_root = os.path.realpath(".")
         tmp_root = os.path.realpath(tempfile.gettempdir())
         home_root = os.path.realpath(os.path.expanduser("~"))
-        real_path = os.path.normpath(os.path.realpath(os.path.abspath(path)))
-        if (
-            not real_path.startswith(ws_root + os.sep)
-            and not real_path.startswith(tmp_root + os.sep)
-            and not real_path.startswith(home_root + os.sep)
-        ):
+        cand_path = os.path.realpath(os.path.abspath(path))
+        if cand_path == tmp_root or cand_path.startswith(tmp_root + os.sep):
+            base_root = tmp_root
+        elif cand_path == home_root or cand_path.startswith(home_root + os.sep):
+            base_root = home_root
+        else:
+            base_root = ws_root
+        rel_path = os.path.relpath(cand_path, base_root)
+        if rel_path == ".." or rel_path.startswith(".." + os.sep) or os.path.isabs(rel_path):
+            raise ValueError(f"SCIP/LSIF path outside allowed scope: {path}")
+        real_path = os.path.normpath(os.path.join(base_root, rel_path))
+        if not real_path.startswith(base_root):
             raise ValueError(f"SCIP/LSIF path outside allowed scope: {path}")
         if not os.path.isfile(real_path):
             raise FileNotFoundError(f"SCIP/LSIF index file not found: {path}")

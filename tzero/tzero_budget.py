@@ -68,8 +68,13 @@ class ASTTokenBudgetOptimizer:
         import tempfile
         ws_root = os.path.realpath(".")
         tmp_root = os.path.realpath(tempfile.gettempdir())
-        abs_root = os.path.normpath(os.path.realpath(os.path.abspath(workspace_root)))
-        if abs_root != ws_root and not abs_root.startswith(ws_root + os.sep) and not abs_root.startswith(tmp_root + os.sep):
+        candidate = os.path.realpath(os.path.abspath(workspace_root))
+        base_root = tmp_root if (candidate == tmp_root or candidate.startswith(tmp_root + os.sep)) else ws_root
+        rel_ws = os.path.relpath(candidate, base_root)
+        if rel_ws == ".." or rel_ws.startswith(".." + os.sep) or os.path.isabs(rel_ws):
+            raise ValueError(f"Workspace path outside allowed scope: {workspace_root}")
+        abs_root = os.path.normpath(os.path.join(base_root, rel_ws))
+        if not abs_root.startswith(base_root):
             raise ValueError(f"Workspace path outside allowed scope: {workspace_root}")
         total_chars = 0
         file_count = 0
@@ -92,8 +97,12 @@ class ASTTokenBudgetOptimizer:
             dirs[:] = [d for d in dirs if d not in ignore_dirs and not d.startswith(".")]
             for f in files:
                 if f.endswith((".py", ".ts", ".js", ".rs", ".go", ".cpp", ".c", ".h", ".swift", ".kt", ".dart")):
-                    full_p = os.path.realpath(os.path.join(root, f))
-                    if not (full_p == abs_root or full_p.startswith(abs_root + os.sep)):
+                    resolved_f = os.path.realpath(os.path.join(root, f))
+                    rel_f = os.path.relpath(resolved_f, abs_root)
+                    if rel_f == ".." or rel_f.startswith(".." + os.sep) or os.path.isabs(rel_f):
+                        continue
+                    full_p = os.path.normpath(os.path.join(abs_root, rel_f))
+                    if not full_p.startswith(abs_root):
                         continue
                     try:
                         with open(full_p, "rb") as fp:

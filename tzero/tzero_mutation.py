@@ -212,14 +212,39 @@ class ASTMutationEngine:
 
         return mutants
 
+    _ALLOWED_TEST_ARGS = {
+        tok: tok
+        for tok in ("-m", "unittest", "discover", "pytest", "-v", "-q", "--verbose", "-s", "-p", "-x", "--tb=short", "test_*.py")
+    }
+
+    @classmethod
+    def _resolve_existing_test_entry(cls, token: str, roots: List[str]) -> Optional[str]:
+        """Resolves a relative test path against actual filesystem entries under allowed roots."""
+        cand = os.path.realpath(os.path.abspath(token))
+        for root in roots:
+            rel = os.path.relpath(cand, root)
+            if rel == ".." or rel.startswith(".." + os.sep) or os.path.isabs(rel):
+                continue
+            for walk_root, _, files in os.walk(root):
+                for fname in files:
+                    real_entry = os.path.realpath(os.path.join(walk_root, fname))
+                    if real_entry == cand:
+                        return os.path.relpath(real_entry, roots[0])
+        return None
+
     @staticmethod
     def _sanitize_target_path(target_path: str) -> str:
         if not target_path or "\x00" in target_path:
             raise ValueError("Invalid target path.")
         ws_root = os.path.realpath(".")
         tmp_root = os.path.realpath(tempfile.gettempdir())
-        real_target = os.path.normpath(os.path.realpath(os.path.abspath(target_path)))
-        if not real_target.startswith(ws_root + os.sep) and not real_target.startswith(tmp_root + os.sep):
+        resolved = os.path.realpath(os.path.abspath(target_path))
+        base_root = tmp_root if (resolved == tmp_root or resolved.startswith(tmp_root + os.sep)) else ws_root
+        rel = os.path.relpath(resolved, base_root)
+        if rel == ".." or rel.startswith(".." + os.sep) or os.path.isabs(rel):
+            raise ValueError(f"Path outside allowed workspace or temp scope: {target_path}")
+        real_target = os.path.normpath(os.path.join(base_root, rel))
+        if not real_target.startswith(base_root):
             raise ValueError(f"Path outside allowed workspace or temp scope: {target_path}")
         return real_target
 
@@ -233,7 +258,16 @@ class ASTMutationEngine:
     ) -> MutationReport:
         """Executes full mutation testing on target_file against test_command."""
         start_time = time.time()
-        abs_target = cls._sanitize_target_path(target_file)
+        ws_root = os.path.realpath(".")
+        tmp_root = os.path.realpath(tempfile.gettempdir())
+        resolved_t = os.path.realpath(os.path.abspath(cls._sanitize_target_path(target_file)))
+        base_root = tmp_root if (resolved_t == tmp_root or resolved_t.startswith(tmp_root + os.sep)) else ws_root
+        rel_t = os.path.relpath(resolved_t, base_root)
+        if rel_t == ".." or rel_t.startswith(".." + os.sep) or os.path.isabs(rel_t):
+            raise ValueError(f"Target path outside allowed root: {target_file}")
+        abs_target = os.path.normpath(os.path.join(base_root, rel_t))
+        if not abs_target.startswith(base_root):
+            raise ValueError(f"Target path outside allowed root: {target_file}")
         if not os.path.isfile(abs_target):
             raise FileNotFoundError(f"Target file not found: {target_file}")
 
@@ -254,15 +288,18 @@ class ASTMutationEngine:
                 mutants=[]
             )
 
-        # Build argv safely without shell=True
+        target_dir = os.path.dirname(abs_target)
+        expected_test_name = f"test_{os.path.splitext(os.path.basename(abs_target))[0]}.py"
+
+        # Build argv strictly from fixed flags and verified on-disk entries without shell=True
         if not test_command:
-            base_name = os.path.splitext(os.path.basename(abs_target))[0]
-            candidate_a = os.path.join(os.path.dirname(abs_target), "tests", f"test_{base_name}.py")
-            candidate_b = os.path.realpath(os.path.join(".", "tests", f"test_{base_name}.py"))
-            if os.path.isfile(candidate_a):
-                test_cmd_args = [sys.executable, "-m", "unittest", candidate_a]
-            elif os.path.isfile(candidate_b):
-                test_cmd_args = [sys.executable, "-m", "unittest", candidate_b]
+            matched_test = None
+            for tests_dir in (os.path.join(target_dir, "tests"), os.path.join(ws_root, "tests")):
+                if os.path.isdir(tests_dir) and expected_test_name in os.listdir(tests_dir):
+                    matched_test = os.path.join(tests_dir, expected_test_name)
+                    break
+            if matched_test:
+                test_cmd_args = [sys.executable, "-m", "unittest", matched_test]
             else:
                 test_cmd_args = [sys.executable, "-m", "unittest", "discover", "-s", "tests", "-p", "test_*.py"]
         else:
@@ -277,20 +314,36 @@ class ASTMutationEngine:
                 raise ValueError("Empty test_command.")
             bin_name = os.path.basename(parsed_args[0]).lower()
             if bin_name.startswith("python"):
-                test_cmd_args = [sys.executable] + parsed_args[1:]
+                runner_prefix = [sys.executable]
             elif bin_name in ("pytest", "pytest.exe"):
-                test_cmd_args = [sys.executable, "-m", "pytest"] + parsed_args[1:]
+                runner_prefix = [sys.executable, "-m", "pytest"]
             else:
                 raise ValueError(f"Unsupported test runner executable: {parsed_args[0]}")
+
+            safe_tail: List[str] = []
+            for tok in parsed_args[1:]:
+                if tok in cls._ALLOWED_TEST_ARGS:
+                    safe_tail.append(cls._ALLOWED_TEST_ARGS[tok])
+                else:
+                    matched_rel = cls._resolve_existing_test_entry(tok, [target_dir, ws_root])
+                    if not matched_rel:
+                        # Also support test filenames passed relative to target_dir
+                        alt_cand = os.path.join(target_dir, tok)
+                        matched_rel = cls._resolve_existing_test_entry(alt_cand, [target_dir, ws_root])
+                    if not matched_rel:
+                        raise ValueError(f"Unsupported or missing test argument: {tok}")
+                    safe_tail.append(matched_rel)
+            test_cmd_args = runner_prefix + safe_tail
 
         killed = 0
         survived = 0
         timeouts = 0
         errors = 0
 
-        target_dir = os.path.dirname(abs_target)
         safe_bak_name = os.path.basename(abs_target) + ".tzero_mut_bak"
-        backup_path = os.path.join(target_dir, safe_bak_name)
+        backup_path = os.path.normpath(os.path.join(target_dir, safe_bak_name))
+        if not backup_path.startswith(target_dir):
+            raise ValueError("Backup path escaped target directory.")
         with open(backup_path, "w", encoding="utf-8") as f:
             f.write(original_code)
 
@@ -301,6 +354,8 @@ class ASTMutationEngine:
         try:
             for m in mutants:
                 # Write mutant to disk
+                if not abs_target.startswith(base_root):
+                    raise ValueError("Target path escaped allowed root.")
                 with open(abs_target, "w", encoding="utf-8") as f:
                     f.write(m.mutated_code)
 

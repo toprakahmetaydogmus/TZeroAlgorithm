@@ -1572,10 +1572,13 @@ class DashboardRequestHandler(http.server.BaseHTTPRequestHandler):
             raise ValueError("Invalid null byte in path.")
         ws_root = os.path.realpath(".")
         tmp_root = os.path.realpath(tempfile.gettempdir())
-        real_target = os.path.normpath(os.path.realpath(os.path.abspath(candidate)))
-        in_ws = (real_target == ws_root) or real_target.startswith(ws_root + os.sep)
-        in_tmp = (real_target == tmp_root) or real_target.startswith(tmp_root + os.sep)
-        if not in_ws and not in_tmp:
+        resolved = os.path.realpath(os.path.abspath(candidate))
+        base_root = tmp_root if (resolved == tmp_root or resolved.startswith(tmp_root + os.sep)) else ws_root
+        rel = os.path.relpath(resolved, base_root)
+        if rel == ".." or rel.startswith(".." + os.sep) or os.path.isabs(rel):
+            raise ValueError(f"Access denied: path outside allowed workspace or temp scope ({candidate})")
+        real_target = os.path.normpath(os.path.join(base_root, rel))
+        if not real_target.startswith(base_root):
             raise ValueError(f"Access denied: path outside allowed workspace or temp scope ({candidate})")
         return real_target
     """Handles static UI and JSON-RPC API endpoints for T-Zero Dashboard."""
@@ -1832,8 +1835,16 @@ class DashboardRequestHandler(http.server.BaseHTTPRequestHandler):
             content_length = int(self.headers.get("Content-Length", 0))
             body = self.rfile.read(content_length).decode("utf-8")
             try:
+                import tempfile
                 payload = json.loads(body) if body.strip() else {}
-                target_p = self._resolve_safe_api_path(payload.get("path", "."))
+                raw_debt = self._resolve_safe_api_path(payload.get("path", "."))
+                ws_root = os.path.realpath(".")
+                tmp_root = os.path.realpath(tempfile.gettempdir())
+                base_root = tmp_root if (raw_debt == tmp_root or raw_debt.startswith(tmp_root + os.sep)) else ws_root
+                rel_debt = os.path.relpath(raw_debt, base_root)
+                target_p = os.path.normpath(os.path.join(base_root, rel_debt))
+                if not target_p.startswith(base_root):
+                    raise ValueError("Access denied: debt path outside allowed root")
                 from tzero.tzero_debt import CodeHealthAnalyzer
                 if os.path.isfile(target_p):
                     rep = CodeHealthAnalyzer.analyze_file(target_p)
@@ -1931,12 +1942,20 @@ class DashboardRequestHandler(http.server.BaseHTTPRequestHandler):
             self._send_json(resp)
         elif parsed.path == "/api/scip/summary":
             try:
+                import tempfile
                 payload = self._read_json_body()
                 raw_scip = str(payload.get("path") or "").strip()
                 if not raw_scip:
                     resp = {"success": False, "error": "SCIP/LSIF index file not found: (empty)"}
                 else:
-                    scip_path = self._resolve_safe_api_path(raw_scip)
+                    resolved_scip = self._resolve_safe_api_path(raw_scip)
+                    ws_root = os.path.realpath(".")
+                    tmp_root = os.path.realpath(tempfile.gettempdir())
+                    base_root = tmp_root if (resolved_scip == tmp_root or resolved_scip.startswith(tmp_root + os.sep)) else ws_root
+                    rel_scip = os.path.relpath(resolved_scip, base_root)
+                    scip_path = os.path.normpath(os.path.join(base_root, rel_scip))
+                    if not scip_path.startswith(base_root):
+                        raise ValueError("Access denied: SCIP path outside allowed root")
                     if not os.path.isfile(scip_path):
                         resp = {"success": False, "error": f"SCIP/LSIF index file not found: {raw_scip}"}
                     else:

@@ -214,8 +214,13 @@ class CodeHealthAnalyzer:
             import tempfile
             ws_root = os.path.realpath(".")
             tmp_root = os.path.realpath(tempfile.gettempdir())
-            real_fp = os.path.normpath(os.path.realpath(os.path.abspath(file_path)))
-            if not real_fp.startswith(ws_root + os.sep) and not real_fp.startswith(tmp_root + os.sep):
+            cand_fp = os.path.realpath(os.path.abspath(file_path))
+            base_root = tmp_root if (cand_fp == tmp_root or cand_fp.startswith(tmp_root + os.sep)) else ws_root
+            rel_fp = os.path.relpath(cand_fp, base_root)
+            if rel_fp == ".." or rel_fp.startswith(".." + os.sep) or os.path.isabs(rel_fp):
+                raise ValueError(f"Path outside allowed workspace/temp root: {file_path}")
+            real_fp = os.path.normpath(os.path.join(base_root, rel_fp))
+            if not real_fp.startswith(base_root):
                 raise ValueError(f"Path outside allowed workspace/temp root: {file_path}")
             try:
                 with open(real_fp, "r", encoding="utf-8", errors="replace") as f:
@@ -341,7 +346,17 @@ class CodeHealthAnalyzer:
 
     @classmethod
     def analyze_workspace(cls, workspace_root: str = ".", max_files: int = 250) -> WorkspaceHealthReport:
-        abs_root = os.path.realpath(os.path.abspath(workspace_root))
+        import tempfile
+        ws_root = os.path.realpath(".")
+        tmp_root = os.path.realpath(tempfile.gettempdir())
+        cand_root = os.path.realpath(os.path.abspath(workspace_root))
+        base_root = tmp_root if (cand_root == tmp_root or cand_root.startswith(tmp_root + os.sep)) else ws_root
+        rel_root = os.path.relpath(cand_root, base_root)
+        if rel_root == ".." or rel_root.startswith(".." + os.sep) or os.path.isabs(rel_root):
+            raise ValueError(f"Workspace path outside allowed scope: {workspace_root}")
+        abs_root = os.path.normpath(os.path.join(base_root, rel_root))
+        if not abs_root.startswith(base_root):
+            raise ValueError(f"Workspace path outside allowed scope: {workspace_root}")
         reports: List[FileHealthReport] = []
 
         ignore_dirs = {".git", ".venv", "venv", "__pycache__", "node_modules", "dist", "build", ".pytest_cache"}

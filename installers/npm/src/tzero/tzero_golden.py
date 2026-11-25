@@ -160,7 +160,17 @@ class ASTGoldenRegressionEngine:
     @classmethod
     def generate_baseline(cls, workspace_root: str = ".", max_files: int = 300) -> GoldenBaseline:
         """Scans workspace and generates the golden contract baseline."""
-        abs_root = os.path.realpath(os.path.abspath(workspace_root))
+        import tempfile
+        ws_root = os.path.realpath(".")
+        tmp_root = os.path.realpath(tempfile.gettempdir())
+        candidate_root = os.path.realpath(os.path.abspath(workspace_root))
+        base_root = tmp_root if (candidate_root == tmp_root or candidate_root.startswith(tmp_root + os.sep)) else ws_root
+        rel_root = os.path.relpath(candidate_root, base_root)
+        if rel_root == ".." or rel_root.startswith(".." + os.sep) or os.path.isabs(rel_root):
+            raise ValueError(f"Workspace root outside allowed scope: {workspace_root}")
+        abs_root = os.path.normpath(os.path.join(base_root, rel_root))
+        if not abs_root.startswith(base_root):
+            raise ValueError(f"Workspace root outside allowed scope: {workspace_root}")
         all_sigs: Dict[str, Dict[str, Any]] = {}
         hasher = hashlib.sha256()
 
@@ -171,10 +181,14 @@ class ASTGoldenRegressionEngine:
             dirs[:] = [d for d in dirs if d not in ignore_dirs and not d.startswith(".")]
             for f in files:
                 if f.endswith(".py"):
-                    full_p = os.path.realpath(os.path.join(root, f))
-                    if not (full_p == abs_root or full_p.startswith(abs_root + os.sep)):
+                    resolved_p = os.path.realpath(os.path.join(root, f))
+                    rel_file = os.path.relpath(resolved_p, abs_root)
+                    if rel_file == ".." or rel_file.startswith(".." + os.sep) or os.path.isabs(rel_file):
                         continue
-                    rel_p = os.path.relpath(full_p, abs_root).replace("\\", "/")
+                    full_p = os.path.normpath(os.path.join(abs_root, rel_file))
+                    if not full_p.startswith(abs_root):
+                        continue
+                    rel_p = rel_file.replace("\\", "/")
                     try:
                         with open(full_p, "r", encoding="utf-8", errors="replace") as fp:
                             code = fp.read()
@@ -212,10 +226,24 @@ class ASTGoldenRegressionEngine:
     @classmethod
     def verify_against_golden(cls, workspace_root: str = ".", golden_path: Optional[str] = None) -> Dict[str, Any]:
         """Compares current working tree AST signatures against the golden baseline."""
-        abs_root = os.path.realpath(os.path.abspath(workspace_root))
+        import tempfile
+        ws_root = os.path.realpath(".")
+        tmp_root = os.path.realpath(tempfile.gettempdir())
+        cand_root = os.path.realpath(os.path.abspath(workspace_root))
+        base_root = tmp_root if (cand_root == tmp_root or cand_root.startswith(tmp_root + os.sep)) else ws_root
+        rel_ws = os.path.relpath(cand_root, base_root)
+        if rel_ws == ".." or rel_ws.startswith(".." + os.sep) or os.path.isabs(rel_ws):
+            return {"success": False, "error": "Workspace root outside allowed scope."}
+        abs_root = os.path.normpath(os.path.join(base_root, rel_ws))
+        if not abs_root.startswith(base_root):
+            return {"success": False, "error": "Workspace root outside allowed scope."}
         raw_g_path = golden_path or os.path.join(abs_root, ".tzero", "goldens.json")
-        g_path = os.path.realpath(os.path.abspath(raw_g_path))
-        if not (g_path == abs_root or g_path.startswith(abs_root + os.sep)):
+        cand_g = os.path.realpath(os.path.abspath(raw_g_path))
+        rel_g = os.path.relpath(cand_g, abs_root)
+        if rel_g == ".." or rel_g.startswith(".." + os.sep) or os.path.isabs(rel_g):
+            return {"success": False, "error": "Golden path outside workspace root."}
+        g_path = os.path.normpath(os.path.join(abs_root, rel_g))
+        if not g_path.startswith(abs_root):
             return {"success": False, "error": "Golden path outside workspace root."}
 
         if not os.path.isfile(g_path):

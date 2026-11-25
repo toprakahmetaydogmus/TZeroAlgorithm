@@ -471,9 +471,11 @@ class ASTContractExtractor:
             if "\n" in header_tail and "extends" not in header_tail:
                 continue
             bases: List[str] = []
-            ext_m = re.search(r'\bextends\s+(.+)$', header_tail, re.DOTALL)
-            if ext_m:
-                bases = [b.strip() for b in ext_m.group(1).split(",") if b.strip()]
+            ext_idx = header_tail.find("extends")
+            if ext_idx != -1 and (ext_idx == 0 or not (header_tail[ext_idx - 1].isalnum() or header_tail[ext_idx - 1] == "_")):
+                after_ext = header_tail[ext_idx + 7:]
+                if after_ext and after_ext[0].isspace():
+                    bases = [b.strip() for b in after_ext.strip().split(",") if b.strip()]
             end_brace = cls._find_matching_brace(clean_code, brace_idx)
             if end_brace == -1:
                 end_brace = len(clean_code) - 1
