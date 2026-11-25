@@ -16,23 +16,18 @@ if str(REPO_ROOT) not in sys.path:
 
 HEAVY_FILES = {
     "test_e2e_full.py",
-    "test_cli_comprehensive.py",
-    "test_local_ci.py",
-    "test_mcp.py",
 }
 
 TARGET_PRIORITY = {
     "test_tool_01_to_10": 0,
-    "test_execute_codebase_workflow_actions": 1,
-    "test_tool_11_to_20": 2,
-    "test_tool_21_to_37": 3,
-    "test_cli_local_ci_flags": 4,
-    "test_full_pipeline_run_quick": 5,
-    "test_terminal_report_rendering": 6,
-    "test_mcp_local_ci_tool_routing": 7,
-    "test_tool_sync_cost_drift": 8,
-    "test_fixer_deep.py": 9,
-    "test_cli.py": 10,
+    "test_cli_comprehensive.py": 1,
+    "test_mcp.py": 2,
+    "test_local_ci.py": 3,
+    "test_tool_11_to_20": 4,
+    "test_tool_21_to_37": 5,
+    "test_cli.py": 6,
+    "test_fixer_deep.py": 7,
+    "test_tier1_feature_coverage.py": 8,
 }
 
 
@@ -110,14 +105,21 @@ def run_target(target: str) -> Tuple[str, int, float, str]:
 
 def main(argv: Optional[List[str]] = None) -> int:
     """Run discovered unittest targets in parallel and exit non-zero on failure."""
-    raw_targets = argv if argv is not None and len(argv) > 0 else ["tests"]
+    raw = list(argv) if argv is not None else sys.argv[1:]
+    shard_idx, shard_total = 0, 1
+    if len(raw) >= 2 and raw[0] == "--shard":
+        idx_s, tot_s = raw[1].split("/", 1)
+        shard_idx, shard_total = int(idx_s) - 1, int(tot_s)
+        raw = raw[2:]
+
+    raw_targets = raw if len(raw) > 0 else ["tests"]
     items = discover_test_targets(raw_targets)
     if not items:
         print("No test targets discovered.", file=sys.stderr)
         return 1
 
-    targets = [target for target, _ in items]
-    workers = min(len(targets), max(4, (os.cpu_count() or 4) + 2))
+    targets = [target for pos, (target, _) in enumerate(items) if pos % shard_total == shard_idx]
+    workers = min(len(targets), max(2, os.cpu_count() or 4))
     t0 = time.perf_counter()
     with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as pool:
         results = list(pool.map(run_target, targets))

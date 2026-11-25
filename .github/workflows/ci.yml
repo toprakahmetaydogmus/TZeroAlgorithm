@@ -66,15 +66,27 @@ jobs:
           - os: ubuntu-24.04
             python-version: "3.11"
             suite: full
+            shard: "1/2"
+          - os: ubuntu-24.04
+            python-version: "3.11"
+            suite: full
+            shard: "2/2"
           - os: ubuntu-24.04
             python-version: "3.12"
             suite: full
+            shard: "1/2"
+          - os: ubuntu-24.04
+            python-version: "3.12"
+            suite: full
+            shard: "2/2"
           - os: windows-latest
             python-version: "3.12"
             suite: cross-os
+            shard: "1/1"
           - os: macos-latest
             python-version: "3.12"
             suite: cross-os
+            shard: "1/1"
 
     steps:
     - uses: actions/checkout@v5
@@ -92,7 +104,7 @@ jobs:
     - name: Run Full Test Suite (Parallel)
       if: matrix.suite == 'full'
       run: |
-        python scripts/run_parallel_tests.py tests
+        python scripts/run_parallel_tests.py --shard ${{ matrix.shard }} tests
 
     - name: Run Cross-Platform OS & Guard Tests
       if: matrix.suite == 'cross-os'
