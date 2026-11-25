@@ -66,12 +66,12 @@ jobs:
     - name: Run Full Test Suite (Parallel)
       if: matrix.suite == 'full'
       run: |
-        python scripts/run_parallel_tests.py tests packages/anti_rea/tests
+        python scripts/run_parallel_tests.py tests
 
     - name: Run Cross-Platform OS & Guard Tests
       if: matrix.suite == 'cross-os'
       run: |
-        python scripts/run_parallel_tests.py tests/test_welcome_and_install_ide.py tests/test_hook_opt_in.py tests/test_local_ci.py tests/test_terminal.py tests/test_cli.py tests/test_packaging_sync.py tests/test_ci_workflow.py tests/test_release_dispatch.py tests/test_armor.py packages/anti_rea/tests
+        python scripts/run_parallel_tests.py tests/test_welcome_and_install_ide.py tests/test_hook_opt_in.py tests/test_local_ci.py tests/test_terminal.py tests/test_cli.py tests/test_packaging_sync.py tests/test_ci_workflow.py tests/test_release_dispatch.py tests/test_armor.py
 
     - name: Run Node and VS Code Extension Tests
       if: matrix.os == 'ubuntu-24.04' && matrix.python-version == '3.12'

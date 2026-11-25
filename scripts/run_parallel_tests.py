@@ -62,7 +62,7 @@ def run_test_file(test_file: pathlib.Path) -> Tuple[pathlib.Path, int, float, st
 
 def main(argv: List[str] | None = None) -> int:
     """Run discovered unittest modules in parallel and exit non-zero on failure."""
-    targets = argv if argv is not None and len(argv) > 0 else ["tests", "packages/anti_rea/tests"]
+    targets = argv if argv is not None and len(argv) > 0 else ["tests"]
     files = discover_test_files(targets)
     if not files:
         print("No test files discovered.", file=sys.stderr)
