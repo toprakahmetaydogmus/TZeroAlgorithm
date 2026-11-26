@@ -4642,7 +4642,7 @@ function initGitHubStars() {
     if (navStar) navStar.textContent = "★ " + stars;
     if (heroStar) heroStar.textContent = stars;
     if (progBar) {
-      const target = 100;
+      const target = stars < 100 ? 100 : (stars < 250 ? 250 : 500);
       const pct = Math.min(100, Math.max(5, (stars / target) * 100));
       progBar.style.width = pct + "%";
     }
@@ -4657,7 +4657,7 @@ function initGitHubStars() {
     updateDisplay(parseInt(cachedStars, 10));
     if (isFresh) return; // Fresh cache, skip API query
   } else {
-    updateDisplay(46); // Default baseline
+    updateDisplay(111); // Default baseline
   }
 
   // Fetch live star count from GitHub API

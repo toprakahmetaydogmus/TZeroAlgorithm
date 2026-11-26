@@ -41,11 +41,47 @@ class TestTrafficAndSupport(unittest.TestCase):
         self.assertEqual(res["bio"], BIO_URL)
 
     def test_open_github_star_page(self):
-        res = open_github_star_page(open_browser=False)
+        with patch("tzero.tzero_traffic._resolve_community_stats", return_value={
+            "stars": 111,
+            "target_stars": 250,
+            "progress_pct": 44.4,
+            "downloads_label": "22,900+",
+            "saved_tokens_label": "1,120,000+",
+        }):
+            res = open_github_star_page(open_browser=False)
         self.assertEqual(res["repo_url"], REPO_URL)
-        self.assertEqual(res["current_stars"], 45)
-        self.assertEqual(res["target_stars"], 100)
+        self.assertEqual(res["current_stars"], 111)
+        self.assertEqual(res["target_stars"], 250)
+        self.assertEqual(res["downloads"], "22,900+")
         self.assertFalse(res["opened_browser"])
+
+    def test_live_community_stats_and_siber_akademi_logo(self):
+        import tempfile
+        from tzero.tzero_growth import get_live_community_stats, next_star_milestone
+
+        self.assertEqual(next_star_milestone(45), 100)
+        self.assertEqual(next_star_milestone(111), 250)
+        self.assertEqual(next_star_milestone(250), 500)
+
+        class MockGitHubResp:
+            def __enter__(self):
+                return self
+            def __exit__(self, *args):
+                pass
+            def read(self):
+                return b'{"stargazers_count": 118}'
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            cache_file = Path(tmpdir) / "stats.json"
+            with patch("tzero.tzero_growth._community_cache_path", return_value=cache_file), \
+                 patch("urllib.request.urlopen", return_value=MockGitHubResp()):
+                stats = get_live_community_stats(force_refresh=True)
+        self.assertEqual(stats["stars"], 118)
+        self.assertEqual(stats["target_stars"], 250)
+        self.assertEqual(stats["source"], "live")
+        repo_root = Path(__file__).resolve().parent.parent
+        self.assertTrue((repo_root / "assets" / "siber_akademi_logo.png").is_file())
+        self.assertTrue((repo_root / "tzero" / "siber_akademi.ico").is_file())
 
     @patch("webbrowser.open")
     def test_first_launch_repo_open(self, mock_webopen):

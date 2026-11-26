@@ -4591,8 +4591,8 @@ class AutoReadmeGUI:
         if siber_akademi_icon:
             try:
                 siber_akademi_icon.apply_window_icon(self.root)
-                self.logo_img = siber_akademi_icon.get_logo_photo_image((36, 36))
-                self.logo_sm = siber_akademi_icon.get_logo_photo_image((22, 22))
+                self.logo_img = siber_akademi_icon.get_logo_photo_image((36, 36), circle=True)
+                self.logo_sm = siber_akademi_icon.get_logo_photo_image((38, 38), circle=True)
             except Exception:
                 pass
         if not self.logo_img:
@@ -4603,6 +4603,21 @@ class AutoReadmeGUI:
                     self.root.iconbitmap(icon_path)
                 except Exception:
                     pass
+
+        try:
+            from tzero.tzero_growth import get_cached_community_stats
+            self.community_stats = get_cached_community_stats()
+        except Exception:
+            self.community_stats = {
+                "stars": 111,
+                "target_stars": 250,
+                "progress_pct": 44.4,
+                "downloads": 22900,
+                "downloads_label": "22,900+",
+                "saved_tokens_label": "1,120,000+",
+                "source": "fallback",
+            }
+        self._star_dialog_widgets = {}
 
         saved_theme = _config_mgr.get_profile().get("theme", "Slate 950 (Linear Standard)")
         if saved_theme in THEME_PALETTES:
@@ -4617,6 +4632,7 @@ class AutoReadmeGUI:
         self.load_saved_credentials()
         self.setup_keyboard_shortcuts()
         self.start_system_telemetry()
+        self.start_community_stats_refresh()
         self.safe_after(1200, self.check_and_show_star_welcome_popup)
         
     def safe_after(self, ms: int, func, *args):
@@ -4647,10 +4663,10 @@ class AutoReadmeGUI:
         self.sidebar = GlassCard(self.bg_canvas, bg=sidebar_bg, highlightbackground=sidebar_bg)
         self.sidebar.place(x=8, y=8, width=66, relheight=0.98)
 
-        # Top Avatar Circle
+        # Top Siber Akademi Logo Badge
         avatar_canvas = tk.Canvas(self.sidebar, width=44, height=44, bg=sidebar_bg, highlightthickness=0)
         avatar_canvas.pack(pady=(12, 14))
-        avatar_canvas.create_oval(2, 2, 42, 42, fill=PALETTE.get("accent_coral", "#f97316"), outline="#ffffff", width=2)
+        avatar_canvas.create_oval(2, 2, 42, 42, fill="#181c24", outline=PALETTE.get("accent_cyan", "#38bdf8"), width=2)
         if self.logo_sm:
             avatar_canvas.create_image(22, 22, image=self.logo_sm)
         else:
@@ -4801,14 +4817,14 @@ class AutoReadmeGUI:
 
         self.star_header_btn = CanvasPillButton(
             header_controls,
-            text="★ STAR (45★)",
+            text=f"★ STAR ({self.community_stats['stars']}★)",
             command=self.open_star_action,
             height=28,
             radius=14,
             bg_color=PALETTE.get("warning", "#eab308"),
             text_color="#000000",
             font=("Segoe UI", 7, "bold"),
-            width=100
+            width=114
         )
         self.star_header_btn.pack(side=tk.LEFT, padx=3)
 
@@ -6285,8 +6301,21 @@ class AutoReadmeGUI:
             except Exception:
                 pass
 
+        stats = dict(getattr(self, "community_stats", {}) or {})
+        stars = int(stats.get("stars", 111))
+        target_stars = int(stats.get("target_stars", 250))
+        pct_ratio = max(0.05, min(1.0, stars / max(1, target_stars)))
+        pct_int = int(round(pct_ratio * 100))
+        dl_label = str(stats.get("downloads_label", "22,900+"))
+        saved_label = str(stats.get("saved_tokens_label", "1,120,000+"))
+
         dialog = tk.Toplevel(self.root)
-        dialog_title = f"⭐ T-Zero v{CURRENT_VERSION} — Lütfen Star Verin!" if first_launch else f"⭐ T-Zero v{CURRENT_VERSION} — 100 Yıldız Hedefi!"
+        if siber_akademi_icon:
+            try:
+                siber_akademi_icon.apply_window_icon(dialog)
+            except Exception:
+                pass
+        dialog_title = f"⭐ T-Zero v{CURRENT_VERSION} — Lütfen Star Verin!" if first_launch else f"⭐ T-Zero v{CURRENT_VERSION} — {target_stars} Yıldız Hedefi!"
         dialog.title(dialog_title)
         dialog.geometry("560x430")
         dialog.configure(bg=PALETTE["bg_start"])
@@ -6302,61 +6331,75 @@ class AutoReadmeGUI:
         header_text = (
             "🚀 TARAYICINIZDA GITHUB AÇILDI: LÜTFEN STAR VERİN! ⭐"
             if first_launch
-            else "⭐ 100 YILDIZ HEDEFİ: TOPLULUĞA KATILIN!"
+            else f"⭐ {target_stars} YILDIZ HEDEFİ: TOPLULUĞA KATILIN!"
         )
-        tk.Label(
+        hdr_lbl = tk.Label(
             h_frame,
             text=header_text,
             font=("Segoe UI", 12, "bold"),
             fg=PALETTE.get("warning", "#fbbf24"),
             bg=PALETTE["bg_start"]
-        ).pack(side=tk.LEFT)
+        )
+        hdr_lbl.pack(side=tk.LEFT)
 
         # Stats Badge
         stats_frame = tk.Frame(pad, bg=PALETTE["card_bg"], highlightthickness=1, highlightbackground=PALETTE["card_border"], padx=14, pady=10)
         stats_frame.pack(fill=tk.X, pady=(0, 12))
-        tk.Label(
+        stats_lbl = tk.Label(
             stats_frame,
-            text="🚀 20,880+ İndirme (PyPI & npm)   |   ⚡ 1,120,000+ Kurtarılan Token\n⭐ Mevcut Yıldız: 45 / 100 Hedef  (İlerleme: %45)",
+            text=f"🚀 {dl_label} İndirme (PyPI & npm)   |   ⚡ {saved_label} Kurtarılan Token\n⭐ Mevcut Yıldız: {stars} / {target_stars} Hedef  (İlerleme: %{pct_int})",
             font=("Segoe UI", 9, "bold"),
             fg=PALETTE.get("accent_cyan", "#38bdf8"),
             bg=PALETTE["card_bg"],
             justify=tk.CENTER
-        ).pack()
+        )
+        stats_lbl.pack()
 
         # Visual Progress Bar
         bar_container = tk.Frame(pad, bg=PALETTE["card_border"], height=14)
         bar_container.pack(fill=tk.X, pady=(0, 14))
         bar_container.pack_propagate(False)
-        bar_fill = tk.Frame(bar_container, bg=PALETTE.get("warning", "#fbbf24"), width=int(508 * 0.45), height=14)
-        bar_fill.place(x=0, y=0, relheight=1.0, relwidth=0.45)
+        bar_fill = tk.Frame(bar_container, bg=PALETTE.get("warning", "#fbbf24"), width=int(508 * pct_ratio), height=14)
+        bar_fill.place(x=0, y=0, relheight=1.0, relwidth=pct_ratio)
 
         # Message
-        if first_launch:
-            msg = (
-                "Merhaba! Ben Toprak Ahmet Aydoğmuş (Siber Akademi).\n"
-                "T-Zero'yu başlattığınız için GitHub depomuz tarayıcınızda açıldı!\n\n"
-                "Projemizin bağımsız kalabilmesi ve herkese %100 BEDAVA sunulabilmesi için\n"
-                "lütfen açılan GitHub sayfasında sağ üstteki ★ STAR butonuna tıklayarak\n"
-                "projemize destek olun! ⭐ (100 Yıldız Hedefi: 45/100)\n\n"
-                "Yıldızınız projemizin büyümesi ve daha fazla geliştiriciye ulaşması için çok değerli!"
-            )
-        else:
-            msg = (
+        def _build_star_msg(cur_s: int, tgt_s: int) -> str:
+            if first_launch:
+                return (
+                    "Merhaba! Ben Toprak Ahmet Aydoğmuş (Siber Akademi).\n"
+                    "T-Zero'yu başlattığınız için GitHub depomuz tarayıcınızda açıldı!\n\n"
+                    "Projemizin bağımsız kalabilmesi ve herkese %100 BEDAVA sunulabilmesi için\n"
+                    "lütfen açılan GitHub sayfasında sağ üstteki ★ STAR butonuna tıklayarak\n"
+                    f"projemize destek olun! ⭐ ({tgt_s} Yıldız Hedefi: {cur_s}/{tgt_s})\n\n"
+                    "Yıldızınız projemizin büyümesi ve daha fazla geliştiriciye ulaşması için çok değerli!"
+                )
+            return (
                 "Merhaba! Ben Toprak Ahmet Aydoğmuş (Siber Akademi).\n"
                 "T-Zero'yu yapay zeka araçlarındaki token maliyetini ve context israfını\n"
                 "önlemek için sıfırdan geliştirdim ve herkese %100 BEDAVA sunuyorum.\n\n"
                 "Projemizin bağımsız kalabilmesi ve daha fazla geliştiriciye ulaşabilmesi için\n"
                 "GitHub depomuza vereceğiniz TEK BİR YILDIZ çok büyük bir fark yaratıyor!"
             )
-        tk.Label(
+
+        msg = _build_star_msg(stars, target_stars)
+        msg_lbl = tk.Label(
             pad,
             text=msg,
             font=("Segoe UI", 9),
             fg=PALETTE["text_main"],
             bg=PALETTE["bg_start"],
             justify=tk.LEFT
-        ).pack(anchor=tk.W, pady=(0, 16))
+        )
+        msg_lbl.pack(anchor=tk.W, pady=(0, 16))
+        self._star_dialog_widgets = {
+            "dialog": dialog,
+            "hdr_lbl": hdr_lbl,
+            "stats_lbl": stats_lbl,
+            "bar_fill": bar_fill,
+            "msg_lbl": msg_lbl,
+            "first_launch": first_launch,
+            "build_msg": _build_star_msg,
+        }
 
         # Star Action Button (Big Golden Button)
         def on_star_click():
@@ -8284,6 +8327,49 @@ Custom Requirements:
                 except Exception:
                     break
         threading.Thread(target=telemetry, daemon=True).start()
+
+    def _apply_live_community_stats(self, stats: Dict[str, Any]):
+        """Apply live GitHub star and registry download counts to header & open dialog."""
+        if not stats:
+            return
+        self.community_stats = stats
+        stars = int(stats.get("stars", 111))
+        target_stars = int(stats.get("target_stars", 250))
+        pct_ratio = max(0.05, min(1.0, stars / max(1, target_stars)))
+        pct_int = int(round(pct_ratio * 100))
+        dl_label = str(stats.get("downloads_label", "22,900+"))
+        saved_label = str(stats.get("saved_tokens_label", "1,120,000+"))
+
+        try:
+            if hasattr(self, "star_header_btn") and self.star_header_btn.winfo_exists():
+                self.star_header_btn.set_text(f"★ STAR ({stars}★)")
+        except Exception:
+            pass
+
+        w = getattr(self, "_star_dialog_widgets", {}) or {}
+        dlg = w.get("dialog")
+        try:
+            if dlg and dlg.winfo_exists():
+                if not w.get("first_launch"):
+                    w["hdr_lbl"].config(text=f"⭐ {target_stars} YILDIZ HEDEFİ: TOPLULUĞA KATILIN!")
+                w["stats_lbl"].config(
+                    text=f"🚀 {dl_label} İndirme (PyPI & npm)   |   ⚡ {saved_label} Kurtarılan Token\n⭐ Mevcut Yıldız: {stars} / {target_stars} Hedef  (İlerleme: %{pct_int})"
+                )
+                w["bar_fill"].place_configure(relwidth=pct_ratio)
+                w["msg_lbl"].config(text=w["build_msg"](stars, target_stars))
+        except Exception:
+            pass
+
+    def start_community_stats_refresh(self):
+        """Fetch live GitHub star count and download stats asynchronously without blocking UI."""
+        def _worker():
+            try:
+                from tzero.tzero_growth import get_live_community_stats
+                stats = get_live_community_stats(timeout=3.0, force_refresh=True, include_downloads=True)
+                self.safe_after(0, lambda s=stats: self._apply_live_community_stats(s))
+            except Exception:
+                pass
+        threading.Thread(target=_worker, daemon=True).start()
 
 
 # --- 14. STARTUP ORCHESTRATION & CLI WIZARD ---

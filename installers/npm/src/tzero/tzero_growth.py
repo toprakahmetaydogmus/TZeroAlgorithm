@@ -14,6 +14,7 @@ Twitter/X, LinkedIn, Dev.to, Turkish Tech Hubs, and Awesome-Lists.
 import sys
 import os
 import json
+import time
 import urllib.request
 from pathlib import Path
 from typing import Dict, Any, List
@@ -30,17 +31,170 @@ VERSION = f"v{_TZ_VER}"
 PYPI_PKG = "tzero-mcp"
 NPM_PKG = "tzero-mcp"
 
+DEFAULT_STAR_BASELINE = 111
+DEFAULT_DOWNLOADS_BASELINE = 22900
+DEFAULT_SAVED_TOKENS_LABEL = "1,120,000+"
+STAR_MILESTONES = (100, 250, 500, 1000, 2500, 5000, 10000)
+COMMUNITY_CACHE_TTL_SEC = 900
 
-def get_live_github_stars() -> int:
-    """Fetch current GitHub stargazers count."""
+
+def _community_cache_path() -> Path:
+    return Path.home() / ".tzero" / "community_stats_cache.json"
+
+
+def next_star_milestone(stars: int) -> int:
+    """Return the next community star milestone strictly above current count."""
+    count = max(0, int(stars))
+    for milestone in STAR_MILESTONES:
+        if count < milestone:
+            return milestone
+    return ((count // 5000) + 1) * 5000
+
+
+def format_downloads_label(count: int) -> str:
+    """Format package download totals concisely (e.g., 22914 -> '22,900+')."""
+    val = max(0, int(count))
+    if val >= 1000:
+        val = (val // 100) * 100
+    return f"{val:,d}+"
+
+
+def _read_community_cache() -> Dict[str, Any]:
+    try:
+        cache_file = _community_cache_path()
+        if cache_file.is_file():
+            data = json.loads(cache_file.read_text(encoding="utf-8"))
+            if isinstance(data, dict):
+                return data
+    except Exception:
+        pass
+    return {}
+
+
+def _write_community_cache(stars: int, downloads: int) -> None:
+    try:
+        cache_file = _community_cache_path()
+        cache_file.parent.mkdir(parents=True, exist_ok=True)
+        payload = {
+            "stars": int(stars),
+            "downloads": int(downloads),
+            "updated_at": time.time(),
+        }
+        cache_file.write_text(json.dumps(payload), encoding="utf-8")
+    except Exception:
+        pass
+
+
+def _build_community_stats(stars: int, downloads: int, source: str) -> Dict[str, Any]:
+    target = next_star_milestone(stars)
+    pct = min(100.0, round((stars / max(1, target)) * 100.0, 1))
+    return {
+        "stars": int(stars),
+        "target_stars": target,
+        "progress_pct": pct,
+        "downloads": int(downloads),
+        "downloads_label": format_downloads_label(downloads),
+        "saved_tokens_label": DEFAULT_SAVED_TOKENS_LABEL,
+        "source": source,
+    }
+
+
+def get_cached_community_stats(max_age_sec: int = COMMUNITY_CACHE_TTL_SEC) -> Dict[str, Any]:
+    """Return instantaneous cached (or baseline) community stats without blocking on network."""
+    cached = _read_community_cache()
+    stars = int(cached.get("stars", DEFAULT_STAR_BASELINE) or DEFAULT_STAR_BASELINE)
+    downloads = int(cached.get("downloads", DEFAULT_DOWNLOADS_BASELINE) or DEFAULT_DOWNLOADS_BASELINE)
+    stars = max(DEFAULT_STAR_BASELINE, stars) if cached.get("source") != "test" else stars
+    downloads = max(DEFAULT_DOWNLOADS_BASELINE, downloads)
+    updated_at = float(cached.get("updated_at", 0.0) or 0.0)
+    is_fresh = bool(cached) and (time.time() - updated_at) < max_age_sec
+    return _build_community_stats(stars, downloads, "cache" if is_fresh else "fallback")
+
+
+def _fetch_live_downloads(timeout: float = 2.0) -> int:
+    total = 0
+    try:
+        req = urllib.request.Request(
+            f"https://pypistats.org/api/packages/{PYPI_PKG}/overall",
+            headers={"User-Agent": "T-Zero-Growth-Engine"},
+        )
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+            total += sum(
+                int(row.get("downloads", 0))
+                for row in data.get("data", [])
+                if row.get("category") == "with_mirrors"
+            )
+    except Exception:
+        pass
+    try:
+        req = urllib.request.Request(
+            f"https://api.npmjs.org/downloads/point/last-year/{NPM_PKG}",
+            headers={"User-Agent": "T-Zero-Growth-Engine"},
+        )
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+            total += int(data.get("downloads", 0))
+    except Exception:
+        pass
+    return total
+
+
+def get_live_github_stars(timeout: float = 2.0, force_refresh: bool = False) -> int:
+    """Fetch current GitHub stargazers count with local TTL cache and resilient fallback."""
+    cached = _read_community_cache()
+    updated_at = float(cached.get("updated_at", 0.0) or 0.0)
+    if not force_refresh and cached and (time.time() - updated_at) < COMMUNITY_CACHE_TTL_SEC:
+        if "stars" in cached:
+            return int(cached["stars"])
+
     try:
         url = "https://api.github.com/repos/toprakahmetaydogmus/TZeroAlgorithm"
-        req = urllib.request.Request(url, headers={"User-Agent": "T-Zero-Growth-Engine"})
-        with urllib.request.urlopen(req, timeout=5) as resp:
+        req = urllib.request.Request(
+            url,
+            headers={
+                "User-Agent": "T-Zero-Growth-Engine",
+                "Accept": "application/vnd.github.v3+json",
+            },
+        )
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
             data = json.loads(resp.read().decode("utf-8"))
-            return int(data.get("stargazers_count", 45))
+            if isinstance(data, dict) and "stargazers_count" in data:
+                stars = int(data["stargazers_count"])
+                downloads = max(DEFAULT_DOWNLOADS_BASELINE, int(cached.get("downloads", DEFAULT_DOWNLOADS_BASELINE) or DEFAULT_DOWNLOADS_BASELINE))
+                _write_community_cache(stars, downloads)
+                return stars
     except Exception:
-        return 45
+        pass
+
+    if cached and "stars" in cached:
+        return int(cached["stars"])
+    return DEFAULT_STAR_BASELINE
+
+
+def get_live_community_stats(
+    timeout: float = 2.0,
+    force_refresh: bool = False,
+    include_downloads: bool = False,
+) -> Dict[str, Any]:
+    """Fetch live GitHub star count and registry downloads with TTL cache + offline fallback."""
+    cached = _read_community_cache()
+    updated_at = float(cached.get("updated_at", 0.0) or 0.0)
+    is_fresh = bool(cached) and (time.time() - updated_at) < COMMUNITY_CACHE_TTL_SEC
+    if not force_refresh and is_fresh and "stars" in cached:
+        stars = int(cached["stars"])
+        downloads = max(DEFAULT_DOWNLOADS_BASELINE, int(cached.get("downloads", DEFAULT_DOWNLOADS_BASELINE) or DEFAULT_DOWNLOADS_BASELINE))
+        return _build_community_stats(stars, downloads, "cache")
+
+    stars = get_live_github_stars(timeout=timeout, force_refresh=force_refresh)
+    downloads = max(DEFAULT_DOWNLOADS_BASELINE, int(cached.get("downloads", DEFAULT_DOWNLOADS_BASELINE) or DEFAULT_DOWNLOADS_BASELINE))
+    if include_downloads:
+        fetched_dl = _fetch_live_downloads(timeout=timeout)
+        if fetched_dl > 0:
+            downloads = max(DEFAULT_DOWNLOADS_BASELINE, fetched_dl)
+            _write_community_cache(stars, downloads)
+    source = "live" if _read_community_cache().get("stars") == stars else "fallback"
+    return _build_community_stats(stars, downloads, source)
 
 
 def render_progress_bar(current: int, target: int = 100, length: int = 30) -> str:

@@ -53,18 +53,26 @@ def find_git_root(start_dir: Optional[Path] = None) -> Optional[Path]:
 
 def get_welcome_banner(version: str = VERSION) -> str:
     """Returns the ANSI styled welcome banner asking developers to star the project."""
+    try:
+        from tzero.tzero_growth import get_cached_community_stats
+        stats = get_cached_community_stats()
+    except Exception:
+        stats = {"stars": 111, "target_stars": 250, "downloads_label": "22,900+"}
+    stars = stats["stars"]
+    target = stats["target_stars"]
+    dl_label = stats["downloads_label"]
     raw_banner = f"""\033[1;36m
 ┌──────────────────────────────────────────────────────────────────────────────┐
 │  ★ WELCOME TO T-ZERO CONTEXT ARCHITECT & MCP SUITE (v{version})               │
 ├──────────────────────────────────────────────────────────────────────────────┤
 │                                                                              │
 │  Hi! I'm Toprak Ahmet Aydoğmuş (independent engineer at Siber Akademi).      │
-│  T-Zero has reached \033[1;32m20,880+ downloads\033[1;36m across PyPI & npm!                   │
+│  T-Zero has reached \033[1;32m{dl_label} downloads\033[1;36m across PyPI & npm!                   │
 │                                                                              │
 │  T-Zero slashes AI coding prompt tokens by 85–95% using deterministic AST    │
-│  signature extraction with 100% Zero-Leak security and 20 MCP tools.         │
+│  signature extraction with 100% Zero-Leak security and 21 MCP tools.         │
 │                                                                              │
-│  ★ \033[1;33mHELP US REACH OUR 100 STARS GOAL (Current: 45/100):\033[1;36m                      │
+│  ★ \033[1;33mHELP US REACH OUR {target} STARS GOAL (Current: {stars}/{target}):\033[1;36m                     │
 │     \033[1;32m► Run 'tzero star' or visit: {REPO_URL}\033[1;36m       │
 │                                                                              │
 │  💖 \033[1;35mSPONSOR & KEEP T-ZERO 100% FREE:\033[1;36m                                     │

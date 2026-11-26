@@ -1182,7 +1182,12 @@ def run_init(argv: Optional[List[str]] = None) -> int:
     if failures:
         print(sanitize_terminal_text(f"\033[33m⚠️  {failures} client(s) could not be updated.\033[0m"))
 
-    print(sanitize_terminal_text("""
+    try:
+        from tzero.tzero_growth import get_cached_community_stats
+        _st = get_cached_community_stats()
+    except Exception:
+        _st = {"stars": 111, "target_stars": 250, "downloads_label": "22,900+"}
+    print(sanitize_terminal_text(f"""
 \033[1;37m★ HOW TO USE IN YOUR IDE (CURSOR, CLAUDE, WINDSURF):
 1. Restart your IDE or Reload Window.
 2. In Composer / Chat, prompt your agent:\033[0m
@@ -1196,8 +1201,8 @@ def run_init(argv: Optional[List[str]] = None) -> int:
 │  to eliminate token bloat, costs, and AI hallucinations worldwide.           │
 │  Search "Toprak Ahmet Aydoğmuş" on Google to learn more!                     │
 │                                                                              │
-│  🎉 \033[1;32m20,880+ Downloads across PyPI & npm!\033[1;36m                                    │
-│  ⭐ \033[1;33mHELP US REACH OUR 100 STARS GOAL (Current: 45 / 100):\033[1;36m                   │
+│  🎉 \033[1;32m{_st['downloads_label']} Downloads across PyPI & npm!\033[1;36m                                    │
+│  ⭐ \033[1;33mHELP US REACH OUR {_st['target_stars']} STARS GOAL (Current: {_st['stars']} / {_st['target_stars']}):\033[1;36m                 │
 │     \033[1;32m► Run 'tzero star' or visit: https://github.com/toprakahmetaydogmus/TZeroAlgorithm\033[1;36m │
 │                                                                              │
 │  100% Free & Open-Source under AGPL-3.0 License. Thank you! ★                │
