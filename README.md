@@ -37,9 +37,7 @@
 [![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Zero--GPU%20Demo-Hugging%20Face-ffd21e?style=for-the-badge&logo=huggingface&logoColor=black)](https://huggingface.co/spaces/toprakke4/tzero-token-reducer)
 [![Live Vercel Hub](https://img.shields.io/badge/%E2%9A%A1%20Live%20Gateway-Vercel-000000?style=for-the-badge&logo=vercel)](https://tzero-indol.vercel.app)
 
-<p align="center">
-  <a href="https://vibeshelf.co/tool/t-zero/"><img src="https://vibeshelf.co/badge.svg" width="200" height="44" alt="Listed on VibeShelf"/></a>
-</p>
+
 
 > **If T-Zero cuts your LLM prompt tokens or saves you API bills in Cursor / Claude, please give us a star! ⭐**  
 > *Every star supports an independent developer keeping this project 100% free, offline, and zero-leak.*
@@ -713,6 +711,13 @@ Help us reach our **500 Stars Milestone**! Share T-Zero with your network in one
 *Built with passion by Toprak Ahmet Aydoğmuş (Siber Akademi) for developers worldwide.*
 
 </div>
+
+---
+
+## Directory Listings
+
+<a href="https://submitaitools.org/github-com-toprakahmetaydogmus-tzeroalgorithm/"><img src="https://submitaitools.org/static_submitaitools/images/submitaitools.png" width="100" alt="T-Zero on Submit AI Tools"></a>
+<a href="https://vibeshelf.co/tool/t-zero/"><img src="https://vibeshelf.co/badge.svg" width="100" alt="T-Zero on VibeShelf"></a>
 
 ---
 
