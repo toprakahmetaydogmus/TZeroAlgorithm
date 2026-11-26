@@ -5,8 +5,8 @@
   "license": "AGPL-3.0-only",
   "architecture": {
     "64bit": {
-      "url": "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/download/v12.2.1/TZeroAlgorithm.exe",
-      "hash": "3fdaddc3c85109727a3ce35804d1a50321ab85c616ccd2bc0957117b801dfb92",
+      "url": "https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/download/v12.3.0/TZeroAlgorithm.exe",
+      "hash": "9d223e6621c6b6cafa85c8c0d1440d28e579f504d506f190122d484a0dd2be6b",
       "bin": [
         [
           "TZeroAlgorithm.exe",

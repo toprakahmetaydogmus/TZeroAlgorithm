@@ -104,9 +104,9 @@ def build_downloads_grid(version: str, existing_html: str) -> str:
     <div class="latest-release-banner animate-on-scroll" id="latest-release-banner">
       <div class="rel-banner-tag"><span class="rel-pulse"></span> Latest GitHub Release: <strong id="live-release-tag">v{version}</strong></div>
       <div class="rel-banner-meta">
-        <span>Published: <strong id="live-release-date">Nov 24, 2026</strong></span>
+        <span>Published: <strong id="live-release-date">Nov 26, 2026</strong></span>
         <span class="rel-divider">•</span>
-        <span>Verified Assets: <strong id="live-release-assets">7 Packages</strong></span>
+        <span>Verified Assets: <strong id="live-release-assets">24 Packages</strong></span>
       </div>
       <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/latest" target="_blank" rel="noopener noreferrer" class="rel-banner-link" id="live-release-link">
         View Release on GitHub →

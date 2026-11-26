@@ -209,7 +209,7 @@ SECRET_RULES: List[SecretRule] = [
         rule_id="SEC-CRYPTO-001",
         provider="PKI",
         description="Private Key Block or Header (RSA, EC, OPENSSH, DSA, PGP)",
-        pattern=re.compile(r"-----BEGIN (?:[A-Z0-9 ]+ )?PRIVATE KEY-----[\s\S]*?-----END (?:[A-Z0-9 ]+ )?PRIVATE KEY-----|-----BEGIN (?:RSA |EC |OPENSSH |DSA |PGP )?PRIVATE KEY-----"),
+        pattern=re.compile(r"-----BEGIN (?:[A-Z0-9 ]{1,32} )?PRIVATE KEY-----"),
         mask_tag="[ZERO_LEAK_MASKED_PRIVATE_KEY]"
     ),
     SecretRule(
@@ -265,10 +265,38 @@ class ZeroLeakEngine:
 
     MIN_ENTROPY_THRESHOLD: float = 4.75
     MIN_ENTROPY_LENGTH: int = 28
-    _PEM_BEGIN_RE = re.compile(r"-----BEGIN (?:[A-Z0-9 ]+ )?PRIVATE KEY-----")
-    _PEM_COMPLETE_BLOCK_RE = re.compile(
-        r"-----BEGIN (?:[A-Z0-9 ]+ )?PRIVATE KEY-----[\s\S]*?-----END (?:[A-Z0-9 ]+ )?PRIVATE KEY-----"
-    )
+    _PEM_BEGIN_RE = re.compile(r"-----BEGIN (?:[A-Z0-9 ]{1,32} )?PRIVATE KEY-----")
+    _PEM_END_RE = re.compile(r"-----END (?:[A-Z0-9 ]{1,32} )?PRIVATE KEY-----")
+
+    @classmethod
+    def _iter_pem_block_spans(cls, text: str) -> List[Tuple[int, int]]:
+        """Linearly locates complete PEM BEGIN..END block byte spans without polynomial regex backtracking."""
+        spans: List[Tuple[int, int]] = []
+        pos = 0
+        for begin_match in cls._PEM_BEGIN_RE.finditer(text):
+            if begin_match.start() < pos:
+                continue
+            end_match = cls._PEM_END_RE.search(text, begin_match.end())
+            if not end_match:
+                break
+            spans.append((begin_match.start(), end_match.end()))
+            pos = end_match.end()
+        return spans
+
+    @classmethod
+    def _mask_pem_blocks(cls, text: str, replacement: str = "[ZERO_LEAK_MASKED_PRIVATE_KEY]") -> str:
+        """Replaces complete PEM BEGIN..END blocks linearly cleanly."""
+        spans = cls._iter_pem_block_spans(text)
+        if not spans:
+            return text
+        chunks: List[str] = []
+        last = 0
+        for s, e in spans:
+            chunks.append(text[last:s])
+            chunks.append(replacement)
+            last = e
+        chunks.append(text[last:])
+        return "".join(chunks)
 
     @classmethod
     def is_placeholder(cls, s: str) -> bool:
@@ -304,9 +332,10 @@ class ZeroLeakEngine:
 
         # Pre-compute line numbers covered by complete multi-line PEM blocks
         pem_ranges: List[Tuple[int, int]] = []
-        for pm in cls._PEM_COMPLETE_BLOCK_RE.finditer(text):
-            start_line = text[: pm.start()].count("\n") + 1
-            end_line = text[: pm.end()].count("\n") + 1
+        for s_pos, e_pos in cls._iter_pem_block_spans(text):
+            block_txt = text[s_pos:e_pos]
+            start_line = text[:s_pos].count("\n") + 1
+            end_line = text[:e_pos].count("\n") + 1
             pem_ranges.append((start_line, end_line))
             findings.append(SecretFinding(
                 rule_id="SEC-CRYPTO-001",
@@ -315,9 +344,9 @@ class ZeroLeakEngine:
                 severity="CRITICAL",
                 line_no=start_line,
                 preview="[ZERO_LEAK_MASKED_PRIVATE_KEY]",
-                entropy=round(calculate_shannon_entropy(pm.group(0)), 2),
+                entropy=round(calculate_shannon_entropy(block_txt), 2),
                 is_entropy_anomaly=False,
-                secret_value=pm.group(0),
+                secret_value=block_txt,
             ))
 
         def _in_pem_block(ln: int) -> bool:
@@ -426,7 +455,7 @@ class ZeroLeakEngine:
         if not text:
             return ""
 
-        sanitized = cls._PEM_COMPLETE_BLOCK_RE.sub("[ZERO_LEAK_MASKED_PRIVATE_KEY]", text)
+        sanitized = cls._mask_pem_blocks(text, "[ZERO_LEAK_MASKED_PRIVATE_KEY]")
 
         if cls._PEM_BEGIN_RE.search(sanitized):
             if not allow_incomplete_pem:
