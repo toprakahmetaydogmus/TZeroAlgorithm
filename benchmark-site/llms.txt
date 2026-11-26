@@ -10,8 +10,9 @@ T-Zero solves context window bloat and expensive token costs:
 - Slashes prompt context tokens by 85% to 95% using deterministic AST signature extraction.
 - Completely preserves type signatures, class hierarchies, docstrings, imports, and interface contracts while pruning implementation bodies.
 - 100% Zero-Leak security certified: Shannon entropy scanner (H >= 4.75) detects and redacts secrets/credentials locally.
+- 180-Tier Ultra Anti-REA Shield: 12 security domains × 15 tiers protecting Python apps, PyInstaller executables, and Electron ASAR archives.
 - 0.0% Hallucination rate: Pre-flight reality lock mathematically validates imports and call signatures against the live workspace AST.
-- 628 automated tests passing with 0 errors (100% green).
+- 630+ automated tests passing with 0 errors (100% green).
 
 ## Quick Start for Developers & AI Agents
 

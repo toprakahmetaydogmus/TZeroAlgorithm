@@ -88,10 +88,10 @@ tzero share
 
 # Option D: Standalone Windows 64-Bit Executable Suite (Zero Dependencies):
 # Download all-in-one suite (.ZIP) with GUI, CLI, MCP Server & 1-Click Configurator:
-# https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/download/v12.2.2/TZero-v12.2.2-Windows-x64.zip
+# https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/download/v12.3.0/TZero-v12.3.0-Windows-x64.zip
 
 # Install VS Code / Cursor Extension (.vsix):
-code --install-extension dist/tzero-vscode-12.2.2.vsix
+code --install-extension dist/tzero-vscode-12.3.0.vsix
 ```
 
 Git reminder hooks are opt-in. Installation and normal startup do not change
@@ -179,7 +179,7 @@ tzero init --vscode        # VS Code (Continue / Copilot)
 tzero init --zed           # Zed Editor
 
 # Install official VS Code / Cursor Extension (.vsix):
-code --install-extension dist/tzero-vscode-12.2.2.vsix
+code --install-extension dist/tzero-vscode-12.3.0.vsix
 ```
 
 ### Manual Configuration Snippets (Any MCP Client)
@@ -628,15 +628,15 @@ curl -fsSL https://raw.githubusercontent.com/toprakahmetaydogmus/tzero-pc-fixer/
 ---
 
 <a id="whats-new-in-v1220-24-tier-anti-rea-armor-suite"></a>
-## What's New in v12.2.0: 24-Tier Anti-REA Armor Suite & AI Reverse Engineering Shield
-T-Zero v12.2.0 introduces the world's first **24-Tier Anti-REA (Reverse Engineering Agent) Armor Suite**, providing defense against automated AI code extractors, decompilers (`pyinstxtractor`, `uncompyle6`, `pycdc`), debugger hooks (`x64dbg`, `IDA Pro`), and cognitive jailbreaks:
-- **PyInstaller ExtractorShield:** Corrupts pyinstxtractor archive parsing with deceptive headers while maintaining 100% native runtime execution.
-- **PolyVM Stack Bytecode Obfuscator & CFG Traps:** Flattens control-flow graphs into synthetic dispatcher loops, crashing static AST reconstructors.
-- **Hardware & Ring-3 Anti-Debug Matrix:** Detects `x64dbg`, `IDA`, Win32 `IsDebuggerPresent`, `NtGlobalFlag` (0x70), and PEB `BeingDebugged` with instant hard exits (`0xC0000409`).
-- **In-Flight Memory & String Vault:** Encrypts string literals with rolling-key XOR and scrubs process memory (`memset(0)`).
+## What's New in v12.3.0: 180-Tier Ultra Anti-REA Armor Suite & Authenticated Bytecode Envelopes
+T-Zero v12.3.0 expands **Anti-REA (Reverse Engineering Agent) Armor** to **180 Tiers across 12 Security Domains** (15 verified enforcement layers per domain), stopping automated AI code extractors, decompilers (`pyinstxtractor`, `uncompyle6`, `pycdc`), debugger hooks (`x64dbg`, `IDA Pro`), and cognitive jailbreaks while preserving 100% native application behavior:
+- **HKDF-SHA256 + CTR + HMAC Authenticated Bytecode Envelope (`CryptoBytecodeEnvelope`):** Seals user application logic in authenticated compressed marshal capsules with zero-regression support for classes, `@dataclass`, `async`/`await`, generators, UTF-8, and `sys.argv`, wiping decrypted RAM buffers immediately after load.
+- **Multi-Cave PyInstaller ExtractorShield & PE Metadata Scrubbing:** Combines up to 4 PE section alignment cave decoy `MEI` headers with MSVC Rich/DanS header zeroization and COFF `TimeDateStamp` scrubbing while keeping native C bootloader execution intact.
+- **Zero-Subprocess Ring-3 & POSIX Anti-Debug Matrix:** Native Win32 `CreateToolhelp32Snapshot` (<2ms, zero subprocess), `IsDebuggerPresent`, `NtSetInformationThread(0x11)`, `sys.gettrace`/`sys.monitoring` debugger lockouts, Linux `TracerPid`, Anti-VM hypervisor guards, and RDTSC nanosecond stepping checkpoints.
+- **Type-Safe MBA & PolyVM Stack Obfuscator:** Strict integer-guarded Mixed Boolean-Arithmetic identities (zero string/float `TypeError` risk) + per-build randomized opcode VMs + In-Flight String Vault (`memset(0)`).
 - **Stealth Canary Beacon (Opt-In Only):** Disabled by default (`webhook_canary: false`). When explicitly configured with a webhook URL, dispatches intrusion alert payloads containing only `threat_type`, `detected_tool`, `timestamp`, `platform`, `os_name`, `python_version`, `pid`, and `hostname[:16]` (no source code or secrets are ever transmitted).
-- **Built-in CLI & GUI:** Run `tzero armor`, `tzero audit-rea`, `tzero shield-exe`, or launch `tzero-gui`.
-- **Static Verification & Packaging Notice:** Use `tzero audit-rea` for static textual indicator scores; official Windows ZIP and VS Code `.vsix` bundles include both `LICENSE` and `NOTICE`.
+- **Built-in CLI, Matrix & GUI:** Run `tzero armor`, `tzero audit-rea`, `tzero shield-exe`, `python -m tzero.anti_rea.cli matrix`, or launch `tzero-gui`.
+- **Static Verification & Packaging Notice:** Use `tzero audit-rea` for static textual indicator + 180-Tier domain coverage scores; official Windows ZIP and VS Code `.vsix` bundles include both `LICENSE` and `NOTICE`.
 
 ---
 

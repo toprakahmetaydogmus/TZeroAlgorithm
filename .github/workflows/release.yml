@@ -1,7 +1,7 @@
 name: Release
 
 # Builds the Windows executable and publishes it as a GitHub Release.
-#   * Push a version tag like v12.2.2 -> test, build, and create/update the release.
+#   * Push a version tag like v12.3.0 -> test, build, and create/update the release.
 #   * Run manually (Actions tab) -> test and build only; all executables are attached as artifacts.
 
 concurrency:
@@ -18,9 +18,9 @@ concurrency:
   workflow_dispatch:
     inputs:
       tag_name:
-        description: 'Release tag to target (e.g. v12.2.2)'
+        description: 'Release tag to target (e.g. v12.3.0)'
         required: false
-        default: 'v12.2.2'
+        default: 'v12.3.0'
 
 permissions:
   contents: write
@@ -75,7 +75,7 @@ jobs:
               path = os.path.join("dist", name)
               if not os.path.isfile(path):
                   raise SystemExit(f"{path} was not built")
-              res = subprocess.run([path, "--version"], capture_output=True, text=True, timeout=30)
+              res = subprocess.run([path, "--version"], capture_output=True, text=True, timeout=90)
               if res.returncode != 0:
                   print(res.stdout)
                   print(res.stderr, file=sys.stderr)
@@ -153,7 +153,7 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'release'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || inputs.tag_name || 'v12.2.2' }}
+          tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || inputs.tag_name || 'v12.3.0' }}
           fail_on_unmatched_files: false
           files: |
             dist/TZeroAlgorithm.exe

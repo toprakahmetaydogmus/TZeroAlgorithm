@@ -111,7 +111,7 @@ def build_downloads_grid(version: str, existing_html: str) -> str:
       <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/latest" target="_blank" rel="noopener noreferrer" class="rel-banner-link" id="live-release-link">
         View Release on GitHub →
       </a>
-      <div class="rel-banner-body" id="live-release-body">Production Sovereign Release: AST pruning, 26-Tier Anti-REA binary armor, Zero-Leak OS security, multi-agent context optimization, and verified standalone executables.</div>
+      <div class="rel-banner-body" id="live-release-body">Production Sovereign Release: AST pruning, 180-Tier Anti-REA binary armor, Zero-Leak OS security, multi-agent context optimization, and verified standalone executables.</div>
     </div>
 
     <div class="downloads-grid animate-on-scroll">
@@ -140,7 +140,7 @@ def build_downloads_grid(version: str, existing_html: str) -> str:
         <div class="dl-badge badge-cyan">Desktop Control Center</div>
         <div class="dl-icon">🖥️</div>
         <h3 class="dl-name">TZeroAlgorithm.exe</h3>
-        <p class="dl-desc">Standalone GUI, Codebase Scanner, Token Reducer, 26-Tier Anti-REA Armor &amp; offline AST audit dashboard suite.</p>
+        <p class="dl-desc">Standalone GUI, Codebase Scanner, Token Reducer, 180-Tier Anti-REA Armor &amp; offline AST audit dashboard suite.</p>
         <div class="dl-meta">
           <span>Size: <strong>{gui_size}</strong></span>
           <span>Version: <strong>v{version}</strong></span>

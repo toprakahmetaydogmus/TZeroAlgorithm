@@ -11,7 +11,7 @@ Part of Siber Akademi T-Zero Security Suite.
 License: MIT
 """
 
-__version__ = "4.1.0"
+__version__ = "5.0.0"
 __author__ = "Toprak Ahmet Aydoğmuş"
 __license__ = "MIT"
 
@@ -40,6 +40,14 @@ from .string_vault import StringVault
 from .asar_shield import AsarShield
 from .anti_vm import AntiVMGuard
 from .rdtsc_guard import RDTSCTimingGuard
+from .crypto_loader import CryptoBytecodeEnvelope
+from .tier_catalog import (
+    ANTI_REA_DOMAINS,
+    ANTI_REA_TIERS,
+    TOTAL_TIER_COUNT,
+    get_tier_catalog,
+    evaluate_static_tier_coverage,
+)
 
 __all__ = [
     "AntiREAEngine",
@@ -67,4 +75,10 @@ __all__ = [
     "AsarShield",
     "AntiVMGuard",
     "RDTSCTimingGuard",
+    "CryptoBytecodeEnvelope",
+    "ANTI_REA_DOMAINS",
+    "ANTI_REA_TIERS",
+    "TOTAL_TIER_COUNT",
+    "get_tier_catalog",
+    "evaluate_static_tier_coverage",
 ]

@@ -42,7 +42,7 @@ import gradio as gr
 # ==================================================================================================
 # CONSTANTS, PALETTES & MULTI-MODEL PRICING TIERS
 # ==================================================================================================
-APP_VERSION = "12.2.2"
+APP_VERSION = "12.3.0"
 REPO_URL = "https://github.com/toprakahmetaydogmus/TZeroAlgorithm"
 VERCEL_URL = "https://tzero-indol.vercel.app"
 SPACE_URL = "https://huggingface.co/spaces/toprakke4/tzero-token-reducer"

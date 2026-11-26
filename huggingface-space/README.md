@@ -13,7 +13,7 @@ short_description: AST Context Architect, Token Reducer & Anti-REA MCP
 
 # T-Zero: Enterprise AST Context Architect & Token Reducer
 
-Live Hugging Face Space demonstration for **T-Zero (v12.2.2 Sovereign Edition - TDQS 5.0 Anchor Certified)**.
+Live Hugging Face Space demonstration for **T-Zero (v12.3.0 Sovereign Edition - TDQS 5.0 Anchor Certified)**.
 - **Up to 95.8% Context Token Reduction** via Deterministic AST Skeletonization & Symbol Topology
 - **0.0% LLM Performance Loss** (100% Typed Contract Fidelity, zero attention drift)
 - **0% AI Hallucinations** via Pre-Flight Reality-Lock

@@ -99,3 +99,24 @@ class AsarShield:
             }
         except Exception as e:
             return {"success": False, "error": str(e)}
+
+    @classmethod
+    def protect_js_source(cls, js_source: str) -> str:
+        """Wraps JavaScript / Electron source with anti-debug, prototype freeze & integrity traps."""
+        guard = """/* SIBER AKADEMI ANTI-REA D11: ELECTRON / NODE JS GUARD */
+(function(_g){
+  try {
+    if (typeof process !== 'undefined' && process.execArgv && process.execArgv.some(function(a){ return a.indexOf('--inspect') === 0; })) {
+      process.exit(1);
+    }
+    var _t0 = Date.now();
+    if (typeof Object.freeze === 'function') {
+      try { Object.freeze(Object.prototype); } catch(_) {}
+    }
+    if ((Date.now() - _t0) > 2500 && typeof process !== 'undefined') {
+      process.exit(1);
+    }
+  } catch(_) {}
+})(typeof globalThis !== 'undefined' ? globalThis : this);
+"""
+        return f"{guard}\n{js_source}"

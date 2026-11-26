@@ -114,6 +114,6 @@ jobs:
         if: github.event_name == 'release' || inputs.upload_release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.event_name == 'release' && github.event.release.tag_name || (startsWith(github.ref, 'refs/tags/') && github.ref_name || 'v12.2.2') }}
+          tag_name: ${{ github.event_name == 'release' && github.event.release.tag_name || (startsWith(github.ref, 'refs/tags/') && github.ref_name || 'v12.3.0') }}
           files: dist/*.whl
           fail_on_unmatched_files: false

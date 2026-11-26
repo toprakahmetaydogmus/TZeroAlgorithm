@@ -23,6 +23,8 @@ import ast
 import os
 from typing import Dict, Any, List
 
+from .tier_catalog import evaluate_static_tier_coverage, TOTAL_TIER_COUNT
+
 
 class AIResistanceAuditor:
     """Audits target files for resistance against AI reverse-engineering agents."""
@@ -128,10 +130,15 @@ class AIResistanceAuditor:
         has_anti_debugger = "_verify_bare_metal_execution_environment" in source_code or "IsDebuggerPresent" in source_code
         has_anti_vm = "_verify_bare_metal_hardware" in source_code or "VBoxMouse.sys" in source_code
         has_rdtsc = "_rdtsc_checkpoint" in source_code or "perf_counter_ns" in source_code
+        has_crypto_envelope = "_tzero_decrypt_and_exec" in source_code
+
+        tier_coverage = evaluate_static_tier_coverage(source_code, has_homoglyphs=has_homoglyphs)
+        tiers_active = tier_coverage["tiers_active"]
 
         if not syntax_valid:
             score = min(score, 20)
             rating = "SYNTAX_INVALID"
+            tier_rating = "SYNTAX_INVALID"
             status = "FAIL_SYNTAX_ERROR"
         else:
             rating = (
@@ -141,6 +148,11 @@ class AIResistanceAuditor:
                 "MODERATE" if score >= 40 else
                 "VULNERABLE"
             )
+            tier_rating = (
+                "SOVEREIGN_180_ULTRA_ARMOR" if tiers_active >= 135 else
+                "MILITARY_GRADE_IMPREGNABLE" if score >= 90 else
+                rating
+            )
             status = "PASS" if score >= 60 else "RECOMMEND_HARDENING"
 
         return {
@@ -149,6 +161,13 @@ class AIResistanceAuditor:
             "score_kind": "static_textual_indicator",
             "syntax_valid": syntax_valid,
             "rating": rating,
+            "tier_rating": tier_rating,
+            "tiers_active": tiers_active,
+            "tiers_total": TOTAL_TIER_COUNT,
+            "domains_active": tier_coverage["domains_active"],
+            "domains_total": tier_coverage["domains_total"],
+            "tier_coverage_pct": tier_coverage["coverage_pct"],
+            "domain_breakdown": tier_coverage["domain_breakdown"],
             "defenses_active": {
                 "adversarial_prompt_traps": has_prompt_trap,
                 "control_flow_flattening": has_cff,
@@ -156,6 +175,7 @@ class AIResistanceAuditor:
                 "homoglyph_desynchronization": has_homoglyphs,
                 "mcp_honeypot_armor": has_mcp_or_honeypot,
                 "dynamic_polyvm_container": has_vm,
+                "hmac_crypto_envelope": has_crypto_envelope,
                 "decompiler_crash_barrier": has_decompiler_trap,
                 "cognitive_jailbreak_decoy": has_jailbreak_decoy,
                 "anti_agent_sandbox_guard": has_anti_agent,

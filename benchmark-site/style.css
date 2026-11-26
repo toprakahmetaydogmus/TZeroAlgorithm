@@ -3334,4 +3334,89 @@ input[type="range"]::-moz-range-thumb {
   .support-header { flex-direction: column; align-items: flex-start; }
   .modal-dialog { padding: 24px 18px; }
   .modal-star-banner { flex-direction: column; align-items: flex-start; }
+  .fortress-grid { grid-template-columns: 1fr; }
+}
+
+.btn-anti-rea-hero {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 22px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.16), rgba(6, 182, 212, 0.16));
+  border: 1px solid rgba(16, 185, 129, 0.48);
+  color: #34d399;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.btn-anti-rea-hero:hover {
+  transform: translateY(-2px);
+  border-color: #10b981;
+  box-shadow: 0 10px 28px rgba(16, 185, 129, 0.24);
+  color: #6ee7b7;
+}
+
+.fortress-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+  margin-top: 24px;
+}
+
+.fortress-card {
+  background: rgba(15, 23, 42, 0.86);
+  border: 1px solid rgba(16, 185, 129, 0.24);
+  border-radius: 16px;
+  padding: 24px;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.fortress-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(16, 185, 129, 0.65);
+  box-shadow: 0 14px 36px rgba(16, 185, 129, 0.14);
+}
+
+.fortress-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #34d399;
+  background: rgba(16, 185, 129, 0.14);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  margin-bottom: 12px;
+}
+
+.fortress-card h3 {
+  font-size: 1.12rem;
+  font-weight: 700;
+  color: #f8fafc;
+  margin: 0 0 10px 0;
+}
+
+.fortress-card p {
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: #94a3b8;
+  margin: 0;
+}
+
+.fortress-card code {
+  color: #22d3ee;
+  background: rgba(6, 182, 212, 0.12);
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 0.85em;
+}
+
+.fortress-cta-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 28px;
 }
