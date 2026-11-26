@@ -180,7 +180,7 @@ class TZeroTerminalCockpit:
         box_bottom = f"{c.CYAN}╚{'═' * 78}╝{c.RESET}"
 
         lines.append(box_top)
-        lines.append(cls._box_line(f"  {c.BOLD}{c.BRIGHT_CYAN}⚡ SİBER AKADEMİ — T-ZERO CONTEXT ARCHITECT & LIVE COCKPIT v12.2.1{c.RESET}"))
+        lines.append(cls._box_line(f"  {c.BOLD}{c.BRIGHT_CYAN}⚡ SİBER AKADEMİ — T-ZERO CONTEXT ARCHITECT & LIVE COCKPIT v12.2.2{c.RESET}"))
         lines.append(cls._box_line(f"  {c.DIM}Zero-Leak AST Intelligence | 100% Offline | $0 Cloud Cost Guarantee{c.RESET}"))
         lines.append(box_mid)
 
@@ -325,7 +325,7 @@ class TZeroTerminalCockpit:
         elif choice == "4":
             from tzero.tzero_commit import LocalSemanticCommitSynthesizer
             print(f"\n{cls.YELLOW}[Synthesizing Release CHANGELOG]...{cls.RESET}")
-            entry = LocalSemanticCommitSynthesizer.generate_changelog_entry(version="v12.2.1", repo_dir=workspace_dir)
+            entry = LocalSemanticCommitSynthesizer.generate_changelog_entry(version="v12.2.2", repo_dir=workspace_dir)
             print(f"\n{cls.BRIGHT_CYAN}{entry}{cls.RESET}\n")
             input("Press Enter to return to cockpit...")
         elif choice == "5":

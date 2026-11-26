@@ -1,7 +1,7 @@
 name: Release
 
 # Builds the Windows executable and publishes it as a GitHub Release.
-#   * Push a version tag like v12.2.1 -> test, build, and create/update the release.
+#   * Push a version tag like v12.2.2 -> test, build, and create/update the release.
 #   * Run manually (Actions tab) -> test and build only; all executables are attached as artifacts.
 
 concurrency:
@@ -18,9 +18,9 @@ concurrency:
   workflow_dispatch:
     inputs:
       tag_name:
-        description: 'Release tag to target (e.g. v12.2.1)'
+        description: 'Release tag to target (e.g. v12.2.2)'
         required: false
-        default: 'v12.2.1'
+        default: 'v12.2.2'
 
 permissions:
   contents: write
@@ -92,7 +92,7 @@ jobs:
         shell: bash
         run: |
           mkdir -p dist
-          cp LICENSE extensions/vscode/ 2>/dev/null || true
+          cp LICENSE NOTICE extensions/vscode/ 2>/dev/null || true
           cd extensions/vscode
           npx --yes @vscode/vsce package --no-dependencies -o ../../dist/
           cd ../..
@@ -153,7 +153,7 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'release'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || inputs.tag_name || 'v12.2.1' }}
+          tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || inputs.tag_name || 'v12.2.2' }}
           fail_on_unmatched_files: false
           files: |
             dist/TZeroAlgorithm.exe

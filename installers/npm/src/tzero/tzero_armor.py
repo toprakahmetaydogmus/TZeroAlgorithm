@@ -8,7 +8,7 @@ Includes native Ring-3 anti-debugging against x64dbg, IDA Pro, WinDbg, and Cheat
 stealth canary beacon telemetry, in-flight string vault, and Electron asar shielding.
 
 Developer: Toprak Ahmet Aydoğmuş (Siber Akademi)
-Part of Siber Akademi T-Zero Context Architect v12.2.1 Master Edition.
+Part of Siber Akademi T-Zero Context Architect v12.2.2 Master Edition.
 License: MIT
 """
 
@@ -98,22 +98,44 @@ def protect_path_with_armor(
     if p.is_file():
         return AntiREAEngine.protect_file(str(p), output_path=output_path, seed=seed, **options)
 
-    # If directory, protect all .py files within
+    out_root: Optional[Path] = None
+    if output_path:
+        out_root = Path(output_path)
+        if out_root.exists() and not out_root.is_dir():
+            return {
+                "success": False,
+                "error": f"Output target for directory protection must be a directory, got file: {output_path}",
+            }
+        if out_root.resolve() == p.resolve():
+            out_root = None
+
     results = []
+    failures = []
     count = 0
     for py_file in p.rglob("*.py"):
         if "__pycache__" in str(py_file) or ".venv" in str(py_file):
             continue
-        res = AntiREAEngine.protect_file(str(py_file), seed=seed, **options)
+        dst_path: Optional[str] = None
+        if out_root is not None:
+            rel = py_file.relative_to(p)
+            dst_file = out_root / rel
+            dst_file.parent.mkdir(parents=True, exist_ok=True)
+            dst_path = str(dst_file)
+        res = AntiREAEngine.protect_file(str(py_file), output_path=dst_path, seed=seed, **options)
         if res.get("success"):
             count += 1
             results.append(res)
+        else:
+            failures.append({"file": str(py_file), "error": res.get("error", "Unknown protection failure")})
 
     return {
-        "success": count > 0,
+        "success": len(failures) == 0 and count > 0,
         "directory": str(p),
+        "output_directory": str(out_root) if out_root is not None else str(p),
         "files_protected": count,
-        "details": results
+        "files_failed": len(failures),
+        "failures": failures,
+        "details": results,
     }
 
 

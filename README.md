@@ -88,10 +88,10 @@ tzero share
 
 # Option D: Standalone Windows 64-Bit Executable Suite (Zero Dependencies):
 # Download all-in-one suite (.ZIP) with GUI, CLI, MCP Server & 1-Click Configurator:
-# https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/download/v12.2.1/TZero-v12.2.1-Windows-x64.zip
+# https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/download/v12.2.2/TZero-v12.2.2-Windows-x64.zip
 
 # Install VS Code / Cursor Extension (.vsix):
-code --install-extension dist/tzero-vscode-12.2.1.vsix
+code --install-extension dist/tzero-vscode-12.2.2.vsix
 ```
 
 Git reminder hooks are opt-in. Installation and normal startup do not change
@@ -179,7 +179,7 @@ tzero init --vscode        # VS Code (Continue / Copilot)
 tzero init --zed           # Zed Editor
 
 # Install official VS Code / Cursor Extension (.vsix):
-code --install-extension dist/tzero-vscode-12.2.1.vsix
+code --install-extension dist/tzero-vscode-12.2.2.vsix
 ```
 
 ### Manual Configuration Snippets (Any MCP Client)
@@ -634,8 +634,9 @@ T-Zero v12.2.0 introduces the world's first **24-Tier Anti-REA (Reverse Engineer
 - **PolyVM Stack Bytecode Obfuscator & CFG Traps:** Flattens control-flow graphs into synthetic dispatcher loops, crashing static AST reconstructors.
 - **Hardware & Ring-3 Anti-Debug Matrix:** Detects `x64dbg`, `IDA`, Win32 `IsDebuggerPresent`, `NtGlobalFlag` (0x70), and PEB `BeingDebugged` with instant hard exits (`0xC0000409`).
 - **In-Flight Memory & String Vault:** Encrypts string literals with rolling-key XOR and scrubs process memory (`memset(0)`).
-- **Stealth Canary Beacon:** Dispatches real-time intrusion alarms via Webhook/DNS without plaintext network footprints.
+- **Stealth Canary Beacon (Opt-In Only):** Disabled by default (`webhook_canary: false`). When explicitly configured with a webhook URL, dispatches intrusion alert payloads containing only `threat_type`, `detected_tool`, `timestamp`, `platform`, `os_name`, `python_version`, `pid`, and `hostname[:16]` (no source code or secrets are ever transmitted).
 - **Built-in CLI & GUI:** Run `tzero armor`, `tzero audit-rea`, `tzero shield-exe`, or launch `tzero-gui`.
+- **Static Verification & Packaging Notice:** Use `tzero audit-rea` for static textual indicator scores; official Windows ZIP and VS Code `.vsix` bundles include both `LICENSE` and `NOTICE`.
 
 ---
 

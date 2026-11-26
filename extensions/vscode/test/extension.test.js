@@ -19,7 +19,7 @@ test('terminal command preserves arguments in its explicitly selected shell', ()
 });
 
 test('package.json defines 11.0.0 metadata, sidebar viewContainer, and commands with zero runtime deps', () => {
-    assert.equal(pkg.version, '12.2.1');
+    assert.equal(pkg.version, '12.2.2');
     assert.equal(pkg.dependencies === undefined || Object.keys(pkg.dependencies).length === 0, true);
     assert.ok(pkg.contributes.viewsContainers && Array.isArray(pkg.contributes.viewsContainers.activitybar));
     assert.ok(pkg.contributes.views && Array.isArray(pkg.contributes.views.tzeroSidebar));
@@ -152,7 +152,14 @@ test('core.js renders offline sidebar HTML with live metrics and command dispatc
     assert.match(html, /tzero\.federationImpact/);
     assert.match(html, /Debt Score: 92\/100/);
     assert.match(html, /Content-Security-Policy/);
+    assert.doesNotMatch(html, /unsafe-inline/);
     assert.doesNotMatch(html, /https?:\/\/cdn\./i);
+
+    const dispatched = [];
+    assert.equal(core.dispatchSidebarMessage({ type: 'runCommand', command: 'tzero.audit' }, (c) => dispatched.push(c)), true);
+    assert.equal(core.dispatchSidebarMessage({ type: 'runCommand', command: 'workbench.action.terminal.new' }, (c) => dispatched.push(c)), false);
+    assert.equal(core.dispatchSidebarMessage({ type: 'badType', command: 'tzero.audit' }, (c) => dispatched.push(c)), false);
+    assert.deepEqual(dispatched, ['tzero.audit']);
 });
 
 test('core.js quotes terminal args safely and ignores braces inside strings/comments', () => {

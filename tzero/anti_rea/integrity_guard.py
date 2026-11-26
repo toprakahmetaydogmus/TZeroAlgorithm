@@ -49,17 +49,29 @@ class MemoryIntegrityGuard:
 
     @classmethod
     def inject_integrity_check_code(cls, source_code: str) -> str:
-        """Injects standalone in-memory integrity attestation boiler into source code."""
+        """Injects standalone in-memory integrity attestation into source code."""
         snippet = '''
 # --- SIBER AKADEMI IN-MEMORY CODE INTEGRITY ATTESTATION ---
+_ATTESTATION_FINGERPRINTS = {}
+
 def _attest_memory_bytecode_fingerprints():
-    """Validates that running code objects have not been intercepted by Frida or debuggers."""
+    """Validates module function bytecode fingerprints against in-memory tampering."""
     import sys, hashlib
-    # Self-attest current module functions
     mod = sys.modules.get(__name__)
     if not mod:
-        return True
-    return True
+        return False
+    checked = 0
+    for name, obj in list(vars(mod).items()):
+        code_obj = getattr(obj, "__code__", None)
+        if code_obj is not None and not name.startswith("_vault_"):
+            digest = hashlib.sha256(code_obj.co_code).hexdigest()
+            expected = _ATTESTATION_FINGERPRINTS.get(name)
+            if expected is None:
+                _ATTESTATION_FINGERPRINTS[name] = digest
+            elif expected != digest:
+                return False
+            checked += 1
+    return checked > 0
 
 _ATTESTATION_OK = _attest_memory_bytecode_fingerprints()
 '''

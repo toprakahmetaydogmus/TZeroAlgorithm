@@ -151,9 +151,7 @@ function activate(context) {
             webviewView.webview.options = { enableScripts: true };
             webviewView.webview.html = core.buildSidebarHtml(state);
             webviewView.webview.onDidReceiveMessage((msg) => {
-                if (msg && msg.type === 'runCommand' && msg.command) {
-                    vscode.commands.executeCommand(msg.command);
-                }
+                core.dispatchSidebarMessage(msg, (cmd) => vscode.commands.executeCommand(cmd));
             });
         }
     };
@@ -172,7 +170,7 @@ function activate(context) {
 
     const openMenuCmd = vscode.commands.registerCommand('tzero.openMenu', async () => {
         const items = [
-            { label: '$(star-full) ⭐ Star on GitHub (45/100 Goal)', command: 'tzero.star' },
+            { label: '$(star-full) ⭐ Star on GitHub (Official Repo)', command: 'tzero.star' },
             { label: '$(sync) Refresh Live AST Telemetry', command: 'tzero.refreshMetrics' },
             { label: '$(rocket) Initialize Workspace (tzero --init)', command: 'tzero.init' },
             { label: '$(list-tree) View Workspace Context Tree', command: 'tzero.showTree' },
@@ -196,7 +194,7 @@ function activate(context) {
             { label: '$(tools) System Diagnostics (--doctor)', command: 'tzero.doctor' },
             { label: '$(globe) Launch Local Web Dashboard', command: 'tzero.openDashboard' }
         ];
-        const picked = await vscode.window.showQuickPick(items, { placeHolder: 'T-Zero Context Architect Command Center (v12.2.1)' });
+        const picked = await vscode.window.showQuickPick(items, { placeHolder: 'T-Zero Context Architect Command Center (v12.2.2)' });
         if (picked) {
             vscode.commands.executeCommand(picked.command);
         }
@@ -565,7 +563,7 @@ function activate(context) {
             const starTimer = setTimeout(async () => {
                 try {
                     const choice = await vscode.window.showInformationMessage(
-                        '⭐ T-Zero v12.2.1 is active! 26-Tier Anti-REA Armor + AST Context Architect. Help us reach our 100 stars milestone!',
+                        '⭐ T-Zero v12.2.2 is active! 26-Tier Anti-REA Armor + AST Context Architect. Help us reach our 100 stars milestone!',
                         '⭐ Star on GitHub (1-Click)',
                         'Later'
                     );

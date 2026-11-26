@@ -78,6 +78,8 @@ def build_vscode_extension():
     log("Packaging VS Code / Cursor Extension (.vsix)...")
     vscode_dir = ROOT_DIR / "extensions" / "vscode"
     shutil.copy2(ROOT_DIR / "LICENSE", vscode_dir / "LICENSE")
+    if (ROOT_DIR / "NOTICE").is_file():
+        shutil.copy2(ROOT_DIR / "NOTICE", vscode_dir / "NOTICE")
     npx_cmd = shutil.which("npx") or "npx"
     subprocess.run(
         [npx_cmd, "--yes", "@vscode/vsce", "package", "--no-dependencies"],

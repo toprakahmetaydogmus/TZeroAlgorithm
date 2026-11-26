@@ -248,6 +248,44 @@ function escapeHtml(str) {
         .replace(/'/g, '&#39;');
 }
 
+const crypto = require('crypto');
+
+const SIDEBAR_ACTIONS = Object.freeze([
+    { id: 'tzero.refreshMetrics', label: 'Refresh Telemetry' },
+    { id: 'tzero.init', label: 'Initialize Workspace (--init)' },
+    { id: 'tzero.showTree', label: 'Export RepoMap Tree' },
+    { id: 'tzero.audit', label: 'Zero-Leak Secret Audit' },
+    { id: 'tzero.explain', label: 'Explain Active File' },
+    { id: 'tzero.debt', label: 'Tech Debt & Health (--debt)' },
+    { id: 'tzero.budget', label: 'Budget Optimizer (--budget)' },
+    { id: 'tzero.contracts', label: 'API Contracts (--contracts)' },
+    { id: 'tzero.golden', label: 'Golden Verify (--golden)' },
+    { id: 'tzero.mutate', label: 'AST Mutation Test (--mutate)' },
+    { id: 'tzero.bridge', label: 'Polyglot Bridge (--bridge)' },
+    { id: 'tzero.mergeHeal', label: 'Merge Healer (--merge-heal)' },
+    { id: 'tzero.lspCheck', label: 'Arch & Zero-Leak Check (--check-arch)' },
+    { id: 'tzero.grounding', label: 'Copy Grounding Contract (--grounding)' },
+    { id: 'tzero.pack', label: 'Pack Repo to Budget (--pack)' },
+    { id: 'tzero.hookInstall', label: 'Install AI Hooks (--hook-install all)' },
+    { id: 'tzero.federationImpact', label: 'Federation Impact (--federation)' },
+    { id: 'tzero.auditRea', label: 'Anti-REA Resistance Audit (--audit-rea)' },
+    { id: 'tzero.armor', label: 'Apply 26-Tier Anti-REA Armor (--armor)' },
+    { id: 'tzero.openDashboard', label: 'Launch Web Dashboard' }
+]);
+
+const ALLOWED_SIDEBAR_COMMANDS = new Set(SIDEBAR_ACTIONS.map((a) => a.id));
+
+function dispatchSidebarMessage(msg, executeCommandFn) {
+    if (!msg || typeof msg !== 'object' || msg.type !== 'runCommand' || typeof msg.command !== 'string') {
+        return false;
+    }
+    if (!ALLOWED_SIDEBAR_COMMANDS.has(msg.command)) {
+        return false;
+    }
+    executeCommandFn(msg.command);
+    return true;
+}
+
 function buildSidebarHtml(state) {
     const s = state || {};
     const m = s.metrics || {};
@@ -257,31 +295,9 @@ function buildSidebarHtml(state) {
     const savingsPct = m.savings_pct !== undefined ? `${Number(m.savings_pct).toFixed(1)}%` : 'Ready';
     const lastCmd = escapeHtml(s.lastCommand || 'None');
     const lastOut = escapeHtml(s.lastOutput || 'Click Refresh Telemetry to scan this workspace.');
+    const nonce = crypto.randomBytes(16).toString('hex');
 
-    const actions = [
-        { id: 'tzero.refreshMetrics', label: 'Refresh Telemetry' },
-        { id: 'tzero.init', label: 'Initialize Workspace (--init)' },
-        { id: 'tzero.showTree', label: 'Export RepoMap Tree' },
-        { id: 'tzero.audit', label: 'Zero-Leak Secret Audit' },
-        { id: 'tzero.explain', label: 'Explain Active File' },
-        { id: 'tzero.debt', label: 'Tech Debt & Health (--debt)' },
-        { id: 'tzero.budget', label: 'Budget Optimizer (--budget)' },
-        { id: 'tzero.contracts', label: 'API Contracts (--contracts)' },
-        { id: 'tzero.golden', label: 'Golden Verify (--golden)' },
-        { id: 'tzero.mutate', label: 'AST Mutation Test (--mutate)' },
-        { id: 'tzero.bridge', label: 'Polyglot Bridge (--bridge)' },
-        { id: 'tzero.mergeHeal', label: 'Merge Healer (--merge-heal)' },
-        { id: 'tzero.lspCheck', label: 'Arch & Zero-Leak Check (--check-arch)' },
-        { id: 'tzero.grounding', label: 'Copy Grounding Contract (--grounding)' },
-        { id: 'tzero.pack', label: 'Pack Repo to Budget (--pack)' },
-        { id: 'tzero.hookInstall', label: 'Install AI Hooks (--hook-install all)' },
-        { id: 'tzero.federationImpact', label: 'Federation Impact (--federation)' },
-        { id: 'tzero.auditRea', label: 'Anti-REA Resistance Audit (--audit-rea)' },
-        { id: 'tzero.armor', label: 'Apply 26-Tier Anti-REA Armor (--armor)' },
-        { id: 'tzero.openDashboard', label: 'Launch Web Dashboard' }
-    ];
-
-    const buttonsHtml = actions
+    const buttonsHtml = SIDEBAR_ACTIONS
         .map((a) => `<button class="cmd-btn" data-cmd="${escapeHtml(a.id)}">${escapeHtml(a.label)}</button>`)
         .join('\n                ');
 
@@ -289,9 +305,9 @@ function buildSidebarHtml(state) {
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline';" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'nonce-${nonce}'; script-src 'nonce-${nonce}';" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <style>
+    <style nonce="${nonce}">
         body {
             font-family: var(--vscode-font-family);
             color: var(--vscode-foreground);
@@ -364,7 +380,7 @@ function buildSidebarHtml(state) {
         <div><strong>Last Run:</strong> <code>${lastCmd}</code></div>
         <pre>${lastOut}</pre>
     </div>
-    <script>
+    <script nonce="${nonce}">
         const vscode = acquireVsCodeApi();
         document.querySelectorAll('.cmd-btn').forEach((btn) => {
             btn.addEventListener('click', () => {
@@ -377,6 +393,9 @@ function buildSidebarHtml(state) {
 }
 
 module.exports = {
+    SIDEBAR_ACTIONS,
+    ALLOWED_SIDEBAR_COMMANDS,
+    dispatchSidebarMessage,
     resolveExecutable,
     quoteTerminalArg,
     buildTerminalCommand,

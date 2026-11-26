@@ -78,6 +78,12 @@ def main():
 
     elif args.command == "audit":
         audit = AIResistanceAuditor.audit_file(args.path)
+        if audit.get("error"):
+            if args.json:
+                print(json.dumps(audit, indent=2))
+            else:
+                print(f"[FAIL] {audit['error']}", file=sys.stderr)
+            sys.exit(1)
         if args.json:
             print(json.dumps(audit, indent=2))
         else:
@@ -85,7 +91,7 @@ def main():
             print("  SHIELD AUDIT REPORT: AI REVERSE-ENGINEERING RESISTANCE (TDQS-REA)")
             print("================================================================================")
             print(f"Target File:       {audit.get('file', args.path)}")
-            print(f"AI Score:          {audit.get('score', 0)} / 100 [{audit.get('rating', 'UNKNOWN')}]")
+            print(f"AI Score:          {audit.get('score', 0)} / 100 [{audit.get('rating', 'UNVERIFIED')}]")
             print(f"Jailbreak Immune:  {'YES (Impregnable)' if audit.get('jailbreak_ai_immune') else 'NO'}")
             print(f"Status:            {audit.get('status', 'N/A')}")
             print("\nActive Defenses:")

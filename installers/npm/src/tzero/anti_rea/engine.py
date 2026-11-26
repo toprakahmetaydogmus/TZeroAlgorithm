@@ -9,8 +9,10 @@ Part of Siber Akademi T-Zero Security Suite.
 License: MIT
 """
 
+import ast
 import os
-from typing import Dict, Any, Optional
+import tempfile
+from typing import Dict, Any, List, Optional, Tuple
 
 from .traps import AdversarialTrapGenerator
 from .extractor_shield import ExtractorShield
@@ -42,6 +44,49 @@ class AntiREAEngine:
     """Master engine orchestrating military-grade Anti-REA code and binary protection."""
 
     @classmethod
+    def _extract_python_prologue(cls, source_code: str) -> Tuple[str, str, str]:
+        """Preserve encoding/shebang header and mandatory `from __future__` imports at module top."""
+        lines = source_code.splitlines(keepends=True)
+        head_comments: List[str] = []
+        idx = 0
+        while idx < len(lines):
+            s = lines[idx].strip()
+            if idx == 0 and s.startswith("#!"):
+                head_comments.append(lines[idx])
+                idx += 1
+            elif s.startswith("#") and ("coding" in s or idx < 2):
+                head_comments.append(lines[idx])
+                idx += 1
+            elif not s:
+                head_comments.append(lines[idx])
+                idx += 1
+            else:
+                break
+
+        rest_code = "".join(lines[idx:])
+        future_lines: List[str] = []
+        body_code = rest_code
+        try:
+            tree = ast.parse(rest_code)
+            future_indices = set()
+            for node in tree.body:
+                if isinstance(node, ast.ImportFrom) and node.module == "__future__":
+                    for ln in range(node.lineno, (node.end_lineno or node.lineno) + 1):
+                        future_indices.add(ln)
+            if future_indices:
+                r_lines = rest_code.splitlines(keepends=True)
+                kept = []
+                for ln_no, ln_txt in enumerate(r_lines, 1):
+                    if ln_no in future_indices:
+                        future_lines.append(ln_txt if ln_txt.endswith("\n") else ln_txt + "\n")
+                    else:
+                        kept.append(ln_txt)
+                body_code = "".join(kept)
+        except Exception:
+            pass
+        return "".join(head_comments), "".join(future_lines), body_code
+
+    @classmethod
     def protect_python_source(
         cls,
         source_code: str,
@@ -67,8 +112,8 @@ class AntiREAEngine:
         webhook_canary: Optional[str] = None,
         seed: int = 42,
     ) -> str:
-        """Applies comprehensive 24-tier Anti-REA protection passes to Python source code."""
-        code = source_code
+        """Applies comprehensive Anti-REA protection passes while preserving valid Python prologue."""
+        head_comments, future_block, code = cls._extract_python_prologue(source_code)
 
         # 1. Algebraic Identity Mutation (Mixed Boolean-Arithmetic)
         if algebraic_mutation:
@@ -146,11 +191,21 @@ class AntiREAEngine:
         if bpe_disrupt:
             code = BPETokenDisrupter.inject_bpe_bomb_comment(code, length=50, seed=seed)
 
-        # 18. Adversarial Prompt Injection Traps (in header)
-        if prompt_traps:
-            code = AdversarialTrapGenerator.inject_python_docstring_trap(code)
+        # Strip redundant coding header inserted mid-file by VM header before placing valid top prologue
+        if future_block:
+            code_lines = code.splitlines(keepends=True)
+            if code_lines and "coding" in code_lines[0]:
+                code = "".join(code_lines[1:])
 
-        return code
+        # Module docstring MUST come before `from __future__ import ...`, which MUST come before code
+        trap_doc = ""
+        if prompt_traps:
+            trap_doc = f'"""\n{AdversarialTrapGenerator.get_trap_payload(0)}\n"""\n'
+
+        header = head_comments
+        if not header or "coding" not in header:
+            header = "# -*- coding: utf-8 -*-\n" + header
+        return f"{header}{trap_doc}{future_block}{code}"
 
     @classmethod
     def protect_file(
@@ -173,15 +228,24 @@ class AntiREAEngine:
         if file_path.lower().endswith((".exe", ".bin", ".elf", ".so", ".pyd")):
             return ExtractorShield.shield_file(file_path, output_path=out)
 
-        # Otherwise assume Python source code
+        # Otherwise assume Python source code: transform, compile-verify in temp staging, then write atomically
+        staged_path = None
         try:
-            with open(file_path, "r", encoding="utf-8", errors="replace") as f:
+            with open(file_path, "r", encoding="utf-8", errors="strict") as f:
                 content = f.read()
 
             protected = cls.protect_python_source(content, **options)
 
-            with open(out, "w", encoding="utf-8") as f:
-                f.write(protected)
+            # Verify transformed Python compiles cleanly BEFORE replacing target file
+            compile(protected, out, "exec")
+
+            out_dir = os.path.dirname(os.path.abspath(out)) or "."
+            os.makedirs(out_dir, exist_ok=True)
+            with tempfile.NamedTemporaryFile("w", dir=out_dir, delete=False, encoding="utf-8", prefix=".tzero_armor_") as tf:
+                tf.write(protected)
+                staged_path = tf.name
+            os.replace(staged_path, out)
+            staged_path = None
 
             audit_before = AIResistanceAuditor.audit_python_source(content)
             audit_after = AIResistanceAuditor.audit_python_source(protected)
@@ -196,6 +260,11 @@ class AntiREAEngine:
                 "status": "PROTECTED_MILITARY_GRADE" if audit_after["score"] >= 80 else "PROTECTED"
             }
         except Exception as e:
+            if staged_path and os.path.exists(staged_path):
+                try:
+                    os.remove(staged_path)
+                except OSError:
+                    pass
             return {"success": False, "error": str(e)}
 
     @classmethod

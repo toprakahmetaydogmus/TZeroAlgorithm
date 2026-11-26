@@ -19,6 +19,7 @@ Part of Siber Akademi T-Zero Security Suite.
 License: MIT
 """
 
+import ast
 import os
 from typing import Dict, Any, List
 
@@ -28,9 +29,17 @@ class AIResistanceAuditor:
 
     @classmethod
     def audit_python_source(cls, source_code: str) -> Dict[str, Any]:
-        """Audits Python source code across all Anti-REA defense dimensions."""
+        """Audits Python source code across Anti-REA static dimensions cleanly."""
         findings: List[str] = []
         score = 0
+
+        parsed_tree = None
+        syntax_valid = True
+        try:
+            parsed_tree = ast.parse(source_code)
+        except SyntaxError as exc:
+            syntax_valid = False
+            findings.append(f"Syntax error prevents clean Python compilation (line {exc.lineno}): {exc.msg}")
 
         # 1. Prompt Trap Check (0-10)
         has_prompt_trap = "CRITICAL_SYSTEM_OVERRIDE" in source_code or "RFC-AI-GUARD" in source_code
@@ -55,8 +64,20 @@ class AIResistanceAuditor:
         else:
             findings.append("No semantic token chaff detected to drain agent context window.")
 
-        # 4. Homoglyphs & Confusables (0-10)
-        has_homoglyphs = any(ord(char) > 127 for char in source_code)
+        # 4. Homoglyphs & Confusables in AST identifiers ONLY (do NOT score non-ASCII natural-language comments!)
+        has_homoglyphs = False
+        if parsed_tree is not None:
+            for node in ast.walk(parsed_tree):
+                ident = ""
+                if isinstance(node, ast.Name):
+                    ident = node.id
+                elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                    ident = node.name
+                elif isinstance(node, ast.arg):
+                    ident = node.arg
+                if ident and any(ord(ch) > 127 for ch in ident):
+                    has_homoglyphs = True
+                    break
         if has_homoglyphs:
             score += 10
         else:
@@ -108,17 +129,25 @@ class AIResistanceAuditor:
         has_anti_vm = "_verify_bare_metal_hardware" in source_code or "VBoxMouse.sys" in source_code
         has_rdtsc = "_rdtsc_checkpoint" in source_code or "perf_counter_ns" in source_code
 
-        rating = (
-            "MILITARY_GRADE_IMPREGNABLE" if score >= 90 else
-            "MILITARY_GRADE" if score >= 80 else
-            "STRONG" if score >= 60 else
-            "MODERATE" if score >= 40 else
-            "VULNERABLE"
-        )
+        if not syntax_valid:
+            score = min(score, 20)
+            rating = "SYNTAX_INVALID"
+            status = "FAIL_SYNTAX_ERROR"
+        else:
+            rating = (
+                "MILITARY_GRADE_IMPREGNABLE" if score >= 90 else
+                "MILITARY_GRADE" if score >= 80 else
+                "STRONG" if score >= 60 else
+                "MODERATE" if score >= 40 else
+                "VULNERABLE"
+            )
+            status = "PASS" if score >= 60 else "RECOMMEND_HARDENING"
 
         return {
             "score": score,
             "max_score": 100,
+            "score_kind": "static_textual_indicator",
+            "syntax_valid": syntax_valid,
             "rating": rating,
             "defenses_active": {
                 "adversarial_prompt_traps": has_prompt_trap,
@@ -136,10 +165,11 @@ class AIResistanceAuditor:
                 "rdtsc_hardware_timing_guard": has_rdtsc,
                 "memory_integrity_guard": has_debugger_or_integrity,
             },
-            "jailbreak_ai_immune": score >= 85 and has_jailbreak_decoy and has_vm,
+            "unverified_layers": ["debugger_evasion", "vm_evasion", "asar_shield"],
+            "jailbreak_ai_immune": syntax_valid and score >= 85 and has_jailbreak_decoy and has_vm,
             "anti_debugger_active": has_anti_debugger,
             "findings": findings,
-            "status": "PASS" if score >= 60 else "RECOMMEND_HARDENING"
+            "status": status,
         }
 
     @classmethod

@@ -25,15 +25,18 @@ class StringVault:
     VAULT_RUNTIME_SNIPPET = '''
 # --- SIBER AKADEMI DYNAMIC IN-FLIGHT STRING VAULT ---
 def _vault_decrypt_string(enc_blob, salt_key):
-    """Decrypts string into ephemeral stack frame and scrubs the buffer."""
+    """Decrypts UTF-8 string into ephemeral stack frame and scrubs the buffers."""
     buf = bytearray(enc_blob)
+    dec = bytearray(len(buf))
     k = salt_key & 0xFF
-    res_chars = []
-    for i in range(len(buf)):
-        byte_val = buf[i] ^ ((k + i * 7) & 0xFF)
-        res_chars.append(chr(byte_val))
-        buf[i] = 0  # Immediate in-place memory wipe
-    return "".join(res_chars)
+    try:
+        for i in range(len(buf)):
+            dec[i] = buf[i] ^ ((k + i * 7) & 0xFF)
+            buf[i] = 0  # Immediate in-place memory wipe
+        return bytes(dec).decode("utf-8", errors="strict")
+    finally:
+        for i in range(len(dec)):
+            dec[i] = 0
 '''
 
     @classmethod

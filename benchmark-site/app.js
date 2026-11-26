@@ -4683,7 +4683,7 @@ function initGitHubStars() {
 
 function initViralShare() {
   const repoUrl = "https://github.com/toprakahmetaydogmus/TZeroAlgorithm";
-  const shareText = "T-Zero v12.2.1: Cut AI coding context tokens by up to 95% using deterministic AST pruning! Open-source local MCP server for Cursor & Claude. Check it out: " + repoUrl;
+  const shareText = "T-Zero v12.2.2: Cut AI coding context tokens by up to 95% using deterministic AST pruning! Open-source local MCP server for Cursor & Claude. Check it out: " + repoUrl;
 
   const btnX = document.getElementById("share-x");
   const btnReddit = document.getElementById("share-reddit");
@@ -4700,7 +4700,7 @@ function initViralShare() {
 
   if (btnReddit) {
     btnReddit.addEventListener("click", () => {
-      const title = "T-Zero v12.2.1: Open-source local AST context pruning for Cursor & Claude (-88% to -95% tokens, $0, 100% offline)";
+      const title = "T-Zero v12.2.2: Open-source local AST context pruning for Cursor & Claude (-88% to -95% tokens, $0, 100% offline)";
       const url = "https://reddit.com/submit?url=" + encodeURIComponent(repoUrl) + "&title=" + encodeURIComponent(title);
       window.open(url, "_blank", "width=800,height=600");
     });
@@ -4715,7 +4715,7 @@ function initViralShare() {
 
   if (btnHN) {
     btnHN.addEventListener("click", () => {
-      const t = "Show HN: T-Zero v12.2.1 – Local AST context pruning for LLMs with 88-95% token reduction";
+      const t = "Show HN: T-Zero v12.2.2 – Local AST context pruning for LLMs with 88-95% token reduction";
       const url = "https://news.ycombinator.com/submitlink?u=" + encodeURIComponent(repoUrl) + "&t=" + encodeURIComponent(t);
       window.open(url, "_blank", "width=700,height=500");
     });
@@ -4748,7 +4748,7 @@ function initLatestRelease() {
 
   function renderRelease(data) {
     if (!data) return;
-    const tagName = data.tag_name || "v12.2.1";
+    const tagName = data.tag_name || "v12.2.2";
     if (releaseTagEl) releaseTagEl.textContent = tagName;
     
     if (releaseDateEl && data.published_at) {
@@ -4810,7 +4810,7 @@ function initLatestRelease() {
   } else {
     // Default fallback baseline
     renderRelease({
-      tag_name: "v12.2.1",
+      tag_name: "v12.2.2",
       published_at: "2026-11-21T00:00:00Z",
       assets: new Array(6),
       body: "Production Sovereign Release: AST pruning, Zero-Leak OS security, multi-agent context optimization, and verified standalone executables.",
@@ -4865,7 +4865,7 @@ function openSupportModal(downloadName = null) {
     if (titleEl) titleEl.textContent = "Thank You for Downloading T-Zero!";
     if (descEl) descEl.innerHTML = `Your download of <strong>${safeName}</strong> has started. T-Zero is 100% free, offline, and zero-leak. Help us keep it alive and free for everyone!`;
   } else {
-    if (itemEl) itemEl.textContent = "T-Zero v12.2.1";
+    if (itemEl) itemEl.textContent = "T-Zero v12.2.2";
     if (titleEl) titleEl.textContent = "Support Open Source & Keep T-Zero Free";
     if (descEl) descEl.innerHTML = "T-Zero is completely free, local-first, and zero-leak. You can support continuous development and cloud benchmark infrastructure with crypto donations or a GitHub star!";
   }

@@ -493,7 +493,7 @@ def calculate_token_cost(token_count: int, provider_name: str) -> float:
 # i18n Translations
 TRANSLATIONS: Dict[str, Dict[str, str]] = {
     "en": {
-        "title": "T-Zero Developer Console & Context Architect v12.2.1",
+        "title": "T-Zero Developer Console & Context Architect v12.2.2",
         "subtitle": f"Developer: {DEV_NAME} | {DEV_URL_MAIN} | {DEV_URL_BIO}",
         "overview_tab": "🏠 Overview Dashboard",
         "setup_tab": "⚡ Setup & AI Models",
@@ -530,7 +530,7 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "audit_btn": "🛡️ SECURITY AUDIT"
     },
     "tr": {
-        "title": "T-Zero Geliştirici Konsolu & Bağlam Mimarı v12.2.1",
+        "title": "T-Zero Geliştirici Konsolu & Bağlam Mimarı v12.2.2",
         "subtitle": f"Geliştirici: {DEV_NAME} | {DEV_URL_MAIN} | {DEV_URL_BIO}",
         "overview_tab": "🏠 Genel Bakış",
         "setup_tab": "⚡ Kurulum & Model",
@@ -2050,7 +2050,56 @@ class KeyringSecretsBackupManager:
             return False
 
     @classmethod
-    def restore_credentials(cls, filepath: str, cipher_key: str) -> bool:
+    def _validate_credential_map(cls, creds: Any) -> Optional[Dict[str, str]]:
+        """Validate backup credential schema strictly before touching OS keyring."""
+        if not isinstance(creds, dict) or not creds:
+            return None
+        known_providers = set(globals().get("AI_PROVIDERS", {}).keys()) | {
+            "OpenAI", "Anthropic", "NVIDIA NIM", "Google Gemini", "OpenRouter",
+            "Groq", "DeepSeek", "HuggingFace", "GitHub", "Ollama",
+        }
+        validated: Dict[str, str] = {}
+        for provider, secret in creds.items():
+            if not isinstance(provider, str) or not isinstance(secret, str):
+                return None
+            p_clean = provider.strip()
+            if not p_clean or len(p_clean) > 64 or any(ord(c) < 32 for c in p_clean):
+                return None
+            if p_clean not in known_providers and not re.fullmatch(r"[A-Za-z0-9 _.\-]{2,48}", p_clean):
+                return None
+            if not secret or len(secret) > 4096:
+                return None
+            validated[p_clean] = secret
+        return validated
+
+    @classmethod
+    def import_legacy_credentials(cls, filepath: str, cipher_key: str) -> bool:
+        """Import a legacy unauthenticated XOR backup after strict schema validation."""
+        try:
+            with open(filepath, "rb") as f:
+                data = f.read()
+            if not data or data.startswith(cls.MAGIC_HEADER):
+                return False
+            encrypted = bytearray(data)
+            key_bytes = cipher_key.encode("utf-8")
+            if key_bytes:
+                for i in range(len(encrypted)):
+                    encrypted[i] ^= key_bytes[i % len(key_bytes)]
+            raw_obj = json.loads(encrypted.decode("utf-8"))
+            validated = cls._validate_credential_map(raw_obj)
+            if not validated:
+                logger.error("Legacy backup rejected: invalid provider/credential schema")
+                return False
+            logger.warning("Imported legacy unauthenticated backup; please re-export to modern HMAC TZB2 format.")
+            for provider, secret in validated.items():
+                keyring.set_password(SERVICE_NAME, provider, secret)
+            return True
+        except Exception as e:
+            logger.error(f"Legacy backup import failed: {e}")
+            return False
+
+    @classmethod
+    def restore_credentials(cls, filepath: str, cipher_key: str, allow_legacy: bool = True) -> bool:
         try:
             import hashlib
             import hmac
@@ -2068,19 +2117,18 @@ class KeyringSecretsBackupManager:
                     return False
                 kstream = cls._keystream(enc_key, len(cipher_bytes))
                 raw_data = bytes([b ^ k for b, k in zip(cipher_bytes, kstream)])
-                creds = json.loads(raw_data.decode("utf-8"))
-            else:
-                # Legacy XOR fallback for backward compatibility
-                encrypted = bytearray(data)
-                key_bytes = cipher_key.encode("utf-8")
-                if key_bytes:
-                    for i in range(len(encrypted)):
-                        encrypted[i] ^= key_bytes[i % len(key_bytes)]
-                creds = json.loads(encrypted.decode("utf-8"))
+                validated = cls._validate_credential_map(json.loads(raw_data.decode("utf-8")))
+                if not validated:
+                    logger.error("Backup payload failed schema validation")
+                    return False
+                for provider, secret in validated.items():
+                    keyring.set_password(SERVICE_NAME, provider, secret)
+                return True
 
-            for provider, secret in creds.items():
-                keyring.set_password(SERVICE_NAME, provider, secret)
-            return True
+            if allow_legacy:
+                return cls.import_legacy_credentials(filepath, cipher_key)
+            logger.error("Rejected unauthenticated legacy backup (allow_legacy=False)")
+            return False
         except Exception as e:
             logger.error(f"Restore keyring credentials failed: {e}")
             return False
@@ -9390,13 +9438,18 @@ def main():
             print("  --audit, -a   Audit AI decompilation resistance without modifying files.")
             sys.exit(0)
         target_path = next((a for a in extra_args if not a.startswith("-")), ".")
+        out_path = None
+        for idx_a, a in enumerate(extra_args):
+            if a in ("-o", "--output", "--out") and idx_a + 1 < len(extra_args):
+                out_path = extra_args[idx_a + 1]
+                break
         if any(flag in ("--audit", "-a") for flag in extra_args):
             from tzero.tzero_armor import audit_path_rea_resistance
             audit = audit_path_rea_resistance(target_path)
             print(json.dumps(audit, indent=2))
             sys.exit(0 if "error" not in audit else 1)
         from tzero.tzero_armor import protect_path_with_armor
-        res = protect_path_with_armor(target_path)
+        res = protect_path_with_armor(target_path, output_path=out_path)
         if res.get("success"):
             print(f"[OK] Applied Anti-REA Armor to: {target_path}")
             if "score_after" in res:
@@ -9412,16 +9465,22 @@ def main():
         from tzero.tzero_armor import audit_path_rea_resistance
         target_path = sys.argv[2] if len(sys.argv) > 2 and not sys.argv[2].startswith("-") else "."
         audit = audit_path_rea_resistance(target_path)
+        if audit.get("error"):
+            print(f"[ERROR] {audit['error']}", file=sys.stderr)
+            sys.exit(1)
         print("================================================================================")
         print("  SHIELD AUDIT REPORT: AI REVERSE-ENGINEERING RESISTANCE (TDQS-REA)")
         print("================================================================================")
         print(f"Target:       {target_path}")
-        print(f"AI Score:     {audit.get('score', 0)} / 100 [{audit.get('rating', 'UNKNOWN')}]")
+        print(f"AI Score:     {audit.get('score', 0)} / 100 [{audit.get('rating', 'UNVERIFIED')}]")
+        print(f"Score Basis:  {audit.get('score_kind', 'static_textual_indicator')}")
         print(f"Status:       {audit.get('status', 'N/A')}")
         if audit.get("defenses_active"):
             print("\nActive Defenses:")
             for k, v in audit["defenses_active"].items():
                 print(f"  [{'✔' if v else ' '}] {k}")
+        if audit.get("unverified_layers"):
+            print(f"\nUnverified Layers (not measured statically): {', '.join(audit['unverified_layers'])}")
         recs = audit.get("sample_findings") or audit.get("findings", [])
         if recs:
             print("\nRecommendations:")
@@ -9562,7 +9621,7 @@ def main():
                         default="o200k_base", help="BPE encoding for --symbol-context")
     parser.add_argument("--cache-aligned", action="store_true", help="Order context for KV-cache prefix stability (immutable static prefix before dynamic query suffix)")
     parser.add_argument("--commit-msg", action="store_true", help="Generate Conventional Commit message from local AST git diff ($0 local engine)")
-    parser.add_argument("--changelog", nargs="?", const="v12.2.1", default=None, metavar="VERSION", help="Generate release CHANGELOG markdown from git history")
+    parser.add_argument("--changelog", nargs="?", const="v12.2.2", default=None, metavar="VERSION", help="Generate release CHANGELOG markdown from git history")
     parser.add_argument("--ci", choices=["github", "gitlab", "pre-commit", "local", "all"], default=None, help="Install CI/CD workflow or run local verification suite")
     parser.add_argument("--local-ci", action="store_true", help="Run comprehensive Local CI & Pre-Push verification battery ($0 quota burn)")
     parser.add_argument("--quick-ci", action="store_true", help="Run fast Local CI smoke checks in seconds")
@@ -9626,7 +9685,7 @@ def main():
     parser.add_argument("--card", "--badge", nargs="?", const="assets/tzero_badge_card.svg", default=None, metavar="FILE", help="Generate viral dark-mode SVG banner card and GitHub README badges")
     parser.add_argument("--showcase", nargs="?", const="tzero_showcase.html", default=None, metavar="FILE", help="Generate interactive split-screen HTML5 comparison showcase slider")
     parser.add_argument("--marketing", "--growth", action="store_true", help="Launch $0-budget viral growth engine and export campaign materials for Reddit, HN, X, and Product Hunt")
-    parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect v12.2.1 Master Edition (engine v4.1.0)")
+    parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect v12.2.2 Master Edition (engine v4.1.0)")
 
 
     def print_master_tutorial():
@@ -9735,7 +9794,7 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
     def print_quickstart_guide():
         print("""
 ================================================================================
-⚡ SİBER AKADEMİ — T-ZERO CONTEXT ARCHITECT & MCP v12.2.1 MASTER (engine v4.1.0)
+⚡ SİBER AKADEMİ — T-ZERO CONTEXT ARCHITECT & MCP v12.2.2 MASTER (engine v4.1.0)
 ================================================================================
 🎯 %95'e Varan Token Tasarrufu & Otonom Yapay Zeka Mimari Bağlam Motoru
 
@@ -9952,7 +10011,7 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
             print(json.dumps(audit, indent=2))
             return
         from tzero.tzero_armor import protect_path_with_armor
-        res = protect_path_with_armor(args.armor)
+        res = protect_path_with_armor(args.armor, output_path=getattr(args, "output", None))
         if res.get("success"):
             print(f"[OK] Applied Anti-REA Armor to: {args.armor}")
             if "score_after" in res:
@@ -9967,7 +10026,7 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
         from tzero.tzero_armor import audit_path_rea_resistance
         audit = audit_path_rea_resistance(args.audit_rea)
         print(json.dumps(audit, indent=2))
-        return
+        sys.exit(1 if audit.get("error") else 0)
     elif getattr(args, "telemetry", None) is not None:
         from tzero.tzero_telemetry import get_summary, render_report
         ws_dir = args.telemetry if args.telemetry != "." else (getattr(args, "dir", ".") or ".")
@@ -10714,7 +10773,7 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
         if not os.path.exists(app_path):
             app_path = os.path.join(os.getcwd(), "huggingface-space", "app.py")
         print("\033[36m" + "=" * 80)
-        print("🤗 SİBER AKADEMİ — T-ZERO HUGGING FACE SPACE & GRADIO COCKPIT (v12.2.1)")
+        print("🤗 SİBER AKADEMİ — T-ZERO HUGGING FACE SPACE & GRADIO COCKPIT (v12.2.2)")
         print("=" * 80 + "\033[0m")
         print("🌐 Official Live Space : https://huggingface.co/spaces/toprakke4/tzero-token-reducer")
         print(f"📁 Local Application   : {app_path}")
@@ -10740,20 +10799,28 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
     elif getattr(args, "vault", None) is not None:
         from tzero.tzero_security import ZeroLeakEngine
         target = args.vault or args.dir
+        if not os.path.exists(target):
+            print(f"[AUTO-VAULT ERROR] Target path not found: {target}", file=sys.stderr)
+            sys.exit(1)
+        proj_root = ZeroLeakEngine.resolve_project_root(target)
+        env_path = os.path.join(proj_root, ".env")
+        gi_path = os.path.join(proj_root, ".gitignore")
         if os.path.isfile(target):
             with open(target, "r", encoding="utf-8", errors="ignore") as f:
                 c = f.read()
             migrated_code, env_file, count, report = ZeroLeakEngine.auto_migrate_to_env(
-                c,
-                env_file_path=".env" if args.migrate else None,
-                gitignore_path=".gitignore" if args.migrate else None
+                c, env_file_path=env_path, gitignore_path=gi_path, dry_run=True
             )
             if args.migrate:
-                with open(target, "w", encoding="utf-8") as f:
-                    f.write(migrated_code)
-                print(f"[AUTO-VAULT] Successfully migrated {count} secret(s) into .env and updated code.")
+                res = ZeroLeakEngine.migrate_files_atomically([target], env_file_path=env_path, gitignore_path=gi_path)
+                if not res.get("success"):
+                    print(f"[AUTO-VAULT ERROR] Migration aborted safely (files preserved): {res.get('error')}", file=sys.stderr)
+                    sys.exit(1)
+                if res.get("warning"):
+                    print(f"[AUTO-VAULT WARNING] {res['warning']}", file=sys.stderr)
+                print(f"[AUTO-VAULT] Successfully migrated {res.get('migrated_count', 0)} secret(s) into {env_path} and updated code.")
             else:
-                print(f"[AUTO-VAULT DRY-RUN] Detected {count} hardcoded credential(s) ready for .env migration. Re-run with --migrate to apply.")
+                print(f"[AUTO-VAULT DRY-RUN] Detected {count} hardcoded credential(s) ready for {env_path} migration. Re-run with --migrate to apply.")
         else:
             findings = ZeroLeakEngine.scan_workspace(target)
             violations = findings.get("violations", [])
@@ -10765,21 +10832,18 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
                 for idx, _ in enumerate(violations, 1):
                     print(f"  - [FINDING #{idx}] Credential pattern detected (redacted).")
                 if args.migrate:
-                    total_migrated = 0
-                    violating_files = sorted({v.get("file", "") for v in violations if v.get("file")})
-                    for vf in violating_files:
-                        if os.path.isfile(vf):
-                            with open(vf, "r", encoding="utf-8", errors="ignore") as f:
-                                sc = f.read()
-                            mc, ef, c_cnt, _ = ZeroLeakEngine.auto_migrate_to_env(
-                                sc,
-                                env_file_path=os.path.join(target, ".env"),
-                                gitignore_path=os.path.join(target, ".gitignore")
-                            )
-                            with open(vf, "w", encoding="utf-8") as f:
-                                f.write(mc)
-                            total_migrated += c_cnt
-                    print(f"[AUTO-VAULT] Successfully secured and migrated {total_migrated} secret(s) into {os.path.join(target, '.env')}.")
+                    violating_files = sorted({v.get("file", "") for v in violations if v.get("file") and os.path.isfile(v.get("file", ""))})
+                    res = ZeroLeakEngine.migrate_files_atomically(
+                        violating_files,
+                        env_file_path=os.path.join(target, ".env"),
+                        gitignore_path=os.path.join(target, ".gitignore"),
+                    )
+                    if not res.get("success"):
+                        print(f"[AUTO-VAULT ERROR] Migration aborted cleanly (all files preserved): {res.get('error')}", file=sys.stderr)
+                        sys.exit(1)
+                    if res.get("warning"):
+                        print(f"[AUTO-VAULT WARNING] {res['warning']}", file=sys.stderr)
+                    print(f"[AUTO-VAULT] Successfully secured and migrated {res.get('migrated_count', 0)} secret(s) into {os.path.join(target, '.env')}.")
                 else:
                     print("\n[TIP] Run with --migrate to automatically extract these secrets into .env and refactor source files.")
         sys.exit(0)

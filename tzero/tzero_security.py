@@ -208,8 +208,8 @@ SECRET_RULES: List[SecretRule] = [
     SecretRule(
         rule_id="SEC-CRYPTO-001",
         provider="PKI",
-        description="Private Key Header (RSA, EC, OPENSSH, DSA, PGP)",
-        pattern=re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH |DSA |PGP )?PRIVATE KEY-----"),
+        description="Private Key Block or Header (RSA, EC, OPENSSH, DSA, PGP)",
+        pattern=re.compile(r"-----BEGIN (?:[A-Z0-9 ]+ )?PRIVATE KEY-----[\s\S]*?-----END (?:[A-Z0-9 ]+ )?PRIVATE KEY-----|-----BEGIN (?:RSA |EC |OPENSSH |DSA |PGP )?PRIVATE KEY-----"),
         mask_tag="[ZERO_LEAK_MASKED_PRIVATE_KEY]"
     ),
     SecretRule(
@@ -265,6 +265,10 @@ class ZeroLeakEngine:
 
     MIN_ENTROPY_THRESHOLD: float = 4.75
     MIN_ENTROPY_LENGTH: int = 28
+    _PEM_BEGIN_RE = re.compile(r"-----BEGIN (?:[A-Z0-9 ]+ )?PRIVATE KEY-----")
+    _PEM_COMPLETE_BLOCK_RE = re.compile(
+        r"-----BEGIN (?:[A-Z0-9 ]+ )?PRIVATE KEY-----[\s\S]*?-----END (?:[A-Z0-9 ]+ )?PRIVATE KEY-----"
+    )
 
     @classmethod
     def is_placeholder(cls, s: str) -> bool:
@@ -291,28 +295,70 @@ class ZeroLeakEngine:
 
     @classmethod
     def scan_text(cls, text: str, check_entropy: bool = True) -> List[SecretFinding]:
-        """Scans in-memory text for known secrets and high-entropy secret anomalies."""
+        """Scans in-memory text (including comments and multiline PEM blocks) for secrets."""
         if not text:
             return []
 
         findings: List[SecretFinding] = []
         lines = text.splitlines()
 
+        # Pre-compute line numbers covered by complete multi-line PEM blocks
+        pem_ranges: List[Tuple[int, int]] = []
+        for pm in cls._PEM_COMPLETE_BLOCK_RE.finditer(text):
+            start_line = text[: pm.start()].count("\n") + 1
+            end_line = text[: pm.end()].count("\n") + 1
+            pem_ranges.append((start_line, end_line))
+            findings.append(SecretFinding(
+                rule_id="SEC-CRYPTO-001",
+                provider="PKI",
+                description="Private Key Block (PEM)",
+                severity="CRITICAL",
+                line_no=start_line,
+                preview="[ZERO_LEAK_MASKED_PRIVATE_KEY]",
+                entropy=round(calculate_shannon_entropy(pm.group(0)), 2),
+                is_entropy_anomaly=False,
+                secret_value=pm.group(0),
+            ))
+
+        def _in_pem_block(ln: int) -> bool:
+            return any(s <= ln <= e for s, e in pem_ranges)
+
         for lineno, line in enumerate(lines, 1):
             stripped = line.strip()
-            if not stripped or stripped.startswith(("#", "//", "*", "/*")):
+            if not stripped or _in_pem_block(lineno):
                 continue
 
-            # 1. Signature Rule Matching
+            # 1. Signature Rule Matching (scans code AND comment lines alike)
             has_specific_provider_match = False
             for rule in SECRET_RULES:
+                if rule.rule_id == "SEC-CRYPTO-001":
+                    if cls._PEM_BEGIN_RE.search(line):
+                        val = cls._PEM_BEGIN_RE.search(line).group(0)
+                        findings.append(SecretFinding(
+                            rule_id=rule.rule_id,
+                            provider=rule.provider,
+                            description=rule.description,
+                            severity=rule.severity,
+                            line_no=lineno,
+                            preview=cls.mask_preview(line),
+                            entropy=round(calculate_shannon_entropy(val), 2),
+                            is_entropy_anomaly=False,
+                            secret_value=val,
+                        ))
+                        has_specific_provider_match = True
+                    continue
+
                 # If a specific provider rule matched, avoid duplicate generic rule hit on same line
                 if rule.rule_id == "SEC-GENERIC-001" and has_specific_provider_match:
                     continue
 
                 for match in rule.pattern.finditer(line):
-                    val = match.group(0)
-                    if cls.is_placeholder(val):
+                    # Preserve capture group 1 for generic/Bearer assignment rules so LHS variable stays intact
+                    if rule.rule_id in ("SEC-GENERIC-001", "SEC-AUTH-002") and match.lastindex and match.lastindex >= 1:
+                        val = match.group(1)
+                    else:
+                        val = match.group(0)
+                    if cls.is_placeholder(val) or cls.is_placeholder(match.group(0)):
                         continue
 
                     ent = calculate_shannon_entropy(val)
@@ -325,13 +371,13 @@ class ZeroLeakEngine:
                         preview=cls.mask_preview(line),
                         entropy=round(ent, 2),
                         is_entropy_anomaly=False,
-                        secret_value=val
+                        secret_value=val,
                     ))
                     if rule.provider != "Generic":
                         has_specific_provider_match = True
 
             # 2. Shannon Entropy Scanner for Unmatched Candidate Tokens
-            if check_entropy:
+            if check_entropy and not stripped.startswith(("#", "//", "*", "/*")):
                 # Candidate secrets must be single compact tokens without whitespace, slashes, or URL schemas
                 candidate_tokens = re.findall(r"""['"]([A-Za-z0-9+/=_\-]{28,})['"]""", line)
                 for tok in candidate_tokens:
@@ -347,7 +393,7 @@ class ZeroLeakEngine:
                         continue
                     if cls.is_natural_or_identifier(tok):
                         continue
-                    
+
                     ent = calculate_shannon_entropy(tok)
                     if ent >= cls.MIN_ENTROPY_THRESHOLD and len(tok) >= cls.MIN_ENTROPY_LENGTH:
                         already_reported = any(f.line_no == lineno for f in findings)
@@ -361,7 +407,7 @@ class ZeroLeakEngine:
                                 preview=cls.mask_preview(line),
                                 entropy=round(ent, 2),
                                 is_entropy_anomaly=True,
-                                secret_value=tok
+                                secret_value=tok,
                             ))
 
         return findings
@@ -369,21 +415,31 @@ class ZeroLeakEngine:
     @classmethod
     def mask_preview(cls, line: str, max_len: int = 70) -> str:
         """Sanitizes line for safe terminal output and logging."""
-        sanitized = cls.sanitize_text(line)
+        sanitized = cls.sanitize_text(line, allow_incomplete_pem=True)
         if len(sanitized) > max_len:
             return sanitized[:max_len] + "..."
         return sanitized
 
     @classmethod
-    def sanitize_text(cls, text: str) -> str:
+    def sanitize_text(cls, text: str, allow_incomplete_pem: bool = False) -> str:
         """Sanitizes text by masking all detected secrets with Zero-Leak tokens."""
         if not text:
             return ""
 
-        sanitized = text
+        sanitized = cls._PEM_COMPLETE_BLOCK_RE.sub("[ZERO_LEAK_MASKED_PRIVATE_KEY]", text)
+
+        if cls._PEM_BEGIN_RE.search(sanitized):
+            if not allow_incomplete_pem:
+                raise ValueError(
+                    "Incomplete PEM private key block detected without END delimiter; aborting redaction to prevent body leak."
+                )
+            sanitized = cls._PEM_BEGIN_RE.sub("[ZERO_LEAK_MASKED_PRIVATE_KEY]", sanitized)
 
         # 1. Mask specific patterns
         for rule in SECRET_RULES:
+            if rule.rule_id == "SEC-CRYPTO-001":
+                continue
+
             def _replace_match(m):
                 full_val = m.group(0)
                 if cls.is_placeholder(full_val):
@@ -402,14 +458,40 @@ class ZeroLeakEngine:
         return sanitized
 
     @classmethod
+    def _sanitize_string_value(cls, val: str, allow_incomplete_pem: bool = False) -> str:
+        """Sanitize an extracted string value even when unquoted inside an AST literal."""
+        cleaned = cls.sanitize_text(val, allow_incomplete_pem=allow_incomplete_pem)
+        if cleaned != val:
+            return cleaned
+        # Strip unquoted high-entropy raw tokens inside AST constants if scan_text flags them
+        stripped = val.strip()
+        if cls.scan_text(f'val = "{stripped}"'):
+            if len(stripped) >= cls.MIN_ENTROPY_LENGTH and calculate_shannon_entropy(stripped) >= 4.4 and not cls.is_placeholder(stripped):
+                return f"{stripped[:4]}...[ZERO_LEAK_HIGH_ENTROPY_SECRET]"
+            if len(stripped) >= 12 and not cls.is_placeholder(stripped):
+                return "[ZERO_LEAK_MASKED_VALUE]"
+        return cleaned
+
+    @classmethod
     def sanitize_ast(cls, tree: ast.AST) -> ast.AST:
         """Walks an AST tree and replaces hardcoded string literals containing secrets."""
         for node in ast.walk(tree):
             if isinstance(node, ast.Constant) and isinstance(node.value, str):
-                val = node.value
-                # Check if raw value itself or wrapped in quotes triggers detection
-                if cls.scan_text(f'val = "{val}"'):
-                    node.value = cls.sanitize_text(val)
+                node.value = cls._sanitize_string_value(node.value)
+        ast.fix_missing_locations(tree)
+        # Re-verify unparsed code so no AST literal secret survives
+        try:
+            rendered = ast.unparse(tree)
+            remaining = cls.scan_text(rendered)
+            if remaining:
+                secret_vals = {f.secret_value for f in remaining if f.secret_value}
+                for node in ast.walk(tree):
+                    if isinstance(node, ast.Constant) and isinstance(node.value, str):
+                        for sv in secret_vals:
+                            if sv and sv in node.value:
+                                node.value = node.value.replace(sv, "[ZERO_LEAK_MASKED_VALUE]")
+        except Exception:
+            pass
         return tree
 
     @classmethod
@@ -462,25 +544,96 @@ class ZeroLeakEngine:
         return cls.scan_files_map(files_map)
 
     @classmethod
+    def resolve_project_root(cls, target_path: str) -> str:
+        """Resolve nearest project root (.git ancestor) or target directory consistently."""
+        abs_p = os.path.abspath(target_path)
+        start = abs_p if os.path.isdir(abs_p) else os.path.dirname(abs_p)
+        curr = start
+        while True:
+            if os.path.isdir(os.path.join(curr, ".git")):
+                return curr
+            parent = os.path.dirname(curr)
+            if parent == curr:
+                return start
+            curr = parent
+
+    @classmethod
+    def check_env_git_status(
+        cls, env_file_path: str, gitignore_path: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """Use Git check-ignore/ls-files when available (fallback to real rule parsing)."""
+        import subprocess
+        abs_env = os.path.abspath(env_file_path)
+        proj_root = cls.resolve_project_root(abs_env)
+        env_name = os.path.basename(abs_env)
+        in_git = os.path.isdir(os.path.join(proj_root, ".git"))
+        tracked = False
+        ignored = False
+
+        if in_git:
+            rel_env = os.path.relpath(abs_env, proj_root).replace("\\", "/")
+            tr = subprocess.run(
+                ["git", "-C", proj_root, "ls-files", "--error-unmatch", rel_env],
+                capture_output=True, text=True, check=False,
+            )
+            tracked = tr.returncode == 0
+            ig = subprocess.run(
+                ["git", "-C", proj_root, "check-ignore", "-q", abs_env],
+                capture_output=True, text=True, check=False,
+            )
+            ignored = ig.returncode == 0
+        elif gitignore_path and os.path.isfile(gitignore_path):
+            with open(gitignore_path, "r", encoding="utf-8", errors="ignore") as gf:
+                for raw_line in gf:
+                    rule = raw_line.strip()
+                    if not rule or rule.startswith("#") or rule.startswith("!"):
+                        continue
+                    norm = rule.lstrip("/")
+                    if norm in (env_name, "*.env") or (norm == ".env" and env_name == ".env"):
+                        ignored = True
+                        break
+        return {
+            "in_git": in_git,
+            "tracked": tracked,
+            "ignored": ignored,
+            "warning": f"WARNING: {abs_env} is already tracked by Git! Run `git rm --cached {env_name}`." if tracked else "",
+        }
+
+    @classmethod
+    def _load_existing_env(cls, env_file_path: Optional[str]) -> Dict[str, str]:
+        env_map: Dict[str, str] = {}
+        if env_file_path and os.path.isfile(env_file_path):
+            with open(env_file_path, "r", encoding="utf-8", errors="replace") as ef:
+                for raw in ef:
+                    line = raw.strip()
+                    if not line or line.startswith("#") or "=" not in line:
+                        continue
+                    k, _, v = line.partition("=")
+                    k = k.strip()
+                    if k:
+                        env_map[k] = v.strip()
+        return env_map
+
+    @classmethod
     def auto_migrate_to_env(
         cls,
         code_str: str,
         env_file_path: Optional[str] = None,
-        gitignore_path: Optional[str] = None
+        gitignore_path: Optional[str] = None,
+        shared_env_registry: Optional[Dict[str, str]] = None,
+        dry_run: bool = False,
     ) -> Tuple[str, str, int, str]:
-        """Automatically extracts detected hardcoded secrets into .env format and refactors code with os.environ.get."""
+        """Extract hardcoded secrets to .env atomically without variable collisions or partial writes."""
         findings = cls.scan_text(code_str)
         valid_findings = [f for f in findings if f.secret_value and not cls.is_placeholder(f.secret_value)]
-        
+
         if not valid_findings:
             return code_str, "# No secrets detected.", 0, "### 100% Zero-Leak Certified\nNo hardcoded credentials found in source code."
 
         migrated_code = code_str
-        env_entries: Dict[str, str] = {}
-        used_vars: Set[str] = set()
-        counter = 1
+        env_registry: Dict[str, str] = shared_env_registry if shared_env_registry is not None else cls._load_existing_env(env_file_path)
+        new_env_entries: Dict[str, str] = {}
 
-        # Sort findings descending by length to avoid partial substrings
         unique_findings = []
         seen_vals = set()
         for f in valid_findings:
@@ -502,6 +655,7 @@ class ZeroLeakEngine:
             "Slack": "SLACK_BOT_TOKEN",
             "Database": "DATABASE_URL",
             "JWT": "JWT_SECRET_TOKEN",
+            "PKI": "PRIVATE_KEY_PEM",
             "PrivateKey": "PRIVATE_KEY_PEM",
         }
 
@@ -512,23 +666,30 @@ class ZeroLeakEngine:
             "| :--- | :--- | :--- |",
         ]
 
-        for f in unique_findings:
-            base_var = provider_map.get(f.provider, "")
-            if not base_var:
-                clean_desc = re.sub(r"[^A-Z0-9_]", "_", f.description.upper()[:20])
-                base_var = f"{clean_desc}_TOKEN"
-                
-            var_name = base_var
-            while var_name in used_vars:
-                var_name = f"{base_var}_{counter}"
-                counter += 1
-            used_vars.add(var_name)
+        # Build reverse map secret_value -> existing env var for idempotent reuse
+        val_to_var = {v: k for k, v in env_registry.items()}
 
-            env_entries[var_name] = f.secret_value
+        for f in unique_findings:
+            if f.secret_value in val_to_var:
+                var_name = val_to_var[f.secret_value]
+            else:
+                base_var = provider_map.get(f.provider, "")
+                if not base_var:
+                    clean_desc = re.sub(r"[^A-Z0-9_]", "_", f.description.upper()[:20]).strip("_")
+                    base_var = f"{clean_desc or 'APP'}_SECRET"
+
+                var_name = base_var
+                idx = 2
+                while var_name in env_registry:
+                    var_name = f"{base_var}_{idx}"
+                    idx += 1
+                env_registry[var_name] = f.secret_value
+                val_to_var[f.secret_value] = var_name
+                new_env_entries[var_name] = f.secret_value
+
             redacted = f.secret_value[:6] + "..." + f.secret_value[-4:] if len(f.secret_value) > 12 else "***"
             report_lines.append(f"| `{f.provider}` | `{var_name}` | `{redacted}` |")
 
-            # Replace quotes in code
             pat_d = f'"{f.secret_value}"'
             pat_s = f"'{f.secret_value}'"
             replacement = f'os.environ.get("{var_name}", "")'
@@ -537,37 +698,191 @@ class ZeroLeakEngine:
             elif pat_s in migrated_code:
                 migrated_code = migrated_code.replace(pat_s, replacement)
             else:
-                migrated_code = migrated_code.replace(f.secret_value, replacement)
+                # Preserve surrounding quotes/assignment cleanly if matched inside a quoted value
+                escaped_v = re.escape(f.secret_value)
+                if re.search(rf"""(['"]){escaped_v}\1""", migrated_code):
+                    migrated_code = re.sub(rf"""(['"]){escaped_v}\1""", replacement, migrated_code)
+                else:
+                    migrated_code = migrated_code.replace(f.secret_value, replacement)
 
-        # Check if os is imported
         if "os.environ" in migrated_code and "import os" not in migrated_code and "from os import" not in migrated_code:
-            migrated_code = "import os\n" + migrated_code
+            lines_m = migrated_code.splitlines(keepends=True)
+            ins_idx = 0
+            for idx_l, ln_txt in enumerate(lines_m):
+                s_ln = ln_txt.strip()
+                if idx_l == 0 and s_ln.startswith("#!"):
+                    ins_idx = idx_l + 1
+                elif s_ln.startswith("# -*-") or s_ln.startswith("# coding"):
+                    ins_idx = idx_l + 1
+                elif s_ln.startswith("from __future__ import"):
+                    ins_idx = idx_l + 1
+                elif s_ln and not s_ln.startswith("#"):
+                    break
+            lines_m.insert(ins_idx, "import os\n")
+            migrated_code = "".join(lines_m)
 
-        # Build .env text
         env_lines = ["# Auto-Vault Generated by T-Zero Zero-Leak Engine", "# DO NOT COMMIT THIS FILE TO PUBLIC REPOSITORIES", ""]
-        for k, v in env_entries.items():
+        for k, v in env_registry.items():
             env_lines.append(f"{k}={v}")
         env_content = "\n".join(env_lines) + "\n"
 
-        # If file paths provided, update physical .env and .gitignore
-        if env_file_path:
-            try:
-                with open(env_file_path, "a", encoding="utf-8") as ef:
-                    ef.write("\n" + "\n".join(f"{k}={v}" for k, v in env_entries.items()) + "\n")
-            except Exception:
-                pass
+        # Stage & commit physical .gitignore and .env atomically BEFORE returning success
+        if not dry_run and (env_file_path or gitignore_path):
+            import tempfile
+            if env_file_path and gitignore_path is None:
+                gitignore_path = os.path.join(os.path.dirname(os.path.abspath(env_file_path)), ".gitignore")
 
-        if gitignore_path:
+            gi_staged = None
+            env_staged = None
             try:
-                gi_content = ""
-                if os.path.exists(gitignore_path):
-                    with open(gitignore_path, "r", encoding="utf-8") as gf:
-                        gi_content = gf.read()
-                if ".env" not in gi_content:
-                    with open(gitignore_path, "a", encoding="utf-8") as gf:
-                        gf.write("\n.env\n*.env\n")
-            except Exception:
-                pass
+                if gitignore_path and env_file_path:
+                    git_status = cls.check_env_git_status(env_file_path, gitignore_path)
+                    if git_status.get("warning"):
+                        report_lines.append(f"\n> {git_status['warning']}")
+                    if not git_status.get("ignored"):
+                        existing_gi = ""
+                        if os.path.isfile(gitignore_path):
+                            with open(gitignore_path, "r", encoding="utf-8") as gf:
+                                existing_gi = gf.read()
+                        env_base = os.path.basename(os.path.abspath(env_file_path))
+                        sep = "\n" if existing_gi and not existing_gi.endswith("\n") else ""
+                        new_gi = f"{existing_gi}{sep}{env_base}\n"
+                        gi_dir = os.path.dirname(os.path.abspath(gitignore_path)) or "."
+                        os.makedirs(gi_dir, exist_ok=True)
+                        with tempfile.NamedTemporaryFile("w", dir=gi_dir, delete=False, encoding="utf-8", prefix=".tzero_gi_") as tf:
+                            tf.write(new_gi)
+                            gi_staged = tf.name
+
+                if env_file_path:
+                    env_dir = os.path.dirname(os.path.abspath(env_file_path)) or "."
+                    os.makedirs(env_dir, exist_ok=True)
+                    with tempfile.NamedTemporaryFile("w", dir=env_dir, delete=False, encoding="utf-8", prefix=".tzero_env_") as tf:
+                        tf.write(env_content)
+                        env_staged = tf.name
+
+                if gi_staged:
+                    os.replace(gi_staged, gitignore_path)
+                    gi_staged = None
+                if env_staged:
+                    os.replace(env_staged, env_file_path)
+                    env_staged = None
+            except Exception as exc:
+                for p in (gi_staged, env_staged):
+                    if p and os.path.exists(p):
+                        try:
+                            os.remove(p)
+                        except OSError:
+                            pass
+                raise RuntimeError(f"Auto-Vault failed to persist environment/gitignore safely: {exc}") from exc
 
         return migrated_code, env_content, len(unique_findings), "\n".join(report_lines)
+
+    @classmethod
+    def migrate_files_atomically(
+        cls,
+        file_paths: List[str],
+        env_file_path: str,
+        gitignore_path: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Atomically migrate multiple files using a shared env table with rollback on write errors."""
+        import tempfile
+        abs_env = os.path.abspath(env_file_path)
+        abs_gi = os.path.abspath(gitignore_path) if gitignore_path else os.path.join(os.path.dirname(abs_env), ".gitignore")
+        orig_sources: Dict[str, str] = {}
+        staged_sources: Dict[str, str] = {}
+        orig_env = None
+        if os.path.isfile(abs_env):
+            with open(abs_env, "r", encoding="utf-8") as _ef:
+                orig_env = _ef.read()
+        orig_gi = None
+        if os.path.isfile(abs_gi):
+            with open(abs_gi, "r", encoding="utf-8") as _gf:
+                orig_gi = _gf.read()
+        shared_env = cls._load_existing_env(abs_env)
+        total_migrated = 0
+
+        try:
+            for fp in file_paths:
+                abs_fp = os.path.abspath(fp)
+                with open(abs_fp, "r", encoding="utf-8", errors="ignore") as f:
+                    raw = f.read()
+                migrated, _, cnt, _ = cls.auto_migrate_to_env(
+                    raw,
+                    env_file_path=abs_env,
+                    gitignore_path=abs_gi,
+                    shared_env_registry=shared_env,
+                    dry_run=True,
+                )
+                if cnt > 0 and migrated != raw:
+                    if abs_fp.endswith(".py"):
+                        ast.parse(migrated, filename=abs_fp)
+                    orig_sources[abs_fp] = raw
+                    fdir = os.path.dirname(abs_fp) or "."
+                    with tempfile.NamedTemporaryFile("w", dir=fdir, delete=False, encoding="utf-8", prefix=".tzero_src_") as tf:
+                        tf.write(migrated)
+                        staged_sources[abs_fp] = tf.name
+                    total_migrated += cnt
+
+            if total_migrated == 0:
+                return {"success": True, "migrated_count": 0, "env_file": abs_env, "warning": ""}
+
+            # Write .gitignore and .env atomically BEFORE mutating any source files
+            git_status = cls.check_env_git_status(abs_env, abs_gi)
+            if not git_status.get("ignored"):
+                existing_gi = orig_gi or ""
+                env_base = os.path.basename(abs_env)
+                sep = "\n" if existing_gi and not existing_gi.endswith("\n") else ""
+                os.makedirs(os.path.dirname(abs_gi) or ".", exist_ok=True)
+                with tempfile.NamedTemporaryFile("w", dir=os.path.dirname(abs_gi) or ".", delete=False, encoding="utf-8", prefix=".tzero_gi_") as tf:
+                    tf.write(f"{existing_gi}{sep}{env_base}\n")
+                    gi_tmp = tf.name
+                os.replace(gi_tmp, abs_gi)
+
+            env_lines = ["# Auto-Vault Generated by T-Zero Zero-Leak Engine", "# DO NOT COMMIT THIS FILE TO PUBLIC REPOSITORIES", ""]
+            for k, v in shared_env.items():
+                env_lines.append(f"{k}={v}")
+            os.makedirs(os.path.dirname(abs_env) or ".", exist_ok=True)
+            with tempfile.NamedTemporaryFile("w", dir=os.path.dirname(abs_env) or ".", delete=False, encoding="utf-8", prefix=".tzero_env_") as tf:
+                tf.write("\n".join(env_lines) + "\n")
+                env_tmp = tf.name
+            os.replace(env_tmp, abs_env)
+
+            # Commit staged sources
+            for abs_fp, tmp_p in staged_sources.items():
+                os.replace(tmp_p, abs_fp)
+            staged_sources.clear()
+
+            return {
+                "success": True,
+                "migrated_count": total_migrated,
+                "env_file": abs_env,
+                "gitignore_file": abs_gi,
+                "warning": git_status.get("warning", ""),
+            }
+        except Exception as exc:
+            # Rollback .env / .gitignore / any partially touched sources
+            for tmp_p in staged_sources.values():
+                if os.path.exists(tmp_p):
+                    try:
+                        os.remove(tmp_p)
+                    except OSError:
+                        pass
+            if orig_env is not None:
+                try:
+                    with open(abs_env, "w", encoding="utf-8") as ef:
+                        ef.write(orig_env)
+                except OSError:
+                    pass
+            elif os.path.exists(abs_env):
+                try:
+                    os.remove(abs_env)
+                except OSError:
+                    pass
+            if orig_gi is not None:
+                try:
+                    with open(abs_gi, "w", encoding="utf-8") as gf:
+                        gf.write(orig_gi)
+                except OSError:
+                    pass
+            return {"success": False, "error": str(exc), "migrated_count": 0}
 

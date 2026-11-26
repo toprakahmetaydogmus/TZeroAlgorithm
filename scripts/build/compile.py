@@ -333,10 +333,10 @@ def create_release_bundle():
                 p = os.path.join("dist", b)
                 if os.path.exists(p):
                     zf.write(p, arcname=b)
-            for doc in ("README.md", "README.tr.md", "LICENSE"):
+            for doc in ("README.md", "docs/README.tr.md", "LICENSE", "NOTICE"):
                 doc_p = PROJECT_ROOT / doc
                 if doc_p.is_file():
-                    zf.write(str(doc_p), arcname=doc)
+                    zf.write(str(doc_p), arcname=doc_p.name)
     logger.info("Master release bundle successfully generated at: %s", os.path.abspath(bundle_path))
     return bundle_path
 

@@ -33,7 +33,7 @@ import ast
 import inspect
 import logging
 
-SERVER_VERSION = "12.2.1"
+SERVER_VERSION = "12.2.2"
 
 # Version checks must not initialize the MCP SDK or dependency bootstrap. Besides
 # being needlessly expensive, that path may wait on package discovery/network
@@ -1434,22 +1434,47 @@ def create_mcp_server():
                 return "\n".join(out)
             return f"🔒 [ZERO-LEAK PASS] File `{target_file}` is 100% clean. Zero hardcoded secrets detected."
 
-        # Audit entire workspace for secret leaks
+        # Audit entire workspace on FULL unpruned raw files (never AST-pruned skeletons)
         scanner = CodebaseScanner()
-        files, sizes, snippets = scanner.scan_directory(abs_root)
+        files, _, _ = scanner.scan_directory(abs_root)
         all_leaks = []
+        fully_scanned = 0
+        partially_scanned = 0
+        skipped = 0
+        unreadable = []
         for f in files:
-            content = snippets.get(f, "")
+            fp = os.path.join(abs_root, f)
+            try:
+                with open(fp, "r", encoding="utf-8", errors="replace") as fh:
+                    content = fh.read()
+                fully_scanned += 1
+            except Exception as exc:
+                unreadable.append(f"{f} ({exc})")
+                continue
             leaks = scan_text_for_secrets(content)
             for leak in leaks:
                 all_leaks.append((f, leak))
-        
+
         if all_leaks:
-            out = [f"🚨 **Zero-Leak Security Audit: Found {len(all_leaks)} potential secret leaks in workspace `{abs_root}`!**\n"]
+            out = [
+                f"🚨 **[ZERO-LEAK ALERT] Zero-Leak Security Audit: Found {len(all_leaks)} potential secret leaks in workspace `{abs_root}`!**",
+                f"- Scan Coverage: `{fully_scanned}` fully scanned, `{partially_scanned}` partial, `{skipped}` skipped, `{len(unreadable)}` unreadable\n",
+            ]
             for fname, leak in all_leaks[:20]:
                 out.append(f"- `{fname}` (Line {leak['line']}): {leak['desc']}")
+            if unreadable:
+                out.append(f"\n⚠️ Unreadable files: {', '.join(unreadable[:10])}")
             return "\n".join(out)
-        return f"🔒 [ZERO-LEAK PASS] All {len(files)} files in `{abs_root}` passed 100% Zero-Leak security audit. Zero exposed secrets."
+        if unreadable or partially_scanned > 0:
+            return (
+                f"⚠️ **[ZERO-LEAK INCOMPLETE]** Scan could not certify `{abs_root}` clean: "
+                f"`{fully_scanned}` full, `{partially_scanned}` partial, `{skipped}` skipped, `{len(unreadable)}` unreadable "
+                f"({', '.join(unreadable[:10])})."
+            )
+        return (
+            f"🔒 [ZERO-LEAK PASS] All {fully_scanned} files in `{abs_root}` (0 partial, 0 skipped, 0 unreadable) "
+            f"passed full raw unpruned Zero-Leak security audit. Zero exposed secrets."
+        )
 
     # -------------------------------------------------------------------------
     # TOOL 17: verify_hallucination_guard
@@ -5209,27 +5234,43 @@ def create_mcp_server():
     )
     def resource_file_skeleton(path: str) -> str:
         import urllib.parse
-        ws_root = os.path.abspath(".")
+        ws_root = os.path.realpath(os.path.abspath("."))
         rel_clean = urllib.parse.unquote(path or "").lstrip("/\\")
         if not rel_clean or ".." in rel_clean.replace("\\", "/").split("/"):
             return f"[BLOCKED] Unsafe relative path blocked: {rel_clean or path}"
-        abs_target = os.path.abspath(os.path.join(ws_root, rel_clean))
+        joined = os.path.abspath(os.path.join(ws_root, rel_clean))
+        if os.path.islink(joined):
+            return f"[BLOCKED] Symlink traversal blocked: {path}"
+        real_target = os.path.realpath(joined)
         try:
-            if os.path.commonpath([ws_root, abs_target]) != ws_root:
-                return f"[BLOCKED] Path escapes workspace root: {path}"
+            if os.path.commonpath([ws_root, real_target]) != ws_root:
+                return f"[BLOCKED] Real path escapes workspace root: {path}"
         except ValueError:
             return f"[BLOCKED] Invalid workspace path: {path}"
-        if not os.path.isfile(abs_target):
+        if not os.path.isfile(real_target):
             return f"[ERROR] File not found: {rel_clean}"
         try:
-            with open(abs_target, "r", encoding="utf-8", errors="replace") as fp:
-                raw_code = fp.read()
+            open_flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0)
+            fd = os.open(real_target, open_flags)
+            try:
+                st_expected = os.stat(real_target)
+                st_opened = os.fstat(fd)
+                if st_expected.st_ino and st_opened.st_ino and (st_expected.st_ino != st_opened.st_ino or st_expected.st_dev != st_opened.st_dev):
+                    return f"[BLOCKED] Target identity changed during open: {path}"
+                with os.fdopen(fd, "r", encoding="utf-8", errors="replace") as fp:
+                    fd = -1
+                    raw_code = fp.read()
+            finally:
+                if fd >= 0:
+                    os.close(fd)
             from tzero.tzero_polyglot import PolyglotTokenReducer
-            reduced = PolyglotTokenReducer.reduce_code(raw_code, filename=abs_target, mode="ultra")
+            reduced = PolyglotTokenReducer.reduce_code(raw_code, filename=real_target, mode="ultra")
             from tzero.tzero_security import ZeroLeakEngine
             if ZeroLeakEngine.scan_text(reduced):
                 reduced = ZeroLeakEngine.sanitize_text(reduced)
             return reduced
+        except OSError as e:
+            return f"[BLOCKED] Unsafe or inaccessible file '{rel_clean}': {e}"
         except Exception as e:
             return f"[ERROR] Failed to extract skeleton for '{rel_clean}': {e}"
 
