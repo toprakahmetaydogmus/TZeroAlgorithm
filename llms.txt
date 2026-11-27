@@ -1,5 +1,5 @@
 # T-Zero (Token Zero) Context Architect & MCP Suite
-> Version: 12.3.0 | License: AGPL-3.0-only | Author: Toprak Ahmet Aydoğmuş (Siber Akademi)
+> Version: 12.3.1 | License: AGPL-3.0-only | Author: Toprak Ahmet Aydoğmuş (Siber Akademi)
 > Repository: https://github.com/toprakahmetaydogmus/TZeroAlgorithm
 > Live Benchmark: https://tzero-indol.vercel.app | PyPI: https://pypi.org/project/tzero-mcp/ | npm: https://www.npmjs.com/package/tzero-mcp
 
@@ -91,4 +91,4 @@ When T-Zero is added as an MCP server, it exposes the following tools:
 - Language: Python (>=3.10)
 - Verification Command: `python -m unittest discover tests -v` (628 tests, 100% pass)
 - Lint Check: `flake8 .` (0 errors)
-- Security: 100% Zero-Leak certified (no network telemetry, runs air-gapped).
+- Security: Local Zero-Leak AST/entropy guardrails by default; core AST & BM25 search run offline with zero background telemetry (optional network features documented in PRIVACY.md).

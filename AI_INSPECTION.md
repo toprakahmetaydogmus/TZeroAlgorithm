@@ -1,6 +1,6 @@
 # T-Zero Autonomous AI Agent Inspection & Execution Guide
 > **Canonical System Overview for AI Coding Assistants (Claude Code, Cursor, Windsurf, Copilot, ChatGPT, Antigravity)**
-> Version: `12.3.0` | License: `AGPL-3.0-only` | Rating: `100% Zero-Leak Certified` | Architecture: `Dual-Engine Hybrid (Rust + Python)`
+> Version: `12.3.1` | License: `AGPL-3.0-only` | Rating: `100% Zero-Leak Certified` | Architecture: `Dual-Engine Hybrid (Rust + Python)`
 > Author: **Toprak Ahmet Aydoğmuş** (Siber Akademi)
 > Repository: [https://github.com/toprakahmetaydogmus/TZeroAlgorithm](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)
 > Web Benchmark & Live Suite: [https://tzero-indol.vercel.app](https://tzero-indol.vercel.app)
@@ -161,9 +161,9 @@ print(f"Monthly savings for team: ${roi['monthly_savings_usd']:.2f}")
 
 ## Security & Privacy Guarantees
 
-- **100% Offline & Local:** Operates entirely on the local machine; zero external API requests for AST compression.
+- **Local AST Core:** AST compression, BM25 lexical search, and entropy scanning run locally with zero external API requests by default.
 - **Shannon Entropy Scanner:** High-entropy strings (passwords, JWTs, private keys, API tokens) are automatically flagged and redacted before context leaves the machine.
-- **Air-Gapped Ready:** Works without internet access in secure enterprise environments.
+- **Transparent Optional Network Features:** Optional AI-assisted synthesis, DuckDuckGo search, and GitHub/PyPI/npm metadata lookups are strictly opt-in or on-demand (see [PRIVACY.md](PRIVACY.md)). No automatic cloud fallback occurs when credentials are absent or fail.
 
 ---
 

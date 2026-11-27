@@ -4,4 +4,4 @@ Opaque-box verification harness ensuring 100% zero-leak security, Web3 complianc
 Rust core parity, release integrity, and absolute zero-age privacy enforcement.
 """
 
-__version__ = "12.3.0"
+__version__ = "12.3.1"

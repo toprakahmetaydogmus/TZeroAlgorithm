@@ -38,7 +38,7 @@ except ImportError:
             return False
 
 REPO_URL = "https://github.com/toprakahmetaydogmus/TZeroAlgorithm"
-VERSION = "12.3.0"
+VERSION = "12.3.1"
 _BANNER_PRINTED = False
 
 

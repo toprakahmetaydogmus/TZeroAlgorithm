@@ -1041,7 +1041,7 @@ flowchart LR
 
         return f"""# T-ZERO JARVIS MASTER WORKSPACE ORCHESTRATOR
 *Executive AI Engineering Manager & Autonomous Multi-Agent Coordinator*
-*Version: 5.1.0 | 100% Offline | $0.00 Cost | 100% Zero-Leak Certified*
+*Version: 5.1.0 | Local AST Core | $0.00 Cost | 100% Zero-Leak Certified*
 
 ---
 

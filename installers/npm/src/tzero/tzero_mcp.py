@@ -33,7 +33,7 @@ import ast
 import inspect
 import logging
 
-SERVER_VERSION = "12.3.0"
+SERVER_VERSION = "12.3.1"
 
 # Version checks must not initialize the MCP SDK or dependency bootstrap. Besides
 # being needlessly expensive, that path may wait on package discovery/network

@@ -299,12 +299,16 @@ class ASTMutationEngine:
         target_dir = os.path.dirname(abs_target)
         expected_test_name = f"test_{os.path.splitext(os.path.basename(abs_target))[0]}.py"
 
-        # Discover untainted test files strictly from workspace root (and tzero_* temp dirs)
+        # Discover untainted test files from workspace root, validated target_dir, and tzero_* temp dirs
         discover_roots = [ws_root]
+        if base_root == tmp_root and target_dir not in discover_roots:
+            discover_roots.append(target_dir)
         try:
             for d_entry in os.scandir(tmp_root):
                 if d_entry.is_dir() and d_entry.name.startswith("tzero_"):
-                    discover_roots.append(os.path.realpath(d_entry.path))
+                    entry_real = os.path.realpath(d_entry.path)
+                    if entry_real not in discover_roots:
+                        discover_roots.append(entry_real)
         except OSError:
             pass
 

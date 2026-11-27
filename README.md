@@ -63,7 +63,7 @@ GitHub flags **npm `tzero-mcp@12.3.0`** in [GHSA-pm3r-rxg9-cj5j](https://github.
 
 ### Local analysis and network access
 
-AST pruning and lexical search run locally. AI-assisted generation may send prompts, file paths, dependency relationships and code excerpts to a configured provider or the legacy Pollinations fallback. Package and tokenizer downloads, web search, public project metrics and hosted demos can also use the network. System repair features can change system state. See [Privacy and network behavior](PRIVACY.md) for details.
+AST pruning, Shannon entropy secret scanning, and BM25 lexical search run locally. Optional AI-assisted generation sends prompts, file paths, dependency relationships, and code excerpts only to the provider you configure or explicitly select — missing keys and remote provider errors fall back locally to the AST engine without automatic Pollinations retries. Package and tokenizer downloads, optional DuckDuckGo web search, public GitHub/PyPI/npm project metrics, and hosted demos can also use the network. System repair and optional 180-Tier Anti-REA hardening tools run only when explicitly invoked (including opt-in-only webhook alerts). See [Privacy and network behavior](PRIVACY.md) for details.
 
 ### Quickstart
 
@@ -94,10 +94,10 @@ tzero share
 
 # Option D: Standalone Windows 64-Bit Executable Suite (Zero Dependencies):
 # Download all-in-one suite (.ZIP) with GUI, CLI, MCP Server & 1-Click Configurator:
-# https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/download/v12.3.0/TZero-v12.3.0-Windows-x64.zip
+# https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/download/v12.3.1/TZero-v12.3.1-Windows-x64.zip
 
 # Install VS Code / Cursor Extension (.vsix):
-code --install-extension dist/tzero-vscode-12.3.0.vsix
+code --install-extension dist/tzero-vscode-12.3.1.vsix
 ```
 
 Git reminder hooks are opt-in. Installation and normal startup do not change
@@ -198,7 +198,7 @@ tzero init --vscode        # VS Code (Continue / Copilot)
 tzero init --zed           # Zed Editor
 
 # Install official VS Code / Cursor Extension (.vsix):
-code --install-extension dist/tzero-vscode-12.3.0.vsix
+code --install-extension dist/tzero-vscode-12.3.1.vsix
 ```
 
 ### Manual Configuration Snippets (Any MCP Client)

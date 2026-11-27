@@ -8,7 +8,7 @@ Includes native Ring-3 anti-debugging against x64dbg, IDA Pro, WinDbg, and Cheat
 stealth canary beacon telemetry, in-flight string vault, and Electron asar shielding.
 
 Developer: Toprak Ahmet Aydoğmuş (Siber Akademi)
-Part of Siber Akademi T-Zero Context Architect v12.3.0 Master Edition.
+Part of Siber Akademi T-Zero Context Architect v12.3.1 Master Edition.
 License: MIT
 """
 

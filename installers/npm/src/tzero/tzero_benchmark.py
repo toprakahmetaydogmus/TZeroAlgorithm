@@ -2,7 +2,7 @@
 """
 Siber Akademi — T-Zero Autonomous Benchmark & Performance Optimization Engine.
 Developer: Toprak Ahmet Aydoğmuş (Siber Akademi)
-Version: 12.3.0
+Version: 12.3.1
 License: MIT
 
 Performs quantitative multi-model benchmarks comparing raw codebase context

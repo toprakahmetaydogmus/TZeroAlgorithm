@@ -269,7 +269,7 @@ const SIDEBAR_ACTIONS = Object.freeze([
     { id: 'tzero.hookInstall', label: 'Install AI Hooks (--hook-install all)' },
     { id: 'tzero.federationImpact', label: 'Federation Impact (--federation)' },
     { id: 'tzero.auditRea', label: 'Anti-REA Resistance Audit (--audit-rea)' },
-    { id: 'tzero.armor', label: 'Apply 26-Tier Anti-REA Armor (--armor)' },
+    { id: 'tzero.armor', label: 'Apply 180-Tier Anti-REA Armor (--armor)' },
     { id: 'tzero.openDashboard', label: 'Launch Web Dashboard' }
 ]);
 

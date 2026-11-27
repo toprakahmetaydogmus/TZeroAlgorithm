@@ -493,7 +493,7 @@ def calculate_token_cost(token_count: int, provider_name: str) -> float:
 # i18n Translations
 TRANSLATIONS: Dict[str, Dict[str, str]] = {
     "en": {
-        "title": "T-Zero Developer Console & Context Architect v12.3.0",
+        "title": "T-Zero Developer Console & Context Architect v12.3.1",
         "subtitle": f"Developer: {DEV_NAME} | {DEV_URL_MAIN} | {DEV_URL_BIO}",
         "overview_tab": "🏠 Overview Dashboard",
         "setup_tab": "⚡ Setup & AI Models",
@@ -530,7 +530,7 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "audit_btn": "🛡️ SECURITY AUDIT"
     },
     "tr": {
-        "title": "T-Zero Geliştirici Konsolu & Bağlam Mimarı v12.3.0",
+        "title": "T-Zero Geliştirici Konsolu & Bağlam Mimarı v12.3.1",
         "subtitle": f"Geliştirici: {DEV_NAME} | {DEV_URL_MAIN} | {DEV_URL_BIO}",
         "overview_tab": "🏠 Genel Bakış",
         "setup_tab": "⚡ Kurulum & Model",
@@ -2459,7 +2459,8 @@ class ContextExportManager:
         """Generates ARCHITECTURE.md with Mermaid diagrams and module specs.
         
         Supports live 3rd-party AI synthesis (NVIDIA NIM, OpenAI, Gemini, Anthropic, OpenRouter,
-        Local Ollama, or Free AI Cloud) and seamless fallback to the local offline AST architecture engine.
+        Local Ollama, or explicitly selected Free AI Cloud) and falls back locally to the AST
+        architecture engine on missing credentials or provider errors without silent cloud retries.
         """
         if use_ai:
             try:
@@ -2478,11 +2479,22 @@ class ContextExportManager:
                     if not active_model and active_prov:
                         active_model = prof.get("model") or active_prov.get_models()[0]
 
-                if not active_key and (not active_prov or active_prov.name != "Free AI Cloud (No Key Required)"):
-                    active_prov = FreePollinationsProvider()
-                    active_url = active_prov.get_base_url()
-                    active_key = ""
-                    active_model = "openai"
+                if not active_prov:
+                    if progress_cb:
+                        progress_cb(50, "No remote provider configured. Using Local AST Architecture Engine...")
+                    return ContextExportManager.generate_offline_architecture_blueprint(
+                        project_name, files, deps, snippets
+                    )
+
+                if not active_key and active_prov.name not in ("Local Ollama", "Free AI Cloud (No Key Required)"):
+                    if progress_cb:
+                        progress_cb(
+                            50,
+                            f"No API credential configured for {active_prov.name}. Using Local AST Architecture Engine...",
+                        )
+                    return ContextExportManager.generate_offline_architecture_blueprint(
+                        project_name, files, deps, snippets
+                    )
 
                 if progress_cb:
                     progress_cb(30, f"Synthesizing architecture with {active_prov.name} ({active_model})...")
@@ -3611,7 +3623,7 @@ class SecurityHubCard(LuxuryCard):
     def __init__(self, parent, action_cmd=None, armor_cmd=None, **kwargs):
         super().__init__(parent, radius=18, padding=12, **kwargs)
         tk.Label(self.inner, text="🛡 SİBER AKADEMİ GÜVENLİK", font=("Segoe UI", 9, "bold"), fg=PALETTE.get("accent_cyan", "#3843a0"), bg=self.card_bg).pack(anchor=tk.W)
-        tk.Label(self.inner, text="100% Zero-Leak + 26-Tier Anti-REA Armor", font=("Segoe UI", 7), fg=PALETTE.get("accent_green", "#10b981"), bg=self.card_bg).pack(anchor=tk.W, pady=(1, 6))
+        tk.Label(self.inner, text="100% Zero-Leak + 180-Tier Anti-REA Armor", font=("Segoe UI", 7), fg=PALETTE.get("accent_green", "#10b981"), bg=self.card_bg).pack(anchor=tk.W, pady=(1, 6))
         btn_row = tk.Frame(self.inner, bg=self.card_bg)
         btn_row.pack(fill=tk.X)
         self.btn = CanvasPillButton(btn_row, text="RAPORU İNCELE", command=action_cmd, height=28, radius=14, font=("Segoe UI", 7, "bold"), bg_color=PALETTE.get("card_hover", "#e0e7ff"), text_color=PALETTE.get("accent_cyan", "#3843a0"))
@@ -5008,7 +5020,7 @@ class AutoReadmeGUI:
         self.open_security_audit_dialog()
 
     def run_quick_anti_rea_armor(self):
-        """Executes 26-Tier Anti-REA Resistance audit & protection from GUI Security Hub."""
+        """Executes 180-Tier Anti-REA Resistance audit & protection from GUI Security Hub."""
         target = (self.dir_entry.get().strip() if hasattr(self, "dir_entry") else "") or os.getcwd()
         try:
             from tzero.tzero_armor import audit_path_rea_resistance
@@ -5017,9 +5029,9 @@ class AutoReadmeGUI:
             rating = audit.get("rating", "UNKNOWN")
             self.log(f"[ANTI-REA AUDIT] Target: {target} | Score: {score}/100 ({rating})")
             messagebox.showinfo(
-                "T-Zero 26-Tier Anti-REA Armor",
+                "T-Zero 180-Tier Anti-REA Armor",
                 f"Target: {target}\nAI Resistance Score: {score}/100 ({rating})\n"
-                f"Active Tiers: Anti-VM (25), RDTSC Guard (26), Ring-3 Anti-Debug, Opaque CFF, PolyVM.",
+                f"Active Defense Matrix: 12 Domains x 15 Sub-Tiers (Crypto Capsule, Opaque CFF, PolyVM, Anti-Debug, Anti-VM, RDTSC).",
             )
         except Exception as exc:
             self.log(f"[ANTI-REA ERROR] {exc}")
@@ -7748,32 +7760,21 @@ Custom Requirements:
         generator = ContextGenerator(self.cancel_event)
         target_dir = self.dir_entry.get().strip() or os.getcwd()
 
-        # If commercial provider has no key at all, skip doomed HTTP failure and auto-heal immediately!
+        # If commercial provider has no key at all, stay strictly local via the AST engine (no cloud fallback)
         if not key and p.name not in ("Free AI Cloud (No Key Required)", "Local Ollama"):
-            self.log(f"Harici API anahtarı girilmedi ({provider_name}). Otomatik Siber Free AI Cloud ve Yerel AST Motoruna aktarılıyor...")
-            free_p = FreePollinationsProvider()
-            free_url = f"{free_p.get_base_url().rstrip('/')}/chat/completions"
-            free_headers = free_p.get_headers("")
+            self.log(
+                f"Harici API anahtarı girilmedi ({provider_name}). Veriler dışarı gönderilmeden Yerel Çevrimdışı AST Motoru çalıştırılıyor..."
+            )
             try:
-                content = generator.generate_readme(
-                    free_url, "", free_headers, "openai", messages, update_prog, provider=free_p, timeout=12
-                )
-                self.log("Canlı AI mimari analizi Ücretsiz Siber AI Cloud ile başarıyla üretildi.")
-                self.safe_after(0, lambda: self.on_gen_success(content))
-                self.safe_after(0, lambda: self.show_toast(
-                    "⚡ API anahtarı gerekmeden Ücretsiz Siber AI Cloud ile canlı bağlam üretildi!",
-                    "info"
-                ))
-                return
-            except Exception as free_err:
-                self.log(f"Ücretsiz Bulut yanıt vermedi ({free_err}). Yerel Çevrimdışı AST Motoru (%100 Ücretsiz & Sıfır Sızıntı) çalıştırılıyor...")
                 offline_content = generate_offline_context(target_dir, selected_files, self.file_snippets)
                 self.safe_after(0, lambda: self.on_gen_success(offline_content))
                 self.safe_after(0, lambda: self.show_toast(
-                    "⚡ Yerel Çevrimdışı AST Motoru (%100 Ücretsiz & Sıfır Sızıntı) ile eksiksiz bağlam derlendi!",
+                    "⚡ API anahtarı olmadan Yerel Çevrimdışı AST Motoru ile eksiksiz bağlam derlendi!",
                     "success"
                 ))
-                return
+            except Exception as offline_err:
+                self.safe_after(0, lambda msg=f"Offline Error: {offline_err}": self.on_gen_fail(msg))
+            return
 
         headers = p.get_headers(key)
         try:
@@ -7788,24 +7789,7 @@ Custom Requirements:
                 raw_err = str(e)
                 clean_err = re.sub(r'(Bearer\s+|key[:=]\s*)[A-Za-z0-9_\-\.]{8,}', r'\1[PROTECTED]', raw_err)
                 self.log(f"Uzak API yanıtı: {clean_err}")
-                self.log("Otomatik İyileştirme Devrede: Siber Free AI Cloud & Yerel AST Motoruna aktarılıyor...")
-                try:
-                    free_p = FreePollinationsProvider()
-                    free_url = f"{free_p.get_base_url().rstrip('/')}/chat/completions"
-                    free_headers = free_p.get_headers("")
-                    content = generator.generate_readme(
-                        free_url, "", free_headers, "openai", messages, update_prog, provider=free_p, timeout=12
-                    )
-                    self.log("Canlı AI mimari analizi Ücretsiz Siber AI Cloud ile başarıyla tamamlandı.")
-                    self.safe_after(0, lambda: self.on_gen_success(content))
-                    self.safe_after(0, lambda: self.show_toast(
-                        "⚡ Harici API bağlantısı yerine Ücretsiz Siber AI Cloud ile canlı bağlam üretildi!",
-                        "info"
-                    ))
-                    return
-                except Exception as free_err:
-                    clean_free_err = re.sub(r'(Bearer\s+|key[:=]\s*)[A-Za-z0-9_\-\.]{8,}', r'\1[PROTECTED]', str(free_err))
-                    self.log(f"Ücretsiz Bulut yanıt vermedi ({clean_free_err}). Yerel Çevrimdışı AST Motoru devrede (%100 Free & Sıfır Sızıntı)...")
+                self.log("Başka bir bulut sağlayıcıya yönlendirilmeden Yerel Çevrimdışı AST Motoru devrede...")
 
                 try:
                     offline_content = generate_offline_context(target_dir, selected_files, self.file_snippets)
@@ -9434,7 +9418,7 @@ def main():
         extra_args = sys.argv[2:]
         if any(flag in ("-h", "--help") for flag in extra_args):
             print("Usage: tzero armor [TARGET_PATH] [--audit]")
-            print("  Protect source files against AI reverse engineering (26-Tier TDQS-REA Armor).")
+            print("  Protect source files against AI reverse engineering (180-Tier TDQS-REA Armor).")
             print("  --audit, -a   Audit AI decompilation resistance without modifying files.")
             sys.exit(0)
         target_path = next((a for a in extra_args if not a.startswith("-")), ".")
@@ -9624,7 +9608,7 @@ def main():
                         default="o200k_base", help="BPE encoding for --symbol-context")
     parser.add_argument("--cache-aligned", action="store_true", help="Order context for KV-cache prefix stability (immutable static prefix before dynamic query suffix)")
     parser.add_argument("--commit-msg", action="store_true", help="Generate Conventional Commit message from local AST git diff ($0 local engine)")
-    parser.add_argument("--changelog", nargs="?", const="v12.3.0", default=None, metavar="VERSION", help="Generate release CHANGELOG markdown from git history")
+    parser.add_argument("--changelog", nargs="?", const="v12.3.1", default=None, metavar="VERSION", help="Generate release CHANGELOG markdown from git history")
     parser.add_argument("--ci", choices=["github", "gitlab", "pre-commit", "local", "all"], default=None, help="Install CI/CD workflow or run local verification suite")
     parser.add_argument("--local-ci", action="store_true", help="Run comprehensive Local CI & Pre-Push verification battery ($0 quota burn)")
     parser.add_argument("--quick-ci", action="store_true", help="Run fast Local CI smoke checks in seconds")
@@ -9688,7 +9672,7 @@ def main():
     parser.add_argument("--card", "--badge", nargs="?", const="assets/tzero_badge_card.svg", default=None, metavar="FILE", help="Generate viral dark-mode SVG banner card and GitHub README badges")
     parser.add_argument("--showcase", nargs="?", const="tzero_showcase.html", default=None, metavar="FILE", help="Generate interactive split-screen HTML5 comparison showcase slider")
     parser.add_argument("--marketing", "--growth", action="store_true", help="Launch $0-budget viral growth engine and export campaign materials for Reddit, HN, X, and Product Hunt")
-    parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect v12.3.0 Master Edition (engine v4.1.0)")
+    parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect v12.3.1 Master Edition (engine v4.1.0)")
 
 
     def print_master_tutorial():
@@ -9797,7 +9781,7 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
     def print_quickstart_guide():
         print("""
 ================================================================================
-⚡ SİBER AKADEMİ — T-ZERO CONTEXT ARCHITECT & MCP v12.3.0 MASTER (engine v4.1.0)
+⚡ SİBER AKADEMİ — T-ZERO CONTEXT ARCHITECT & MCP v12.3.1 MASTER (engine v4.1.0)
 ================================================================================
 🎯 %95'e Varan Token Tasarrufu & Otonom Yapay Zeka Mimari Bağlam Motoru
 
@@ -10776,7 +10760,7 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
         if not os.path.exists(app_path):
             app_path = os.path.join(os.getcwd(), "huggingface-space", "app.py")
         print("\033[36m" + "=" * 80)
-        print("🤗 SİBER AKADEMİ — T-ZERO HUGGING FACE SPACE & GRADIO COCKPIT (v12.3.0)")
+        print("🤗 SİBER AKADEMİ — T-ZERO HUGGING FACE SPACE & GRADIO COCKPIT (v12.3.1)")
         print("=" * 80 + "\033[0m")
         print("🌐 Official Live Space : https://huggingface.co/spaces/toprakke4/tzero-token-reducer")
         print(f"📁 Local Application   : {app_path}")

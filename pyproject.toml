@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tzero-mcp"
-version = "12.3.0"
-description = "Enterprise Codebase Context Builder, AST Signatures Analyzer, Token Reducer & 26-Tier Anti-REA Armor Suite for LLMs"
+version = "12.3.1"
+description = "Enterprise Codebase Context Builder, AST Signatures Analyzer, Token Reducer & 180-Tier Anti-REA Armor Suite for LLMs"
 readme = "README.md"
 requires-python = ">=3.11"
 license = "AGPL-3.0-only"

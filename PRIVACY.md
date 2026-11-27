@@ -7,16 +7,13 @@ receive those results according to the client's settings and privacy policy.
 
 | Operation | Network and data |
 | --- | --- |
-| AI-assisted architecture or documentation generation | Can send prompts, paths, dependency relationships, and code excerpts to the configured OpenAI, Anthropic, Google Gemini, NVIDIA NIM, or OpenRouter endpoint. A configured Ollama endpoint receives the inference request when selected. |
+| AI-assisted architecture or documentation generation | When explicitly enabled (`use_ai=True` or remote provider selected), can send prompts, paths, dependency relationships, and code excerpts only to the selected provider (OpenAI, Anthropic, Google Gemini, NVIDIA NIM, OpenRouter, local Ollama, or `Free AI Cloud (No Key Required)` if manually chosen). Missing credentials or provider errors fall back locally to deterministic AST output. |
 | Legacy `jarvis_zero_key_query` | Sends the prompt and system instruction to Ollama on the same machine. The Ollama service and selected model determine any further processing. If local inference fails, T-Zero reports that it is unavailable. |
-| Web search | Sends the query to DuckDuckGo when invoked. |
-| Public project metrics and version lookups | May query GitHub, npm, or PyPI for repository and package metadata. |
-| Package installation, tokenizer data, hosted demos | Package managers, the tokenizer's first uncached fetch and hosted demos can contact their respective services. Runtime dependency checks print a manual command if packages are missing. |
+| Web search | Sends the query to DuckDuckGo only when explicitly invoked via the web-search helper. |
+| Public project metrics and version lookups | May query GitHub, npm, or PyPI when displaying community counters, running `tzero share`, or loading live badges. |
+| Package installation, tokenizer data, hosted demos | Package managers, the tokenizer's first uncached fetch, and hosted demos can contact their respective services. Runtime dependency checks print a manual command if packages are missing and do not install automatically unless requested. |
 
-The legacy Ollama tool no longer falls back to Pollinations. The desktop AI
-generator and AI-assisted architecture export can still retry through Pollinations
-after a missing credential or provider error. For sensitive workspaces, use local
-AST generation and leave AI-assisted generation disabled.
+Automatic Pollinations fallbacks have been removed from all code paths (`jarvis_zero_key_query`, `ContextExportManager.generate_architecture_blueprint`, and the desktop GUI generator). Pollinations (`https://text.pollinations.ai/`) is contacted only if the user explicitly selects `Free AI Cloud (No Key Required)`. For sensitive workspaces, use local AST generation and leave AI-assisted generation disabled.
 
 ## Local state changes
 

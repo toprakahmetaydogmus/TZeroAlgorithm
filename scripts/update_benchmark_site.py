@@ -104,7 +104,7 @@ def build_downloads_grid(version: str, existing_html: str) -> str:
     <div class="latest-release-banner animate-on-scroll" id="latest-release-banner">
       <div class="rel-banner-tag"><span class="rel-pulse"></span> Latest GitHub Release: <strong id="live-release-tag">v{version}</strong></div>
       <div class="rel-banner-meta">
-        <span>Published: <strong id="live-release-date">Nov 26, 2026</strong></span>
+        <span>Published: <strong id="live-release-date">Nov 27, 2026</strong></span>
         <span class="rel-divider">•</span>
         <span>Verified Assets: <strong id="live-release-assets">24 Packages</strong></span>
       </div>
