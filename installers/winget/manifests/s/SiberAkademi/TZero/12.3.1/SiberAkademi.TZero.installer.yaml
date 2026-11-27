@@ -21,6 +21,6 @@ InstallerSwitches:
 Installers:
   - Architecture: x64
     InstallerUrl: https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/download/v12.3.1/TZero-v12.3.1-Windows-x64.zip
-    InstallerSha256: 7EEF39B23F1545ED5B66C736F8E1713445F6C4F4004EAB41C9717026C6D79F03
+    InstallerSha256: CF2E5A9BF05A848319B989C8CC5AA1685F2AD03D75EDC9ECFF6AC0D9489DD5A6
 ManifestType: installer
 ManifestVersion: 1.6.0
