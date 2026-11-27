@@ -36,7 +36,9 @@ AST analizi ve kelime tabanlı kod araması yerel çalışır. Ağ kullanan öze
 [![Canlı Ağ Geçidi](https://img.shields.io/badge/%E2%9A%A1%20Canl%C4%B1%20Ge%C3%A7it-Vercel-000000?style=for-the-badge&logo=vercel)](https://tzero-indol.vercel.app)
 
 <p align="center">
-  <a href="https://vibeshelf.co/tool/t-zero/"><img src="https://vibeshelf.co/badge.svg" width="200" height="44" alt="Listed on VibeShelf"/></a>
+  <a href="https://www.producthunt.com/products/tzeroalgorithm"><img src="https://raw.githubusercontent.com/toprakahmetaydogmus/TZeroAlgorithm/main/assets/product_hunt_badge.png" width="158" height="34" alt="Find us on Product Hunt"/></a>
+  &nbsp;
+  <a href="https://vibeshelf.co/tool/t-zero/"><img src="https://vibeshelf.co/badge.svg" width="155" height="34" alt="Listed on VibeShelf"/></a>
 </p>
 
 > **T-Zero LLM bağlam boyutunuzu küçülttüyse veya token faturalarınızı düşürdüyse lütfen GitHub'da bize bir yıldız verin! ⭐**  

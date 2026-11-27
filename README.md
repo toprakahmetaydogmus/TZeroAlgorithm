@@ -42,7 +42,11 @@
 [![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Zero--GPU%20Demo-Hugging%20Face-ffd21e?style=for-the-badge&logo=huggingface&logoColor=black)](https://huggingface.co/spaces/toprakke4/tzero-token-reducer)
 [![Live Vercel Hub](https://img.shields.io/badge/%E2%9A%A1%20Live%20Gateway-Vercel-000000?style=for-the-badge&logo=vercel)](https://tzero-indol.vercel.app)
 
-
+<p align="center">
+  <a href="https://www.producthunt.com/products/tzeroalgorithm"><img src="assets/product_hunt_badge.png" width="158" height="34" alt="Find us on Product Hunt" /></a>
+  &nbsp;
+  <a href="https://vibeshelf.co/tool/t-zero/"><img src="https://vibeshelf.co/badge.svg" width="155" height="34" alt="Listed on VibeShelf" /></a>
+</p>
 
 > **If T-Zero cuts your LLM prompt tokens or saves you API bills in Cursor / Claude, please give us a star! ⭐**  
 > *Every star supports an independent developer maintaining this open-source project.*
@@ -123,7 +127,6 @@ local setting was added by T-Zero, `git config --local --unset core.hooksPath`
 restores inherited/default hook lookup. If it replaced a previous local setting,
 restore that original value or rerun your hook manager's installer. T-Zero cannot
 recover an overwritten configuration value automatically.
-
 
 ### Navigation & Interactive Jump Stations
 
@@ -736,7 +739,7 @@ Help us reach our **500 Stars Milestone**! Share T-Zero with your network in one
 
 ## Directory Listings
 
-<a href="https://www.producthunt.com/products/tzeroalgorithm?launch=tzeroalgorithm"><img src="https://img.shields.io/badge/Product%20Hunt-Featured%20Launch%20%F0%9F%9A%80-DA552F?style=for-the-badge&logo=producthunt&logoColor=white" alt="T-Zero on Product Hunt"></a>
+<a href="https://www.producthunt.com/products/tzeroalgorithm"><img src="assets/product_hunt_badge.png" width="158" height="34" alt="T-Zero on Product Hunt"></a>
 <a href="https://vibeshelf.co/tool/t-zero/"><img src="https://vibeshelf.co/badge.svg" width="140" alt="T-Zero on VibeShelf"></a>
 <a href="https://submitaitools.org/github-com-toprakahmetaydogmus-tzeroalgorithm/"><img src="https://submitaitools.org/static_submitaitools/images/submitaitools.png" width="100" alt="T-Zero on Submit AI Tools"></a>
 <a href="https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm"><img src="https://img.shields.io/badge/Glama%20MCP-TDQS%205.0%2F5.0-8b5cf6?style=for-the-badge" alt="T-Zero on Glama MCP"></a>
