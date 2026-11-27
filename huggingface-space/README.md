@@ -22,6 +22,8 @@ Live Hugging Face Space demonstration for **T-Zero (v12.3.0 Sovereign Edition - 
 - **Multi-Model Financial ROI Cockpit** (Claude 3.5 Sonnet, GPT-4o, Gemini 1.5 Pro, DeepSeek V3)
 
 GitHub: [toprakahmetaydogmus/TZeroAlgorithm](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)  
+Product Hunt: [T-Zero Launch](https://www.producthunt.com/products/tzeroalgorithm?launch=tzeroalgorithm)  
+180-Tier Anti-REA Lab: [tzero-indol.vercel.app/anti_rea_lab.html](https://tzero-indol.vercel.app/anti_rea_lab.html)  
 PC-Fixer: [toprakahmetaydogmus/tzero-pc-fixer](https://github.com/toprakahmetaydogmus/tzero-pc-fixer)  
 PyPI: [tzero-mcp](https://pypi.org/project/tzero-mcp/)  
 Developer: Toprak Ahmet Aydoğmuş (Siber Akademi)

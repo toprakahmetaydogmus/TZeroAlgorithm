@@ -30,6 +30,7 @@ AST analizi ve kelime tabanlı kod araması yerel çalışır. Ağ kullanan öze
 *Cursor, Claude Code, Windsurf ve Antigravity IDE için ampirik olarak kanıtlanmış deterministik AST token sıkıştırma motoru.*
 
 [![GitHub'da Yıldızla](https://img.shields.io/badge/%E2%AD%90%20GitHub'da%20Y%C4%B1ld%C4%B1zla-Hedef%3A%20500-f59e0b?style=for-the-badge&logo=github&logoColor=white)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)
+[![Product Hunt](https://img.shields.io/badge/Product%20Hunt-T--Zero%20Lansman%20%F0%9F%9A%80-DA552F?style=for-the-badge&logo=producthunt&logoColor=white)](https://www.producthunt.com/products/tzeroalgorithm?launch=tzeroalgorithm)
 [![Google Colab Canlı Lab](https://img.shields.io/badge/%F0%9F%9A%80%20%C4%B0nteraktif-Google%20Colab-f9ab00?style=for-the-badge&logo=googlecolab&logoColor=white)](https://colab.research.google.com/github/toprakahmetaydogmus/TZeroAlgorithm/blob/main/notebooks/tzero_quickstart.ipynb)
 [![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Zero--GPU%20Demo-Hugging%20Face-ffd21e?style=for-the-badge&logo=huggingface&logoColor=black)](https://huggingface.co/spaces/toprakke4/tzero-token-reducer)
 [![Canlı Ağ Geçidi](https://img.shields.io/badge/%E2%9A%A1%20Canl%C4%B1%20Ge%C3%A7it-Vercel-000000?style=for-the-badge&logo=vercel)](https://tzero-indol.vercel.app)
@@ -54,7 +55,7 @@ T-Zero (Token Zero), yapay zeka kodlama asistanları (Cursor, Claude Desktop, An
 Yapay zeka modellerine tüm kaynak kodlar metin olarak verildiğinde, fonksiyon gövdelerindeki döngüler ve ara hesaplamalar yüzünden **bağlam penceresinin %80 ila %95'i israf edilir**. T-Zero, kodu metin olarak değil AST (Soyut Sözdizimi Ağacı) olarak okur; fonksiyon gövdelerini çıkarıp arayüzleri, tipleri ve sınıf yapılarını korur.
 
 ### Temel Özellikler:
-- **20 Standart MCP Aracı:** `get_project_context_tree`, `prune_code_snippet`, `audit_codebase_quality`, `verify_hallucination_guard`, `auto_vault_migrate`, `change_impact_analysis` vb.
+- **21 Kanonik / 58 Çalışma Zamanı MCP Aracı & 180 Katmanlı Anti-REA Kalkanı:** `build_project_context`, `prune_code_snippet`, `audit_code_quality`, `verify_security_guard`, `analyze_change_impact`, `orchestrate_agent_swarm` ve 12 güvenlik alanlı 180-Tier Anti-REA koruması.
 - **Smart Skeleton (Tier-2):** Üzerinde çalışılan hedef dosya %100 tam kod kalırken, çevresindeki 1. derece bağımlılıklar imza iskeleti haline getirilir.
 - **Reality-Lock Halüsinasyon Kontrolü & %0 Kaçış İspatı:** Modelin uydurduğu import ve fonksiyon çağrılarını koda yazılmadan önce statik AST üzerinde yakalar, 60 ampirik senaryo ile %0.0 halüsinasyon kaçış oranını kanıtlar ve kendi kendine onarır (`tzero --prove-zero-hallucination`).
 - **1-Tıkla Auto-Vault Sızıntı Taşıyıcı:** Koddaki gizli API anahtarlarını otomatik bulup `.env` içine taşır, `.gitignore`'a ekler ve kodu `os.environ.get(...)` ile refactor eder.

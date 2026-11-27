@@ -26,6 +26,8 @@ AST 分析和代码搜索在本地运行。有关联网功能，请参阅[隐私
 [![CodeQL](https://img.shields.io/badge/code%20scanning-CodeQL%20passed-10b981?style=flat-square&logo=github)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions/workflows/codeql.yml)
 [![Dependabot](https://img.shields.io/badge/dependabot-active-02569B?style=flat-square&logo=dependabot&logoColor=white)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/blob/main/.github/dependabot.yml)
 [![License](https://img.shields.io/badge/license-AGPL--3.0-64748b?style=flat-square)](../LICENSE)
+[![Product Hunt](https://img.shields.io/badge/Product%20Hunt-T--Zero%20Launch-DA552F?style=flat-square&logo=producthunt&logoColor=white)](https://www.producthunt.com/products/tzeroalgorithm?launch=tzeroalgorithm)
+[![Anti-REA](https://img.shields.io/badge/Anti--REA-180%20Tiers-10b981?style=flat-square&logo=shield&logoColor=white)](https://tzero-indol.vercel.app/anti_rea_lab.html)
 
 </div>
 

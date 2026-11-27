@@ -2,9 +2,13 @@
 <!-- mcp-name: io.github.toprakahmetaydogmus/tzero -->
 <div align="center">
 
-# T-Zero: Deterministic AST Context Compressor & MCP Server
+<a href="https://www.producthunt.com/products/tzeroalgorithm?launch=tzeroalgorithm">
+  <img src="assets/siber_akademi_logo.png" width="96" height="96" alt="Siber Akademi — T-Zero" style="border-radius: 18px;" />
+</a>
 
-### *AST Context Compression Engine, 21 Canonical MCP Tools (58 Runtime Tools), Real BPE Tokenizer Benchmarks & Pre-Flight Reality-Lock for AI Coding Assistants.*
+# T-Zero: Deterministic AST Context Compressor, MCP Server & 180-Tier Anti-REA
+
+### *AST Context Compression Engine, 21 Canonical MCP Tools (58 Runtime Tools), 180-Tier Anti-REA Sovereign Armor, Real BPE Benchmarks & Pre-Flight Reality-Lock.*
 
 **[English](README.md)** | **[Türkçe](docs/README.tr.md)** | **[日本語](docs/README.ja.md)** | **[简体中文](docs/README.zh.md)** | **[Privacy Policy](PRIVACY.md)** | **[Interactive Colab](https://colab.research.google.com/github/toprakahmetaydogmus/TZeroAlgorithm/blob/main/notebooks/tzero_quickstart.ipynb)** | **[Hugging Face Space](https://huggingface.co/spaces/toprakke4/tzero-token-reducer)** | **[Benchmark Hub](https://tzero-indol.vercel.app)**
 
@@ -19,6 +23,7 @@
 
 <!-- Badges Tier 2: Engineering Quality, Security, Tests & Governance -->
 [![Engine](https://img.shields.io/badge/engine-Rust%20%2B%20Python%20AST-orange?style=flat-square&logo=rust&logoColor=white)](#whats-new-in-v1200-turbo-rust-hybrid-core--multi-language-tree-sitter)
+[![Anti-REA](https://img.shields.io/badge/Anti--REA-180%20Tiers%20(12%20Domains)-10b981?style=flat-square&logo=shield&logoColor=white)](#whats-new-in-v1230-180-tier-ultra-anti-rea-armor-suite--authenticated-bytecode-envelopes)
 [![CI](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions/workflows/ci.yml)
 [![TDQS](https://img.shields.io/badge/TDQS-5.0%20%2F%205.0%20(Grade%20A%2B)-8b5cf6?style=flat-square&logo=checkmarx&logoColor=white)](https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm/schema)
 [![CodeQL](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions/workflows/codeql.yml/badge.svg?branch=main)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions/workflows/codeql.yml)
@@ -32,7 +37,7 @@
 *Empirically proven token optimization engine for Cursor, Claude Code, Windsurf & Antigravity IDE.*
 
 [![Star on GitHub](https://img.shields.io/badge/%E2%AD%90%20Star%20on%20GitHub-Goal%3A%20500-f59e0b?style=for-the-badge&logo=github&logoColor=white)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)
-[![Product Hunt](https://img.shields.io/badge/Product%20Hunt-View%20our%20launch-DA552F?style=for-the-badge&logo=producthunt&logoColor=white)](https://www.producthunt.com/products/tzeroalgorithm?launch=tzeroalgorithm)
+[![Product Hunt](https://img.shields.io/badge/Product%20Hunt-T--Zero%20Launch%20%F0%9F%9A%80-DA552F?style=for-the-badge&logo=producthunt&logoColor=white)](https://www.producthunt.com/products/tzeroalgorithm?launch=tzeroalgorithm)
 [![Interactive Colab](https://img.shields.io/badge/%F0%9F%9A%80%20Interactive-Google%20Colab-f9ab00?style=for-the-badge&logo=googlecolab&logoColor=white)](https://colab.research.google.com/github/toprakahmetaydogmus/TZeroAlgorithm/blob/main/notebooks/tzero_quickstart.ipynb)
 [![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Zero--GPU%20Demo-Hugging%20Face-ffd21e?style=for-the-badge&logo=huggingface&logoColor=black)](https://huggingface.co/spaces/toprakke4/tzero-token-reducer)
 [![Live Vercel Hub](https://img.shields.io/badge/%E2%9A%A1%20Live%20Gateway-Vercel-000000?style=for-the-badge&logo=vercel)](https://tzero-indol.vercel.app)
@@ -731,8 +736,10 @@ Help us reach our **500 Stars Milestone**! Share T-Zero with your network in one
 
 ## Directory Listings
 
+<a href="https://www.producthunt.com/products/tzeroalgorithm?launch=tzeroalgorithm"><img src="https://img.shields.io/badge/Product%20Hunt-Featured%20Launch%20%F0%9F%9A%80-DA552F?style=for-the-badge&logo=producthunt&logoColor=white" alt="T-Zero on Product Hunt"></a>
+<a href="https://vibeshelf.co/tool/t-zero/"><img src="https://vibeshelf.co/badge.svg" width="140" alt="T-Zero on VibeShelf"></a>
 <a href="https://submitaitools.org/github-com-toprakahmetaydogmus-tzeroalgorithm/"><img src="https://submitaitools.org/static_submitaitools/images/submitaitools.png" width="100" alt="T-Zero on Submit AI Tools"></a>
-<a href="https://vibeshelf.co/tool/t-zero/"><img src="https://vibeshelf.co/badge.svg" width="100" alt="T-Zero on VibeShelf"></a>
+<a href="https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm"><img src="https://img.shields.io/badge/Glama%20MCP-TDQS%205.0%2F5.0-8b5cf6?style=for-the-badge" alt="T-Zero on Glama MCP"></a>
 
 ---
 

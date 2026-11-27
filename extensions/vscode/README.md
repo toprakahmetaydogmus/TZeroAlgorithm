@@ -13,6 +13,7 @@
   <a href="https://open-vsx.org/extension/siber-akademi/tzero-vscode"><img src="https://img.shields.io/open-vsx/dt/siber-akademi/tzero-vscode?style=for-the-badge&logo=openvsx&color=purple&label=Downloads" alt="Open VSX Downloads" /></a>
   <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm"><img src="https://img.shields.io/github/stars/toprakahmetaydogmus/TZeroAlgorithm?style=for-the-badge&logo=github&color=f59e0b&logoColor=white" alt="GitHub Stars" /></a>
   <a href="https://www.npmjs.com/package/tzero-mcp"><img src="https://img.shields.io/npm/v/tzero-mcp?color=cb3837&logo=npm&style=for-the-badge&logoColor=white" alt="NPM Version" /></a>
+  <a href="https://www.producthunt.com/products/tzeroalgorithm?launch=tzeroalgorithm"><img src="https://img.shields.io/badge/Product%20Hunt-T--Zero%20Launch-DA552F?style=for-the-badge&logo=producthunt&logoColor=white" alt="T-Zero on Product Hunt" /></a>
   <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-AGPL--3.0--only-10b981?style=for-the-badge" alt="License AGPL-3.0-only" /></a>
 </p>
 

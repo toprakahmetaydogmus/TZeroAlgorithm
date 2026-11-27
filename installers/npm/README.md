@@ -5,6 +5,7 @@
 [![npm version](https://img.shields.io/npm/v/tzero-mcp.svg?color=cb3837&logo=npm)](https://www.npmjs.com/package/tzero-mcp)
 [![License: AGPL-3.0-only](https://img.shields.io/badge/License-AGPL--3.0--only-yellow.svg)](./LICENSE)
 [![Socket Badge](https://socket.dev/api/badge/npm/package/tzero-mcp)](https://socket.dev/npm/package/tzero-mcp)
+[![Product Hunt](https://img.shields.io/badge/Product%20Hunt-T--Zero%20Launch-DA552F?style=flat-square&logo=producthunt&logoColor=white)](https://www.producthunt.com/products/tzeroalgorithm?launch=tzeroalgorithm)
 [![GitHub Stars](https://img.shields.io/github/stars/toprakahmetaydogmus/TZeroAlgorithm?style=social)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm)
 
 ---
