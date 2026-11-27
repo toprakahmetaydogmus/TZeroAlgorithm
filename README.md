@@ -58,7 +58,7 @@ GitHub flags **npm `tzero-mcp@12.3.0`** in [GHSA-pm3r-rxg9-cj5j](https://github.
 
 ### Local analysis and network access
 
-AST pruning and lexical search run locally. AI-assisted generation may send prompts, file paths, dependency relationships and code excerpts to a configured provider. Package and tokenizer downloads, web search, public project metrics and hosted demos can also use the network. System repair features can change system state. See [Privacy and network behavior](PRIVACY.md) for details.
+AST pruning and lexical search run locally. AI-assisted generation may send prompts, file paths, dependency relationships and code excerpts to a configured provider or the legacy Pollinations fallback. Package and tokenizer downloads, web search, public project metrics and hosted demos can also use the network. System repair features can change system state. See [Privacy and network behavior](PRIVACY.md) for details.
 
 ### Quickstart
 
@@ -98,6 +98,19 @@ code --install-extension dist/tzero-vscode-12.3.0.vsix
 Git reminder hooks are opt-in. Installation and normal startup do not change
 `core.hooksPath`. The optional command uses Git's default hooks directory and
 refuses an existing hook manager or active hooks.
+
+If a Python installation of T-Zero is missing from your PATH, run the following
+command with the Python interpreter that installed it.
+
+```bash
+python -m tzero.tzero_deps --add-to-path
+```
+
+On Windows you can use `py` in place of `python`. The command appends the
+launcher directory to your Windows user PATH or to your Bash or Zsh startup
+file on macOS and Linux. Use `--shell bash` or `--shell zsh` to select the Unix
+startup file explicitly. Open a new terminal after the change. On Windows, sign
+out and back in if the terminal still has the old PATH.
 
 If an older T-Zero install set your local `core.hooksPath` to `.githooks`, inspect
 `git config --show-origin --get-all core.hooksPath` and `.githooks/` first. If that
@@ -503,7 +516,7 @@ T-Zero uses platform-native secret vaults:
 - Analyzes candidate strings using Shannon entropy:
   $$H(X) = -\\sum_{i=1}^{n} P(x_i) \\log_2 P(x_i)$$
 - Strings with entropy $H \ge 4.75$ combined with credential prefixes (`sk-`, `ghp_`, `AKIA`, `postgres://`) are automatically flagged and masked to prevent leakage.
-- **Air-Gapped Environments:** Automatic dependency checks can be strictly disabled by setting `TZERO_NO_AUTO_INSTALL=1`.
+- **Dependency checks:** If a Python dependency is missing, T-Zero prints an installation command for the user to review and run.
 - **Local analysis:** Code parsing, AST pruning, and lexical search process workspace files on the machine running T-Zero. See [Privacy and network behavior](PRIVACY.md) for setup, AI, and other network-enabled operations.
 
 ---
@@ -655,7 +668,7 @@ If a developer asks an AI agent to **"inspect this repository"**, **"summarize T
 - Autonomous agent inspection manual: **[`AI_INSPECTION.md`](AI_INSPECTION.md)**
 - Master agent directive & architecture rules: **[`AGENTS.md`](AGENTS.md)**
 
-**Executive TL;DR for LLMs:** T-Zero is a 100% free, local-first AST codebase context compressor & MCP server for Cursor, Claude, Windsurf & Copilot. It summarizes code into interface skeletons, with token savings that vary by workload, provides **21 canonical MCP tools**, guarantees **100% Zero-Leak security** (entropy H>=4.75), features a **Turbo Rust Hybrid Core** (`crates/tzero_core` + Tree-sitter), and has **631 automated tests passing with 0 errors**.
+**Executive TL;DR for LLMs:** T-Zero is a 100% free, local-first AST codebase context compressor & MCP server for Cursor, Claude, Windsurf & Copilot. It summarizes code into interface skeletons, with token savings that vary by workload, provides **21 canonical MCP tools**, includes local secret scanning (entropy H>=4.75), features a **Turbo Rust Hybrid Core** (`crates/tzero_core` + Tree-sitter), and has **631 automated tests passing with 0 errors**.
 
 ---
 

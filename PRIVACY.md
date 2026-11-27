@@ -24,6 +24,9 @@ Saving API credentials in the app uses the configured OS keyring. Depending on
 the tool, explicitly requested repair and setup actions can write files, run local
 system commands, or change configuration. Dependency checks leave shell startup
 files and the Windows user PATH unchanged.
+The explicit `python -m tzero.tzero_deps --add-to-path` command appends the
+installed T-Zero launcher directory to the requesting user's PATH through the
+Windows user registry or their Bash or Zsh startup file.
 
 The repository includes optional protection tooling for generated applications
 with anti-debugging, encrypted bytecode execution, and a webhook alert option.

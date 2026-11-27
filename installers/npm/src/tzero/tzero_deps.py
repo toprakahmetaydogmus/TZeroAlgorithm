@@ -12,9 +12,12 @@ import importlib
 import importlib.util
 import os
 import re
+import shlex
 import shutil
 import subprocess
 import sys
+import sysconfig
+from pathlib import Path
 from typing import List, NamedTuple, Optional, Tuple
 
 OPT_OUT_ENV = "TZERO_NO_AUTO_INSTALL"
@@ -139,6 +142,105 @@ def ensure_dependencies(include_mcp: bool = False, *, install: bool = False) -> 
 
 def _line(level: str, text: str) -> str:
     return f"  [{level:^4}] {text}"
+
+
+def _tzero_scripts_directory() -> Path:
+    executable = "tzero.exe" if os.name == "nt" else "tzero"
+    for scheme in (sysconfig.get_default_scheme(), sysconfig.get_preferred_scheme("user")):
+        scripts = Path(sysconfig.get_path("scripts", scheme)).resolve()
+        if (scripts / executable).is_file():
+            return scripts
+    raise ValueError("No T-Zero executable was found for this Python installation.")
+
+
+def _append_windows_user_path(scripts: Path) -> bool:
+    import ntpath
+    import winreg
+
+    directory = str(scripts)
+
+    def normalize(value: str) -> str:
+        return ntpath.normcase(ntpath.normpath(winreg.ExpandEnvironmentStrings(value)))
+
+    access = winreg.KEY_READ | winreg.KEY_SET_VALUE
+    with winreg.CreateKeyEx(winreg.HKEY_CURRENT_USER, "Environment", 0, access) as key:
+        try:
+            current, kind = winreg.QueryValueEx(key, "Path")
+        except FileNotFoundError:
+            current, kind = "", winreg.REG_EXPAND_SZ
+        if kind not in (winreg.REG_SZ, winreg.REG_EXPAND_SZ):
+            raise ValueError("The Windows user PATH is not a string.")
+        if any(normalize(entry) == normalize(directory) for entry in current.split(";") if entry):
+            return False
+        separator = ";" if current and not current.endswith(";") else ""
+        winreg.SetValueEx(key, "Path", 0, kind, current + separator + directory)
+    return True
+
+
+def _append_shell_path(scripts: Path, config: Path) -> bool:
+    import fcntl
+
+    directory = shlex.quote(str(scripts))
+    entry = f'case ":$PATH:" in *:{directory}:*) ;; *) export PATH="${{PATH:+$PATH:}}"{directory} ;; esac'
+    with config.open("a+", encoding="utf-8", errors="surrogateescape", newline="") as handle:
+        fcntl.flock(handle, fcntl.LOCK_EX)
+        handle.seek(0)
+        current = handle.read()
+        if entry in current.splitlines():
+            return False
+        if current and not current.endswith("\n"):
+            handle.write("\n")
+        handle.write(f"# Added by T-Zero\n{entry}\n")
+    return True
+
+
+def add_to_user_path(shell: Optional[str] = None) -> int:
+    """Add an installed T-Zero launcher to the user's PATH on explicit request."""
+    try:
+        scripts = _tzero_scripts_directory()
+        separator = ";" if os.name == "nt" else ":"
+        if any(char in str(scripts) for char in (separator, "\r", "\n")):
+            raise ValueError("The T-Zero executable directory contains a PATH separator or newline.")
+        if os.name == "nt":
+            if shell:
+                raise ValueError("--shell applies to Bash and Zsh on Unix.")
+            changed = _append_windows_user_path(scripts)
+            target = "the Windows user PATH"
+        else:
+            shell = shell or Path(os.environ.get("SHELL", "")).name
+            if shell not in ("bash", "zsh"):
+                raise ValueError("Select Bash or Zsh with --shell bash or --shell zsh.")
+            config_dir = Path.home()
+            if shell == "zsh" and os.environ.get("ZDOTDIR"):
+                config_dir = Path(os.environ["ZDOTDIR"]).expanduser()
+            config = config_dir / f".{shell}rc"
+            changed = _append_shell_path(scripts, config)
+            target = str(config)
+    except (OSError, ValueError) as exc:
+        _err(f"[T-Zero] Could not update PATH: {exc}")
+        return 1
+
+    if changed:
+        print(f"Added {scripts} to {target}. Open a new shell to use the updated PATH.")
+    else:
+        print(f"{scripts} is already configured in {target}.")
+    return 0
+
+
+def main() -> int:
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Check Python dependencies and configure T-Zero's user PATH.")
+    parser.add_argument(
+        "--add-to-path", action="store_true", help="Persist T-Zero's executable directory in your user PATH."
+    )
+    parser.add_argument("--shell", choices=("bash", "zsh"), help="Select the shell configuration file to update on Unix.")
+    args = parser.parse_args()
+    if args.add_to_path:
+        return add_to_user_path(args.shell)
+    if args.shell:
+        parser.error("--shell requires --add-to-path")
+    return run_doctor()
 
 
 def _run_deep_subsystem_check() -> int:
@@ -379,4 +481,4 @@ def run_doctor(deep: bool = False) -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(run_doctor())
+    sys.exit(main())
