@@ -296,7 +296,7 @@ T-Zero uses platform-native secret vaults:
   $$H(X) = -\\sum_{i=1}^{n} P(x_i) \\log_2 P(x_i)$$
 - Strings with entropy $H \ge 4.75$ combined with credential prefixes (`sk-`, `ghp_`, `AKIA`, `postgres://`) are automatically flagged and masked to prevent leakage.
 - **Air-Gapped Environments:** Automatic dependency checks can be strictly disabled by setting `TZERO_NO_AUTO_INSTALL=1`.
-- **Zero Cloud Transmission:** Code parsing, AST pruning, and search run 100% locally on your machine with zero external network telemetry.
+- **Local analysis:** AST pruning and lexical search run on the machine hosting T-Zero. See [Privacy and network behavior](PRIVACY.md) for setup and optional features.
 
 ---
 

@@ -712,7 +712,7 @@ exit 0
         lines = []
         lines.append("\033[36m┌────────────────────────────────────────────────────────────────────────┐\033[0m")
         lines.append("\033[36m│\033[0m  \033[1;37m⚡ T-ZERO LOCAL CI & PRE-PUSH VERIFICATION RUNNER\033[0m                     \033[36m│\033[0m")
-        lines.append("\033[36m│\033[0m  \033[32mZero Quota Burn\033[0m • \033[33m100% Offline\033[0m • \033[35mZero-Leak Guaranteed\033[0m                      \033[36m│\033[0m")
+        lines.append("\033[36m│\033[0m  \033[32mLocal AST Analysis\033[0m • \033[33mToken Estimates\033[0m                      \033[36m│\033[0m")
         lines.append("\033[36m└────────────────────────────────────────────────────────────────────────┘\033[0m")
         lines.append("")
 

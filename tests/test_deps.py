@@ -40,13 +40,22 @@ class TestEnsureDependencies(unittest.TestCase):
                 mock.patch("subprocess.run", side_effect=AssertionError("pip must not run")):
             self.assertTrue(tzero_deps.ensure_dependencies())
 
+    def test_missing_packages_do_not_install_or_change_path_by_default(self):
+        with mock.patch.object(tzero_deps, "REQUIRED", [FAKE_MISSING]), \
+                mock.patch("subprocess.run", side_effect=AssertionError("pip must not run")), \
+                mock.patch.dict(os.environ, {"PATH": ""}), \
+                contextlib.redirect_stderr(io.StringIO()) as stderr:
+            self.assertFalse(tzero_deps.ensure_dependencies())
+            self.assertEqual(os.environ["PATH"], "")
+        self.assertIn("Install manually", stderr.getvalue())
+
     def test_opt_out_env_blocks_install(self):
         stderr = io.StringIO()
         with mock.patch.object(tzero_deps, "REQUIRED", [FAKE_MISSING]), \
                 mock.patch.dict(os.environ, {tzero_deps.OPT_OUT_ENV: "1"}), \
                 mock.patch("subprocess.run", side_effect=AssertionError("pip must not run")), \
                 contextlib.redirect_stderr(stderr):
-            self.assertFalse(tzero_deps.ensure_dependencies())
+            self.assertFalse(tzero_deps.ensure_dependencies(install=True))
         self.assertIn("fake-package>=1.0.0", stderr.getvalue())
 
     def test_successful_install_path(self):
@@ -58,7 +67,7 @@ class TestEnsureDependencies(unittest.TestCase):
                 mock.patch.object(tzero_deps, "check_dependency", side_effect=statuses), \
                 contextlib.redirect_stderr(io.StringIO()):
             os.environ.pop(tzero_deps.OPT_OUT_ENV, None)
-            self.assertTrue(tzero_deps.ensure_dependencies())
+            self.assertTrue(tzero_deps.ensure_dependencies(install=True))
         command = run.call_args[0][0]
         self.assertEqual(command[1:4], ["-m", "pip", "install"])
         self.assertIn("fake-package>=1.0.0", command)
@@ -70,7 +79,7 @@ class TestEnsureDependencies(unittest.TestCase):
                 mock.patch("subprocess.run", return_value=failed), \
                 contextlib.redirect_stderr(stderr):
             os.environ.pop(tzero_deps.OPT_OUT_ENV, None)
-            self.assertFalse(tzero_deps.ensure_dependencies())
+            self.assertFalse(tzero_deps.ensure_dependencies(install=True))
         self.assertIn("Install manually", stderr.getvalue())
 
     def test_install_output_never_touches_stdout(self):
@@ -82,7 +91,7 @@ class TestEnsureDependencies(unittest.TestCase):
                 mock.patch.object(tzero_deps, "check_dependency", side_effect=[("missing", None), ("ok", "1")]), \
                 contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(io.StringIO()):
             os.environ.pop(tzero_deps.OPT_OUT_ENV, None)
-            tzero_deps.ensure_dependencies()
+            tzero_deps.ensure_dependencies(install=True)
         self.assertEqual(stdout.getvalue(), "")
 
 

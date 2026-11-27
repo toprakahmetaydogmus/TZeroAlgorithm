@@ -181,7 +181,7 @@ class TZeroTerminalCockpit:
 
         lines.append(box_top)
         lines.append(cls._box_line(f"  {c.BOLD}{c.BRIGHT_CYAN}⚡ SİBER AKADEMİ — T-ZERO CONTEXT ARCHITECT & LIVE COCKPIT v12.3.0{c.RESET}"))
-        lines.append(cls._box_line(f"  {c.DIM}Zero-Leak AST Intelligence | 100% Offline | $0 Cloud Cost Guarantee{c.RESET}"))
+        lines.append(cls._box_line(f"  {c.DIM}Local AST Analysis | Optional Network Services{c.RESET}"))
         lines.append(box_mid)
 
         # Workspace summary line

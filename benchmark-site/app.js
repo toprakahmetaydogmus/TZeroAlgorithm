@@ -4704,7 +4704,7 @@ function initViralShare() {
 
   if (btnReddit) {
     btnReddit.addEventListener("click", () => {
-      const title = "T-Zero v12.3.0: Open-source local AST context pruning for Cursor & Claude (-88% to -95% tokens, $0, 100% offline)";
+      const title = "T-Zero v12.3.0: Open-source local AST context pruning for Cursor & Claude (-88% to -95% tokens with local AST analysis)";
       const url = "https://reddit.com/submit?url=" + encodeURIComponent(repoUrl) + "&title=" + encodeURIComponent(title);
       window.open(url, "_blank", "width=800,height=600");
     });
