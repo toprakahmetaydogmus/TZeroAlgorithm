@@ -8,7 +8,7 @@ Repository: https://github.com/toprakahmetaydogmus/TZeroAlgorithm
 
 import sys
 
-VERSION = "12.3.1"
+VERSION = "12.3.2"
 
 # Fast-path for --version
 if len(sys.argv) > 1 and sys.argv[1] in ("--version", "-V"):

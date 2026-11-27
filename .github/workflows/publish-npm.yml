@@ -28,9 +28,12 @@ jobs:
           node-version: 22
           registry-url: 'https://registry.npmjs.org'
 
+      - name: Ensure npm supports Trusted Publishing (OIDC)
+        run: npm install -g npm@latest
+
       - name: Publish package to npm
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TOKEN_INPUT: ${{ secrets.NPM_TOKEN }}
         run: |
           cd installers/npm
           PACKAGE_VERSION=$(node -p "require('./package.json').version")
@@ -41,10 +44,10 @@ jobs:
             exit 0
           fi
 
-          if [ -n "$NODE_AUTH_TOKEN" ]; then
+          if [ -n "$NPM_TOKEN_INPUT" ]; then
             echo "Publishing to npm registry using NPM_TOKEN..."
-            npm publish --access public
+            NODE_AUTH_TOKEN="$NPM_TOKEN_INPUT" npm publish --access public
           else
-            echo "::error::NPM_TOKEN secret is not configured; npm publication did not happen."
-            exit 1
+            echo "Publishing to npm registry using GitHub Trusted Publishing (OIDC)..."
+            npm publish --provenance --access public
           fi

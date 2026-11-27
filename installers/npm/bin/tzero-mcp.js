@@ -15,9 +15,9 @@ const pkg = require("../package.json");
 const banner = `\x1b[36m
 ┌──────────────────────────────────────────────────────────────────────────────┐
 │  ⚡ T-ZERO MCP SERVER v${pkg.version} (Model Context Protocol)                       │
-│  Enterprise AST Context Compressor, Zero-Leak Guard & 20 Canonical Tools     │
+│  Enterprise AST Context Compressor, Zero-Leak Guard & 21 Canonical Tools     │
 │                                                                              │
-│  ⭐ Help Reach 100 Stars: https://github.com/toprakahmetaydogmus/TZeroAlgorithm │
+│  ⭐ GitHub (119+ Stars): https://github.com/toprakahmetaydogmus/TZeroAlgorithm │
 │  🔌 Connected to:   Cursor, Claude Desktop, Antigravity, Windsurf & Cline    │
 └──────────────────────────────────────────────────────────────────────────────┘
 \x1b[0m`;

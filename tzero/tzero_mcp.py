@@ -33,7 +33,7 @@ import ast
 import inspect
 import logging
 
-SERVER_VERSION = "12.3.1"
+SERVER_VERSION = "12.3.2"
 
 # Version checks must not initialize the MCP SDK or dependency bootstrap. Besides
 # being needlessly expensive, that path may wait on package discovery/network
@@ -1890,9 +1890,9 @@ def create_mcp_server():
     # -------------------------------------------------------------------------
     @_maybe_tool(
         name="jarvis_zero_key_query",
-        title="Query Offline Models via Zero Key Neural Gateway",
+        title="Query Local Ollama Models via Zero Key Gateway",
         description=(
-            "Dispatches inference prompts to free zero-API-key intelligence providers (local Ollama or free cloud endpoints), distinguishing from 'search_codebase_semantic' and 'get_project_context_tree' by generating natural language completions rather than static codebase context.\n"
+            "Dispatches inference prompts strictly to a local Ollama daemon (127.0.0.1:11434) with zero external API keys, distinguishing from 'search_codebase_semantic' and 'get_project_context_tree' by generating natural language completions rather than static codebase context.\n"
             "\n"
             "Parameters:\n"
             "- `prompt` (str, required): User prompt, code question, or instruction for the AI model.\n"
@@ -1901,15 +1901,15 @@ def create_mcp_server():
             "Behavior:\n"
             "- Read-only: Performs query inference without modifying workspace files or persisting conversational state.\n"
             "- Non-idempotent: Model responses may vary across invocations.\n"
-            "- Open-World Network Operation: Dispatches HTTP requests to local Ollama (127.0.0.1:11434) or Pollinations Free Cloud (text.pollinations.ai) with zero user API keys or billing.\n"
-            "- Auth & Rate Limits: Zero credentials required; no account or credit card needed. External free tier has a 45-second network timeout.\n"
-            "- Error Handling: Automatically falls back from local Ollama to free cloud endpoints if local daemon is inactive.\n"
+            "- Open-World Network Operation: Dispatches local HTTP requests strictly to local Ollama (127.0.0.1:11434) with zero user API keys, zero billing, and zero external cloud fallbacks.\n"
+            "- Auth & Rate Limits: Zero credentials required; no account or credit card needed. Local daemon check has a 1.5-second timeout and inference has a 60-second timeout.\n"
+            "- Error Handling: Reports unavailability immediately if local Ollama is inactive without falling back to external cloud services.\n"
             "\n"
             "Usage Guidelines:\n"
-            "- When to use: Query free AI inference for coding questions or reasoning without configuring API keys or paying commercial provider fees.\n"
+            "- When to use: Query free local Ollama inference for coding questions or reasoning without configuring API keys or paying commercial provider fees.\n"
             "- When NOT to use: Do not use for local codebase search or AST parsing (use 'search_codebase_semantic' or 'get_project_context_tree' instead); do not use for structured file modifications (use 'generate_smart_micro_patch' instead).\n"
             "\n"
-            "Returns: Structured Markdown containing selected zero-cost provider name, model identifier, cost confirmation ($0.00), and response completion text."
+            "Returns: Structured Markdown containing selected local provider name, model identifier, cost confirmation ($0.00), and response completion text."
         ),
         annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=False, open_world_hint=True)
     )

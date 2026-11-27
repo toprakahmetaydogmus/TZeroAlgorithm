@@ -177,7 +177,7 @@ class AntiREAEngine:
         if rdtsc_guard:
             code = RDTSCTimingGuard.wrap_source_with_rdtsc_guard(code)
 
-        # 13. Stealth Threat Canary Beacon (Opt-In Only)
+        # 13. Opt-In Tamper Alert Webhook (Disabled by Default)
         if webhook_canary:
             code = CanaryBeacon.inject_beacon_into_source(code, webhook_url=webhook_canary)
 

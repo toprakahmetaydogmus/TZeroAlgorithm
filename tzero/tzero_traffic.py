@@ -18,7 +18,7 @@ import webbrowser
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-CURRENT_VERSION = "12.3.1"
+CURRENT_VERSION = "12.3.2"
 REPO_URL = "https://github.com/toprakahmetaydogmus/TZeroAlgorithm"
 RELEASES_URL = f"{REPO_URL}/releases"
 PYPI_URL = "https://pypi.org/project/tzero-mcp/"

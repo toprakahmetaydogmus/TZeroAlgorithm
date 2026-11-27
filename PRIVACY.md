@@ -7,13 +7,13 @@ receive those results according to the client's settings and privacy policy.
 
 | Operation | Network and data |
 | --- | --- |
-| AI-assisted architecture or documentation generation | When explicitly enabled (`use_ai=True` or remote provider selected), can send prompts, paths, dependency relationships, and code excerpts only to the selected provider (OpenAI, Anthropic, Google Gemini, NVIDIA NIM, OpenRouter, local Ollama, or `Free AI Cloud (No Key Required)` if manually chosen). Missing credentials or provider errors fall back locally to deterministic AST output. |
+| AI-assisted architecture or documentation generation | When explicitly enabled (`use_ai=True` or remote provider selected), can send prompts, paths, dependency relationships, and code excerpts only to the user-selected provider (OpenAI, Anthropic, Google Gemini, NVIDIA NIM, OpenRouter, or local Ollama). Missing credentials or provider errors fall back locally to deterministic AST output. |
 | Legacy `jarvis_zero_key_query` | Sends the prompt and system instruction to Ollama on the same machine. The Ollama service and selected model determine any further processing. If local inference fails, T-Zero reports that it is unavailable. |
 | Web search | Sends the query to DuckDuckGo only when explicitly invoked via the web-search helper. |
 | Public project metrics and version lookups | May query GitHub, npm, or PyPI when displaying community counters, running `tzero share`, or loading live badges. |
 | Package installation, tokenizer data, hosted demos | Package managers, the tokenizer's first uncached fetch, and hosted demos can contact their respective services. Runtime dependency checks print a manual command if packages are missing and do not install automatically unless requested. |
 
-Automatic Pollinations fallbacks have been removed from all code paths (`jarvis_zero_key_query`, `ContextExportManager.generate_architecture_blueprint`, and the desktop GUI generator). Pollinations (`https://text.pollinations.ai/`) is contacted only if the user explicitly selects `Free AI Cloud (No Key Required)`. For sensitive workspaces, use local AST generation and leave AI-assisted generation disabled.
+All Pollinations integration (`FreePollinationsProvider` / `https://text.pollinations.ai/`) and all automatic cloud fallbacks have been completely removed from the codebase (`jarvis_zero_key_query`, `ContextExportManager.generate_architecture_blueprint`, `PROVIDERS`, and the desktop GUI generator). For sensitive workspaces, use local AST generation and leave AI-assisted generation disabled.
 
 ## Local state changes
 

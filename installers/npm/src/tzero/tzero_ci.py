@@ -755,7 +755,7 @@ def main():
         prog="tzero-ci",
         description="Siber Akademi T-Zero Local CI Pipeline & Pre-Push Verification Shield"
     )
-    parser.add_argument("--version", "-v", action="version", version="%(prog)s 12.3.1")
+    parser.add_argument("--version", "-v", action="version", version="%(prog)s 12.3.2")
     parser.add_argument("--quick", "-q", action="store_true", help="Run fast verification battery (seconds)")
     parser.add_argument("--all", "-a", action="store_true", help="Run full matrix verification battery")
     parser.add_argument("--fix", action="store_true", help="Attempt auto-repair for auto-fixable gates (metadata sync)")

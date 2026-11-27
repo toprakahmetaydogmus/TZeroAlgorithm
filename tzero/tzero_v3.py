@@ -493,7 +493,7 @@ def calculate_token_cost(token_count: int, provider_name: str) -> float:
 # i18n Translations
 TRANSLATIONS: Dict[str, Dict[str, str]] = {
     "en": {
-        "title": "T-Zero Developer Console & Context Architect v12.3.1",
+        "title": "T-Zero Developer Console & Context Architect v12.3.2",
         "subtitle": f"Developer: {DEV_NAME} | {DEV_URL_MAIN} | {DEV_URL_BIO}",
         "overview_tab": "🏠 Overview Dashboard",
         "setup_tab": "⚡ Setup & AI Models",
@@ -530,7 +530,7 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "audit_btn": "🛡️ SECURITY AUDIT"
     },
     "tr": {
-        "title": "T-Zero Geliştirici Konsolu & Bağlam Mimarı v12.3.1",
+        "title": "T-Zero Geliştirici Konsolu & Bağlam Mimarı v12.3.2",
         "subtitle": f"Geliştirici: {DEV_NAME} | {DEV_URL_MAIN} | {DEV_URL_BIO}",
         "overview_tab": "🏠 Genel Bakış",
         "setup_tab": "⚡ Kurulum & Model",
@@ -1094,23 +1094,7 @@ class LocalOllamaProvider(BaseProvider):
         }
 
 
-class FreePollinationsProvider(BaseProvider):
-    def __init__(self):
-        super().__init__(
-            "Free AI Cloud (No Key Required)",
-            "https://text.pollinations.ai/openai",
-            ["openai", "mistral", "qwen-coder", "deepseek"]
-        )
-
-    def get_headers(self, api_key: str = "") -> Dict[str, str]:
-        return {
-            "Content-Type": "application/json",
-            "User-Agent": f"TZeroAlgorithmV4/4.1 (Toprak Ahmet Aydogmus; {DEV_URL_GITHUB})"
-        }
-
-
 PROVIDERS: Dict[str, BaseProvider] = {
-    "Free AI Cloud (No Key Required)": FreePollinationsProvider(),
     "NVIDIA NIM": NvidiaProvider(),
     "OpenAI": OpenAIProvider(),
     "Google Gemini": GeminiProvider(),
@@ -2459,8 +2443,8 @@ class ContextExportManager:
         """Generates ARCHITECTURE.md with Mermaid diagrams and module specs.
         
         Supports live 3rd-party AI synthesis (NVIDIA NIM, OpenAI, Gemini, Anthropic, OpenRouter,
-        Local Ollama, or explicitly selected Free AI Cloud) and falls back locally to the AST
-        architecture engine on missing credentials or provider errors without silent cloud retries.
+        or Local Ollama) and falls back locally to the AST architecture engine on missing
+        credentials or provider errors without silent cloud retries.
         """
         if use_ai:
             try:
@@ -2486,7 +2470,7 @@ class ContextExportManager:
                         project_name, files, deps, snippets
                     )
 
-                if not active_key and active_prov.name not in ("Local Ollama", "Free AI Cloud (No Key Required)"):
+                if not active_key and active_prov.name != "Local Ollama":
                     if progress_cb:
                         progress_cb(
                             50,
@@ -7761,7 +7745,7 @@ Custom Requirements:
         target_dir = self.dir_entry.get().strip() or os.getcwd()
 
         # If commercial provider has no key at all, stay strictly local via the AST engine (no cloud fallback)
-        if not key and p.name not in ("Free AI Cloud (No Key Required)", "Local Ollama"):
+        if not key and p.name != "Local Ollama":
             self.log(
                 f"Harici API anahtarı girilmedi ({provider_name}). Veriler dışarı gönderilmeden Yerel Çevrimdışı AST Motoru çalıştırılıyor..."
             )
@@ -9608,7 +9592,7 @@ def main():
                         default="o200k_base", help="BPE encoding for --symbol-context")
     parser.add_argument("--cache-aligned", action="store_true", help="Order context for KV-cache prefix stability (immutable static prefix before dynamic query suffix)")
     parser.add_argument("--commit-msg", action="store_true", help="Generate Conventional Commit message from local AST git diff ($0 local engine)")
-    parser.add_argument("--changelog", nargs="?", const="v12.3.1", default=None, metavar="VERSION", help="Generate release CHANGELOG markdown from git history")
+    parser.add_argument("--changelog", nargs="?", const="v12.3.2", default=None, metavar="VERSION", help="Generate release CHANGELOG markdown from git history")
     parser.add_argument("--ci", choices=["github", "gitlab", "pre-commit", "local", "all"], default=None, help="Install CI/CD workflow or run local verification suite")
     parser.add_argument("--local-ci", action="store_true", help="Run comprehensive Local CI & Pre-Push verification battery ($0 quota burn)")
     parser.add_argument("--quick-ci", action="store_true", help="Run fast Local CI smoke checks in seconds")
@@ -9672,7 +9656,7 @@ def main():
     parser.add_argument("--card", "--badge", nargs="?", const="assets/tzero_badge_card.svg", default=None, metavar="FILE", help="Generate viral dark-mode SVG banner card and GitHub README badges")
     parser.add_argument("--showcase", nargs="?", const="tzero_showcase.html", default=None, metavar="FILE", help="Generate interactive split-screen HTML5 comparison showcase slider")
     parser.add_argument("--marketing", "--growth", action="store_true", help="Launch $0-budget viral growth engine and export campaign materials for Reddit, HN, X, and Product Hunt")
-    parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect v12.3.1 Master Edition (engine v4.1.0)")
+    parser.add_argument("--version", "-v", action="version", version="T-Zero Context Architect v12.3.2 Master Edition (engine v4.1.0)")
 
 
     def print_master_tutorial():
@@ -9781,7 +9765,7 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
     def print_quickstart_guide():
         print("""
 ================================================================================
-⚡ SİBER AKADEMİ — T-ZERO CONTEXT ARCHITECT & MCP v12.3.1 MASTER (engine v4.1.0)
+⚡ SİBER AKADEMİ — T-ZERO CONTEXT ARCHITECT & MCP v12.3.2 MASTER (engine v4.1.0)
 ================================================================================
 🎯 %95'e Varan Token Tasarrufu & Otonom Yapay Zeka Mimari Bağlam Motoru
 
@@ -10760,7 +10744,7 @@ If this open-source tool helped you, please consider giving us a ⭐ on GitHub:
         if not os.path.exists(app_path):
             app_path = os.path.join(os.getcwd(), "huggingface-space", "app.py")
         print("\033[36m" + "=" * 80)
-        print("🤗 SİBER AKADEMİ — T-ZERO HUGGING FACE SPACE & GRADIO COCKPIT (v12.3.1)")
+        print("🤗 SİBER AKADEMİ — T-ZERO HUGGING FACE SPACE & GRADIO COCKPIT (v12.3.2)")
         print("=" * 80 + "\033[0m")
         print("🌐 Official Live Space : https://huggingface.co/spaces/toprakke4/tzero-token-reducer")
         print(f"📁 Local Application   : {app_path}")

@@ -35,17 +35,22 @@ if (!isQuiet) {
 if (process.argv.includes("star") || process.argv.includes("--star")) {
   console.log(`\x1b[33m
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║  ⭐ T-ZERO 100 STARS GOAL: JOIN THE COMMUNITY!                               ║
+║  ⭐ T-ZERO OPEN SOURCE: SUPPORT US WITH A GITHUB STAR!                       ║
 ╠══════════════════════════════════════════════════════════════════════════════╣
-║  🎉 20,880+ Downloads across PyPI & npm!                                     ║
-║  ⭐ Current Stars: 45 / 100 Target                                           ║
+║  🎉 26,290+ Downloads across PyPI, npm, Open VSX, VS Code & Releases!        ║
+║  ⭐ Live Stars: 119+ (Goal: 250)                                             ║
 ║  ► Opening GitHub: https://github.com/toprakahmetaydogmus/TZeroAlgorithm    ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 \x1b[0m`);
-  const openCmd = process.platform === "win32" ? "start" : process.platform === "darwin" ? "open" : "xdg-open";
+  const repoUrl = "https://github.com/toprakahmetaydogmus/TZeroAlgorithm";
   try {
-    const { exec } = require("child_process");
-    exec(`${openCmd} https://github.com/toprakahmetaydogmus/TZeroAlgorithm`);
+    if (process.platform === "win32") {
+      spawn("cmd.exe", ["/c", "start", "", repoUrl], { shell: false, stdio: "ignore", detached: true }).unref();
+    } else if (process.platform === "darwin") {
+      spawn("open", [repoUrl], { shell: false, stdio: "ignore", detached: true }).unref();
+    } else {
+      spawn("xdg-open", [repoUrl], { shell: false, stdio: "ignore", detached: true }).unref();
+    }
   } catch (e) {}
 }
 

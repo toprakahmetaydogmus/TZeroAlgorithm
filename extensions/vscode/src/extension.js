@@ -194,7 +194,7 @@ function activate(context) {
             { label: '$(tools) System Diagnostics (--doctor)', command: 'tzero.doctor' },
             { label: '$(globe) Launch Local Web Dashboard', command: 'tzero.openDashboard' }
         ];
-        const picked = await vscode.window.showQuickPick(items, { placeHolder: 'T-Zero Context Architect Command Center (v12.3.1)' });
+        const picked = await vscode.window.showQuickPick(items, { placeHolder: 'T-Zero Context Architect Command Center (v12.3.2)' });
         if (picked) {
             vscode.commands.executeCommand(picked.command);
         }
@@ -563,7 +563,7 @@ function activate(context) {
             const starTimer = setTimeout(async () => {
                 try {
                     const choice = await vscode.window.showInformationMessage(
-                        '⭐ T-Zero v12.3.1 is active! 180-Tier Anti-REA Armor + AST Context Architect. Help us reach our 250 stars milestone!',
+                        '⭐ T-Zero v12.3.2 is active! 180-Tier Anti-REA Armor + AST Context Architect. Help us reach our 250 stars milestone!',
                         '⭐ Star on GitHub (1-Click)',
                         'Later'
                     );

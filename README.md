@@ -90,10 +90,10 @@ tzero share
 
 # Option D: Standalone Windows 64-Bit Executable Suite (Zero Dependencies):
 # Download all-in-one suite (.ZIP) with GUI, CLI, MCP Server & 1-Click Configurator:
-# https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/download/v12.3.1/TZero-v12.3.1-Windows-x64.zip
+# https://github.com/toprakahmetaydogmus/TZeroAlgorithm/releases/download/v12.3.2/TZero-v12.3.2-Windows-x64.zip
 
 # Install VS Code / Cursor Extension (.vsix):
-code --install-extension dist/tzero-vscode-12.3.1.vsix
+code --install-extension dist/tzero-vscode-12.3.2.vsix
 ```
 
 ### Navigation & Interactive Jump Stations
@@ -203,7 +203,7 @@ tzero init --vscode        # VS Code (Continue / Copilot)
 tzero init --zed           # Zed Editor
 
 # Install official VS Code / Cursor Extension (.vsix):
-code --install-extension dist/tzero-vscode-12.3.1.vsix
+code --install-extension dist/tzero-vscode-12.3.2.vsix
 ```
 
 ### Manual Configuration Snippets (Any MCP Client)
@@ -658,7 +658,7 @@ T-Zero v12.3.0 expands **Anti-REA (Reverse Engineering Agent) Armor** to **180 T
 - **Multi-Cave PyInstaller ExtractorShield & PE Metadata Scrubbing:** Combines up to 4 PE section alignment cave decoy `MEI` headers with MSVC Rich/DanS header zeroization and COFF `TimeDateStamp` scrubbing while keeping native C bootloader execution intact.
 - **Zero-Subprocess Ring-3 & POSIX Anti-Debug Matrix:** Native Win32 `CreateToolhelp32Snapshot` (<2ms, zero subprocess), `IsDebuggerPresent`, `NtSetInformationThread(0x11)`, `sys.gettrace`/`sys.monitoring` debugger lockouts, Linux `TracerPid`, Anti-VM hypervisor guards, and RDTSC nanosecond stepping checkpoints.
 - **Type-Safe MBA & PolyVM Stack Obfuscator:** Strict integer-guarded Mixed Boolean-Arithmetic identities (zero string/float `TypeError` risk) + per-build randomized opcode VMs + In-Flight String Vault (`memset(0)`).
-- **Stealth Canary Beacon (Opt-In Only):** Disabled by default (`webhook_canary: false`). When explicitly configured with a webhook URL, dispatches intrusion alert payloads containing only `threat_type`, `detected_tool`, `timestamp`, `platform`, `os_name`, `python_version`, `pid`, and `hostname[:16]` (no source code or secrets are ever transmitted).
+- **Tamper Alert Webhook (Opt-In Only):** Disabled by default (`webhook_canary: false`). When explicitly configured with a webhook URL, dispatches tamper notification payloads containing only `threat_type`, `detected_tool`, `timestamp`, `platform`, `os_name`, `python_version`, `pid`, and `hostname[:16]` (no source code or secrets are ever transmitted).
 - **Built-in CLI, Matrix & GUI:** Run `tzero armor`, `tzero audit-rea`, `tzero shield-exe`, `python -m tzero.anti_rea.cli matrix`, or launch `tzero-gui`.
 - **Static Verification & Packaging Notice:** Use `tzero audit-rea` for static textual indicator + 180-Tier domain coverage scores; official Windows ZIP and VS Code `.vsix` bundles include both `LICENSE` and `NOTICE`.
 

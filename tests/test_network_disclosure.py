@@ -142,6 +142,24 @@ class TestPrivacyAndClaimsTransparency(unittest.TestCase):
         self.assertNotIn("100% Offline & Local", ai_insp)
         self.assertNotIn("runs air-gapped", llms)
 
+    def test_runtime_package_contains_no_pollinations_or_evasive_scanner_triggers(self):
+        forbidden = (
+            "pollinations.ai",
+            "FreePollinationsProvider",
+            "api.telegram.org",
+            "bypass HTTP firewalls",
+            "OS-Telemetry",
+        )
+        tzero_dir = ROOT / "tzero"
+        for py_file in sorted(tzero_dir.rglob("*.py")):
+            content = py_file.read_text(encoding="utf-8", errors="ignore")
+            for marker in forbidden:
+                self.assertNotIn(
+                    marker,
+                    content,
+                    f"Forbidden scanner trigger '{marker}' found in {py_file.relative_to(ROOT)}",
+                )
+
 
 if __name__ == "__main__":
     unittest.main()

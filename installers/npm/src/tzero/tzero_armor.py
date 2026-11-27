@@ -5,10 +5,10 @@ Military-grade defense engine protecting codebases and executables
 against AI-driven automated reverse engineering (e.g. morluto/rea,
 Ghidra MCP bridge, IDA Pro LLM plugins, pyinstxtractor) and uncensored/jailbroken LLMs.
 Includes native Ring-3 anti-debugging against x64dbg, IDA Pro, WinDbg, and Cheat Engine,
-stealth canary beacon telemetry, in-flight string vault, and Electron asar shielding.
+opt-in tamper alert webhook, in-flight string vault, and Electron asar shielding.
 
 Developer: Toprak Ahmet Aydoğmuş (Siber Akademi)
-Part of Siber Akademi T-Zero Context Architect v12.3.1 Master Edition.
+Part of Siber Akademi T-Zero Context Architect v12.3.2 Master Edition.
 License: MIT
 """
 

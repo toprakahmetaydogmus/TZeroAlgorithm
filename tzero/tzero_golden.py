@@ -11,7 +11,7 @@ Capabilities:
 - 100% Offline, $0 cost, zero cloud dependencies (Python standard library only).
 
 Author: Toprak Ahmet Aydoğmuş (Siber Akademi)
-Part of T-Zero Context Architect v12.3.1 Master Edition.
+Part of T-Zero Context Architect v12.3.2 Master Edition.
 """
 
 import ast
@@ -208,7 +208,7 @@ class ASTGoldenRegressionEngine:
 
         return GoldenBaseline(
             workspace_root=abs_root,
-            version="12.3.1",
+            version="12.3.2",
             created_at=time.time(),
             symbols=all_sigs,
             total_symbols=len(all_sigs),

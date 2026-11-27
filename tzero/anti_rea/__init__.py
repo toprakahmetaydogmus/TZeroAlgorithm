@@ -4,7 +4,7 @@
 World-class, 24-tier anti-reverse-engineering defense matrix against autonomous
 AI agents (morluto/rea, Ghidra MCP, pyinstxtractor, IDA LLM) and uncensored/jailbroken LLMs.
 Includes native Ring-3 anti-debugging against x64dbg, IDA Pro, WinDbg, and Cheat Engine,
-stealth canary beacon telemetry, in-flight string vault, and Electron asar shielding.
+opt-in tamper alert webhook, in-flight string vault, and Electron asar shielding.
 
 Developer: Toprak Ahmet Aydoğmuş (Siber Akademi)
 Part of Siber Akademi T-Zero Security Suite.
