@@ -105,8 +105,10 @@ class TestCIWorkflow(unittest.TestCase):
         npm_text = npm_path.read_text(encoding="utf-8")
 
         self.assertIn("NPM_TOKEN", npm_text)
+        self.assertIn("id-token: write", npm_text)
         self.assertIn("registry.npmjs.org", npm_text)
         self.assertIn("npm publish --access public", npm_text)
+        self.assertIn("--provenance --access public", npm_text)
         self.assertIn("exit 1", npm_text)
 
     def test_publish_pypi_workflow_handles_pypi_token(self):
