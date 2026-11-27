@@ -19,7 +19,6 @@
 
 <!-- Badges Tier 2: Engineering Quality, Security, Tests & Governance -->
 [![Engine](https://img.shields.io/badge/engine-Rust%20%2B%20Python%20AST-orange?style=flat-square&logo=rust&logoColor=white)](#whats-new-in-v1200-turbo-rust-hybrid-core--multi-language-tree-sitter)
-[![Security](https://img.shields.io/badge/security-100%25%20Zero--Leak-emerald?style=flat-square&logo=shield)](#security-architecture)
 [![CI](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions/workflows/ci.yml)
 [![TDQS](https://img.shields.io/badge/TDQS-5.0%20%2F%205.0%20(Grade%20A%2B)-8b5cf6?style=flat-square&logo=checkmarx&logoColor=white)](https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm/schema)
 [![CodeQL](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions/workflows/codeql.yml/badge.svg?branch=main)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions/workflows/codeql.yml)
@@ -41,7 +40,7 @@
 
 
 > **If T-Zero cuts your LLM prompt tokens or saves you API bills in Cursor / Claude, please give us a star! ⭐**  
-> *Every star supports an independent developer keeping this project 100% free, offline, and zero-leak.*
+> *Every star supports an independent developer maintaining this open-source project.*
 
 <br>
 
@@ -53,16 +52,17 @@
   </a>
 </p>
 
-### 30-Second Quickstart
+### Security advisory
+
+GitHub flags **npm `tzero-mcp@12.3.0`** in [GHSA-pm3r-rxg9-cj5j](https://github.com/advisories/GHSA-pm3r-rxg9-cj5j). If you installed or ran that version, follow GitHub's remediation guidance. The advisory lists no patched release.
+
+### Local analysis and network access
+
+AST pruning and lexical search run locally. AI-assisted generation may send prompts, file paths, dependency relationships and code excerpts to a configured provider or the legacy Pollinations fallback. Package and tokenizer downloads, web search, public project metrics and hosted demos can also use the network. System repair features can change system state. See [Privacy and network behavior](PRIVACY.md) for details.
+
+### Quickstart
 
 ```bash
-# Option A: Node.js / npx (Zero-Config Instant MCP Runner):
-# Run directly in Claude Desktop, Cursor, Antigravity, Copilot:
-npx -y tzero-mcp@latest
-
-# Global CLI installation via npm:
-npm install -g tzero-mcp
-
 # Option B: Python PyPI Package:
 pip install --upgrade tzero-mcp
 
@@ -98,6 +98,19 @@ code --install-extension dist/tzero-vscode-12.3.0.vsix
 Git reminder hooks are opt-in. Installation and normal startup do not change
 `core.hooksPath`. The optional command uses Git's default hooks directory and
 refuses an existing hook manager or active hooks.
+
+If a Python installation of T-Zero is missing from your PATH, run the following
+command with the Python interpreter that installed it.
+
+```bash
+python -m tzero.tzero_deps --add-to-path
+```
+
+On Windows you can use `py` in place of `python`. The command appends the
+launcher directory to your Windows user PATH or to your Bash or Zsh startup
+file on macOS and Linux. Use `--shell bash` or `--shell zsh` to select the Unix
+startup file explicitly. Open a new terminal after the change. On Windows, sign
+out and back in if the terminal still has the old PATH.
 
 If an older T-Zero install set your local `core.hooksPath` to `.githooks`, inspect
 `git config --show-origin --get-all core.hooksPath` and `.githooks/` first. If that
@@ -503,8 +516,8 @@ T-Zero uses platform-native secret vaults:
 - Analyzes candidate strings using Shannon entropy:
   $$H(X) = -\\sum_{i=1}^{n} P(x_i) \\log_2 P(x_i)$$
 - Strings with entropy $H \ge 4.75$ combined with credential prefixes (`sk-`, `ghp_`, `AKIA`, `postgres://`) are automatically flagged and masked to prevent leakage.
-- **Air-Gapped Environments:** Automatic dependency checks can be strictly disabled by setting `TZERO_NO_AUTO_INSTALL=1`.
-- **Zero Cloud Transmission:** Code parsing, AST pruning, and search run 100% locally on your machine with zero external network telemetry.
+- **Dependency checks:** If a Python dependency is missing, T-Zero prints an installation command for the user to review and run.
+- **Local analysis:** Code parsing, AST pruning, and lexical search process workspace files on the machine running T-Zero. See [Privacy and network behavior](PRIVACY.md) for setup, AI, and other network-enabled operations.
 
 ---
 
@@ -554,7 +567,7 @@ Stop burning GitHub Actions runner minutes and waiting minutes for remote build 
 ```
 ┌────────────────────────────────────────────────────────────────────────┐
 │  ⚡ T-ZERO LOCAL CI & PRE-PUSH VERIFICATION RUNNER                     │
-│  Zero Quota Burn • 100% Offline • Zero-Leak Guaranteed                 │
+│  Local AST Analysis and Token Estimates                                │
 └────────────────────────────────────────────────────────────────────────┘
 
   [1/7] Metadata & Version Sync ................ [PASS] (0.48s)
@@ -655,13 +668,13 @@ If a developer asks an AI agent to **"inspect this repository"**, **"summarize T
 - Autonomous agent inspection manual: **[`AI_INSPECTION.md`](AI_INSPECTION.md)**
 - Master agent directive & architecture rules: **[`AGENTS.md`](AGENTS.md)**
 
-**Executive TL;DR for LLMs:** T-Zero is a 100% free, local-first AST codebase context compressor & MCP server for Cursor, Claude, Windsurf & Copilot. It summarizes code into interface skeletons, with token savings that vary by workload, provides **21 canonical MCP tools**, guarantees **100% Zero-Leak security** (entropy H>=4.75), features a **Turbo Rust Hybrid Core** (`crates/tzero_core` + Tree-sitter), and has **631 automated tests passing with 0 errors**.
+**Executive TL;DR for LLMs:** T-Zero is a 100% free, local-first AST codebase context compressor & MCP server for Cursor, Claude, Windsurf & Copilot. It summarizes code into interface skeletons, with token savings that vary by workload, provides **21 canonical MCP tools**, includes local secret scanning (entropy H>=4.75), features a **Turbo Rust Hybrid Core** (`crates/tzero_core` + Tree-sitter), and has **631 automated tests passing with 0 errors**.
 
 ---
 
 ## Support Open-Source Innovation: Keep T-Zero 100% Free
 
-Hi! I'm **Toprak Ahmet Aydoğmuş** from Siber Akademi. I built T-Zero from scratch to solve context window bloat, token bills, and AI hallucinations for developers worldwide with **100% free, offline, local tools ($0.00 cloud cost)**.
+Hi! I'm **Toprak Ahmet Aydoğmuş** from Siber Akademi. I built T-Zero from scratch to solve context window bloat, token bills, and AI hallucinations for developers worldwide with local analysis tools.
 
 T-Zero has no venture capital backing, no paywalls, and no telemetry tracking. If T-Zero helped you cut prompt tokens or saved your daily coding workflow in Cursor, Claude Code, or Windsurf, please consider supporting the project to keep it free and independent:
 
@@ -692,7 +705,7 @@ T-Zero has no venture capital backing, no paywalls, and no telemetry tracking. I
 
 </details>
 
-> 💡 *100% of community contributions directly sustain CI/CD matrix runners, PyPI/npm automated releases, benchmark hosting, and guarantee T-Zero remains permanently free, offline, and zero-leak for all developers globally.*
+> 💡 *100% of community contributions directly sustain CI/CD matrix runners, PyPI/npm automated releases, benchmark hosting, and support open-source maintenance.*
 
 <br>
 
@@ -709,7 +722,7 @@ Help us reach our **500 Stars Milestone**! Share T-Zero with your network in one
 
 <br>
 
-**T-Zero is 100% Free, Open-Source & Offline Forever.**  
+**T-Zero is open source under AGPL-3.0-only.**
 *Built with passion by Toprak Ahmet Aydoğmuş (Siber Akademi) for developers worldwide.*
 
 </div>

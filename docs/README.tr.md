@@ -1,3 +1,5 @@
+AST analizi ve kelime tabanlı kod araması yerel çalışır. Ağ kullanan özellikleri [gizlilik belgesinde](../PRIVACY.md), npm `12.3.0` güvenlik duyurusunu [GitHub’da](https://github.com/advisories/GHSA-pm3r-rxg9-cj5j) inceleyebilirsiniz.
+
 # T-Zero Algoritması - Türkçe Dokümantasyon
 
 [English](../README.md) | **[Türkçe](README.tr.md)** | [日本語](README.ja.md) | [简体中文](README.zh.md) | [Gizlilik Politikası (Privacy)](../PRIVACY.md) | [Google Colab Canlı Lab](https://colab.research.google.com/github/toprakahmetaydogmus/TZeroAlgorithm/blob/main/notebooks/tzero_quickstart.ipynb) | [Hugging Face Canlı Demo](https://huggingface.co/spaces/toprakke4/tzero-token-reducer) | [Tarayıcıda Doğrudan Aç (GitHub Codespaces)](https://codespaces.new/toprakahmetaydogmus/TZeroAlgorithm)
@@ -15,7 +17,6 @@
 
 <!-- Rozetler 2. Kademe: Mühendislik Kalitesi, Güvenlik, Testler ve Yönetişim -->
 [![Motor](https://img.shields.io/badge/motor-Rust%20%2B%20Python%20AST-orange?style=flat-square&logo=rust&logoColor=white)](../README.md#whats-new-in-v1200-turbo-rust-hybrid-core--multi-language-tree-sitter)
-[![Güvenlik](https://img.shields.io/badge/g%C3%BCvenlik-%25100%20S%C4%B1f%C4%B1r--S%C4%B1z%C4%B1nt%C4%B1-emerald?style=flat-square&logo=shield)](../README.md#security-architecture)
 [![CI](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions/workflows/ci.yml/badge.svg)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions/workflows/ci.yml)
 [![TDQS](https://img.shields.io/badge/TDQS-5.0%20%2F%205.0%20(Derece%20A%2B)-8b5cf6?style=flat-square&logo=checkmarx&logoColor=white)](https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm/schema)
 [![CodeQL Analizi](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions/workflows/codeql.yml/badge.svg)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions/workflows/codeql.yml)
@@ -38,7 +39,7 @@
 </p>
 
 > **T-Zero LLM bağlam boyutunuzu küçülttüyse veya token faturalarınızı düşürdüyse lütfen GitHub'da bize bir yıldız verin! ⭐**  
-> *Her bir yıldız, bağımsız geliştiricinin bu projeyi %100 ücretsiz, çevrimdışı ve sıfır sızıntılı olarak sürdürmesini destekler.*
+> *Her bir yıldız, bağımsız geliştiricinin bu projeyi açık kaynak olarak sürdürmesini destekler.*
 
 </div>
 
@@ -60,7 +61,7 @@ Yapay zeka modellerine tüm kaynak kodlar metin olarak verildiğinde, fonksiyon 
 - **Shannon Entropi Güvenlik Filtresi:** Yüksek entropili ($H \ge 4.75$) gizli anahtarları ve şifreleri yerel olarak tespit eder.
 - **Turbo Overdrive (Kamçılama Modu):** Kod tarama veya AST çıkarımı yavaşladığında (>150ms veya $\ge 15$ dosya) otomatik devreye girerek 32 worker thread ile paralel burst ve mikrosaniye seviyesinde bellek içi fast-path önbellek sunar.
 - **Otonom Dinamik Alt Ajan Fabrikası (Dynamic Subagent Swarm):** Karmaşık görev verildiğinde aynı anda gereken tüm alt görevleri analiz eder; gerekirse anında ad-hoc alt ajanlar sentezleyip (`AgentForge`) çok çekirdekli paralel koşturur ve PBFT konsensüsü ile birleştirir.
-- **%100 Yerel ve Çevrimdışı:** Dış bulut embedding API'si gerektirmez, $0 maliyetle çalışır.
+- **Yerel Kod Araması:** Dış embedding API'si gerektirmez.
 - **Sıfır-Halüsinasyon Matematiksel & Ampirik İspat Raporu:** [ZERO_HALLUCINATION_PROOF.md](ZERO_HALLUCINATION_PROOF.md)
 - **Google Colab İnteraktif Lab:** [Google Colab Üzerinde Test Et](https://colab.research.google.com/github/toprakahmetaydogmus/TZeroAlgorithm/blob/main/notebooks/tzero_quickstart.ipynb)
 - **Bilimsel ve Teknik Whitepaper:** [WHITE_PAPER_TZERO_V10.md](WHITE_PAPER_TZERO_V10.md) (Matematiksel ispatlar, DAG-AC sıkıştırma ve Reality-Lock analizi)
@@ -123,7 +124,7 @@ GitHub Actions dakikalarını yakıp uzakta hata beklemenin önüne geçin! **T-
 
 ## Açık Kaynak İnovasyonu Destekleyin: T-Zero'yu %100 Ücretsiz Tutun
 
-Merhaba! Ben **Toprak Ahmet Aydoğmuş**, Siber Akademi'den. T-Zero'yu sıfırdan, yapay zeka kodlama araçlarındaki bağlam şişkinliğini, token maliyetlerini ve halüsinasyonları çözmek için **%100 yerel, çevrimdışı ve ücretsiz ($0 maliyet)** olarak geliştirdim.
+Merhaba! Ben **Toprak Ahmet Aydoğmuş**, Siber Akademi'den. T-Zero'yu sıfırdan, yapay zeka kodlama araçlarındaki bağlam şişkinliğini, token maliyetlerini ve halüsinasyonları çözmek için yerel analiz araçlarıyla geliştirdim.
 
 T-Zero'nun hiçbir risk sermayesi fonu, ücretli aboneliği veya telemetri takibi yoktur. T-Zero günlük iş akışınızda Cursor, Claude Code veya Windsurf üzerinde token tasarrufu sağladıysa bağımsız geliştirmeyi destekleyebilirsiniz:
 
@@ -153,7 +154,7 @@ T-Zero'nun hiçbir risk sermayesi fonu, ücretli aboneliği veya telemetri takib
 
 </details>
 
-> 💡 *Tüm topluluk bağışları, T-Zero'nun sürekli entegrasyon (CI/CD) matrislerini, otomatik paket yayınlarını, açık kaynak test altyapısını ve araçların tüm geliştiriciler için daima %100 ücretsiz, çevrimdışı ve sıfır-sızıntılı kalmasını finanse etmek için kullanılır.*
+> 💡 *Tüm topluluk bağışları, T-Zero'nun sürekli entegrasyon (CI/CD) matrislerini, otomatik paket yayınlarını, açık kaynak test altyapısını ve proje bakımını finanse etmek için kullanılır.*
 
 <br>
 
@@ -170,7 +171,7 @@ T-Zero'nun hiçbir risk sermayesi fonu, ücretli aboneliği veya telemetri takib
 
 <br>
 
-**T-Zero Sonsuza Kadar %100 Ücretsiz, Açık Kaynak ve Çevrimdışıdır.**  
+**T-Zero, AGPL-3.0-only lisansıyla açık kaynaktır.**
 *Toprak Ahmet Aydoğmuş (Siber Akademi) tarafından dünya genelindeki tüm geliştiriciler için sevgiyle geliştirildi.*
 
 </div>

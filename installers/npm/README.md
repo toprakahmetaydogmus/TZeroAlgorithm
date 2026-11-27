@@ -20,44 +20,19 @@ If this package helps your engineering team or AI workflows:
 
 ---
 
-## Instant MCP Execution (Zero Install Needed)
+## Security advisory
 
-Run directly via `npx` in your `claude_desktop_config.json`, Cursor MCP settings, or Windsurf / Antigravity config:
+GitHub flags **`tzero-mcp@12.3.0`** in [GHSA-pm3r-rxg9-cj5j](https://github.com/advisories/GHSA-pm3r-rxg9-cj5j). If you installed or ran that version, follow the advisory's remediation guidance. GitHub lists no patched version.
 
-```json
-{
-  "mcpServers": {
-    "tzero": {
-      "command": "npx",
-      "args": ["-y", "tzero-mcp@latest"]
-    }
-  }
-}
-```
-
-## CLI Installation & Usage
-
-```bash
-# Global installation via npm
-npm install -g tzero-mcp
-
-# Compress any project directory into an AST Skeleton tree (95% token savings)
-tzero --tree . --out tree.txt
-
-# Launch interactive Model Context Protocol (MCP) Server
-tzero-mcp
-
-# 1-Click connect to Cursor, Claude Desktop, Antigravity & VS Code
-tzero-add-mcp
-```
+This npm package uses a separate Python interpreter. It requires Python dependencies to be installed explicitly for that interpreter. See the [source repository](https://github.com/toprakahmetaydogmus/TZeroAlgorithm) for setup instructions and [network and system behavior](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/blob/main/PRIVACY.md).
 
 ## Key Capabilities
 
 - **95% Deterministic Token Reduction:** Compresses source code into AST skeletons preserving function signatures, type annotations, and docstrings while pruning redundant logic bodies.
-- **100% Zero-Leak Security Guard:** Deep Shannon Entropy ($H \ge 4.75$) scanner for API keys and secrets before LLM context ingestion.
+- **Secret scanning:** Deep Shannon Entropy ($H \ge 4.75$) scanner for API keys and secrets before LLM context ingestion.
 - **Reality-Lock Pre-Flight:** Catches hallucinations before code execution by validating imports and call hierarchies against real AST nodes.
 - **20 Native Developer Tools:** AST PageRank, call-chain tracer, BM25 semantic hybrid search, change blast radius analyzer, and system doctor.
-- **100% Private, Local & Free:** Pure offline operation — $0 API cost, zero cloud lock-in.
+- **Local AST parsing and lexical search:** These operations run on the machine hosting T-Zero.
 
 ## License
 

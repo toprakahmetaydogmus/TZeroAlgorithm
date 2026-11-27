@@ -1,27 +1,40 @@
-# Privacy policy
+# Privacy and network behavior
 
-The T-Zero MCP servers run workspace analysis and PC diagnostics on the machine
-where the server is launched. Local scans do not require an account or cloud
-inference. The MCP servers do not send product telemetry to a T-Zero service.
+AST parsing, AST pruning, and lexical search read workspace data on the machine
+running T-Zero. MCP tools can return source excerpts, paths, and diagnostic
+results to the connected client. A remote model configured in that client can
+receive those results according to the client's settings and privacy policy.
 
-Tools can return source excerpts, paths, and diagnostic results to the connected
-MCP client. If that client uses a remote model, its own settings and privacy
-policy govern what it sends. Only grant the client access to workspaces you
-intend it to inspect. Some tools write files or change local system state.
-Review a tool's description and annotations before granting write access.
+| Operation | Network and data |
+| --- | --- |
+| AI-assisted architecture or documentation generation | Can send prompts, paths, dependency relationships, and code excerpts to the configured OpenAI, Anthropic, Google Gemini, NVIDIA NIM, or OpenRouter endpoint. A configured Ollama endpoint receives the inference request when selected. |
+| Legacy `jarvis_zero_key_query` | Sends the prompt and system instruction to Ollama on the same machine. The Ollama service and selected model determine any further processing. If local inference fails, T-Zero reports that it is unavailable. |
+| Web search | Sends the query to DuckDuckGo when invoked. |
+| Public project metrics and version lookups | May query GitHub, npm, or PyPI for repository and package metadata. |
+| Package installation, tokenizer data, hosted demos | Package managers, the tokenizer's first uncached fetch and hosted demos can contact their respective services. Runtime dependency checks print a manual command if packages are missing. |
 
-When you choose to save API credentials through the app, it uses the operating
-system's configured keyring. Local benchmark settings and environment variables
-are optional. Configure them only for runs you initiate and avoid putting
-credentials in benchmark inputs or outputs.
+The legacy Ollama tool no longer falls back to Pollinations. The desktop AI
+generator and AI-assisted architecture export can still retry through Pollinations
+after a missing credential or provider error. For sensitive workspaces, use local
+AST generation and leave AI-assisted generation disabled.
 
-Installing packages, downloading tokenizer data on first use, visiting a
-hosted demo, or using optional network features may contact the relevant
-external service. The offline deep diagnostic avoids downloading tokenizer data.
+## Local state changes
 
-The optional legacy `jarvis_zero_key_query` tool can send its prompt and system
-prompt to an external inference provider if local Ollama is unavailable. Do
-not use it for private source code, credentials, or other sensitive information
-unless you have independently reviewed and accepted that provider's current
-terms. Provider availability and pricing can change. The optional AI-assisted
-architecture blueprint can also send project context to a configured provider.
+Saving API credentials in the app uses the configured OS keyring. Depending on
+the tool, explicitly requested repair and setup actions can write files, run local
+system commands, or change configuration. Dependency checks leave shell startup
+files and the Windows user PATH unchanged.
+The explicit `python -m tzero.tzero_deps --add-to-path` command appends the
+installed T-Zero launcher directory to the requesting user's PATH through the
+Windows user registry or their Bash or Zsh startup file.
+
+The repository includes optional protection tooling for generated applications
+with anti-debugging, encrypted bytecode execution, and a webhook alert option.
+The webhook is disabled by default. When enabled for a generated application, it
+can send detection events and host or process metadata to the configured URL.
+
+## npm 12.3.0 advisory
+
+[GHSA-pm3r-rxg9-cj5j](https://github.com/advisories/GHSA-pm3r-rxg9-cj5j) covers
+`tzero-mcp@12.3.0` on npm and lists no patched version. Follow GitHub's advisory
+if you installed or ran that package.

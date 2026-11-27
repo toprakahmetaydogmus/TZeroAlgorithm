@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Verification tests for T-Zero Welcome Star Banner, Git Hooks, and IDE Installers."""
 
-import os
+import json
 import subprocess
 import sys
 import tempfile
@@ -87,22 +87,13 @@ class TestWelcomeAndInstallIde(unittest.TestCase):
         self.assertEqual(res.returncode, 0)
         self.assertIn("cursor", res.stdout.lower())
 
-    def test_postinstall_node_script(self):
-        env = os.environ.copy()
-        env["TEST_POSTINSTALL"] = "1"
-        env["TZERO_NO_BANNER"] = "0"
-        res = subprocess.run(
-            ["node", str(ROOT_DIR / "installers" / "npm" / "bin" / "postinstall.js")],
-            capture_output=True,
-            text=True,
-            encoding="utf-8",
-            errors="replace",
-            cwd=str(ROOT_DIR),
-            env=env,
-        )
-        self.assertEqual(res.returncode, 0)
-        self.assertIn("T-ZERO MCP INSTALLED SUCCESSFULLY", res.stdout)
-        self.assertIn("https://github.com/toprakahmetaydogmus/TZeroAlgorithm", res.stdout)
+    def test_npm_package_has_no_install_lifecycle_hooks(self):
+        package_root = ROOT_DIR / "installers" / "npm"
+        manifest = json.loads((package_root / "package.json").read_text(encoding="utf-8"))
+        scripts = manifest.get("scripts", {})
+        for hook in ("preinstall", "install", "postinstall"):
+            self.assertNotIn(hook, scripts)
+        self.assertFalse((package_root / "bin" / "postinstall.js").exists())
 
     def test_setup_py_execution(self):
         import tomllib

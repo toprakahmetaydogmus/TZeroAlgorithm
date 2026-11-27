@@ -1,3 +1,5 @@
+AST 解析とコード検索はローカルで実行されます。ネットワークを利用する機能は[プライバシーポリシー](../PRIVACY.md)をご覧ください。npm `12.3.0` については [GitHub の勧告](https://github.com/advisories/GHSA-pm3r-rxg9-cj5j)をご覧ください。
+
 # T-Zero コンテキストアーキテクト & MCP サーバー (Token 削減エンジン)
 
 <p align="center">
@@ -19,7 +21,6 @@
 
 <!-- Badges Tier 2: Engineering Quality, Security, Tests & Governance -->
 [![Engine](https://img.shields.io/badge/engine-Rust%20%2B%20Python%20AST-orange?style=flat-square&logo=rust&logoColor=white)](../README.md#whats-new-in-v1200-turbo-rust-hybrid-core--multi-language-tree-sitter)
-[![Security](https://img.shields.io/badge/security-100%25%20Zero--Leak-emerald?style=flat-square&logo=shield)](../README.md#security-architecture)
 [![Tests](https://img.shields.io/badge/tests-647%20passing%20(100%25)-10b981?style=flat-square&logo=githubactions&logoColor=white)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions/workflows/ci.yml)
 [![TDQS](https://img.shields.io/badge/TDQS-5.0%20%2F%205.0%20(Grade%20A%2B)-8b5cf6?style=flat-square&logo=checkmarx&logoColor=white)](https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm/schema)
 [![CodeQL](https://img.shields.io/badge/code%20scanning-CodeQL%20passed-10b981?style=flat-square&logo=github)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions/workflows/codeql.yml)

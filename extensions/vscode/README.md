@@ -16,7 +16,7 @@
   <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-AGPL--3.0--only-10b981?style=for-the-badge" alt="License AGPL-3.0-only" /></a>
 </p>
 
-> 🚀 **Over 25,000+ total downloads** across PyPI, npm, Open VSX, and VS Code Marketplace! 100% free, offline, local-first AST context compression for AI coding assistants.
+> 🚀 **Over 25,000+ total downloads** across PyPI, npm, Open VSX, and VS Code Marketplace! Local AST context compression for AI coding assistants. See the [privacy policy](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/blob/main/PRIVACY.md) for network-enabled features.
 
 <p align="center">
   <a href="https://github.com/toprakahmetaydogmus/TZeroAlgorithm">

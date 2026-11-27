@@ -1,3 +1,5 @@
+AST 分析和代码搜索在本地运行。有关联网功能，请参阅[隐私说明](../PRIVACY.md)。有关 npm `12.3.0`，请参阅 [GitHub 安全公告](https://github.com/advisories/GHSA-pm3r-rxg9-cj5j)。
+
 # T-Zero 语境架构师与 MCP 服务器 (Token 归零)
 
 <p align="center">
@@ -19,7 +21,6 @@
 
 <!-- Badges Tier 2: Engineering Quality, Security, Tests & Governance -->
 [![Engine](https://img.shields.io/badge/engine-Rust%20%2B%20Python%20AST-orange?style=flat-square&logo=rust&logoColor=white)](../README.md#whats-new-in-v1200-turbo-rust-hybrid-core--multi-language-tree-sitter)
-[![Security](https://img.shields.io/badge/security-100%25%20Zero--Leak-emerald?style=flat-square&logo=shield)](../README.md#security-architecture)
 [![Tests](https://img.shields.io/badge/tests-647%20passing%20(100%25)-10b981?style=flat-square&logo=githubactions&logoColor=white)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions/workflows/ci.yml)
 [![TDQS](https://img.shields.io/badge/TDQS-5.0%20%2F%205.0%20(Grade%20A%2B)-8b5cf6?style=flat-square&logo=checkmarx&logoColor=white)](https://glama.ai/mcp/servers/toprakahmetaydogmus/TZeroAlgorithm/schema)
 [![CodeQL](https://img.shields.io/badge/code%20scanning-CodeQL%20passed-10b981?style=flat-square&logo=github)](https://github.com/toprakahmetaydogmus/TZeroAlgorithm/actions/workflows/codeql.yml)
@@ -44,7 +45,7 @@
    - 在 AI 生成的代码应用到工作区之前，静态验证其所有导入与调用是否在本地 AST 中真实存在，彻底杜绝虚假库引用。
 4. **15+ 种多语言原生支持 (Polyglot):**
    - Python、TypeScript、JavaScript、Rust、Go、C/C++、Java、C#、Swift、Kotlin、Dart、Solidity、Ruby、PHP、Scala、Elixir。
-5. **100% 免费与离线工作 ($0 成本):**
+5. **本地 AST 分析与代码搜索：**
    - 无需任何外部付费 API，本地 CPU 毫秒级极速计算。
 
 ---

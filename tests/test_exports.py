@@ -4,6 +4,8 @@ Test Suite for ContextExportManager and Token Cost Calculator
 import unittest
 import os
 import tempfile
+from unittest import mock
+from tzero.tzero_jarvis.zero_key_router import ZeroKeyAIRouter
 from tzero.tzero_v3 import ContextExportManager, calculate_token_cost, PROVIDER_COST_PER_MILLION
 
 class TestExportsAndCost(unittest.TestCase):
@@ -35,6 +37,13 @@ class TestExportsAndCost(unittest.TestCase):
         )
         self.assertIn("# 🏛️ Architecture & System Blueprint: TestProject", arch)
         self.assertIn("```mermaid", arch)
+
+    def test_zero_key_query_returns_unavailable_without_ollama(self):
+        with mock.patch.object(ZeroKeyAIRouter, "check_ollama_available", return_value=False), \
+                mock.patch("urllib.request.urlopen") as request:
+            response = ZeroKeyAIRouter.query_intelligence("private prompt")
+        self.assertEqual(response["provider"], "unavailable")
+        request.assert_not_called()
 
     def test_repo_map_generation(self):
         rmap = ContextExportManager.generate_repo_map(

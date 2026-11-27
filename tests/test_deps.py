@@ -4,9 +4,12 @@
 import contextlib
 import io
 import os
+import shutil
 import subprocess
 import sys
+import tempfile
 import unittest
+from pathlib import Path
 from unittest import mock
 
 from tzero import tzero_deps
@@ -40,13 +43,22 @@ class TestEnsureDependencies(unittest.TestCase):
                 mock.patch("subprocess.run", side_effect=AssertionError("pip must not run")):
             self.assertTrue(tzero_deps.ensure_dependencies())
 
+    def test_missing_packages_do_not_install_or_change_path_by_default(self):
+        with mock.patch.object(tzero_deps, "REQUIRED", [FAKE_MISSING]), \
+                mock.patch("subprocess.run", side_effect=AssertionError("pip must not run")), \
+                mock.patch.dict(os.environ, {"PATH": ""}), \
+                contextlib.redirect_stderr(io.StringIO()) as stderr:
+            self.assertFalse(tzero_deps.ensure_dependencies())
+            self.assertEqual(os.environ["PATH"], "")
+        self.assertIn("Install manually", stderr.getvalue())
+
     def test_opt_out_env_blocks_install(self):
         stderr = io.StringIO()
         with mock.patch.object(tzero_deps, "REQUIRED", [FAKE_MISSING]), \
                 mock.patch.dict(os.environ, {tzero_deps.OPT_OUT_ENV: "1"}), \
                 mock.patch("subprocess.run", side_effect=AssertionError("pip must not run")), \
                 contextlib.redirect_stderr(stderr):
-            self.assertFalse(tzero_deps.ensure_dependencies())
+            self.assertFalse(tzero_deps.ensure_dependencies(install=True))
         self.assertIn("fake-package>=1.0.0", stderr.getvalue())
 
     def test_successful_install_path(self):
@@ -58,7 +70,7 @@ class TestEnsureDependencies(unittest.TestCase):
                 mock.patch.object(tzero_deps, "check_dependency", side_effect=statuses), \
                 contextlib.redirect_stderr(io.StringIO()):
             os.environ.pop(tzero_deps.OPT_OUT_ENV, None)
-            self.assertTrue(tzero_deps.ensure_dependencies())
+            self.assertTrue(tzero_deps.ensure_dependencies(install=True))
         command = run.call_args[0][0]
         self.assertEqual(command[1:4], ["-m", "pip", "install"])
         self.assertIn("fake-package>=1.0.0", command)
@@ -70,7 +82,7 @@ class TestEnsureDependencies(unittest.TestCase):
                 mock.patch("subprocess.run", return_value=failed), \
                 contextlib.redirect_stderr(stderr):
             os.environ.pop(tzero_deps.OPT_OUT_ENV, None)
-            self.assertFalse(tzero_deps.ensure_dependencies())
+            self.assertFalse(tzero_deps.ensure_dependencies(install=True))
         self.assertIn("Install manually", stderr.getvalue())
 
     def test_install_output_never_touches_stdout(self):
@@ -82,8 +94,51 @@ class TestEnsureDependencies(unittest.TestCase):
                 mock.patch.object(tzero_deps, "check_dependency", side_effect=[("missing", None), ("ok", "1")]), \
                 contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(io.StringIO()):
             os.environ.pop(tzero_deps.OPT_OUT_ENV, None)
-            tzero_deps.ensure_dependencies()
+            tzero_deps.ensure_dependencies(install=True)
         self.assertEqual(stdout.getvalue(), "")
+
+
+class TestOptInPath(unittest.TestCase):
+    @unittest.skipIf(os.name == "nt", "Bash startup files apply to Unix")
+    def test_explicit_bash_update_is_quoted_and_idempotent(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp)
+            scripts = directory / "developer's scripts"
+            config = directory / ".bashrc"
+            config.write_bytes(b"# keep existing content")
+            process_path = os.environ.get("PATH")
+            with mock.patch.object(tzero_deps, "_tzero_scripts_directory", return_value=scripts), \
+                    mock.patch.object(Path, "home", return_value=directory), \
+                    mock.patch.object(sys, "argv", ["tzero_deps", "--add-to-path", "--shell", "bash"]), \
+                    contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(tzero_deps.main(), 0)
+                first = config.read_bytes()
+                self.assertEqual(tzero_deps.main(), 0)
+            self.assertEqual(config.read_bytes(), first)
+            self.assertTrue(first.startswith(b"# keep existing content\n"))
+            self.assertEqual(os.environ.get("PATH"), process_path)
+            bash = shutil.which("bash")
+            if bash:
+                command = '. "$1"; . "$1"; printf %s "$PATH"'
+                result = subprocess.check_output([bash, "-c", command, "_", str(config)], text=True)
+                self.assertEqual(result.split(os.pathsep).count(str(scripts)), 1)
+
+    def test_windows_appends_to_user_path_and_preserves_value_type(self):
+        registry = mock.MagicMock()
+        registry.REG_SZ, registry.REG_EXPAND_SZ = 1, 2
+        registry.KEY_READ, registry.KEY_SET_VALUE = 1, 2
+        registry.ExpandEnvironmentStrings.side_effect = lambda value: value
+        existing = r"C:\Other"
+        scripts = Path(r"C:\Tools\Scripts")
+        registry.QueryValueEx.return_value = (existing, registry.REG_EXPAND_SZ)
+        with mock.patch.dict(sys.modules, {"winreg": registry}):
+            self.assertTrue(tzero_deps._append_windows_user_path(scripts))
+            key = registry.CreateKeyEx.return_value.__enter__.return_value
+            registry.SetValueEx.assert_called_once_with(key, "Path", 0, registry.REG_EXPAND_SZ, f"{existing};{scripts}")
+            registry.SetValueEx.reset_mock()
+            registry.QueryValueEx.return_value = (f"{existing};{scripts}", registry.REG_EXPAND_SZ)
+            self.assertFalse(tzero_deps._append_windows_user_path(scripts))
+            registry.SetValueEx.assert_not_called()
 
 
 class TestDoctor(unittest.TestCase):
