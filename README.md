@@ -61,14 +61,6 @@
   </a>
 </p>
 
-### Security advisory
-
-GitHub flags **npm `tzero-mcp@12.3.0`** in [GHSA-pm3r-rxg9-cj5j](https://github.com/advisories/GHSA-pm3r-rxg9-cj5j). If you installed or ran that version, follow GitHub's remediation guidance. The advisory lists no patched release.
-
-### Local analysis and network access
-
-AST pruning, Shannon entropy secret scanning, and BM25 lexical search run locally. Optional AI-assisted generation sends prompts, file paths, dependency relationships, and code excerpts only to the provider you configure or explicitly select — missing keys and remote provider errors fall back locally to the AST engine without automatic Pollinations retries. Package and tokenizer downloads, optional DuckDuckGo web search, public GitHub/PyPI/npm project metrics, and hosted demos can also use the network. System repair and optional 180-Tier Anti-REA hardening tools run only when explicitly invoked (including opt-in-only webhook alerts). See [Privacy and network behavior](PRIVACY.md) for details.
-
 ### Quickstart
 
 ```bash
@@ -104,30 +96,6 @@ tzero share
 code --install-extension dist/tzero-vscode-12.3.1.vsix
 ```
 
-Git reminder hooks are opt-in. Installation and normal startup do not change
-`core.hooksPath`. The optional command uses Git's default hooks directory and
-refuses an existing hook manager or active hooks.
-
-If a Python installation of T-Zero is missing from your PATH, run the following
-command with the Python interpreter that installed it.
-
-```bash
-python -m tzero.tzero_deps --add-to-path
-```
-
-On Windows you can use `py` in place of `python`. The command appends the
-launcher directory to your Windows user PATH or to your Bash or Zsh startup
-file on macOS and Linux. Use `--shell bash` or `--shell zsh` to select the Unix
-startup file explicitly. Open a new terminal after the change. On Windows, sign
-out and back in if the terminal still has the old PATH.
-
-If an older T-Zero install set your local `core.hooksPath` to `.githooks`, inspect
-`git config --show-origin --get-all core.hooksPath` and `.githooks/` first. If that
-local setting was added by T-Zero, `git config --local --unset core.hooksPath`
-restores inherited/default hook lookup. If it replaced a previous local setting,
-restore that original value or rerun your hook manager's installer. T-Zero cannot
-recover an overwritten configuration value automatically.
-
 ### Navigation & Interactive Jump Stations
 
 [![Technical Whitepaper](https://img.shields.io/badge/%F0%9F%93%91%20Scientific%20Whitepaper-v10.7%20Specification-0284c7?style=for-the-badge&logo=googledocs&logoColor=white)](docs/WHITE_PAPER_TZERO_V10.md)
@@ -155,6 +123,40 @@ recover an overwritten configuration value automatically.
 </p>
 
 </div>
+
+### Git hooks & PATH setup
+
+Git reminder hooks are opt-in. Installation and normal startup do not change
+`core.hooksPath`. The optional command uses Git's default hooks directory and
+refuses an existing hook manager or active hooks.
+
+If a Python installation of T-Zero is missing from your PATH, run the following
+command with the Python interpreter that installed it.
+
+```bash
+python -m tzero.tzero_deps --add-to-path
+```
+
+On Windows you can use `py` in place of `python`. The command appends the
+launcher directory to your Windows user PATH or to your Bash or Zsh startup
+file on macOS and Linux. Use `--shell bash` or `--shell zsh` to select the Unix
+startup file explicitly. Open a new terminal after the change. On Windows, sign
+out and back in if the terminal still has the old PATH.
+
+If an older T-Zero install set your local `core.hooksPath` to `.githooks`, inspect
+`git config --show-origin --get-all core.hooksPath` and `.githooks/` first. If that
+local setting was added by T-Zero, `git config --local --unset core.hooksPath`
+restores inherited/default hook lookup. If it replaced a previous local setting,
+restore that original value or rerun your hook manager's installer. T-Zero cannot
+recover an overwritten configuration value automatically.
+
+### Security advisory
+
+GitHub flags **npm `tzero-mcp@12.3.0`** in [GHSA-pm3r-rxg9-cj5j](https://github.com/advisories/GHSA-pm3r-rxg9-cj5j). If you installed or ran that version, follow GitHub's remediation guidance. The advisory lists no patched release.
+
+### Local analysis and network access
+
+AST pruning, Shannon entropy secret scanning, and BM25 lexical search run locally. Optional AI-assisted generation sends prompts, file paths, dependency relationships, and code excerpts only to the provider you configure or explicitly select — missing keys and remote provider errors fall back locally to the AST engine without automatic Pollinations retries. Package and tokenizer downloads, optional DuckDuckGo web search, public GitHub/PyPI/npm project metrics, and hosted demos can also use the network. System repair and optional 180-Tier Anti-REA hardening tools run only when explicitly invoked (including opt-in-only webhook alerts). See [Privacy and network behavior](PRIVACY.md) for details.
 
 ---
 
